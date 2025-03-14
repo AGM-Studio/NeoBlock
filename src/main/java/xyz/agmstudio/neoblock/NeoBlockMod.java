@@ -10,7 +10,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.moddingx.libx.mod.ModXRegistration;
 import xyz.agmstudio.neoblock.config.Config;
-import xyz.agmstudio.neoblock.tiers.NeoTier;
+import xyz.agmstudio.neoblock.tiers.NeoBlock;
 import xyz.agmstudio.neoblock.util.MessagingUtil;
 
 import java.io.IOException;
@@ -47,7 +47,7 @@ public final class NeoBlockMod extends ModXRegistration {
 
     @Override
     protected void setup(FMLCommonSetupEvent event) {
-        NeoTier.reload();
+        NeoBlock.reload();
     }
     @Override
     protected void clientSetup(FMLClientSetupEvent event) {}

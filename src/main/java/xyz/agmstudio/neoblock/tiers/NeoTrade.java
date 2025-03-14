@@ -6,9 +6,9 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.trading.ItemCost;
 import net.minecraft.world.item.trading.MerchantOffer;
+import xyz.agmstudio.neoblock.util.Range;
 
 import java.util.Optional;
-import java.util.random.RandomGenerator;
 
 public record NeoTrade(Item result, Range resultCount, Item costA, Range costACount, Item costB, Range costBCount, Range uses) {
     public static NeoTrade parse(String trade) {
@@ -57,26 +57,4 @@ public record NeoTrade(Item result, Range resultCount, Item costA, Range costACo
         );
     }
 
-    protected record Range(int min, int max) {
-        public static Range parse(String value) {
-            String[] values = value.split("-");
-            int min = Integer.parseInt(values[0]);
-            int max = values.length > 1 ? Integer.parseInt(values[1]) : min;
-            return new Range(min, max);
-        }
-
-        public Range(int min, int max) {
-            this.min = Math.min(min, max);
-            this.max = Math.max(min, max);
-        }
-
-        public int get() {
-            return RandomGenerator.getDefault().nextInt(min, max + 1);
-        }
-
-        public String dump() {
-            if (min == max) return min + "x";
-            return min + "-" + max + "x";
-        }
-    }
 }

@@ -15,9 +15,12 @@ import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import xyz.agmstudio.neoblock.NeoBlockMod;
+import xyz.agmstudio.neoblock.config.Config;
 import xyz.agmstudio.neoblock.data.NeoWorldData;
 import xyz.agmstudio.neoblock.util.MessagingUtil;
+import xyz.agmstudio.neoblock.util.Range;
 
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.random.RandomGenerator;
@@ -47,6 +50,41 @@ public class NeoBlock {
 
         NeoBlockMod.LOGGER.error("Unable to find a block for {} blocks", breaks);
         return DEFAULT_STATE;
+    }
+
+    public static void regenerateNeoBlock(ServerLevel level, LevelAccessor access, boolean score) {
+        if (score) DATA.addBlockCount(1);
+
+        access.setBlock(NeoBlock.POS, getRandomBlock(), 3);
+
+        Vec3 center = NeoBlock.POS.getCenter();
+        for(Entity entity: access.getEntities(null, AABB.ofSize(center, 1.2, 1.2, 1.2)))
+            entity.teleportTo(center.x, center.y + 0.55, center.z);
+
+        TIERS.forEach(tier -> tier.checkScore(level));
+
+        int breaks = DATA.getBlockCount();
+        if (breaks % NeoTrader.attemptInterval == 0) {
+            List<NeoTrade> trades = new ArrayList<>();
+            TIERS.stream().filter(tier -> tier.getUnlock() <= breaks)
+                    .forEach(tier -> trades.addAll(tier.getRandomTrades()));
+
+            if (!trades.isEmpty()) NeoTrader.spawnWanderingTraderWith(trades, level);
+        }
+    }
+
+    public static void reload() {
+        int i = 0;
+        NeoBlock.TIERS.clear();
+        while (Files.exists(NeoTier.FOLDER.resolve("tier-" + i + ".toml")))
+            NeoBlock.TIERS.add(new NeoTier(i++));
+
+        NeoBlockMod.LOGGER.info("Loaded {} tiers from the tiers folder.", NeoBlock.TIERS.size());
+
+        NeoTrader.chance = Config.NeoTraderChance.get();
+        NeoTrader.increment = Config.NeoTraderChanceIncrement.get();
+        NeoTrader.attemptInterval = Config.NeoTraderAttemptInterval.get();
+        NeoTrader.lifespan = new Range(Config.NeoTraderLifespanMin.get(), Config.NeoTraderLifespanMax.get());
     }
 
     @SubscribeEvent
@@ -81,17 +119,7 @@ public class NeoBlock {
         if (!(event.getLevel() instanceof ServerLevel level) || level.dimension() != Level.OVERWORLD) return;
         final LevelAccessor access = event.getLevel();
         BlockState block = access.getBlockState(NeoBlock.POS);
-        if (block.isAir() || block.canBeReplaced()) {
-            DATA.addBlockCount(1);
-
-            access.setBlock(NeoBlock.POS, getRandomBlock(), 3);
-
-            Vec3 center = NeoBlock.POS.getCenter();
-            for(Entity entity: access.getEntities(null, AABB.ofSize(center, 1.2, 1.2, 1.2)))
-                entity.teleportTo(center.x, center.y + 0.55, center.z);
-
-            TIERS.forEach(tier -> tier.checkScore(level));
-        }
+        if (block.isAir() || block.canBeReplaced()) regenerateNeoBlock(level, access, true);
     }
 
     @SubscribeEvent

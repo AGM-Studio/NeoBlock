@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class NeoTier {
-    private static final Path FOLDER = Paths.get(FMLPaths.CONFIGDIR.get().toAbsolutePath().toString(), NeoBlockMod.MOD_ID, "tiers");
+    protected static final Path FOLDER = Paths.get(FMLPaths.CONFIGDIR.get().toAbsolutePath().toString(), NeoBlockMod.MOD_ID, "tiers");
     private static void loadFromResources(Object tier) {
         if (!Files.exists(FOLDER)) try {
             Files.createDirectories(FOLDER);
@@ -42,15 +42,6 @@ public class NeoTier {
     static {
         if (!Files.exists(FOLDER)) for (int i = 0; i < 10; i++) loadFromResources(i);
         loadFromResources("template");
-    }
-
-    public static void reload() {
-        int i = 0;
-        NeoBlock.TIERS.clear();
-        while (Files.exists(FOLDER.resolve("tier-" + i + ".toml")))
-            NeoBlock.TIERS.add(new NeoTier(i++));
-
-        NeoBlockMod.LOGGER.info("Loaded {} tiers from the tiers folder.", NeoBlock.TIERS.size());
     }
 
     public final CommentedFileConfig CONFIG;

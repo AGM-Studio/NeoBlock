@@ -8,25 +8,38 @@ import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.entity.npc.WanderingTrader;
 import net.minecraft.world.item.trading.MerchantOffers;
 import net.minecraft.world.level.Level;
+import xyz.agmstudio.neoblock.util.Range;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class NeoTrader {
+
     protected final List<NeoTrade> trades;
+
+    public static float chance;
+    public static float increment;
+    public static int attemptInterval;
+    public static Range lifespan;
 
     public static NeoTrader parse(List<String> trades) {
         if (trades.isEmpty()) return null;
 
-        NeoTrader trade = new NeoTrader();
-        trades.stream().map(NeoTrade::parse).forEach(trade.trades::add);
+        NeoTrader trader = new NeoTrader();
+        trades.stream().map(NeoTrade::parse).forEach(trader.trades::add);
 
-        return trade;
+        return trader;
+    }
+    public static void spawnWanderingTraderWith(List<NeoTrade> trades, Level level, LivingEntity... leaches) {
+        NeoTrader trader = new NeoTrader();
+        trader.trades.addAll(trades);
+        trader.spawnWanderingTrader(level, "NeoTrader", leaches);
     }
 
     protected NeoTrader() {
         this.trades = new ArrayList<>();
     }
+
 
     public Villager spawnTrader(Level level) {
         return spawnTrader(level, null);
