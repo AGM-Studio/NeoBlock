@@ -56,7 +56,7 @@ public class NeoTier {
     public final int UNLOCK;
 
     public final List<BlockState> BLOCKS;
-    public final NeoTrade UNLOCK_TRADE;
+    public final NeoTrader UNLOCK_TRADE;
 
     protected NeoTier(int tier) {
         TIER = tier;
@@ -71,7 +71,7 @@ public class NeoTier {
                 .map(block -> BuiltInRegistries.BLOCK.get(ResourceLocation.parse(block)).defaultBlockState()).toList();
 
         List<String> unlockTrades = CONFIG.contains("unlock-trades") ? CONFIG.get("unlock-trades") : List.of();
-        UNLOCK_TRADE = NeoTrade.parse(unlockTrades);
+        UNLOCK_TRADE = NeoTrader.parse(unlockTrades);
     }
 
     public int getUnlock() {
@@ -83,7 +83,7 @@ public class NeoTier {
     public List<BlockState> getBlocks() {
         return BLOCKS;
     }
-    public NeoTrade getUnlockTrade() {
+    public NeoTrader getUnlockTrade() {
         return UNLOCK_TRADE;
     }
 

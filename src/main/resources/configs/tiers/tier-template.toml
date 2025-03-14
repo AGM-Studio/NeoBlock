@@ -22,3 +22,10 @@ unlock-trades = [
     "1xminecraft:oak_sappling; 10-15xminecraft:dirt; 3",
     "1xminecraft:ice; 2-4xminecraft:oak_log; 8-16xminecraft:dirt; 8-12"
 ]
+# Wandering NeoTraders will spawn when they have some offers
+# List of offers they might have when spawned. using same syntax.
+wandering-trades = [
+
+]
+# Amount of trades they will choose from this tier
+wandering-count = 0
