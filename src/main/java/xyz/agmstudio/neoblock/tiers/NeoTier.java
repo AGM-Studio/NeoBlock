@@ -3,6 +3,7 @@ package xyz.agmstudio.neoblock.tiers;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.fml.loading.FMLPaths;
@@ -88,10 +89,10 @@ public class NeoTier {
         List<String> unlockTrades = CONFIG.contains("unlock-trades") ? CONFIG.get("unlock-trades") : List.of();
         UNLOCK_TRADE = NeoTrader.parse(unlockTrades);
 
-        List<String> trades = CONFIG.contains("wandering-trades") ? CONFIG.get("wandering-trades") : List.of();
+        List<String> trades = CONFIG.contains("trader-trades") ? CONFIG.get("trader-trades") : List.of();
         TRADES = trades.stream().map(NeoTrade::parse).toList();
 
-        int tradeCount = CONFIG.contains("wandering-count") ? CONFIG.getInt("wandering-count") : 0;
+        int tradeCount = CONFIG.contains("trader-count") ? CONFIG.getInt("trader-count") : 0;
         TRADE_COUNT = Math.clamp(tradeCount, 0, TRADES.size());
     }
 
@@ -123,8 +124,11 @@ public class NeoTier {
 
     public void checkScore(Level level) {
         if (NeoBlock.DATA.getBlockCount() == UNLOCK) {  // On unlock
-            if (UNLOCK_TRADE != null) UNLOCK_TRADE.spawnTrader(level);
-            MessagingUtil.sendMessage("messages.neoblock.unlocked_tier", level, TIER);
+            MessagingUtil.sendInstantMessage("message.neoblock.unlocked_tier", level, false, TIER);
+            if (UNLOCK_TRADE != null && level instanceof ServerLevel server) {
+                UNLOCK_TRADE.spawnTrader(server, "UnlockTrader");
+                MessagingUtil.sendInstantMessage("message.neoblock.unlocked_trader", level, false, TIER);
+            }
         }
     }
 }

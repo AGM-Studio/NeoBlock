@@ -14,9 +14,6 @@ import java.util.List;
 public class MessagingUtil {
     private final static HashMap<Level, List<MessageHolder>> messages = new HashMap<>();
 
-    public static void sendMessage(String key, Level level, Object... args) {
-        sendMessage(Component.translatable(key, args), level, false);
-    }
     public static void sendMessage(String key, Level level, boolean action, Object... args) {
         sendMessage(Component.translatable(key, args), level, action);
     }
@@ -27,9 +24,6 @@ public class MessagingUtil {
         for (Player player: level.players()) holder.send(player);
 
         messages.computeIfAbsent(level, k -> new ArrayList<>()).add(holder);
-    }
-    public static void sendInstantMessage(String key, Level level, Object... args) {
-        sendInstantMessage(Component.translatable(key, args), level, false);
     }
     public static void sendInstantMessage(String key, Level level, boolean action, Object... args) {
         sendInstantMessage(Component.translatable(key, args), level, action);

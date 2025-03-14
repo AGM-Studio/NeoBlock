@@ -3,5 +3,7 @@
   "generator.neoblock.neoblock_no_nether": "NeoBlock (No Nether)",
   "message.neoblock.dormant_world_1": "This world is not using the §bNeoBlock§r world preset. §bNeoBlock§r has set to dormant.",
   "message.neoblock.dormant_world_2": "If you are a modpack developer, it's recommended to use §4DefaultWorldType§r to prevent this issue.",
-  "message.neoblock.unlock_new_tier": "§cTier %d has been unlocked!"
+  "message.neoblock.unlocked_tier": "§cTier %d§r has been unlocked!",
+  "message.neoblock.unlocked_trader": "As a reward for unlocking this tier, a trader with significant trades has been spawned.",
+  "message.neoblock.trader_spawned": "§b§lA trader has spawned!§r"
 }

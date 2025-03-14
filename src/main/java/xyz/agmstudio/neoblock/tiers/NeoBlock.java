@@ -3,6 +3,7 @@ package xyz.agmstudio.neoblock.tiers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Blocks;
@@ -62,14 +63,24 @@ public class NeoBlock {
             entity.teleportTo(center.x, center.y + 0.55, center.z);
 
         TIERS.forEach(tier -> tier.checkScore(level));
-
+    }
+    public static void attemptSpawnTrader(ServerLevel level) {
         int breaks = DATA.getBlockCount();
-        if (breaks % NeoTrader.attemptInterval == 0) {
-            List<NeoTrade> trades = new ArrayList<>();
-            TIERS.stream().filter(tier -> tier.getUnlock() <= breaks)
-                    .forEach(tier -> trades.addAll(tier.getRandomTrades()));
+        if (breaks % NeoTrader.attemptInterval != 0 || NeoTrader.exists(level, "NeoTrader")) return;
+        float chance = NeoTrader.chance + (NeoTrader.increment * DATA.getTraderFailedAttempts());
+        if (RandomGenerator.getDefault().nextFloat() > chance) {
+            DATA.addTraderFailedAttempts();
+            NeoBlockMod.LOGGER.debug("Trader chance {} failed for {} times in a row", chance, DATA.getTraderFailedAttempts());
+            return;
+        }
+        DATA.resetTraderFailedAttempts();
+        List<NeoTrade> trades = new ArrayList<>();
+        TIERS.stream().filter(tier -> tier.getUnlock() <= breaks)
+                .forEach(tier -> trades.addAll(tier.getRandomTrades()));
 
-            if (!trades.isEmpty()) NeoTrader.spawnWanderingTraderWith(trades, level);
+        if (!trades.isEmpty()) {
+            Villager trader = NeoTrader.spawnTraderWith(trades, level);
+            MessagingUtil.sendInstantMessage("message.neoblock.trader_spawned", level, true);
         }
     }
 
@@ -102,8 +113,8 @@ public class NeoBlock {
             DATA.setActive();
         } else {
             NeoBlockMod.LOGGER.info("NeoBlock has set to dormant.");
-            MessagingUtil.sendMessage("message.neoblock.dormant_world_1", level);
-            MessagingUtil.sendMessage("message.neoblock.dormant_world_2", level);
+            MessagingUtil.sendMessage("message.neoblock.dormant_world_1", level, false);
+            MessagingUtil.sendMessage("message.neoblock.dormant_world_2", level, false);
             DATA.setDormant();
         }
     }
@@ -119,7 +130,11 @@ public class NeoBlock {
         if (!(event.getLevel() instanceof ServerLevel level) || level.dimension() != Level.OVERWORLD) return;
         final LevelAccessor access = event.getLevel();
         BlockState block = access.getBlockState(NeoBlock.POS);
-        if (block.isAir() || block.canBeReplaced()) regenerateNeoBlock(level, access, true);
+        if (block.isAir() || block.canBeReplaced()) {
+            regenerateNeoBlock(level, access, true);
+            attemptSpawnTrader(level);
+        }
+        NeoTrader.manageTraders(level);
     }
 
     @SubscribeEvent

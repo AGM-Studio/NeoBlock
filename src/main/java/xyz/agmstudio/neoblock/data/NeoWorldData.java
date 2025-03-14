@@ -12,6 +12,7 @@ import java.util.HashMap;
 
 public class NeoWorldData extends SavedData {
     private static final String DATA_NAME = "custom_data";
+
     public static NeoWorldData get(Level level) {
         if (level.isClientSide() || !(level instanceof ServerLevel server)) return null;
         return server.getDataStorage().computeIfAbsent(new Factory<>(NeoWorldData::new, NeoWorldData::load), DATA_NAME);
@@ -20,6 +21,7 @@ public class NeoWorldData extends SavedData {
         NeoWorldData data = new NeoWorldData();
         data.worldState = tag.getInt("WorldState");
         data.blockCount = tag.getInt("BlockCount");
+        data.traderFailedAttempts = tag.getInt("TraderFailedAttempts");
 
         CompoundTag pbc = tag.getCompound("PlayerBlockCount");
         pbc.getAllKeys().forEach(key -> data.playerBlockCount.put(key, pbc.getInt(key)));
@@ -28,6 +30,8 @@ public class NeoWorldData extends SavedData {
     }
     private int worldState;
     private int blockCount;
+
+    private int traderFailedAttempts;
 
     private final HashMap<String, Integer> playerBlockCount;
 
@@ -75,6 +79,18 @@ public class NeoWorldData extends SavedData {
         setDirty();
     }
 
+    public int getTraderFailedAttempts() {
+        return traderFailedAttempts;
+    }
+    public void resetTraderFailedAttempts() {
+        traderFailedAttempts = 0;
+        setDirty();
+    }
+    public void addTraderFailedAttempts() {
+        traderFailedAttempts += 1;
+        setDirty();
+    }
+
     @Override
     public String toString() {
         return "NeoWorldData[blockCount=" + blockCount + ", worldState=" + worldState + "]";
@@ -84,6 +100,7 @@ public class NeoWorldData extends SavedData {
     public @NotNull CompoundTag save(@NotNull CompoundTag tag, HolderLookup.@NotNull Provider registries) {
         tag.putInt("WorldState", worldState);
         tag.putInt("BlockCount", blockCount);
+        tag.putInt("TraderFailedAttempts", traderFailedAttempts);
 
         CompoundTag pbc = tag.getCompound("PlayerBlockCount");
         playerBlockCount.keySet().forEach(key -> pbc.putInt(key, playerBlockCount.get(key)));
