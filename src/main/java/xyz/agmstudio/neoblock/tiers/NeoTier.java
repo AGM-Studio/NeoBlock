@@ -51,8 +51,8 @@ public class NeoTier {
     public final int UNLOCK;
 
     public final HashMap<BlockState, Integer> BLOCKS;
-    public final NeoTrader UNLOCK_TRADE;
-    public final List<NeoTrade> TRADES;
+    public final NeoMerchant UNLOCK_TRADE;
+    public final List<NeoOffer> TRADES;
     public final int TRADE_COUNT;
 
     protected NeoTier(int tier) {
@@ -87,17 +87,17 @@ public class NeoTier {
                 .collect(Collectors.joining(",\n\t", "{\n\t", "\n}")));
 
         List<String> unlockTrades = CONFIG.contains("unlock-trades") ? CONFIG.get("unlock-trades") : List.of();
-        UNLOCK_TRADE = NeoTrader.parse(unlockTrades);
+        UNLOCK_TRADE = NeoMerchant.parse(unlockTrades);
 
         List<String> trades = CONFIG.contains("trader-trades") ? CONFIG.get("trader-trades") : List.of();
-        TRADES = trades.stream().map(NeoTrade::parse).toList();
+        TRADES = trades.stream().map(NeoOffer::parse).toList();
 
         int tradeCount = CONFIG.contains("trader-count") ? CONFIG.getInt("trader-count") : 0;
         TRADE_COUNT = Math.clamp(tradeCount, 0, TRADES.size());
     }
 
-    public List<NeoTrade> getRandomTrades() {
-        List<NeoTrade> trades = new ArrayList<>(TRADES);
+    public List<NeoOffer> getRandomTrades() {
+        List<NeoOffer> trades = new ArrayList<>(TRADES);
         Collections.shuffle(trades);
         return trades.subList(0, TRADE_COUNT);
     }

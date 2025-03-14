@@ -6,12 +6,12 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.trading.ItemCost;
 import net.minecraft.world.item.trading.MerchantOffer;
-import xyz.agmstudio.neoblock.util.Range;
+import xyz.agmstudio.neoblock.data.Range;
 
 import java.util.Optional;
 
-public record NeoTrade(Item result, Range resultCount, Item costA, Range costACount, Item costB, Range costBCount, Range uses) {
-    public static NeoTrade parse(String trade) {
+public record NeoOffer(Item result, Range resultCount, Item costA, Range costACount, Item costB, Range costBCount, Range uses) {
+    public static NeoOffer parse(String trade) {
         String[] parts = trade.split("; ");
         if (parts.length < 2) return null;
 
@@ -38,7 +38,7 @@ public record NeoTrade(Item result, Range resultCount, Item costA, Range costACo
 
         if (parts.length > 3) uses = Range.parse(parts[3]);
 
-        return new NeoTrade(resultItem, resultCount, costAItem, costACount, costBItem, costBCount, uses);
+        return new NeoOffer(resultItem, resultCount, costAItem, costACount, costBItem, costBCount, uses);
     }
 
     public String dump() {
@@ -56,5 +56,4 @@ public record NeoTrade(Item result, Range resultCount, Item costA, Range costACo
                 uses.get(), 0, 0
         );
     }
-
 }

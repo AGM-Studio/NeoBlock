@@ -1,4 +1,4 @@
-package xyz.agmstudio.neoblock.util;
+package xyz.agmstudio.neoblock.data;
 
 import java.util.random.RandomGenerator;
 

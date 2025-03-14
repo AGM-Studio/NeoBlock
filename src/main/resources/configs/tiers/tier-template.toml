@@ -1,5 +1,5 @@
 # Amount of blocks broken to unlock.
-unlock = [TIER]00
+unlock = 10000
 # List of all blocks in this tier. All of them have equal chance to be chosen in this tier.
 # Note that, blocks from tier 0 are available
 blocks = [
@@ -22,7 +22,7 @@ unlock-trades = [
     "1xminecraft:oak_sappling; 10-15xminecraft:dirt; 3",
     "1xminecraft:ice; 2-4xminecraft:oak_log; 8-16xminecraft:dirt; 8-12"
 ]
-# Wandering NeoTraders will spawn when they have some offers
+# NeoMerchants will spawn randomly only when they have some offers.
 # List of offers they might have when spawned. using same syntax.
 wandering-trades = [
 

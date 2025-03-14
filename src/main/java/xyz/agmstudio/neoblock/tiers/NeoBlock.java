@@ -16,10 +16,10 @@ import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import xyz.agmstudio.neoblock.NeoBlockMod;
-import xyz.agmstudio.neoblock.config.Config;
+import xyz.agmstudio.neoblock.data.Config;
 import xyz.agmstudio.neoblock.data.NeoWorldData;
 import xyz.agmstudio.neoblock.util.MessagingUtil;
-import xyz.agmstudio.neoblock.util.Range;
+import xyz.agmstudio.neoblock.data.Range;
 
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -66,20 +66,20 @@ public class NeoBlock {
     }
     public static void attemptSpawnTrader(ServerLevel level) {
         int breaks = DATA.getBlockCount();
-        if (breaks % NeoTrader.attemptInterval != 0 || NeoTrader.exists(level, "NeoTrader")) return;
-        float chance = NeoTrader.chance + (NeoTrader.increment * DATA.getTraderFailedAttempts());
+        if (breaks % NeoMerchant.attemptInterval != 0 || NeoMerchant.exists(level, "NeoMerchant")) return;
+        float chance = NeoMerchant.chance + (NeoMerchant.increment * DATA.getTraderFailedAttempts());
         if (RandomGenerator.getDefault().nextFloat() > chance) {
             DATA.addTraderFailedAttempts();
             NeoBlockMod.LOGGER.debug("Trader chance {} failed for {} times in a row", chance, DATA.getTraderFailedAttempts());
             return;
         }
         DATA.resetTraderFailedAttempts();
-        List<NeoTrade> trades = new ArrayList<>();
+        List<NeoOffer> trades = new ArrayList<>();
         TIERS.stream().filter(tier -> tier.getUnlock() <= breaks)
                 .forEach(tier -> trades.addAll(tier.getRandomTrades()));
 
         if (!trades.isEmpty()) {
-            Villager trader = NeoTrader.spawnTraderWith(trades, level);
+            Villager trader = NeoMerchant.spawnTraderWith(trades, level);
             MessagingUtil.sendInstantMessage("message.neoblock.trader_spawned", level, true);
         }
     }
@@ -92,10 +92,10 @@ public class NeoBlock {
 
         NeoBlockMod.LOGGER.info("Loaded {} tiers from the tiers folder.", NeoBlock.TIERS.size());
 
-        NeoTrader.chance = Config.NeoTraderChance.get();
-        NeoTrader.increment = Config.NeoTraderChanceIncrement.get();
-        NeoTrader.attemptInterval = Config.NeoTraderAttemptInterval.get();
-        NeoTrader.lifespan = new Range(Config.NeoTraderLifespanMin.get(), Config.NeoTraderLifespanMax.get());
+        NeoMerchant.chance = Config.NeoMerchantChance.get();
+        NeoMerchant.increment = Config.NeoMerchantChanceIncrement.get();
+        NeoMerchant.attemptInterval = Config.NeoMerchantAttemptInterval.get();
+        NeoMerchant.lifespan = new Range(Config.NeoMerchantLifespanMin.get(), Config.NeoMerchantLifespanMax.get());
     }
 
     @SubscribeEvent
@@ -134,7 +134,7 @@ public class NeoBlock {
             regenerateNeoBlock(level, access, true);
             attemptSpawnTrader(level);
         }
-        NeoTrader.manageTraders(level);
+        NeoMerchant.manageTraders(level);
     }
 
     @SubscribeEvent

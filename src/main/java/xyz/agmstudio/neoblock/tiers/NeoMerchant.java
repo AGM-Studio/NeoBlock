@@ -7,33 +7,33 @@ import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.item.trading.MerchantOffers;
 import org.jetbrains.annotations.NotNull;
-import xyz.agmstudio.neoblock.util.Range;
+import xyz.agmstudio.neoblock.data.Range;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class NeoTrader {
+public class NeoMerchant {
 
-    protected final List<NeoTrade> trades;
+    protected final List<NeoOffer> trades;
 
     public static float chance;
     public static float increment;
     public static int attemptInterval;
     public static Range lifespan;
 
-    public static NeoTrader parse(List<String> trades) {
+    public static NeoMerchant parse(List<String> trades) {
         if (trades.isEmpty()) return null;
 
-        NeoTrader trader = new NeoTrader();
-        trades.stream().map(NeoTrade::parse).forEach(trader.trades::add);
+        NeoMerchant trader = new NeoMerchant();
+        trades.stream().map(NeoOffer::parse).forEach(trader.trades::add);
 
         return trader;
     }
-    public static @NotNull Villager spawnTraderWith(List<NeoTrade> trades, ServerLevel level) {
-        NeoTrader trader = new NeoTrader();
+    public static @NotNull Villager spawnTraderWith(List<NeoOffer> trades, ServerLevel level) {
+        NeoMerchant trader = new NeoMerchant();
         trader.trades.addAll(trades);
 
-        Villager villager = trader.spawnTrader(level, "NeoTrader");
+        Villager villager = trader.spawnTrader(level, "NeoMerchant");
         villager.getPersistentData().putInt("NeoTradeLifespan", lifespan.get());
         return villager;
     }
@@ -47,12 +47,12 @@ public class NeoTrader {
     public static void manageTraders(@NotNull ServerLevel level) {
         for (Entity entity: level.getEntities().getAll())
             if (entity instanceof Villager villager
-                    && villager.getTags().contains("NeoTrader")
+                    && villager.getTags().contains("NeoMerchant")
                     && villager.getPersistentData().getInt("NeoTradeLifespan") < villager.getAge()
             ) entity.remove(Entity.RemovalReason.DISCARDED);
     }
 
-    protected NeoTrader() {
+    protected NeoMerchant() {
         this.trades = new ArrayList<>();
     }
 
@@ -76,7 +76,7 @@ public class NeoTrader {
         level.addFreshEntity(trader);
 
         MerchantOffers offers = new MerchantOffers();
-        this.trades.stream().map(NeoTrade::getOffer).forEach(offers::add);
+        this.trades.stream().map(NeoOffer::getOffer).forEach(offers::add);
         trader.setOffers(offers);
         return trader;
     }
