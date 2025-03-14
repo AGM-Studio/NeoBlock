@@ -20,13 +20,12 @@ import xyz.agmstudio.neoblock.util.MessagingUtil;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.random.RandomGenerator;
-import java.util.stream.IntStream;
 
 @EventBusSubscriber(modid = NeoBlockMod.MOD_ID)
 public class NeoBlock {
     public static final BlockPos POS = new BlockPos(0, 64, 0);
+    public static BlockState DEFAULT_STATE = Blocks.GRASS_BLOCK.defaultBlockState();
 
     public static List<NeoTier> TIERS = new ArrayList<>();
     public static NeoWorldData DATA = null;
@@ -34,14 +33,20 @@ public class NeoBlock {
     public static BlockState getRandomBlock() {
         int breaks = DATA.getBlockCount();
         List<NeoTier> availableTiers = TIERS.stream().filter(tier -> tier.getUnlock() <= breaks).toList();
+        if (availableTiers.isEmpty()) {
+            NeoBlockMod.LOGGER.error("No available tiers for {} blocks", breaks);
+            return DEFAULT_STATE;
+        }
+
         int totalChance = availableTiers.stream().mapToInt(NeoTier::getWeight).sum();
+        int randomValue = RandomGenerator.getDefault().nextInt(totalChance);
+        for (NeoTier tier: availableTiers) {
+            randomValue -= tier.getWeight();
+            if (randomValue < 0) return tier.getRandomBlock();
+        }
 
-        AtomicInteger remainingChance = new AtomicInteger(RandomGenerator.getDefault().nextInt(totalChance));
-        int tier = IntStream.range(0, availableTiers.size()).filter(i -> (remainingChance.addAndGet(-availableTiers.get(i).getWeight()) < 0)).findFirst().orElse(0);
-        List<BlockState> blocks = availableTiers.get(tier).getBlocks();
-
-        int rnd = RandomGenerator.getDefault().nextInt(blocks.size());
-        return blocks.get(rnd);
+        NeoBlockMod.LOGGER.error("Unable to find a block for {} blocks", breaks);
+        return DEFAULT_STATE;
     }
 
     @SubscribeEvent
@@ -55,7 +60,7 @@ public class NeoBlock {
             if (!level.getBlockState(new BlockPos(0, y, 0)).isAir()) isNeoBlock = false;
 
         if (isNeoBlock) {
-            level.setBlock(NeoBlock.POS, Blocks.GRASS_BLOCK.defaultBlockState(), 3);
+            level.setBlock(NeoBlock.POS, DEFAULT_STATE, 3);
             DATA.setActive();
         } else {
             NeoBlockMod.LOGGER.info("NeoBlock has set to dormant.");
