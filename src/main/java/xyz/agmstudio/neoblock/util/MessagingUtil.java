@@ -15,15 +15,30 @@ public class MessagingUtil {
     private final static HashMap<Level, List<MessageHolder>> messages = new HashMap<>();
 
     public static void sendMessage(String key, Level level, Object... args) {
-        sendMessage(Component.translatable(key, args), level);
+        sendMessage(Component.translatable(key, args), level, false);
     }
-    public static void sendMessage(Component message, Level level) {
+    public static void sendMessage(String key, Level level, boolean action, Object... args) {
+        sendMessage(Component.translatable(key, args), level, action);
+    }
+    public static void sendMessage(Component message, Level level, boolean action) {
         NeoBlockMod.LOGGER.info(message.getString());
 
-        MessageHolder holder = new MessageHolder(message);
+        MessageHolder holder = new MessageHolder(message, action);
         for (Player player: level.players()) holder.send(player);
 
         messages.computeIfAbsent(level, k -> new ArrayList<>()).add(holder);
+    }
+    public static void sendInstantMessage(String key, Level level, Object... args) {
+        sendInstantMessage(Component.translatable(key, args), level, false);
+    }
+    public static void sendInstantMessage(String key, Level level, boolean action, Object... args) {
+        sendInstantMessage(Component.translatable(key, args), level, action);
+    }
+    public static void sendInstantMessage(Component message, Level level, boolean action) {
+        NeoBlockMod.LOGGER.info(message.getString());
+
+        MessageHolder holder = new MessageHolder(message, action);
+        for (Player player: level.players()) holder.send(player);
     }
 
     @SubscribeEvent
@@ -36,14 +51,16 @@ public class MessagingUtil {
     static class MessageHolder {
         private final List<Player> players = new ArrayList<>();
         private final Component message;
+        private final boolean action;
 
-        protected MessageHolder(Component message) {
+        protected MessageHolder(Component message, boolean action) {
             this.message = message;
+            this.action = action;
         }
 
         public void send(Player player) {
             if (players.contains(player)) return;
-            player.displayClientMessage(message, false);
+            player.displayClientMessage(message, action);
             players.add(player);
         }
     }
