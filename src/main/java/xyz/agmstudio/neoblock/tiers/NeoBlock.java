@@ -1,6 +1,7 @@
 package xyz.agmstudio.neoblock.tiers;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -8,32 +9,30 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.scores.ScoreHolder;
-import net.minecraft.world.scores.Scoreboard;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import xyz.agmstudio.neoblock.NeoBlockMod;
+import xyz.agmstudio.neoblock.data.NeoWorldData;
 import xyz.agmstudio.neoblock.util.MessagingUtil;
-import xyz.agmstudio.neoblock.util.ScoreboardUtil;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.random.RandomGenerator;
 import java.util.stream.IntStream;
 
+@EventBusSubscriber(modid = NeoBlockMod.MOD_ID)
 public class NeoBlock {
     public static final BlockPos POS = new BlockPos(0, 64, 0);
-    public static BlockScoreboard BLOCK_SCOREBOARD = null;
-    public static WorldScoreboard WORLD_SCOREBOARD = null;
 
     public static List<NeoTier> TIERS = new ArrayList<>();
+    public static NeoWorldData DATA = null;
 
     public static BlockState getRandomBlock() {
-        int breaks = BLOCK_SCOREBOARD.getScore("Total");
+        int breaks = DATA.getBlockCount();
         List<NeoTier> availableTiers = TIERS.stream().filter(tier -> tier.getUnlock() <= breaks).toList();
         int totalChance = availableTiers.stream().mapToInt(NeoTier::getWeight).sum();
 
@@ -46,47 +45,39 @@ public class NeoBlock {
     }
 
     @SubscribeEvent
-    public void onWorldLoad(LevelEvent.Load event) {
-        if (!(event.getLevel() instanceof Level level) || level.dimension() != Level.OVERWORLD || level.isClientSide) return;
-        if (BLOCK_SCOREBOARD != null) NeoBlockMod.LOGGER.warn("NeoBlock.BLOCK_SCOREBOARD is already loaded.");
-        if (WORLD_SCOREBOARD != null) NeoBlockMod.LOGGER.warn("NeoBlock.WORLD_SCOREBOARD is already loaded.");
-        BLOCK_SCOREBOARD = ScoreboardUtil.of(event.getLevel(), BlockScoreboard.class);
-        WORLD_SCOREBOARD = ScoreboardUtil.of(event.getLevel(), WorldScoreboard.class);
+    public static void onWorldLoad(LevelEvent.Load event) {
+        if (!(event.getLevel() instanceof ServerLevel level) || level.dimension() != Level.OVERWORLD) return;
 
-        NeoBlockMod.LOGGER.debug("Loaded {} tiers.", NeoBlock.TIERS.size());
-
-        if (WORLD_SCOREBOARD.isActive() || WORLD_SCOREBOARD.isDormant()) return;
+        DATA = NeoWorldData.get(level);
+        if (DATA == null || DATA.isActive() || DATA.isDormant()) return;
         boolean isNeoBlock = true;
         for (int y: List.of(-64, -61, 0, 64))
             if (!level.getBlockState(new BlockPos(0, y, 0)).isAir()) isNeoBlock = false;
 
         if (isNeoBlock) {
             level.setBlock(NeoBlock.POS, Blocks.GRASS_BLOCK.defaultBlockState(), 3);
-            WORLD_SCOREBOARD.setActive();
+            DATA.setActive();
         } else {
             NeoBlockMod.LOGGER.info("NeoBlock has set to dormant.");
             MessagingUtil.sendMessage("message.neoblock.dormant_world_1", level);
             MessagingUtil.sendMessage("message.neoblock.dormant_world_2", level);
-            WORLD_SCOREBOARD.setDormant();
+            DATA.setDormant();
         }
     }
 
     @SubscribeEvent
-    public void onWorldUnload(LevelEvent.Unload event) {
-        if (!(event.getLevel() instanceof Level level) || level.dimension() != Level.OVERWORLD) return;
-        BLOCK_SCOREBOARD = null;
-        WORLD_SCOREBOARD = null;
+    public static void onWorldUnload(LevelEvent.Unload event) {
+        if (!(event.getLevel() instanceof ServerLevel level) || level.dimension() != Level.OVERWORLD) return;
+        DATA = null;
     }
 
     @SubscribeEvent
-    public void onWorldTick(LevelTickEvent.Post event) {
+    public static void onWorldTick(LevelTickEvent.Post event) {
+        if (!(event.getLevel() instanceof ServerLevel level) || level.dimension() != Level.OVERWORLD) return;
         final LevelAccessor access = event.getLevel();
-        if (access instanceof Level level && level.dimension() != Level.OVERWORLD || access.isClientSide()) return;
-        if (BLOCK_SCOREBOARD == null || WORLD_SCOREBOARD == null || WORLD_SCOREBOARD.isDormant()) return;
-
         BlockState block = access.getBlockState(NeoBlock.POS);
-        if (WORLD_SCOREBOARD.isActive() && (block.isAir() || block.canBeReplaced())) {
-            BLOCK_SCOREBOARD.addScore(null, 1);
+        if (block.isAir() || block.canBeReplaced()) {
+            DATA.addBlockCount(1);
 
             access.setBlock(NeoBlock.POS, getRandomBlock(), 3);
 
@@ -94,40 +85,13 @@ public class NeoBlock {
             for(Entity entity: access.getEntities(null, AABB.ofSize(center, 1.2, 1.2, 1.2)))
                 entity.teleportTo(center.x, center.y + 0.55, center.z);
 
-            TIERS.forEach(tier -> tier.checkScore((Level) access));
+            TIERS.forEach(tier -> tier.checkScore(level));
         }
     }
 
     @SubscribeEvent
-    public void onBlockBreak(BlockEvent.BreakEvent event) {
-        if (!event.getPos().equals(NeoBlock.POS)) return;
-        BLOCK_SCOREBOARD.addScore(event.getPlayer(), 1);
-    }
-
-    public static class BlockScoreboard extends ScoreboardUtil {
-        public BlockScoreboard(Scoreboard scoreboard) {
-            super(scoreboard, "NeoBlockBroken");
-        }
-        public void addScore(@Nullable ScoreHolder holder, int value) {
-            if (holder == null) holder = getStoragePlayer("Total");
-            setScore(holder, value + getScore(holder));
-        }
-    }
-    public static class WorldScoreboard extends ScoreboardUtil {
-        public WorldScoreboard(Scoreboard scoreboard) {
-            super(scoreboard, "NeoWorldData");
-        }
-        public void setActive() {
-            setScore("Setup", 1);
-        }
-        public boolean isActive() {
-            return getScore("Setup") == 1;
-        }
-        public void setDormant() {
-            setScore("Setup", 2);
-        }
-        public boolean isDormant() {
-            return getScore("Setup") == 2;
-        }
+    public static void onBlockBreak(BlockEvent.BreakEvent event) {
+        if (!event.getPos().equals(NeoBlock.POS) || event.getLevel().isClientSide()) return;
+        DATA.addPlayerBlockCount(event.getPlayer(), 1);
     }
 }

@@ -88,7 +88,7 @@ public class NeoTier {
     }
 
     public void checkScore(Level level) {
-        if (NeoBlock.BLOCK_SCOREBOARD.getScore("Total") == UNLOCK) {  // On unlock
+        if (NeoBlock.DATA.getBlockCount() == UNLOCK) {  // On unlock
             if (UNLOCK_TRADE != null) UNLOCK_TRADE.spawnTrader(level);
             MessagingUtil.sendMessage("messages.neoblock.unlocked_tier", level, TIER);
         }
