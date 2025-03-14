@@ -3,5 +3,5 @@
   "generator.neoblock.neoblock_no_nether": "NeoBlock (No Nether)",
   "message.neoblock.dormant_world_1": "This world is not using the §bNeoBlock§r world preset. §bNeoBlock§r has set to dormant.",
   "message.neoblock.dormant_world_2": "If you are a modpack developer, it's recommended to use §4DefaultWorldType§r to prevent this issue.",
-  "message.neoblock.unlock_new_tier": "§cTier [TIER] has been unlocked!"
+  "message.neoblock.unlock_new_tier": "§cTier %d has been unlocked!"
 }

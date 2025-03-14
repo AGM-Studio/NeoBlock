@@ -4,73 +4,74 @@ import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.fml.loading.FMLPaths;
 import xyz.agmstudio.neoblock.NeoBlockMod;
-import xyz.agmstudio.neoblock.config.Config;
 import xyz.agmstudio.neoblock.util.MessagingUtil;
+import xyz.agmstudio.neoblock.util.ResourceUtil;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
 
 public class NeoTier {
-    protected final static Path PATH = Paths.get(FMLPaths.CONFIGDIR.get().toAbsolutePath().toString(), NeoBlockMod.MOD_ID + "/tiers.toml");
-    protected final static CommentedFileConfig CONFIG = CommentedFileConfig.builder(PATH).sync().build();
+    private static final Path FOLDER = Paths.get(FMLPaths.CONFIGDIR.get().toAbsolutePath().toString(), NeoBlockMod.MOD_ID, "tiers");
+    private static void loadFromResources(Object tier) {
+        if (!Files.exists(FOLDER)) try {
+            Files.createDirectories(FOLDER);
+        } catch (Exception e) {
+            NeoBlockMod.LOGGER.error("Unable to create folder {}", FOLDER, e);
+        }
+
+        Path location = FOLDER.resolve("tier-" + tier + ".toml");
+        if (Files.exists(location)) return;
+
+        String resource = "/configs/tiers/tier-" + tier + ".toml";
+        if (!ResourceUtil.doesResourceExist(resource)) resource = "/configs/tiers/tier-template.toml";
+        try {
+            ResourceUtil.processResourceFile(resource, location, Map.of("[TIER]", tier.toString()));
+        } catch (Exception e) {
+            NeoBlockMod.LOGGER.error("Unable to process resource {}", resource, e);
+        }
+    }
+    static {
+        if (!Files.exists(FOLDER)) for (int i = 0; i < 10; i++) loadFromResources(i);
+        loadFromResources("template");
+    }
 
     public static void reload() {
-        CONFIG.load();
-
+        int i = 0;
         NeoBlock.TIERS.clear();
-        for (int i = 0; i < Config.tiers.get(); i++)
-            NeoBlock.TIERS.add(new NeoTier(i));
+        while (Files.exists(FOLDER.resolve("tier-" + i + ".toml")))
+            NeoBlock.TIERS.add(new NeoTier(i++));
 
-        CONFIG.save();
+        NeoBlockMod.LOGGER.info("Loaded {} tiers from the tiers folder.", NeoBlock.TIERS.size());
     }
 
-    @SuppressWarnings("FieldMayBeFinal")
-    private List<BlockState> BLOCKS;
+    public final CommentedFileConfig CONFIG;
     public final int TIER;
-    private int WEIGHT;
-    private int UNLOCK;
-    private NeoTrade UNLOCK_TRADE = null;
+    public final int WEIGHT;
+    public final int UNLOCK;
 
-    private String getPath(String key) {
-        return "tier-" + TIER + "." + key;
-    }
+    public final List<BlockState> BLOCKS;
+    public final NeoTrade UNLOCK_TRADE;
 
     protected NeoTier(int tier) {
-        this.TIER = tier;
+        TIER = tier;
+        CONFIG = CommentedFileConfig.builder(FOLDER.resolve("tier-" + TIER + ".toml")).sync().build();
 
-        String path = getPath("unlock");
-        if (CONFIG.contains(path)) UNLOCK = CONFIG.getInt(path);
-        else {
-            UNLOCK = 100 * TIER;
-            CONFIG.setComment(path, "Amount of blocks broken to unlock.");
-            CONFIG.set(path, UNLOCK);
-        }
-        path = getPath("weight");
-        if (CONFIG.contains(path)) WEIGHT = CONFIG.getInt(path);
-        else {
-            WEIGHT = 1;
-            CONFIG.setComment(path, "The wight of tier when choosing between unlocked tiers.");
-            CONFIG.set(path, WEIGHT);
-        }
-        path = getPath("blocks");
-        if (CONFIG.contains(path)) {
-            List<String> blocks = CONFIG.get(path);
-            BLOCKS = blocks.stream().map(block -> BuiltInRegistries.BLOCK.get(ResourceLocation.parse(block)).defaultBlockState()).toList();
-        } else {
-            BLOCKS = List.of(Blocks.GRASS_BLOCK.defaultBlockState());
-            CONFIG.setComment(path, "List of all blocks in this tier. All of them have equal chance to be chosen in this tier.");
-            CONFIG.set(path, getBlocksName());
-        }
-        path = getPath("unlock-trades");
-        if (CONFIG.contains(path)) {
-            List<String> trades = CONFIG.get(path);
-            UNLOCK_TRADE = NeoTrade.parse(trades);
-        }
+        WEIGHT = CONFIG.contains("weight") ? Math.max(1, CONFIG.getInt("weight")) : 1;
+        UNLOCK = CONFIG.contains("unlock") ? CONFIG.getInt("unlock") : 100 * TIER;
+
+        List<String> blocks = CONFIG.contains("blocks") ? CONFIG.get("blocks") : List.of("minecraft:grass_block");
+        BLOCKS = blocks.stream().map(String::toLowerCase)
+                .map(block -> block.contains(":") ? block : "minecraft:" + block)
+                .map(block -> BuiltInRegistries.BLOCK.get(ResourceLocation.parse(block)).defaultBlockState()).toList();
+
+        List<String> unlockTrades = CONFIG.contains("unlock-trades") ? CONFIG.get("unlock-trades") : List.of();
+        UNLOCK_TRADE = NeoTrade.parse(unlockTrades);
     }
 
     public int getUnlock() {
@@ -80,26 +81,10 @@ public class NeoTier {
         return WEIGHT;
     }
     public List<BlockState> getBlocks() {
-        return BLOCKS.stream().toList();
+        return BLOCKS;
     }
-    public List<String> getBlocksName() {
-        return BLOCKS.stream().map(block -> BuiltInRegistries.BLOCK.getKey(block.getBlock()).toString()).toList();
-    }
-    public void setUnlock(int unlock) {
-        UNLOCK = unlock;
-        CONFIG.set(getPath("unlock"), UNLOCK);
-    }
-    public void setWeight(int weight) {
-        WEIGHT = weight;
-        CONFIG.set(getPath("weight"), WEIGHT);
-    }
-    public void addBlock(BlockState block) {
-        BLOCKS.add(block);
-        CONFIG.set(getPath("blocks"), getBlocksName());
-    }
-    public void removeBlock(BlockState block) {
-        BLOCKS.remove(block);
-        CONFIG.set(getPath("blocks"), getBlocksName());
+    public NeoTrade getUnlockTrade() {
+        return UNLOCK_TRADE;
     }
 
     public void checkScore(Level level) {

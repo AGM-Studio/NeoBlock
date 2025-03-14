@@ -1,0 +1,8 @@
+# Amount of blocks broken to unlock.
+unlock = 0
+# List of all blocks in this tier. All of them have equal chance to be chosen in this tier.
+blocks = [
+    "minecraft:grass_block"
+]
+# The wight of tier when choosing between unlocked tiers.
+weight = 1

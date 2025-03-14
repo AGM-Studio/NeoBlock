@@ -1,0 +1,24 @@
+# Amount of blocks broken to unlock.
+unlock = [TIER]00
+# List of all blocks in this tier. All of them have equal chance to be chosen in this tier.
+# Note that, blocks from tier 0 are available
+blocks = [
+    "minecraft:stone",
+    "minecraft:coal_ore",
+    "minecraft:iron_ore"
+]
+# The wight of tier when choosing between unlocked tiers.
+weight = 1
+# The trades the trader will spawn with when this tier is unlocked.
+# Syntax for item is `COUNT`x`ID`, the count can be a range like `8-12` or a number.
+# Uses also use same syntax as the count, but not providing it will use 1 instead.
+# For a trade use one of the following:
+#    `RESULT`; `COST A`; `COST B`; `USES`
+#    `RESULT`; `COST A`; `COST B`;
+#    `RESULT`; `COST A`; `USES`
+#    `RESULT`; `COST A`;
+unlock-trades = [
+    "1xminecraft:carrot; 2xminecraft:apple; 8-12",
+    "1xminecraft:oak_sappling; 10-15xminecraft:dirt; 3",
+    "1xminecraft:ice; 2-4xminecraft:oak_log; 8-16xminecraft:dirt; 8-12"
+]
