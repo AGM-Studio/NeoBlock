@@ -4,21 +4,20 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
 import org.jetbrains.annotations.NotNull;
+import xyz.agmstudio.neoblock.tiers.NeoBlock;
 
 import java.util.HashMap;
 
-public class NeoWorldData extends SavedData {
+public class WorldData extends SavedData {
     private static final String DATA_NAME = "custom_data";
 
-    public static NeoWorldData get(Level level) {
-        if (level.isClientSide() || !(level instanceof ServerLevel server)) return null;
-        return server.getDataStorage().computeIfAbsent(new Factory<>(NeoWorldData::new, NeoWorldData::load), DATA_NAME);
+    public static WorldData get(ServerLevel level) {
+        return level.getDataStorage().computeIfAbsent(new Factory<>(WorldData::new, WorldData::load), DATA_NAME);
     }
-    public static NeoWorldData load(CompoundTag tag, HolderLookup.Provider lookupProvider) {
-        NeoWorldData data = new NeoWorldData();
+    public static WorldData load(CompoundTag tag, HolderLookup.Provider lookupProvider) {
+        WorldData data = new WorldData();
         data.worldState = tag.getInt("WorldState");
         data.blockCount = tag.getInt("BlockCount");
         data.traderFailedAttempts = tag.getInt("TraderFailedAttempts");
@@ -30,15 +29,18 @@ public class NeoWorldData extends SavedData {
     }
     private int worldState;
     private int blockCount;
-
     private int traderFailedAttempts;
+    private int unlockedTiers;
 
     private final HashMap<String, Integer> playerBlockCount;
 
-    public NeoWorldData() {
+    public WorldData() {
         worldState = 0;
         blockCount = 0;
+        traderFailedAttempts = 0;
         playerBlockCount = new HashMap<>();
+
+        unlockedTiers = 0;
     }
 
     public void setActive() {
@@ -89,6 +91,19 @@ public class NeoWorldData extends SavedData {
     public void addTraderFailedAttempts() {
         traderFailedAttempts += 1;
         setDirty();
+    }
+
+    public int getUnlockedTiers() {
+        return unlockedTiers;
+    }
+    public void setUnlockedTiers(int tiers) {
+        unlockedTiers = tiers;
+    }
+    public void updateUnlockedTiers() {
+        for (int i = 0; i < NeoBlock.TIERS.size(); i++) {
+            if (NeoBlock.TIERS.get(i).getUnlock() > blockCount) break;
+            unlockedTiers = i;
+        }
     }
 
     @Override

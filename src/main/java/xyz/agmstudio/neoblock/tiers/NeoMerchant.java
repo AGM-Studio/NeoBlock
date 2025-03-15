@@ -7,10 +7,13 @@ import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.item.trading.MerchantOffers;
 import org.jetbrains.annotations.NotNull;
+import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.data.Range;
+import xyz.agmstudio.neoblock.util.MessagingUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.random.RandomGenerator;
 
 public class NeoMerchant {
 
@@ -44,7 +47,7 @@ public class NeoMerchant {
         return false;
     }
 
-    public static void manageTraders(@NotNull ServerLevel level) {
+    public static void tick(@NotNull ServerLevel level) {
         for (Entity entity: level.getEntities().getAll())
             if (entity instanceof Villager villager
                     && villager.getTags().contains("NeoMerchant")
@@ -54,6 +57,26 @@ public class NeoMerchant {
 
     protected NeoMerchant() {
         this.trades = new ArrayList<>();
+    }
+
+    public static void attemptSpawnTrader(ServerLevel level) {
+        int breaks = NeoBlock.DATA.getBlockCount();
+        if (breaks % attemptInterval != 0 || exists(level, "NeoMerchant")) return;
+        float chance = NeoMerchant.chance + (increment * NeoBlock.DATA.getTraderFailedAttempts());
+        if (RandomGenerator.getDefault().nextFloat() > chance) {
+            NeoBlock.DATA.addTraderFailedAttempts();
+            NeoBlockMod.LOGGER.debug("Trader chance {} failed for {} times in a row", chance, NeoBlock.DATA.getTraderFailedAttempts());
+            return;
+        }
+        NeoBlock.DATA.resetTraderFailedAttempts();
+        List<NeoOffer> trades = new ArrayList<>();
+        NeoBlock.TIERS.stream().filter(tier -> tier.getUnlock() <= breaks)
+                .forEach(tier -> trades.addAll(tier.getRandomTrades()));
+
+        if (!trades.isEmpty()) {
+            Villager trader = spawnTraderWith(trades, level);
+            MessagingUtil.sendInstantMessage("message.neoblock.trader_spawned", level, true);
+        }
     }
 
     public Villager spawnTrader(ServerLevel level) {

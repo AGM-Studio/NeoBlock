@@ -4,7 +4,6 @@ import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.fml.loading.FMLPaths;
 import xyz.agmstudio.neoblock.NeoBlockMod;
@@ -22,7 +21,7 @@ import java.util.stream.Collectors;
 
 public class NeoTier {
     protected static final Path FOLDER = Paths.get(FMLPaths.CONFIGDIR.get().toAbsolutePath().toString(), NeoBlockMod.MOD_ID, "tiers");
-    private static void loadFromResources(Object tier) {
+    protected static void loadFromResources(Object tier) {
         if (!Files.exists(FOLDER)) try {
             Files.createDirectories(FOLDER);
         } catch (Exception e) {
@@ -35,20 +34,17 @@ public class NeoTier {
         String resource = "/configs/tiers/tier-" + tier + ".toml";
         if (!ResourceUtil.doesResourceExist(resource)) resource = "/configs/tiers/tier-template.toml";
         try {
-            ResourceUtil.processResourceFile(resource, location, Map.of("[TIER]", tier.toString()));
+            ResourceUtil.processResourceFile(resource, location, Map.of("[TIER]", tier == "template" ? "10" : tier.toString()));
         } catch (Exception e) {
             NeoBlockMod.LOGGER.error("Unable to process resource {}", resource, e);
         }
-    }
-    static {
-        if (!Files.exists(FOLDER)) for (int i = 0; i < 10; i++) loadFromResources(i);
-        loadFromResources("template");
     }
 
     public final CommentedFileConfig CONFIG;
     public final int TIER;
     public final int WEIGHT;
     public final int UNLOCK;
+    public final int UNLOCK_TIME;
 
     public final HashMap<BlockState, Integer> BLOCKS;
     public final NeoMerchant UNLOCK_TRADE;
@@ -62,6 +58,7 @@ public class NeoTier {
 
         WEIGHT = CONFIG.contains("weight") ? Math.max(1, CONFIG.getInt("weight")) : 1;
         UNLOCK = CONFIG.contains("unlock") ? CONFIG.getInt("unlock") : 100 * TIER;
+        UNLOCK_TIME = CONFIG.contains("unlock-time") ? CONFIG.getInt("unlock-time") : 0;
 
         List<String> blocks = CONFIG.contains("blocks") ? CONFIG.get("blocks") : List.of("minecraft:grass_block");
         BLOCKS = new HashMap<>();
@@ -122,13 +119,11 @@ public class NeoTier {
         return WEIGHT;
     }
 
-    public void checkScore(Level level) {
-        if (NeoBlock.DATA.getBlockCount() == UNLOCK) {  // On unlock
-            MessagingUtil.sendInstantMessage("message.neoblock.unlocked_tier", level, false, TIER);
-            if (UNLOCK_TRADE != null && level instanceof ServerLevel server) {
-                UNLOCK_TRADE.spawnTrader(server, "UnlockTrader");
-                MessagingUtil.sendInstantMessage("message.neoblock.unlocked_trader", level, false, TIER);
-            }
+    public void onGettingUnlocked(ServerLevel level) {
+        MessagingUtil.sendInstantMessage("message.neoblock.unlocked_tier", level, false, TIER);
+        if (UNLOCK_TRADE != null && level instanceof ServerLevel server) {
+            UNLOCK_TRADE.spawnTrader(server, "UnlockTrader");
+            MessagingUtil.sendInstantMessage("message.neoblock.unlocked_trader", level, false, TIER);
         }
     }
 }

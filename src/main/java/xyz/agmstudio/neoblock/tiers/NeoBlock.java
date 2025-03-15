@@ -3,36 +3,31 @@ package xyz.agmstudio.neoblock.tiers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.npc.Villager;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.level.BlockEvent;
-import net.neoforged.neoforge.event.level.LevelEvent;
-import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.data.Config;
-import xyz.agmstudio.neoblock.data.NeoWorldData;
-import xyz.agmstudio.neoblock.util.MessagingUtil;
 import xyz.agmstudio.neoblock.data.Range;
+import xyz.agmstudio.neoblock.data.WorldData;
+import xyz.agmstudio.neoblock.util.MessagingUtil;
 
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.random.RandomGenerator;
 
-@EventBusSubscriber(modid = NeoBlockMod.MOD_ID)
 public class NeoBlock {
+    public static NeoBlockUpgrade UPGRADE = null;
+
     public static final BlockPos POS = new BlockPos(0, 64, 0);
     public static BlockState DEFAULT_STATE = Blocks.GRASS_BLOCK.defaultBlockState();
 
     public static List<NeoTier> TIERS = new ArrayList<>();
-    public static NeoWorldData DATA = null;
+    public static WorldData DATA = null;
 
     public static BlockState getRandomBlock() {
         int breaks = DATA.getBlockCount();
@@ -53,38 +48,20 @@ public class NeoBlock {
         return DEFAULT_STATE;
     }
 
-    public static void regenerateNeoBlock(ServerLevel level, LevelAccessor access, boolean score) {
-        if (score) DATA.addBlockCount(1);
-
+    public static void regenerateNeoBlock(ServerLevel level, LevelAccessor access) {
         access.setBlock(NeoBlock.POS, getRandomBlock(), 3);
 
         Vec3 center = NeoBlock.POS.getCenter();
         for(Entity entity: access.getEntities(null, AABB.ofSize(center, 1.2, 1.2, 1.2)))
-            entity.teleportTo(center.x, center.y + 0.55, center.z);
-
-        TIERS.forEach(tier -> tier.checkScore(level));
-    }
-    public static void attemptSpawnTrader(ServerLevel level) {
-        int breaks = DATA.getBlockCount();
-        if (breaks % NeoMerchant.attemptInterval != 0 || NeoMerchant.exists(level, "NeoMerchant")) return;
-        float chance = NeoMerchant.chance + (NeoMerchant.increment * DATA.getTraderFailedAttempts());
-        if (RandomGenerator.getDefault().nextFloat() > chance) {
-            DATA.addTraderFailedAttempts();
-            NeoBlockMod.LOGGER.debug("Trader chance {} failed for {} times in a row", chance, DATA.getTraderFailedAttempts());
-            return;
-        }
-        DATA.resetTraderFailedAttempts();
-        List<NeoOffer> trades = new ArrayList<>();
-        TIERS.stream().filter(tier -> tier.getUnlock() <= breaks)
-                .forEach(tier -> trades.addAll(tier.getRandomTrades()));
-
-        if (!trades.isEmpty()) {
-            Villager trader = NeoMerchant.spawnTraderWith(trades, level);
-            MessagingUtil.sendInstantMessage("message.neoblock.trader_spawned", level, true);
-        }
+            entity.teleportTo(entity.getX(), center.y + 0.55, entity.getZ());
     }
 
     public static void reload() {
+        if (!Files.exists(NeoTier.FOLDER)) {
+            for (int i = 0; i < 10; i++) NeoTier.loadFromResources(i);
+            NeoTier.loadFromResources("template");
+        }
+
         int i = 0;
         NeoBlock.TIERS.clear();
         while (Files.exists(NeoTier.FOLDER.resolve("tier-" + i + ".toml")))
@@ -98,12 +75,10 @@ public class NeoBlock {
         NeoMerchant.lifespan = new Range(Config.NeoMerchantLifespanMin.get(), Config.NeoMerchantLifespanMax.get());
     }
 
-    @SubscribeEvent
-    public static void onWorldLoad(LevelEvent.Load event) {
-        if (!(event.getLevel() instanceof ServerLevel level) || level.dimension() != Level.OVERWORLD) return;
-
-        DATA = NeoWorldData.get(level);
+    public static void setupWorldData(ServerLevel level) {
+        DATA = Optional.ofNullable(level).map(WorldData::get).orElse(null);
         if (DATA == null || DATA.isActive() || DATA.isDormant()) return;
+
         boolean isNeoBlock = true;
         for (int y: List.of(-64, -61, 0, 64))
             if (!level.getBlockState(new BlockPos(0, y, 0)).isAir()) isNeoBlock = false;
@@ -119,27 +94,17 @@ public class NeoBlock {
         }
     }
 
-    @SubscribeEvent
-    public static void onWorldUnload(LevelEvent.Unload event) {
-        if (!(event.getLevel() instanceof ServerLevel level) || level.dimension() != Level.OVERWORLD) return;
-        DATA = null;
-    }
-
-    @SubscribeEvent
-    public static void onWorldTick(LevelTickEvent.Post event) {
-        if (!(event.getLevel() instanceof ServerLevel level) || level.dimension() != Level.OVERWORLD) return;
-        final LevelAccessor access = event.getLevel();
-        BlockState block = access.getBlockState(NeoBlock.POS);
-        if (block.isAir() || block.canBeReplaced()) {
-            regenerateNeoBlock(level, access, true);
-            attemptSpawnTrader(level);
+    public static void onBlockBroken(ServerLevel level, LevelAccessor access, boolean triggered) {
+        if (triggered) DATA.addBlockCount(1);
+        if (DATA.getUnlockedTiers() < TIERS.size() - 2) {
+            NeoTier next = TIERS.get(DATA.getUnlockedTiers() + 1);
+            if (next.getUnlock() <= DATA.getBlockCount()) {
+                DATA.setUnlockedTiers(next.TIER);
+                UPGRADE.startUpgrade(level, access, next);
+                return;
+            }
         }
-        NeoMerchant.manageTraders(level);
-    }
 
-    @SubscribeEvent
-    public static void onBlockBreak(BlockEvent.BreakEvent event) {
-        if (!event.getPos().equals(NeoBlock.POS) || event.getLevel().isClientSide()) return;
-        DATA.addPlayerBlockCount(event.getPlayer(), 1);
+        regenerateNeoBlock(level, access);
     }
 }

@@ -1,6 +1,7 @@
 {
   "generator.neoblock.neoblock": "NeoBlock",
   "generator.neoblock.neoblock_no_nether": "NeoBlock (No Nether)",
+  "bossbar.neoblock.upgrade_bar": "Upgrading in %s",
   "message.neoblock.dormant_world_1": "This world is not using the §bNeoBlock§r world preset. §bNeoBlock§r has set to dormant.",
   "message.neoblock.dormant_world_2": "If you are a modpack developer, it's recommended to use §4DefaultWorldType§r to prevent this issue.",
   "message.neoblock.unlocked_tier": "§cTier %d§r has been unlocked!",
