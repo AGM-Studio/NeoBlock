@@ -48,14 +48,17 @@ public class NeoMerchant {
 
         return false;
     }
-    public static void attemptSpawnTrader(ServerLevel level) {
-        if (NeoBlock.DATA.getBlockCount() % attemptInterval != 0 || exists(level, "NeoMerchant")) return;
+    public static WanderingTrader attemptSpawnTrader(ServerLevel level) {
+        if (NeoBlock.DATA.getBlockCount() % attemptInterval != 0 || exists(level, "NeoMerchant")) return null;
         float chance = NeoMerchant.chance + (increment * NeoBlock.DATA.getTraderFailedAttempts());
         if (RandomGenerator.getDefault().nextFloat() > chance) {
             NeoBlock.DATA.addTraderFailedAttempts();
             NeoBlockMod.LOGGER.debug("Trader chance {} failed for {} times in a row", chance, NeoBlock.DATA.getTraderFailedAttempts());
-            return;
+            return null;
         }
+        return forceSpawnTrader(level);
+    }
+    public static WanderingTrader forceSpawnTrader(ServerLevel level) {
         NeoBlock.DATA.resetTraderFailedAttempts();
         List<NeoOffer> trades = new ArrayList<>();
         NeoBlock.TIERS.stream().filter(NeoTier::isUnlocked)
@@ -64,8 +67,10 @@ public class NeoMerchant {
         if (!trades.isEmpty()) {
             WanderingTrader trader = spawnTraderWith(trades, level);
             MessagingUtil.sendInstantMessage("message.neoblock.trader_spawned", level, true);
-        }
+            return trader;
+        } return null;
     }
+
     public static void tick(@NotNull ServerLevel level) {
         for (Entity entity: level.getEntities().getAll())
             if (entity instanceof Villager villager
@@ -93,9 +98,8 @@ public class NeoMerchant {
         return trader;
     }
     public static void handleTrader(WanderingTrader trader) {
-        MerchantOffers offers = offerMap.getOrDefault(trader.getUUID(), null);
+        MerchantOffers offers = offerMap.remove(trader.getUUID());
         if (offers == null) return;
-        offerMap.remove(trader.getUUID());
 
         trader.getOffers().clear();
         offers.forEach(trader.getOffers()::add);
