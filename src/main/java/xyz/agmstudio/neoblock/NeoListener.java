@@ -17,7 +17,6 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
-import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import org.jetbrains.annotations.NotNull;
@@ -75,12 +74,6 @@ public final class NeoListener {
         NeoBlock.onBlockBroken(level, access, true);
 
         executor.submit(() -> NeoMerchant.attemptSpawnTrader(level));
-    }
-
-    @SubscribeEvent
-    public static void onBlockBreak(BlockEvent.@NotNull BreakEvent event) {
-        if (!event.getPos().equals(NeoBlock.POS) || event.getLevel().isClientSide()) return;
-        NeoBlock.DATA.addPlayerBlockCount(event.getPlayer(), 1);
     }
 
     @SubscribeEvent

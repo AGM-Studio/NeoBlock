@@ -129,7 +129,6 @@ public class NeoTier {
     }
 
     public boolean isUnlocked() {
-        return NeoBlock.DATA != null && NeoBlock.DATA.getBlockCount() > UNLOCK;
+        return NeoBlock.DATA != null && NeoBlock.DATA.getBlockCount() >= UNLOCK;
     }
-
 }

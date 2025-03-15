@@ -6,6 +6,7 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.npc.WanderingTrader;
+import xyz.agmstudio.neoblock.tiers.NeoBlock;
 import xyz.agmstudio.neoblock.tiers.merchants.NeoMerchant;
 
 public class MainCommand {
@@ -20,7 +21,8 @@ public class MainCommand {
     // Method that executes when the command is run
     private static int showInfo(CommandContext<CommandSourceStack> context) {
         CommandSourceStack source = context.getSource();
-        source.sendSuccess(() -> Component.literal("Command executed successfully!"), true);
+        source.sendSuccess(() -> Component.translatable("command.neoblock.info", NeoBlock.DATA.getBlockCount(), NeoBlock.DATA.getTier().TIER), true);
+
         return 1;
     }
     private static int forceTrader(CommandContext<CommandSourceStack> context) {

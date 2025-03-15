@@ -43,6 +43,7 @@ public class NeoBlockUpgrade {
                 UPGRADE_BAR.setProgress((float) UPGRADE_TICKS / UPGRADE_GOAL);
                 UPGRADE_BAR.setName(Component.translatable("bossbar.neoblock.upgrade_bar", formatTicks(UPGRADE_GOAL - UPGRADE_TICKS)));
             }
+            NeoBlock.DATA.setDirty();
         }
     }
 

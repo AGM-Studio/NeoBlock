@@ -4,7 +4,6 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.saveddata.SavedData;
 import org.jetbrains.annotations.NotNull;
@@ -23,9 +22,6 @@ public class WorldData extends SavedData {
         data.blockCount = tag.getInt("BlockCount");
         data.traderFailedAttempts = tag.getInt("TraderFailedAttempts");
 
-        CompoundTag pbc = tag.getCompound("PlayerBlockCount");
-        pbc.getAllKeys().forEach(key -> data.playerBlockCount.put(key, pbc.getInt(key)));
-
         data.updateTier();
         CompoundTag upgrade = tag.getCompound("Upgrade");
         data.upgrade.configure(
@@ -41,8 +37,6 @@ public class WorldData extends SavedData {
     private NeoTier tier = null;
 
     private final NeoBlockUpgrade upgrade = new NeoBlockUpgrade();
-
-    private final HashMap<String, Integer> playerBlockCount = new HashMap<>();
     private final HashMap<EntityType<?>, Integer> tradedMobs = new HashMap<>();
 
     public WorldData() {
@@ -77,17 +71,6 @@ public class WorldData extends SavedData {
         blockCount += count;
         setDirty();
     }
-    public int getPlayerBlockCount(@NotNull Entity player) {
-        return playerBlockCount.getOrDefault(player.getStringUUID(), 0);
-    }
-    public void setPlayerBlockCount(@NotNull Entity player, int count) {
-        playerBlockCount.put(player.getStringUUID(), count);
-        setDirty();
-    }
-    public void addPlayerBlockCount(@NotNull Entity player, int count) {
-        playerBlockCount.compute(player.getStringUUID(), (k, v) -> v == null ? count : v + count);
-        setDirty();
-    }
 
     public int getTraderFailedAttempts() {
         return traderFailedAttempts;
@@ -110,7 +93,7 @@ public class WorldData extends SavedData {
     }
     public void updateTier() {
         this.tier = NeoBlock.TIERS.stream()
-                .takeWhile(NeoTier::isUnlocked)
+                .takeWhile(tier -> tier.getUnlock() <= this.blockCount)  // Can't use isUnlocked
                 .reduce((first, second) -> first.TIER > second.TIER ? first : second)
                 .orElse(NeoBlock.TIERS.getFirst());
     }
@@ -125,9 +108,6 @@ public class WorldData extends SavedData {
         tag.putInt("WorldState", worldState);
         tag.putInt("BlockCount", blockCount);
         tag.putInt("TraderFailedAttempts", traderFailedAttempts);
-
-        final CompoundTag pbc = tag.getCompound("PlayerBlockCount");
-        playerBlockCount.forEach(pbc::putInt);
 
         final CompoundTag upgrade = tag.getCompound("Upgrade");
         upgrade.putInt("Goal", this.upgrade.UPGRADE_GOAL);
