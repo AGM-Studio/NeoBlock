@@ -11,7 +11,6 @@ import net.minecraft.world.phys.Vec3;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.data.Config;
 import xyz.agmstudio.neoblock.data.Range;
-import xyz.agmstudio.neoblock.data.WorldData;
 import xyz.agmstudio.neoblock.util.MessagingUtil;
 
 import java.nio.file.Files;
@@ -77,7 +76,11 @@ public class NeoBlock {
 
     public static void setupWorldData(ServerLevel level) {
         DATA = Optional.ofNullable(level).map(WorldData::get).orElse(null);
-        if (DATA == null || DATA.isActive() || DATA.isDormant()) return;
+        if (DATA == null || DATA.isActive() || DATA.isDormant()) {
+            if (DATA != null) DATA.setDirty();
+            return;
+        }
+        NeoBlock.UPGRADE = DATA.fetchUpgrade();
 
         boolean isNeoBlock = true;
         for (int y: List.of(-64, -61, 0, 64))
@@ -96,15 +99,10 @@ public class NeoBlock {
 
     public static void onBlockBroken(ServerLevel level, LevelAccessor access, boolean triggered) {
         if (triggered) DATA.addBlockCount(1);
-        if (DATA.getUnlockedTiers() < TIERS.size() - 2) {
-            NeoTier next = TIERS.get(DATA.getUnlockedTiers() + 1);
-            if (next.getUnlock() <= DATA.getBlockCount()) {
-                DATA.setUnlockedTiers(next.TIER);
-                UPGRADE.startUpgrade(level, access, next);
-                return;
-            }
-        }
-
-        regenerateNeoBlock(level, access);
+        NeoTier next = DATA.getTier().next();
+        if (next != null && next.getUnlock() <= DATA.getBlockCount()) {
+            UPGRADE.startUpgrade(level, access, next);
+            DATA.setTier(next);
+        } else regenerateNeoBlock(level, access);
     }
 }

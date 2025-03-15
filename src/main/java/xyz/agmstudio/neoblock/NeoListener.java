@@ -37,7 +37,9 @@ public final class NeoListener {
         final LevelAccessor access = event.getLevel();
 
         // Upgrading the neoblock... Nothing else should happen meanwhile
-        if (NeoBlock.UPGRADE.isOnUpgrade()) {
+        if (NeoBlock.UPGRADE == null) NeoBlock.UPGRADE = NeoBlock.DATA.fetchUpgrade();
+        if (NeoBlock.UPGRADE == null) NeoBlockMod.LOGGER.info("NeoBlock upgrade not available!");
+        else if (NeoBlock.UPGRADE.isOnUpgrade()) {
             NeoBlock.UPGRADE.tick(level, access);
             return;
         }

@@ -1,23 +1,20 @@
 package xyz.agmstudio.neoblock.tiers;
 
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.fml.loading.FMLPaths;
+import org.jetbrains.annotations.Nullable;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.util.MessagingUtil;
 import xyz.agmstudio.neoblock.util.ResourceUtil;
+import xyz.agmstudio.neoblock.util.StringUtil;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.random.RandomGenerator;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 public class NeoTier {
     protected static final Path FOLDER = Paths.get(FMLPaths.CONFIGDIR.get().toAbsolutePath().toString(), NeoBlockMod.MOD_ID, "tiers");
@@ -46,51 +43,50 @@ public class NeoTier {
     public final int UNLOCK;
     public final int UNLOCK_TIME;
 
-    public final HashMap<BlockState, Integer> BLOCKS;
+    public final HashMap<BlockState, Integer> BLOCKS = new HashMap<>();
     public final NeoMerchant UNLOCK_TRADE;
     public final List<NeoOffer> TRADES;
     public final int TRADE_COUNT;
 
+    public @Nullable NeoTier previous() {
+        return TIER > 0 ? NeoBlock.TIERS.get(this.TIER - 1) : null;
+    }
+    public @Nullable NeoTier next() {
+        return TIER < NeoBlock.TIERS.size() - 1 ? NeoBlock.TIERS.get(this.TIER + 1) : null;
+    }
+    public List<NeoTier> allPrevious() {
+        return NeoBlock.TIERS.subList(0, this.TIER + 1);
+    }
+    public List<NeoTier> allNext() {
+        return NeoBlock.TIERS.subList(this.TIER + 1, NeoBlock.TIERS.size());
+    }
+
     protected NeoTier(int tier) {
         TIER = tier;
-        CONFIG = CommentedFileConfig.builder(FOLDER.resolve("tier-" + TIER + ".toml")).sync().build();
-        CONFIG.load();
+        CONFIG = ResourceUtil.getConfig(FOLDER, "tier-" + tier);
+        if (CONFIG == null) throw new RuntimeException("Unable to find config for tier " + tier);
 
-        WEIGHT = CONFIG.contains("weight") ? Math.max(1, CONFIG.getInt("weight")) : 1;
-        UNLOCK = CONFIG.contains("unlock") ? CONFIG.getInt("unlock") : 100 * TIER;
-        UNLOCK_TIME = CONFIG.contains("unlock-time") ? CONFIG.getInt("unlock-time") : 0;
+        NeoTier previous = previous();
+        WEIGHT = Math.max(1, CONFIG.getIntOrElse("weight", 1));
+        UNLOCK = Math.max(
+                previous == null ? 0 : previous.getUnlock() + 1,
+                CONFIG.getIntOrElse("unlock", 100 * TIER)
+        );
+        UNLOCK_TIME = Math.max(0, CONFIG.getIntOrElse("unlock-time", 0));
 
-        List<String> blocks = CONFIG.contains("blocks") ? CONFIG.get("blocks") : List.of("minecraft:grass_block");
-        BLOCKS = new HashMap<>();
-        Pattern pattern = Pattern.compile("^(\\d+)x");
-        for (String block: blocks) {
-            Matcher matcher = pattern.matcher(block);
-            int count = 1;
-            if (matcher.find()) {
-                count = Integer.parseInt(matcher.group(1));
-                block = block.substring(matcher.end());
-            }
-            try {
-                BlockState state = BuiltInRegistries.BLOCK.get(ResourceLocation.parse(block)).defaultBlockState();
-                NeoBlockMod.LOGGER.debug("Reading '{}' resulted in block {} x{}", block, state, count);
-                BLOCKS.merge(state, count, Integer::sum);
-            } catch (Exception e) {
-                NeoBlockMod.LOGGER.error("Failed to parse block '{}': {}", block, e.getMessage());
-            }
+        List<String> blocks = CONFIG.getOrElse("blocks", List.of("minecraft:grass_block"));
+        blocks.stream().map(StringUtil::parseBlock).forEach(parsed -> BLOCKS.merge(parsed.getKey().defaultBlockState(), parsed.getValue().get(), Integer::sum));
+        if (BLOCKS.isEmpty()) {
+            NeoBlockMod.LOGGER.error("No blocks found for tier {}", TIER);
+            BLOCKS.put(NeoBlock.DEFAULT_STATE, 1);
         }
-        if (BLOCKS.isEmpty()) NeoBlockMod.LOGGER.error("No blocks found for tier {}", TIER);
-        NeoBlockMod.LOGGER.debug("Loaded {} blocks from the tier {}\n{}", BLOCKS.size(), TIER, BLOCKS.entrySet().stream()
-                .map(entry -> entry.getKey() + " = " + entry.getValue())
-                .collect(Collectors.joining(",\n\t", "{\n\t", "\n}")));
 
-        List<String> unlockTrades = CONFIG.contains("unlock-trades") ? CONFIG.get("unlock-trades") : List.of();
+        List<String> unlockTrades = CONFIG.getOrElse("unlock-trades", List.of());
         UNLOCK_TRADE = NeoMerchant.parse(unlockTrades);
 
-        List<String> trades = CONFIG.contains("trader-trades") ? CONFIG.get("trader-trades") : List.of();
+        List<String> trades = CONFIG.getOrElse("trader-trades", List.of());
         TRADES = trades.stream().map(NeoOffer::parse).toList();
-
-        int tradeCount = CONFIG.contains("trader-count") ? CONFIG.getInt("trader-count") : 0;
-        TRADE_COUNT = Math.clamp(tradeCount, 0, TRADES.size());
+        TRADE_COUNT = Math.clamp(CONFIG.getIntOrElse("trader-count", 0), 0, TRADES.size());
     }
 
     public List<NeoOffer> getRandomTrades() {
@@ -125,5 +121,9 @@ public class NeoTier {
             UNLOCK_TRADE.spawnTrader(server, "UnlockTrader");
             MessagingUtil.sendInstantMessage("message.neoblock.unlocked_trader", level, false, TIER);
         }
+    }
+
+    public boolean isUnlocked() {
+        return NeoBlock.DATA != null && NeoBlock.DATA.getBlockCount() >= UNLOCK;
     }
 }

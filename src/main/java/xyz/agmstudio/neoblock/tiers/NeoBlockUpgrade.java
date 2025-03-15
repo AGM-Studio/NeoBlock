@@ -11,7 +11,6 @@ import org.jetbrains.annotations.NotNull;
 public class NeoBlockUpgrade {
     protected int UPGRADE_TICKS = 0;
     protected int UPGRADE_GOAL = 0;
-    protected int UPGRADE_TO = -1;
     private final ServerBossEvent UPGRADE_BAR = new ServerBossEvent(
             Component.translatable("bossbar.neoblock.upgrade_bar", ""),
             BossEvent.BossBarColor.RED,
@@ -47,23 +46,29 @@ public class NeoBlockUpgrade {
     }
 
     protected void finishUpgrade(ServerLevel level, LevelAccessor access) {
-        NeoTier tier = NeoBlock.TIERS.get(UPGRADE_TO);
+        if (NeoBlock.DATA == null) return;
+        NeoTier tier = NeoBlock.DATA.getTier().next();
+        if (tier != null && tier.isUnlocked())
+            tier.onGettingUnlocked(level);
+
         NeoBlock.regenerateNeoBlock(level, access);
-        tier.onGettingUnlocked(level);
 
         UPGRADE_BAR.removeAllPlayers();
         UPGRADE_TICKS = 0;
         UPGRADE_GOAL = 0;
-        UPGRADE_TO = -1;
     }
 
     public void startUpgrade(ServerLevel level, LevelAccessor access, NeoTier tier) {
         UPGRADE_GOAL += tier.UNLOCK_TIME;
-        UPGRADE_TO = tier.TIER;
         if (UPGRADE_GOAL == 0) finishUpgrade(level, access);
         else {
             level.players().forEach(UPGRADE_BAR::addPlayer);
             access.setBlock(NeoBlock.POS, Blocks.BEDROCK.defaultBlockState(), 3);
         }
+    }
+
+    public void configure(int goal, int tick) {
+        UPGRADE_GOAL = goal;
+        UPGRADE_TICKS = tick;
     }
 }

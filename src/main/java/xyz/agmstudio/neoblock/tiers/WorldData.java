@@ -1,4 +1,4 @@
-package xyz.agmstudio.neoblock.data;
+package xyz.agmstudio.neoblock.tiers;
 
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -6,7 +6,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.saveddata.SavedData;
 import org.jetbrains.annotations.NotNull;
-import xyz.agmstudio.neoblock.tiers.NeoBlock;
 
 import java.util.HashMap;
 
@@ -25,12 +24,21 @@ public class WorldData extends SavedData {
         CompoundTag pbc = tag.getCompound("PlayerBlockCount");
         pbc.getAllKeys().forEach(key -> data.playerBlockCount.put(key, pbc.getInt(key)));
 
+        data.updateTier();
+        CompoundTag upgrade = tag.getCompound("Upgrade");
+        data.upgrade.configure(
+                tag.getInt("Goal"),
+                tag.getInt("Tick")
+        );
+
         return data;
     }
     private int worldState;
     private int blockCount;
     private int traderFailedAttempts;
-    private int unlockedTiers;
+    private NeoTier tier = null;
+
+    private final NeoBlockUpgrade upgrade = new NeoBlockUpgrade();
 
     private final HashMap<String, Integer> playerBlockCount;
 
@@ -39,8 +47,6 @@ public class WorldData extends SavedData {
         blockCount = 0;
         traderFailedAttempts = 0;
         playerBlockCount = new HashMap<>();
-
-        unlockedTiers = 0;
     }
 
     public void setActive() {
@@ -93,16 +99,17 @@ public class WorldData extends SavedData {
         setDirty();
     }
 
-    public int getUnlockedTiers() {
-        return unlockedTiers;
+    public @NotNull NeoTier getTier() {
+        if (tier == null) updateTier();
+        return tier == null ? NeoBlock.TIERS.getFirst() : tier;
     }
-    public void setUnlockedTiers(int tiers) {
-        unlockedTiers = tiers;
+    public void setTier(NeoTier tier) {
+        this.tier = tier;
     }
-    public void updateUnlockedTiers() {
-        for (int i = 0; i < NeoBlock.TIERS.size(); i++) {
-            if (NeoBlock.TIERS.get(i).getUnlock() > blockCount) break;
-            unlockedTiers = i;
+    public void updateTier() {
+        for (NeoTier tier: NeoBlock.TIERS) {
+            if (tier.getUnlock() > blockCount) break;
+            this.tier = tier;
         }
     }
 
@@ -120,6 +127,14 @@ public class WorldData extends SavedData {
         CompoundTag pbc = tag.getCompound("PlayerBlockCount");
         playerBlockCount.keySet().forEach(key -> pbc.putInt(key, playerBlockCount.get(key)));
 
+        CompoundTag upgrade = tag.getCompound("Upgrade");
+        tag.putInt("Goal", this.upgrade.UPGRADE_GOAL);
+        tag.putInt("Tick", this.upgrade.UPGRADE_TICKS);
+
         return tag;
+    }
+
+    public NeoBlockUpgrade fetchUpgrade() {
+        return upgrade;
     }
 }
