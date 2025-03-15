@@ -11,6 +11,7 @@ import net.minecraft.world.phys.Vec3;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.data.Config;
 import xyz.agmstudio.neoblock.data.Range;
+import xyz.agmstudio.neoblock.tiers.merchants.NeoMerchant;
 import xyz.agmstudio.neoblock.util.MessagingUtil;
 
 import java.nio.file.Files;
@@ -22,7 +23,7 @@ import java.util.random.RandomGenerator;
 public class NeoBlock {
     public static NeoBlockUpgrade UPGRADE = null;
 
-    public static final double AABB_RANGE = 0.6;
+    public static final double AABB_RANGE = 1.05;
     public static final BlockPos POS = new BlockPos(0, 64, 0);
     public static BlockState DEFAULT_STATE = Blocks.GRASS_BLOCK.defaultBlockState();
 
@@ -53,7 +54,7 @@ public class NeoBlock {
 
         Vec3 center = NeoBlock.POS.getCenter();
         for(Entity entity: access.getEntities(null, AABB.ofSize(center, AABB_RANGE, AABB_RANGE, AABB_RANGE)))
-            entity.teleportTo(entity.getX(), center.y + AABB_RANGE, entity.getZ());
+            entity.teleportTo(entity.getX(), center.y + AABB_RANGE / 2.0, entity.getZ());
     }
 
     public static void reload() {

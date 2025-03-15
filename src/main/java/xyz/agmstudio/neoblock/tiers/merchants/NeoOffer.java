@@ -1,4 +1,4 @@
-package xyz.agmstudio.neoblock.tiers;
+package xyz.agmstudio.neoblock.tiers.merchants;
 
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;

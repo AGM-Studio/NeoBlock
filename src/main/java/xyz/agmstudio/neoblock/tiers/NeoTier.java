@@ -6,6 +6,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.fml.loading.FMLPaths;
 import org.jetbrains.annotations.Nullable;
 import xyz.agmstudio.neoblock.NeoBlockMod;
+import xyz.agmstudio.neoblock.tiers.merchants.NeoMerchant;
+import xyz.agmstudio.neoblock.tiers.merchants.NeoOffer;
 import xyz.agmstudio.neoblock.util.MessagingUtil;
 import xyz.agmstudio.neoblock.util.ResourceUtil;
 import xyz.agmstudio.neoblock.util.StringUtil;

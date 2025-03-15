@@ -1,18 +1,22 @@
-package xyz.agmstudio.neoblock.tiers;
+package xyz.agmstudio.neoblock.tiers.merchants;
 
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.npc.Villager;
-import net.minecraft.world.entity.npc.VillagerProfession;
+import net.minecraft.world.entity.npc.WanderingTrader;
 import net.minecraft.world.item.trading.MerchantOffers;
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.data.Range;
+import xyz.agmstudio.neoblock.tiers.NeoBlock;
+import xyz.agmstudio.neoblock.tiers.NeoTier;
 import xyz.agmstudio.neoblock.util.MessagingUtil;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 import java.util.random.RandomGenerator;
 
 public class NeoMerchant {
@@ -32,13 +36,11 @@ public class NeoMerchant {
 
         return trader;
     }
-    public static @NotNull Villager spawnTraderWith(List<NeoOffer> trades, ServerLevel level) {
+    public static @NotNull WanderingTrader spawnTraderWith(List<NeoOffer> trades, ServerLevel level) {
         NeoMerchant trader = new NeoMerchant();
         trader.trades.addAll(trades);
 
-        Villager villager = trader.spawnTrader(level, "NeoMerchant");
-        villager.getPersistentData().putInt("NeoTradeLifespan", lifespan.get());
-        return villager;
+        return trader.spawnTrader(level, "NeoMerchant");
     }
     public static boolean exists(@NotNull ServerLevel level, String tag) {
         for (Entity entity: level.getEntities().getAll())
@@ -47,8 +49,7 @@ public class NeoMerchant {
         return false;
     }
     public static void attemptSpawnTrader(ServerLevel level) {
-        int breaks = NeoBlock.DATA.getBlockCount();
-        if (breaks % attemptInterval != 0 || exists(level, "NeoMerchant")) return;
+        if (NeoBlock.DATA.getBlockCount() % attemptInterval != 0 || exists(level, "NeoMerchant")) return;
         float chance = NeoMerchant.chance + (increment * NeoBlock.DATA.getTraderFailedAttempts());
         if (RandomGenerator.getDefault().nextFloat() > chance) {
             NeoBlock.DATA.addTraderFailedAttempts();
@@ -61,7 +62,7 @@ public class NeoMerchant {
                 .forEach(tier -> trades.addAll(tier.getRandomTrades()));
 
         if (!trades.isEmpty()) {
-            Villager trader = spawnTraderWith(trades, level);
+            WanderingTrader trader = spawnTraderWith(trades, level);
             MessagingUtil.sendInstantMessage("message.neoblock.trader_spawned", level, true);
         }
     }
@@ -77,28 +78,26 @@ public class NeoMerchant {
         this.trades = new ArrayList<>();
     }
 
-    public Villager spawnTrader(ServerLevel level) {
-        return spawnTrader(level, null);
-    }
-    public Villager spawnTrader(ServerLevel level, String tag) {
-        Villager trader = new Villager(EntityType.VILLAGER, level);
+    public static final HashMap<UUID, MerchantOffers> offerMap = new HashMap<>();
+    public WanderingTrader spawnTrader(ServerLevel level, String... tags) {
+        WanderingTrader trader = new WanderingTrader(EntityType.WANDERING_TRADER, level);
         trader.setPos(NeoBlock.POS.getCenter().add(0, 2, 0));
-        trader.setVillagerData(trader.getVillagerData()
-                .setProfession(VillagerProfession.NITWIT)
-                .setLevel(5)
-        );
-
-        if (tag != null) {
-            for (Entity entity: level.getEntities().getAll())
-                if (entity.getTags().contains(tag)) entity.remove(Entity.RemovalReason.DISCARDED);
-
-            trader.addTag(tag);
-        }
-        level.addFreshEntity(trader);
+        trader.setDespawnDelay(lifespan.get());
+        for (String tag: tags) trader.addTag(tag);
 
         MerchantOffers offers = new MerchantOffers();
         this.trades.stream().map(NeoOffer::getOffer).forEach(offers::add);
-        trader.setOffers(offers);
+        offerMap.put(trader.getUUID(), offers);
+
+        level.addFreshEntity(trader);
         return trader;
+    }
+    public static void handleTrader(WanderingTrader trader) {
+        MerchantOffers offers = offerMap.getOrDefault(trader.getUUID(), null);
+        if (offers == null) return;
+        offerMap.remove(trader.getUUID());
+
+        trader.getOffers().clear();
+        offers.forEach(trader.getOffers()::add);
     }
 }

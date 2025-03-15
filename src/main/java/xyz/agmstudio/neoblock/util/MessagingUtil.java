@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 
 public class MessagingUtil {
-    private final static HashMap<Level, List<MessageHolder>> messages = new HashMap<>();
+    private static final HashMap<Level, List<MessageHolder>> messages = new HashMap<>();
 
     public static void sendMessage(String key, Level level, boolean action, Object... args) {
         sendMessage(Component.translatable(key, args), level, action);

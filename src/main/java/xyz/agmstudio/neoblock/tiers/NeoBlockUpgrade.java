@@ -3,6 +3,7 @@ package xyz.agmstudio.neoblock.tiers;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerBossEvent;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.BossEvent;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Blocks;
@@ -72,5 +73,9 @@ public class NeoBlockUpgrade {
     protected void configure(int goal, int tick) {
         UPGRADE_GOAL = goal;
         UPGRADE_TICKS = tick;
+    }
+
+    public void showTo(ServerPlayer player) {
+        UPGRADE_BAR.addPlayer(player);
     }
 }
