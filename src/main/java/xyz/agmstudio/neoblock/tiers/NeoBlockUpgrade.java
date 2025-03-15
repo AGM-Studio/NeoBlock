@@ -61,14 +61,12 @@ public class NeoBlockUpgrade {
     }
 
     public void startUpgrade(ServerLevel level, LevelAccessor access, NeoTier tier) {
-        if (tier == null || tier.isUnlocked()) return;
+        if (tier == null || !tier.isUnlocked()) return;
+        NeoBlock.setNeoBlock(access, Blocks.BEDROCK.defaultBlockState());
         UPGRADE_GOAL += tier.UNLOCK_TIME;
         tier.onStartUpgrade(level);
         if (UPGRADE_GOAL == 0) finishUpgrade(level, access);
-        else {
-            level.players().forEach(UPGRADE_BAR::addPlayer);
-            NeoBlock.setNeoBlock(access, Blocks.BEDROCK.defaultBlockState());
-        }
+        else level.players().forEach(UPGRADE_BAR::addPlayer);
     }
 
     protected void configure(int goal, int tick) {

@@ -22,6 +22,7 @@ import java.util.random.RandomGenerator;
 public class NeoBlock {
     public static NeoBlockUpgrade UPGRADE = null;
 
+    public static final double AABB_RANGE = 0.6;
     public static final BlockPos POS = new BlockPos(0, 64, 0);
     public static BlockState DEFAULT_STATE = Blocks.GRASS_BLOCK.defaultBlockState();
 
@@ -51,8 +52,8 @@ public class NeoBlock {
         access.setBlock(NeoBlock.POS, block, 3);
 
         Vec3 center = NeoBlock.POS.getCenter();
-        for(Entity entity: access.getEntities(null, AABB.ofSize(center, 1.2, 1.2, 1.2)))
-            entity.teleportTo(entity.getX(), center.y + 0.55, entity.getZ());
+        for(Entity entity: access.getEntities(null, AABB.ofSize(center, AABB_RANGE, AABB_RANGE, AABB_RANGE)))
+            entity.teleportTo(entity.getX(), center.y + AABB_RANGE, entity.getZ());
     }
 
     public static void reload() {
@@ -100,7 +101,7 @@ public class NeoBlock {
     public static void onBlockBroken(ServerLevel level, LevelAccessor access, boolean triggered) {
         if (triggered) DATA.addBlockCount(1);
         NeoTier next = DATA.getTier().next();
-        if (next != null && next.getUnlock() <= DATA.getBlockCount()) UPGRADE.startUpgrade(level, access, next);
+        if (next != null && next.isUnlocked()) UPGRADE.startUpgrade(level, access, next);
         else setNeoBlock(access, getRandomBlock());
     }
 }

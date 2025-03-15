@@ -119,7 +119,7 @@ public class NeoTier {
         MessagingUtil.sendInstantMessage("message.neoblock.unlocked_tier", level, false, TIER);
     }
     public void onStartUpgrade(ServerLevel level) {
-        MessagingUtil.sendInstantMessage("message.neoblock.unlocking_trader", level, false, TIER);
+        MessagingUtil.sendInstantMessage("message.neoblock.unlocking_tier", level, false, TIER);
         if (UNLOCK_TRADE != null) {
             UNLOCK_TRADE.spawnTrader(level, "UnlockTrader");
             MessagingUtil.sendInstantMessage("message.neoblock.unlocking_trader", level, false, TIER);
@@ -127,7 +127,7 @@ public class NeoTier {
     }
 
     public boolean isUnlocked() {
-        return NeoBlock.DATA != null && NeoBlock.DATA.getBlockCount() >= UNLOCK;
+        return NeoBlock.DATA != null && NeoBlock.DATA.getBlockCount() > UNLOCK;
     }
 
 }

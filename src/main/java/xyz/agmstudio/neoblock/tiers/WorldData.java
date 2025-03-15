@@ -107,10 +107,10 @@ public class WorldData extends SavedData {
         this.tier = tier;
     }
     public void updateTier() {
-        for (NeoTier tier: NeoBlock.TIERS) {
-            if (tier.getUnlock() > blockCount) break;
-            this.tier = tier;
-        }
+        this.tier = NeoBlock.TIERS.stream()
+                .takeWhile(NeoTier::isUnlocked)
+                .reduce((first, second) -> first.TIER > second.TIER ? first : second)
+                .orElse(NeoBlock.TIERS.getFirst());
     }
 
     @Override

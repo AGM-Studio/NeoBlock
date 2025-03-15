@@ -57,7 +57,7 @@ public class NeoMerchant {
         }
         NeoBlock.DATA.resetTraderFailedAttempts();
         List<NeoOffer> trades = new ArrayList<>();
-        NeoBlock.TIERS.stream().filter(tier -> tier.getUnlock() <= breaks)
+        NeoBlock.TIERS.stream().filter(NeoTier::isUnlocked)
                 .forEach(tier -> trades.addAll(tier.getRandomTrades()));
 
         if (!trades.isEmpty()) {

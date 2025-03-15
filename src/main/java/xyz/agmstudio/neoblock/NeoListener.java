@@ -13,11 +13,13 @@ import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.tiers.NeoBlock;
 import xyz.agmstudio.neoblock.tiers.NeoMerchant;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 @EventBusSubscriber(modid = NeoBlockMod.MOD_ID)
 public final class NeoListener {
-    static {
-        NeoBlockMod.LOGGER.info("NeoBlock listeners initialized.");
-    }
+    private static final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private static int tickCounter = 0;
 
     @SubscribeEvent
     public static void onWorldLoad(LevelEvent.@NotNull Load event) {
@@ -45,13 +47,15 @@ public final class NeoListener {
         }
 
         // Merchant tick
-        NeoMerchant.tick(level);
+        if (tickCounter++ % 20 == 0) executor.submit(() -> NeoMerchant.tick(level));
+        if (tickCounter > 1000) tickCounter = 0;
 
         // NeoBlock has been broken logic
         BlockState block = access.getBlockState(NeoBlock.POS);
         if (!block.isAir() && !block.canBeReplaced()) return;
         NeoBlock.onBlockBroken(level, access, true);
-        NeoMerchant.attemptSpawnTrader(level);
+
+        executor.submit(() -> NeoMerchant.attemptSpawnTrader(level));
     }
 
     @SubscribeEvent
