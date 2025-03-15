@@ -1,9 +1,11 @@
 package xyz.agmstudio.neoblock.tiers;
 
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.saveddata.SavedData;
 import org.jetbrains.annotations.NotNull;
 
@@ -40,13 +42,13 @@ public class WorldData extends SavedData {
 
     private final NeoBlockUpgrade upgrade = new NeoBlockUpgrade();
 
-    private final HashMap<String, Integer> playerBlockCount;
+    private final HashMap<String, Integer> playerBlockCount = new HashMap<>();
+    private final HashMap<EntityType<?>, Integer> tradedMobs = new HashMap<>();
 
     public WorldData() {
         worldState = 0;
         blockCount = 0;
         traderFailedAttempts = 0;
-        playerBlockCount = new HashMap<>();
     }
 
     public void setActive() {
@@ -124,17 +126,27 @@ public class WorldData extends SavedData {
         tag.putInt("BlockCount", blockCount);
         tag.putInt("TraderFailedAttempts", traderFailedAttempts);
 
-        CompoundTag pbc = tag.getCompound("PlayerBlockCount");
-        playerBlockCount.keySet().forEach(key -> pbc.putInt(key, playerBlockCount.get(key)));
+        final CompoundTag pbc = tag.getCompound("PlayerBlockCount");
+        playerBlockCount.forEach(pbc::putInt);
 
-        CompoundTag upgrade = tag.getCompound("Upgrade");
-        tag.putInt("Goal", this.upgrade.UPGRADE_GOAL);
-        tag.putInt("Tick", this.upgrade.UPGRADE_TICKS);
+        final CompoundTag upgrade = tag.getCompound("Upgrade");
+        upgrade.putInt("Goal", this.upgrade.UPGRADE_GOAL);
+        upgrade.putInt("Tick", this.upgrade.UPGRADE_TICKS);
+
+        final CompoundTag mobs = tag.getCompound("TradedMobs");
+        tradedMobs.forEach((key, value) -> mobs.putInt(BuiltInRegistries.ENTITY_TYPE.getKey(key).toString(), value));
 
         return tag;
     }
 
     public NeoBlockUpgrade fetchUpgrade() {
         return upgrade;
+    }
+    public HashMap<EntityType<?>, Integer> getTradedMobs() {
+        return tradedMobs;
+    }
+    public void addTradedMob(EntityType<?> entityType, int count) {
+        tradedMobs.merge(entityType, count, Integer::sum);
+        setDirty();
     }
 }

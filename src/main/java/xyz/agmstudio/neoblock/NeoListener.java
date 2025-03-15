@@ -1,8 +1,14 @@
 package xyz.agmstudio.neoblock;
 
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.npc.WanderingTrader;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
@@ -10,6 +16,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
+import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
@@ -17,6 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.commands.MainCommand;
 import xyz.agmstudio.neoblock.tiers.NeoBlock;
 import xyz.agmstudio.neoblock.tiers.merchants.NeoMerchant;
+import xyz.agmstudio.neoblock.tiers.merchants.NeoOffer;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -24,7 +32,6 @@ import java.util.concurrent.Executors;
 @EventBusSubscriber(modid = NeoBlockMod.MOD_ID)
 public final class NeoListener {
     private static final ExecutorService executor = Executors.newSingleThreadExecutor();
-    private static int tickCounter = 0;
 
     @SubscribeEvent
     public static void onWorldLoad(LevelEvent.@NotNull Load event) {
@@ -51,9 +58,16 @@ public final class NeoListener {
             return;
         }
 
-        // Merchant tick
-        if (tickCounter++ % 20 == 0) executor.submit(() -> NeoMerchant.tick(level));
-        if (tickCounter > 1000) tickCounter = 0;
+        // Handle items in inventory
+        for (Player player: level.players()) {
+            for (int slot = 0; slot < player.getInventory().getContainerSize(); slot++) {
+                ItemStack stack = player.getInventory().getItem(slot);
+                if (!stack.isEmpty() && NeoOffer.handlePossibleMobTrade(stack)) {
+                    player.getInventory().setItem(slot, ItemStack.EMPTY);
+                    player.getInventory().setChanged();
+                }
+            }
+        }
 
         // NeoBlock has been broken logic
         BlockState block = access.getBlockState(NeoBlock.POS);
@@ -74,10 +88,21 @@ public final class NeoListener {
         if (!(event.getLevel() instanceof ServerLevel level)) return;
         if (event.getEntity() instanceof WanderingTrader trader) NeoMerchant.handleTrader(trader);
         if (event.getEntity() instanceof ServerPlayer player && NeoBlock.UPGRADE.isOnUpgrade()) NeoBlock.UPGRADE.showTo(player);
+        if (event.getEntity() instanceof ItemEntity item && NeoOffer.handlePossibleMobTrade(item.getItem())) event.setCanceled(true);
     }
 
     @SubscribeEvent
     public static void onRegisterCommands(RegisterCommandsEvent event) {
         MainCommand.register(event.getDispatcher());
+    }
+
+    @SubscribeEvent
+    public static void onItemTooltip(ItemTooltipEvent event) {
+        EntityType<?> mob = NeoOffer.getMobTradeEntity(event.getItemStack());
+        if (mob == null) return;
+        event.getToolTip().add(
+                Component.translatable("tooltip.neoblock.spawn_lore", mob.getDescription())
+                        .withStyle(ChatFormatting.ITALIC, ChatFormatting.GRAY)
+        );
     }
 }

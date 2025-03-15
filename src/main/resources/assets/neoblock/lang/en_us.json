@@ -4,6 +4,8 @@
 
   "bossbar.neoblock.upgrade_bar": "Upgrading... (%s)",
 
+  "tooltip.neoblock.spawn_lore": "Purchasing this will ask the trader to bring a %s next time they visit.",
+
   "message.neoblock.dormant_world_1": "This world is not using the §bNeoBlock§r world preset. §bNeoBlock§r has set to dormant.",
   "message.neoblock.dormant_world_2": "If you are a modpack developer, it's recommended to use §4DefaultWorldType§r to prevent this issue.",
   "message.neoblock.unlocked_tier": "Tier %d has been unlocked!",

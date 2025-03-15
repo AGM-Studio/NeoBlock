@@ -3,6 +3,8 @@ package xyz.agmstudio.neoblock.tiers.merchants;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Leashable;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.npc.WanderingTrader;
 import net.minecraft.world.item.trading.MerchantOffers;
@@ -67,6 +69,16 @@ public class NeoMerchant {
         if (!trades.isEmpty()) {
             WanderingTrader trader = spawnTraderWith(trades, level);
             MessagingUtil.sendInstantMessage("message.neoblock.trader_spawned", level, true);
+
+            HashMap<EntityType<?>, Integer> tradedMobs = NeoBlock.DATA.getTradedMobs();
+            tradedMobs.forEach((type, count) -> {
+                for (int i = 0; i < count; i++) {
+                    Entity mob = type.spawn(level, trader.getOnPos(), MobSpawnType.SPAWN_EGG);
+                    if (mob instanceof Leashable leashable) leashable.setLeashedTo(trader, true);
+                }
+            });
+            tradedMobs.clear();
+
             return trader;
         } return null;
     }

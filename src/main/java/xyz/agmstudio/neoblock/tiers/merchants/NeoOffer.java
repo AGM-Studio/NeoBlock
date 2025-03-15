@@ -1,59 +1,78 @@
 package xyz.agmstudio.neoblock.tiers.merchants;
 
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.Item;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.trading.ItemCost;
+import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.trading.MerchantOffer;
 import xyz.agmstudio.neoblock.data.Range;
+import xyz.agmstudio.neoblock.tiers.NeoBlock;
+import xyz.agmstudio.neoblock.util.StringUtil;
 
 import java.util.Optional;
 
-public record NeoOffer(Item result, Range resultCount, Item costA, Range costACount, Item costB, Range costBCount, Range uses) {
-    public static NeoOffer parse(String trade) {
-        String[] parts = trade.split("; ");
-        if (parts.length < 2) return null;
+public final class NeoOffer {
+    private final NeoItem result;
+    private final NeoItem costA;
+    private final NeoItem costB;
+    private final Range uses;
 
-        String[] resultData = parts[0].split("x", 2);
-        Item resultItem = BuiltInRegistries.ITEM.get(ResourceLocation.parse(resultData[1]));
-        Range resultCount = Range.parse(resultData[0]);
-
-        String[] costAData = parts[1].split("x", 2);
-        Item costAItem = BuiltInRegistries.ITEM.get(ResourceLocation.parse(costAData[1]));
-        Range costACount = Range.parse(costAData[0]);
-
-        Item costBItem = null;
-        Range costBCount = new Range(0, 0);
-        Range uses = new Range(1, 1);
-        if (parts.length > 2) {
-            if (parts[2].contains("x")) {
-                String[] costBData = parts[2].split("x", 2);
-                if (costBData.length > 1) {
-                    costBCount = Range.parse(costBData[0]);
-                    costBItem = BuiltInRegistries.ITEM.get(ResourceLocation.parse(costBData[1]));
-                }
-            } else uses = Range.parse(parts[2]);
-        }
-
-        if (parts.length > 3) uses = Range.parse(parts[3]);
-
-        return new NeoOffer(resultItem, resultCount, costAItem, costACount, costBItem, costBCount, uses);
+    public NeoOffer(NeoItem result, NeoItem costA, NeoItem costB, Range uses) {
+        this.result = result;
+        this.costA = costA;
+        this.costB = costB;
+        this.uses = uses;
     }
 
-    public String dump() {
-        String codec = resultCount.dump() + BuiltInRegistries.ITEM.getKey(result) + ";" +
-                " " + costACount.dump() + BuiltInRegistries.ITEM.getKey(costA) + ";";
-        if (costB == null || costBCount == null) return codec;
-        return codec + " " + costBCount.dump() + BuiltInRegistries.ITEM.getKey(costB) + ";";
+    public static NeoOffer parse(String trade) {
+        String[] parts = trade.split("\\s*;\\s*");
+        if (parts.length < 2) return null;
+
+        NeoItem result = NeoItem.parse(parts[0]);
+        NeoItem costA = NeoItem.parse(parts[1]);
+        NeoItem costB = null;
+        Range uses = null;
+
+        if (parts.length == 3) {
+            uses = StringUtil.parseRange(parts[2]);
+            if (uses == null) costB = NeoItem.parse(parts[2]);
+        } else if (parts.length > 3) {
+            costB = NeoItem.parse(parts[2]);
+            uses = StringUtil.parseRange(parts[3]);
+        }
+
+        return new NeoOffer(result, costA, costB, uses);
+    }
+
+    public String toString() {
+        String codec = result + "; " + costA + ";";
+        if (costB != null) codec += " " + costB + ";";
+        return codec + uses.toString();
     }
 
     public MerchantOffer getOffer() {
-        return new MerchantOffer(
-                new ItemCost(costA, costACount.get()),
-                costB == null ? Optional.empty() : Optional.of(new ItemCost(costB, costBCount.get())),
-                new ItemStack(result, resultCount.get()),
-                uses.get(), 0, 0
-        );
+        return new MerchantOffer(costA.getCost(), costB == null ? Optional.empty() : Optional.of(costB.getCost()), result.getStack(), uses.get(), 0, 0);
+    }
+
+    public static EntityType<?> getMobTradeEntity(ItemStack item) {
+        CustomData data = item.getComponents().get(DataComponents.CUSTOM_DATA);
+        if (data == null) return null;
+
+        CompoundTag tag = data.copyTag();
+        if (!tag.getBoolean("isNeoMob")) return null;
+
+        String type = tag.getString("neoMobType");
+        return BuiltInRegistries.ENTITY_TYPE.get(ResourceLocation.parse(type));
+    }
+
+    public static boolean handlePossibleMobTrade(ItemStack item) {
+        EntityType<?> mob = getMobTradeEntity(item);
+        if (mob == null) return false;
+
+        NeoBlock.DATA.addTradedMob(mob, item.getCount());
+        return true;
     }
 }
