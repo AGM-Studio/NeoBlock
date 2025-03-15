@@ -47,8 +47,8 @@ public class NeoBlock {
         return DEFAULT_STATE;
     }
 
-    public static void regenerateNeoBlock(ServerLevel level, LevelAccessor access) {
-        access.setBlock(NeoBlock.POS, getRandomBlock(), 3);
+    public static void setNeoBlock(LevelAccessor access, BlockState block) {
+        access.setBlock(NeoBlock.POS, block, 3);
 
         Vec3 center = NeoBlock.POS.getCenter();
         for(Entity entity: access.getEntities(null, AABB.ofSize(center, 1.2, 1.2, 1.2)))
@@ -100,9 +100,7 @@ public class NeoBlock {
     public static void onBlockBroken(ServerLevel level, LevelAccessor access, boolean triggered) {
         if (triggered) DATA.addBlockCount(1);
         NeoTier next = DATA.getTier().next();
-        if (next != null && next.getUnlock() <= DATA.getBlockCount()) {
-            UPGRADE.startUpgrade(level, access, next);
-            DATA.setTier(next);
-        } else regenerateNeoBlock(level, access);
+        if (next != null && next.getUnlock() <= DATA.getBlockCount()) UPGRADE.startUpgrade(level, access, next);
+        else setNeoBlock(access, getRandomBlock());
     }
 }

@@ -46,19 +46,6 @@ public class NeoMerchant {
 
         return false;
     }
-
-    public static void tick(@NotNull ServerLevel level) {
-        for (Entity entity: level.getEntities().getAll())
-            if (entity instanceof Villager villager
-                    && villager.getTags().contains("NeoMerchant")
-                    && villager.getPersistentData().getInt("NeoTradeLifespan") < villager.getAge()
-            ) entity.remove(Entity.RemovalReason.DISCARDED);
-    }
-
-    protected NeoMerchant() {
-        this.trades = new ArrayList<>();
-    }
-
     public static void attemptSpawnTrader(ServerLevel level) {
         int breaks = NeoBlock.DATA.getBlockCount();
         if (breaks % attemptInterval != 0 || exists(level, "NeoMerchant")) return;
@@ -77,6 +64,17 @@ public class NeoMerchant {
             Villager trader = spawnTraderWith(trades, level);
             MessagingUtil.sendInstantMessage("message.neoblock.trader_spawned", level, true);
         }
+    }
+    public static void tick(@NotNull ServerLevel level) {
+        for (Entity entity: level.getEntities().getAll())
+            if (entity instanceof Villager villager
+                    && villager.getTags().contains("NeoMerchant")
+                    && villager.getPersistentData().getInt("NeoTradeLifespan") < villager.getAge()
+            ) entity.remove(Entity.RemovalReason.DISCARDED);
+    }
+
+    protected NeoMerchant() {
+        this.trades = new ArrayList<>();
     }
 
     public Villager spawnTrader(ServerLevel level) {

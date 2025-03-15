@@ -40,7 +40,7 @@ public class NeoBlockUpgrade {
             if (++UPGRADE_TICKS >= UPGRADE_GOAL) finishUpgrade(level, access);
             else {
                 UPGRADE_BAR.setProgress((float) UPGRADE_TICKS / UPGRADE_GOAL);
-                UPGRADE_BAR.setName(Component.translatable("message.neoblock.upgrade_bar", formatTicks(UPGRADE_GOAL - UPGRADE_TICKS)));
+                UPGRADE_BAR.setName(Component.translatable("bossbar.neoblock.upgrade_bar", formatTicks(UPGRADE_GOAL - UPGRADE_TICKS)));
             }
         }
     }
@@ -48,10 +48,12 @@ public class NeoBlockUpgrade {
     protected void finishUpgrade(ServerLevel level, LevelAccessor access) {
         if (NeoBlock.DATA == null) return;
         NeoTier tier = NeoBlock.DATA.getTier().next();
-        if (tier != null && tier.isUnlocked())
-            tier.onGettingUnlocked(level);
+        if (tier != null && tier.isUnlocked()) {
+            tier.onFinishUpgrade(level);
+            NeoBlock.DATA.setTier(tier);
+        }
 
-        NeoBlock.regenerateNeoBlock(level, access);
+        NeoBlock.setNeoBlock(access, NeoBlock.getRandomBlock());
 
         UPGRADE_BAR.removeAllPlayers();
         UPGRADE_TICKS = 0;
@@ -59,15 +61,17 @@ public class NeoBlockUpgrade {
     }
 
     public void startUpgrade(ServerLevel level, LevelAccessor access, NeoTier tier) {
+        if (tier == null || tier.isUnlocked()) return;
         UPGRADE_GOAL += tier.UNLOCK_TIME;
+        tier.onStartUpgrade(level);
         if (UPGRADE_GOAL == 0) finishUpgrade(level, access);
         else {
             level.players().forEach(UPGRADE_BAR::addPlayer);
-            access.setBlock(NeoBlock.POS, Blocks.BEDROCK.defaultBlockState(), 3);
+            NeoBlock.setNeoBlock(access, Blocks.BEDROCK.defaultBlockState());
         }
     }
 
-    public void configure(int goal, int tick) {
+    protected void configure(int goal, int tick) {
         UPGRADE_GOAL = goal;
         UPGRADE_TICKS = tick;
     }
