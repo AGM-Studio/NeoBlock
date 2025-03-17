@@ -59,8 +59,10 @@ public class NeoBlock {
 
     public static void reload() {
         if (!Files.exists(NeoTier.FOLDER)) {
-            for (int i = 0; i < 10; i++) NeoTier.loadFromResources(i);
-            NeoTier.loadFromResources("template");
+            for (int i = 0; i < 10; i++) try {
+                NeoTier.loadFromResources(i, false);
+            } catch (Exception ignored) { break; }
+            NeoTier.loadFromResources("template", true);
         }
 
         int i = 0;

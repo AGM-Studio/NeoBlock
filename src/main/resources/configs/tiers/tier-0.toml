@@ -1,8 +1,11 @@
 # Amount of blocks broken to unlock.
-unlock = 0
+unlock = 0    # Green phase
 # List of all blocks in this tier. All of them have equal chance to be chosen in this tier.
 blocks = [
-    "minecraft:grass_block"
+    "16xminecraft:grass_block",
+    "4xminecraft:moss_block",
+    "1xminecraft:podzol",
+    "1xminecraft:mycelium"
 ]
 # The wight of tier when choosing between unlocked tiers.
-weight = 1
+weight = 4

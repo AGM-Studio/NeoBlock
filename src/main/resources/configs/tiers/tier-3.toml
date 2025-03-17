@@ -1,0 +1,54 @@
+# Amount of blocks broken to unlock.
+unlock = 300   # Deep Cave phase
+# Upgrade time in ticks. During upgrade the NeoBlock will turn into Bedrock.
+unlock-time = 9600
+# List of all blocks in this tier. All of them have equal chance to be chosen in this tier.
+# Note that, blocks from tier 0 are available
+blocks = [
+    "20xminecraft:deepslate",
+    "14xminecraft:tuff",
+    "5xminecraft:amethyste_block",
+    "4xminecraft:deepslate_coal_ore",
+    "4xminecraft:deepslate_iron_ore",
+    "2xminecraft:deepslate_gold_ore",
+    "4xminecraft:deepslate_copper_ore",
+    "1xminecraft:deepslate_diamond_ore",
+    "2xminecraft:deepslate_redstone_ore",
+    "3xminecraft:deepslate_lapis_ore",
+    "2xminecraft:redstone_ore",
+    "2xminecraft:lapis_ore",
+    "1xminecraft:emerald_ore"
+]
+# The wight of tier when choosing between unlocked tiers.
+weight = 1
+# The trades the trader will spawn with when this tier is unlocked. This trader will despawn (if not dead) upon unlocking next tier.
+# Syntax for item is `COUNT`x`ID`, the count can be a range like `8-12` or a number.
+# Uses also use same syntax as the count, but not providing it will use 1 instead.
+# For a trade use one of the following:
+#    `RESULT`; `COST A`; `COST B`; `USES`
+#    `RESULT`; `COST A`; `COST B`;
+#    `RESULT`; `COST A`; `USES`
+#    `RESULT`; `COST A`;
+unlock-trades = [
+    "1xminecraft:bamboo; 36-64xminecraft:oak_sapling; 1-3",
+    "1xminecraft:lava_bucket; 16-32xminecraft:cobblestone; 1xminecraft:bucket; 3",
+    "4xminecraft:glow_berries; 16-24xminecraft:moss_block; 8-12",
+    "4xminecraft:sweet_berries; 8-12xminecraft:moss_block; 8-12",
+    "1xminecraft:pointed_dripstone; 8-24xminecraft:cobblestone; 6-12"
+]
+# Wandering NeoTraders will spawn when they have some offers
+# List of offers they might have when spawned. using same syntax.
+trader-trades = [
+    "1xminecraft:lava_bucket; 16-32xminecraft:iron_ingot; 1xminecraft:bucket; 3",
+    "2xminecraft:glow_berries; 16-24xminecraft:moss_block; 8-12",
+    "2xminecraft:sweet_berries; 8-12xminecraft:moss_block; 8-12",
+    "1xminecraft:pointed_dripstone; 24-64xminecraft:cobblestone; 6-12",
+    "1xminecraft:bamboo; 36-64xminecraft:oak_sapling; 1-3",
+    "1xminecraft:brown_mushroom; 12-32xminecraft:iron_ingot; 1-3",
+    "1xminecraft:red_mushroom; 12-32xminecraft:iron_ingot; 1-3",
+    "mob:1xminecraft:goat; 16-32xminecraft:gold_ingot; 10-30xminecraft:golden_carrot; 2",
+    "mob:1xminecraft:panda; 16-32xminecraft:gold_ingot; 64xminecraft:bamboo; 2",
+    "mob:1xminecraft:frog; 16-32xminecraft:gold_ingot; 16-32xminecraft:slime_ball; 2"
+]
+# Amount of trades they will choose from this tier
+trader-count = 2

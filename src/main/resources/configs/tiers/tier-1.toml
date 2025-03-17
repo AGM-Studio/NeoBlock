@@ -1,15 +1,21 @@
 # Amount of blocks broken to unlock.
-unlock = 50
+unlock = 50    # Growing phase
+# Upgrade time in ticks. During upgrade the NeoBlock will turn into Bedrock.
+unlock-time = 1200
 # List of all blocks in this tier. All of them have equal chance to be chosen in this tier.
 # Note that, blocks from tier 0 are available
 blocks = [
-    "minecraft:stone",
-    "minecraft:coal_ore",
-    "minecraft:iron_ore"
+    "10xminecraft:stone",
+    "4xminecraft:coal_ore",
+    "2xminecraft:iron_ore",
+    "minecraft:andesite",
+    "minecraft:granite",
+    "minecraft:diorite",
+    "minecraft:clay"
 ]
 # The wight of tier when choosing between unlocked tiers.
-weight = 1
-# The trades the trader will spawn with when this tier is unlocked.
+weight = 3
+# The trades the trader will spawn with when this tier is unlocked. This trader will despawn (if not dead) upon unlocking next tier.
 # Syntax for item is `COUNT`x`ID`, the count can be a range like `8-12` or a number.
 # Uses also use same syntax as the count, but not providing it will use 1 instead.
 # For a trade use one of the following:
@@ -19,6 +25,23 @@ weight = 1
 #    `RESULT`; `COST A`;
 unlock-trades = [
     "1xminecraft:carrot; 2xminecraft:apple; 8-12",
-    "1xminecraft:oak_sappling; 10-15xminecraft:dirt; 3",
+    "1xminecraft:oak_sapling; 10-15xminecraft:dirt; 3",
     "1xminecraft:ice; 2-4xminecraft:oak_log; 8-16xminecraft:dirt; 8-12"
 ]
+# Wandering NeoTraders will spawn when they have some offers
+# List of offers they might have when spawned. using same syntax.
+trader-trades = [
+    "1xminecraft:oak_sapling; 10-15xminecraft:dirt; 3",
+    "1xminecraft:oak_sapling; 10-15xminecraft:moss_block; 3",
+    "1-3xminecraft:carrot; 4-12xminecraft:apple; 3-6",
+    "1-3xminecraft:potato; 4-12xminecraft:apple; 3-6",
+    "1-3xminecraft:beetroot_seeds; 4-12xminecraft:apple; 3-6",
+    "1-3xminecraft:wheat_seeds; 4-12xminecraft:apple; 3-6",
+    "1-3xminecraft:kelp; 4-12xminecraft:grass; 3-6",
+    "mob:1xminecraft:pig; 16-32xminecraft:iron_ingot; 20-30xminecraft:potato; 1-3",
+    "mob:1xminecraft:chicken; 40-60xminecraft:iron_ingot; 20-30xminecraft:wheat_seeds; 1-3",
+    "mob:1xminecraft:cow; 16-32xminecraft:iron_ingot; 10-15xminecraft:wheat; 1-3",
+    "mob:1xminecraft:sheep; 24-36xminecraft:iron_ingot; 10-15xminecraft:wheat; 1-3"
+]
+# Amount of trades they will choose from this tier
+trader-count = 2

@@ -1,0 +1,50 @@
+# Amount of blocks broken to unlock.
+unlock = 150   # Cave phase
+# Upgrade time in ticks. During upgrade the NeoBlock will turn into Bedrock.
+unlock-time = 3600
+# List of all blocks in this tier. All of them have equal chance to be chosen in this tier.
+# Note that, repeatitive blocks will have higher chance this way.
+blocks = [
+    "minecraft:iron_ore",
+    "minecraft:gold_ore",
+    "minecraft:coal_ore",
+    "minecraft:copper_ore"
+]
+# The wight of tier when choosing between unlocked tiers.
+weight = 2
+# The trades the trader will spawn with when this tier is unlocked. This trader will despawn (if not dead) upon unlocking next tier.
+# Syntax for item is `COUNT`x`ID`, the count can be a range like `8-12` or a number.
+# Uses also use same syntax as the count, but not providing it will use 1 instead.
+# For a trade use one of the following:
+#    `RESULT`; `COST A`; `COST B`; `USES`
+#    `RESULT`; `COST A`; `COST B`;
+#    `RESULT`; `COST A`; `USES`
+#    `RESULT`; `COST A`;
+unlock-trades = [
+    "8xminecraft:cobblestone; 6xminecraft:gravel; 8-12",
+    "8xminecraft:cobblestone; 5xminecraft:sand; 8-12",
+    "8xminecraft:cobblestone; 4xminecraft:red_sand; 8-12",
+    "1xminecraft:spruce_sapling; 10-20xminecraft:oak_log; 48-64xminecraft:dirt; 4-8"
+]
+# Wandering NeoTraders will spawn when they have some offers
+# List of offers they might have when spawned. using same syntax.
+trader-trades = [
+    "1xminecraft:spruce_sapling; 10-20xminecraft:oak_log; 48-64xminecraft:dirt; 4-8",
+    "1xminecraft:birch_sapling; 5-10xminecraft:oak_log; 16-48xminecraft:dirt; 4-8",
+    "1xminecraft:jungle_sapling; 10-20xminecraft:oak_log; 48-64xminecraft:dirt; 4-8",
+    "1xminecraft:dark_oak_sapling; 24-48xminecraft:oak_log; 56-64xminecraft:cobblestone; 4-8",
+    "1xminecraft:cherry_sapling; 24-48xminecraft:oak_log; 24-48xminecraft:iron_ingot; 4-8",
+    "1xminecraft:acacia_sapling; 10-20xminecraft:oak_log; 48-64xminecraft:dirt; 4-8",
+    "1xminecraft:mangrove_propagule; 24-48xminecraft:oak_log; 56-64xminecraft:cobblestone; 4-8",
+    "1-3xminecraft:pumpkin_seeds; 20-40xminecraft:apple; 3-6",
+    "1-3xminecraft:melon_seeds; 20-40xminecraft:apple; 3-6",
+    "1-3xminecraft:lily_pad; 20-40xminecraft:grass; 3-6",
+    "mob:1xminecraft:horse; 16-32xminecraft:iron_ingot; 5-15xminecraft:golden_carrot; 2",
+    "mob:1xminecraft:donkey; 16-32xminecraft:iron_ingot; 5-15xminecraft:golden_carrot; 2",
+    "mob:1xminecraft:llama; 16-32xminecraft:iron_ingot; 5-15xminecraft:golden_carrot; 2",
+    "8xminecraft:cobblestone; 6xminecraft:gravel; 8-12",
+    "8xminecraft:cobblestone; 5xminecraft:sand; 8-12",
+    "8xminecraft:cobblestone; 4xminecraft:red_sand; 8-12",
+]
+# Amount of trades they will choose from this tier
+trader-count = 4

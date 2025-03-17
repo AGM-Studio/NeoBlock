@@ -1,0 +1,37 @@
+# Amount of blocks broken to unlock.
+unlock = 1500   # End phase
+# Upgrade time in ticks. During upgrade the NeoBlock will turn into Bedrock.
+unlock-time = 36000
+# List of all blocks in this tier. All of them have equal chance to be chosen in this tier.
+# Note that, blocks from tier 0 are available
+blocks = [
+    "1xminecraft:end_stone"
+]
+# The wight of tier when choosing between unlocked tiers.
+weight = 1
+# The trades the trader will spawn with when this tier is unlocked. This trader will despawn (if not dead) upon unlocking next tier.
+# Syntax for item is `COUNT`x`ID`, the count can be a range like `8-12` or a number.
+# Uses also use same syntax as the count, but not providing it will use 1 instead.
+# For a trade use one of the following:
+#    `RESULT`; `COST A`; `COST B`; `USES`
+#    `RESULT`; `COST A`; `COST B`;
+#    `RESULT`; `COST A`; `USES`
+#    `RESULT`; `COST A`;
+unlock-trades = [
+    "2xminecraft:shulker_shell; 16-32xminecraft:diamond; 4-6",
+    "1xminecraft:chorus_fruit; 16-32xminecraft:gold_ingot; 4-6",
+    "8xminecraft:end_stone; 16-32xminecraft:iron_ingot; 4-6"
+]
+# Wandering NeoTraders will spawn when they have some offers
+# List of offers they might have when spawned. using same syntax.
+trader-trades = [
+    "1xminecraft:deepslate_emerald_ore; 64xminecraft:emerald_block; 1",
+    "1xminecraft:diamond_ore; 4-8xminecraft:diamond; 1",
+    "1xminecraft:budding_amethyst; 16-64xminecraft:diamond; 1",
+    "1xminecraft:small_amethyst_bud; 4-6xminecraft:amethyst_shard; 8-12",
+    "1xminecraft:medium_amethyst_bud; 8-12xminecraft:amethyst_shard; 8-12",
+    "1xminecraft:large_amethyst_bud; 16-24xminecraft:amethyst_shard; 8-12",
+    "1xminecraft:amethyst_cluster; 32-48xminecraft:amethyst_shard; 8-12",
+]
+# Amount of trades they will choose from this tier
+trader-count = 2

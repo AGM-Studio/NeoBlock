@@ -20,7 +20,7 @@ import java.util.random.RandomGenerator;
 
 public class NeoTier {
     protected static final Path FOLDER = Paths.get(FMLPaths.CONFIGDIR.get().toAbsolutePath().toString(), NeoBlockMod.MOD_ID, "tiers");
-    protected static void loadFromResources(Object tier) {
+    protected static void loadFromResources(Object tier, boolean useTemplate) {
         if (!Files.exists(FOLDER)) try {
             Files.createDirectories(FOLDER);
         } catch (Exception e) {
@@ -31,7 +31,10 @@ public class NeoTier {
         if (Files.exists(location)) return;
 
         String resource = "/configs/tiers/tier-" + tier + ".toml";
-        if (!ResourceUtil.doesResourceExist(resource)) resource = "/configs/tiers/tier-template.toml";
+        if (!ResourceUtil.doesResourceExist(resource)) {
+            if (useTemplate) resource = "/configs/tiers/tier-template.toml";
+            else return;
+        }
         try {
             ResourceUtil.processResourceFile(resource, location, Map.of("[TIER]", tier == "template" ? "10" : tier.toString()));
         } catch (Exception e) {
