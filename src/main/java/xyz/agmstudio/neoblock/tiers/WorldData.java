@@ -112,9 +112,11 @@ public class WorldData extends SavedData {
         final CompoundTag upgrade = tag.getCompound("Upgrade");
         upgrade.putInt("Goal", this.upgrade.UPGRADE_GOAL);
         upgrade.putInt("Tick", this.upgrade.UPGRADE_TICKS);
+        tag.put("Upgrade", upgrade);
 
         final CompoundTag mobs = tag.getCompound("TradedMobs");
         tradedMobs.forEach((key, value) -> mobs.putInt(BuiltInRegistries.ENTITY_TYPE.getKey(key).toString(), value));
+        tag.put("TradedMobs", mobs);
 
         return tag;
     }
