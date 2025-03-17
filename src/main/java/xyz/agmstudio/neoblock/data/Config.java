@@ -25,6 +25,29 @@ public class Config {
     public static ModConfigSpec.ConfigValue<Integer> NeoMerchantLifespanMin;
     public static ModConfigSpec.ConfigValue<Integer> NeoMerchantLifespanMax;
 
+    public static ModConfigSpec.ConfigValue<Boolean> AnimateProgressbar;
+    public static ModConfigSpec.ConfigValue<Boolean> AnimateProgressbarName;
+    public static ModConfigSpec.ConfigValue<String> AnimateProgressbarColor;
+
+    public static ModConfigSpec.ConfigValue<Boolean> AnimateUpgradeExplosion;
+    public static ModConfigSpec.ConfigValue<Float> AnimateUpgradeExplosionVolume;
+
+    public static ModConfigSpec.ConfigValue<Boolean> AnimateUpgradeFuse;
+    public static ModConfigSpec.ConfigValue<Float> AnimateUpgradeFuseVolume;
+
+    public static ModConfigSpec.ConfigValue<Boolean> AnimateBlockBreaking;
+    public static ModConfigSpec.ConfigValue<Integer> AnimateBlockBreakingInterval;
+    public static ModConfigSpec.ConfigValue<Float> AnimateBlockBreakingVolume;
+
+    public static ModConfigSpec.ConfigValue<Boolean> AnimateBlockSpiral;
+    public static ModConfigSpec.ConfigValue<Integer> AnimateBlockSpiralInterval;
+    public static ModConfigSpec.ConfigValue<Integer> AnimateBlockSpiralLength;
+
+    public static ModConfigSpec.ConfigValue<Boolean> AnimateBlockSparkle;
+    public static ModConfigSpec.ConfigValue<Integer> AnimateBlockSparkleInterval;
+    public static ModConfigSpec.ConfigValue<Integer> AnimateBlockSparkleLength;
+    public static ModConfigSpec.ConfigValue<Integer> AnimateBlockSparkleFactor;
+
     protected Config(ModConfigSpec.Builder builder) {
         builder.push("neo-trader");
         NeoMerchantChance = builder
@@ -42,7 +65,82 @@ public class Config {
         NeoMerchantLifespanMax = builder
                 .comment("The maximum ticks the trader should exist before despawning.")
                 .define("life-span-max", 20 * 60 * 40);
+        builder.pop();
 
+        builder.push("Animations");
+        builder.push("Progressbar");
+        AnimateProgressbar = builder
+                .comment("If you want the progressbar shows up while upgrading the NeoBlock set this to true, otherwise set it to false")
+                .define("enabled", true);
+        AnimateProgressbarName = builder
+                .define("show-time", true);
+        AnimateProgressbarColor = builder
+                .comment("Supported colors are `red`, `green`, `blue`, `pink`, `yellow`, `purple`, `white`")
+                .define("color", "red");
+        builder.pop();
+
+        builder.push("Upgrade Start");
+        builder.push("Fuse");
+        AnimateUpgradeFuse = builder
+                .comment("If the fuse should be played when upgrade is started.")
+                .define("enabled", true);
+        AnimateUpgradeFuseVolume = builder
+                .comment("The volume of the block breaking sound.")
+                .define("volume", 0.7f);
+        builder.pop();
+        builder.pop();
+
+        builder.push("Upgrade Finish");
+        builder.push("Explosion");
+        AnimateUpgradeExplosion = builder
+                .comment("If the explosion with the thumb should be played when upgrade is finished.")
+                .define("enabled", true);
+        AnimateUpgradeExplosionVolume = builder
+                .comment("The volume of the block breaking sound.")
+                .define("volume", 0.7f);
+        builder.pop();
+        builder.pop();
+
+        builder.push("Block");
+        builder.push("Breaking-Animation");
+        AnimateBlockBreaking = builder
+                .comment("This animation will show block breaking particles and sound every second.")
+                .define("enabled", true);
+        AnimateBlockBreakingInterval = builder
+                .comment("Interval time in ticks. Each 20 ticks is one second.")
+                .define("interval", 20);
+        AnimateBlockBreakingVolume = builder
+                .comment("The volume of the block breaking sound.")
+                .define("volume", 0.7f);
+        builder.pop();
+
+        builder.push("Spiral-Animation");
+        AnimateBlockSpiral = builder
+                .comment("This animation will show enchanting particles.")
+                .define("enabled", false);
+        AnimateBlockSpiralInterval = builder
+                .comment("Interval time in ticks.")
+                .define("interval", 50);
+        AnimateBlockSpiralLength = builder
+                .comment("The length of animation in ticks. If bigger number is used, multiple spirals might appear.")
+                .define("length", 20);
+        builder.pop();
+
+        builder.push("Sparkle");
+        AnimateBlockSparkle = builder
+                .comment("This animation will show sparkling particles once a while")
+                .define("enabled", true);
+        AnimateBlockSparkleInterval = builder
+                .comment("Interval time in ticks.")
+                .define("interval", 200);
+        AnimateBlockSparkleLength = builder
+                .comment("The length of animation in ticks. It's recommended to use lower numbers.")
+                .define("length", 20);
+        AnimateBlockSparkleFactor = builder
+                .comment("The spam protection factor as an Integer.")
+                .define("block-breaking", 3);
+        builder.pop();
+        builder.pop();
         builder.pop();
     }
 }
