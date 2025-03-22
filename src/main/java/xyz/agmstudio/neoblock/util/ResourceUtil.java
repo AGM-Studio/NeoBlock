@@ -2,6 +2,7 @@ package xyz.agmstudio.neoblock.util;
 
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import net.neoforged.fml.loading.FMLPaths;
+import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 
 import java.io.*;
@@ -91,5 +92,17 @@ public class ResourceUtil {
 
         config.load();
         return config;
+    }
+
+    /**
+     * Creates a config folder and returns the path to it using the path given
+     *
+     * @param paths the path to folder starting from the config folder
+     * @return path to desired folder
+     */
+    public static @NotNull Path getConfigFolder(String... paths) {
+        Path path = Paths.get(FMLPaths.CONFIGDIR.get().toAbsolutePath().toString(), paths);
+        if (!path.toFile().exists() && path.toFile().mkdirs()) NeoBlockMod.LOGGER.debug("Creating folder {}", path);
+        return path;
     }
 }

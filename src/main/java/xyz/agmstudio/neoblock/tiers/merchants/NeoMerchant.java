@@ -1,5 +1,6 @@
 package xyz.agmstudio.neoblock.tiers.merchants;
 
+import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -22,13 +23,25 @@ import java.util.UUID;
 import java.util.random.RandomGenerator;
 
 public class NeoMerchant {
-
-    protected final List<NeoOffer> trades;
-
-    public static float chance;
-    public static float increment;
+    public static double chance;
+    public static double increment;
     public static int attemptInterval;
     public static Range lifespan;
+
+    public static void loadConfig() {
+        CommentedFileConfig config = NeoBlockMod.getConfig();
+        NeoMerchant.chance = config.get("neo-trader.chance");
+        NeoMerchant.increment = config.get("neo-trader.chance-increment");
+        NeoMerchant.attemptInterval = config.get("neo-trader.attempt-interval");
+        NeoMerchant.lifespan = new Range(
+                Math.max(0, config.get("neo-trader.life-span-min")),
+                Math.max(0, config.get("neo-trader.life-span-max"))
+        );
+
+        NeoBlockMod.LOGGER.debug("NeoMerchant: Config loaded. \n\tChance: {}\n\tChance Increment: {}\n\tAttempt Interval: {}\n\tLifespan: {}", NeoMerchant.chance, NeoMerchant.increment, NeoMerchant.attemptInterval, NeoMerchant.lifespan);
+    }
+
+    protected final List<NeoOffer> trades;
 
     public static NeoMerchant parse(List<String> trades) {
         if (trades.isEmpty()) return null;
@@ -52,7 +65,7 @@ public class NeoMerchant {
     }
     public static WanderingTrader attemptSpawnTrader(ServerLevel level) {
         if (NeoBlock.DATA.getBlockCount() % attemptInterval != 0 || exists(level, "NeoMerchant")) return null;
-        float chance = NeoMerchant.chance + (increment * NeoBlock.DATA.getTraderFailedAttempts());
+        double chance = NeoMerchant.chance + (increment * NeoBlock.DATA.getTraderFailedAttempts());
         if (RandomGenerator.getDefault().nextFloat() > chance) {
             NeoBlock.DATA.addTraderFailedAttempts();
             NeoBlockMod.LOGGER.debug("Trader chance {} failed for {} times in a row", chance, NeoBlock.DATA.getTraderFailedAttempts());

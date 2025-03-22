@@ -71,11 +71,6 @@ public class NeoBlock {
             NeoBlock.TIERS.add(new NeoTier(i++));
 
         NeoBlockMod.LOGGER.info("Loaded {} tiers from the tiers folder.", NeoBlock.TIERS.size());
-
-        NeoMerchant.chance = Config.NeoMerchantChance.get();
-        NeoMerchant.increment = Config.NeoMerchantChanceIncrement.get();
-        NeoMerchant.attemptInterval = Config.NeoMerchantAttemptInterval.get();
-        NeoMerchant.lifespan = new Range(Config.NeoMerchantLifespanMin.get(), Config.NeoMerchantLifespanMax.get());
     }
 
     public static void setupWorldData(ServerLevel level) {
