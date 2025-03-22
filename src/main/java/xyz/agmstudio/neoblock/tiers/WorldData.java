@@ -36,7 +36,7 @@ public class WorldData extends SavedData {
     private int traderFailedAttempts;
     private NeoTier tier = null;
 
-    private final NeoBlockUpgrade upgrade = new NeoBlockUpgrade();
+    private final NeoBlock.Upgrade upgrade = new NeoBlock.Upgrade();
     private final HashMap<EntityType<?>, Integer> tradedMobs = new HashMap<>();
 
     public WorldData() {
@@ -121,7 +121,7 @@ public class WorldData extends SavedData {
         return tag;
     }
 
-    public NeoBlockUpgrade fetchUpgrade() {
+    public NeoBlock.Upgrade fetchUpgrade() {
         return upgrade;
     }
     public HashMap<EntityType<?>, Integer> getTradedMobs() {

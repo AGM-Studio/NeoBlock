@@ -6,6 +6,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import org.apache.commons.lang3.tuple.Pair;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.agmstudio.neoblock.data.Range;
 
@@ -13,6 +14,25 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class StringUtil {
+    /**
+     * Converts string to snake-case
+     *
+     * @param string the string to be converted
+     * @return the snake-case
+     */
+    public static @NotNull String convertToSnakeCase(@NotNull String string) {
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < string.length(); i++) {
+            char c = string.charAt(i);
+            if (Character.isUpperCase(c)) {
+                if (i > 0) result.append('-');
+                result.append(Character.toLowerCase(c));
+            } else result.append(c);
+        }
+        return result.toString();
+    }
+
+
     private static final Pattern RX = Pattern.compile("^(\\d+)(?:-(\\d+))?x");
     private static final Pattern RP = Pattern.compile("^(\\d+)(?:-(\\d+))?");
 

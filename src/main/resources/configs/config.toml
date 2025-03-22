@@ -1,0 +1,40 @@
+[neo-trader]
+chance = 0.3                # Chance of spawning a NeoMerchant per interval. If no trades are available or another trader lives, no NeoMerchant will be spawned.
+chance-increment = 0.075    # On a failed attempt, will increase the chance of NeoMerchant per interval by this amount.
+attempt-interval = 10       # How many blocks should be broken to attempt to spawn a NeoMerchant.
+life-span-min = 24000       # The minimum ticks the trader should exist before despawning.
+life-span-max = 48000       # The maximum ticks the trader should exist before despawning.
+
+
+[animations.progressbar]
+enabled = true              # If the progressbar should be shown to players
+show-time = true            # If the remaining time should be shown to players
+color = "red"               # Supported colors are `red`, `green`, `blue`, `pink`, `yellow`, `purple`, `white`
+
+[animations.phase.fuse]
+at-start = true
+at-finish = false
+volume = 0.7
+
+[animations.phase.explosion]
+at-start = true
+at-finish = false
+volume = 0.7
+
+[animations.upgrade.breaking]
+enabled = true
+interval = 20       # In ticks
+volume = 0.7
+
+[animations.upgrade.sparkle]
+enabled = false
+interval = 200      # In ticks
+length = 20         # In ticks
+factor = 3
+count = 1
+
+[animations.upgrade.spiral]
+enabled = true
+interval = 50       # In ticks
+length = 20         # In ticks
+count = 5

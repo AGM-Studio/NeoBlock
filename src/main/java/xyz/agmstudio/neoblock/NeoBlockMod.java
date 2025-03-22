@@ -3,25 +3,26 @@ package xyz.agmstudio.neoblock;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.neoforged.fml.loading.FMLPaths;
 import net.neoforged.neoforge.common.NeoForge;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.moddingx.libx.mod.ModXRegistration;
-import xyz.agmstudio.neoblock.data.Config;
 import xyz.agmstudio.neoblock.tiers.NeoBlock;
+import xyz.agmstudio.neoblock.tiers.animations.Animation;
+import xyz.agmstudio.neoblock.tiers.animations.phase.ExplosionAnimation;
+import xyz.agmstudio.neoblock.tiers.animations.phase.FuseAnimation;
+import xyz.agmstudio.neoblock.tiers.animations.phase.UpgradePhaseAnimation;
+import xyz.agmstudio.neoblock.tiers.animations.progress.BreakingAnimation;
+import xyz.agmstudio.neoblock.tiers.animations.progress.SparkleAnimation;
+import xyz.agmstudio.neoblock.tiers.animations.progress.SpiralAnimation;
+import xyz.agmstudio.neoblock.tiers.animations.progress.UpgradeProgressAnimation;
 import xyz.agmstudio.neoblock.tiers.merchants.NeoMerchant;
 import xyz.agmstudio.neoblock.util.MessagingUtil;
 import xyz.agmstudio.neoblock.util.ResourceUtil;
 
-import java.io.IOException;
-import java.nio.file.FileAlreadyExistsException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 @Mod(NeoBlockMod.MOD_ID)
 public final class NeoBlockMod extends ModXRegistration {
@@ -59,11 +60,21 @@ public final class NeoBlockMod extends ModXRegistration {
         NeoBlock.reload();
 
         NeoMerchant.loadConfig();
+
+        UpgradePhaseAnimation.getAnimations().forEach(Animation::register);
+        UpgradeProgressAnimation.getAnimations().forEach(Animation::register);
     }
 
     @Override
     protected void setup(FMLCommonSetupEvent event) {
         NeoBlockMod.reload();
+
+        UpgradePhaseAnimation.addAnimation(ExplosionAnimation.class);
+        UpgradePhaseAnimation.addAnimation(FuseAnimation.class);
+
+        UpgradeProgressAnimation.addAnimation(BreakingAnimation.class);
+        UpgradeProgressAnimation.addAnimation(SparkleAnimation.class);
+        UpgradeProgressAnimation.addAnimation(SpiralAnimation.class);
     }
     @Override
     protected void clientSetup(FMLClientSetupEvent event) {}

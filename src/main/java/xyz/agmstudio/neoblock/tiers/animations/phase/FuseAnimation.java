@@ -1,4 +1,4 @@
-package xyz.agmstudio.neoblock.tiers.animations;
+package xyz.agmstudio.neoblock.tiers.animations.phase;
 
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
@@ -6,21 +6,19 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.phys.Vec3;
-import xyz.agmstudio.neoblock.data.Config;
 import xyz.agmstudio.neoblock.tiers.NeoBlock;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class FuseAnimation extends Animation {
-    private final float volume;
+public class FuseAnimation extends UpgradePhaseAnimation {
+    @AnimationConfig private float volume = 1.5f;
 
     private final List<Integer> animations = new ArrayList<>();
 
     public FuseAnimation() {
-        super();
-        this.volume = Math.min(0, Config.AnimateBlockBreakingVolume.get());
+        super("fuse");
     }
 
     @Override public void animate(ServerLevel level, LevelAccessor access) {

@@ -1,31 +1,36 @@
-package xyz.agmstudio.neoblock.tiers.animations;
+package xyz.agmstudio.neoblock.tiers.animations.progress;
 
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.phys.Vec3;
-import xyz.agmstudio.neoblock.data.Config;
 import xyz.agmstudio.neoblock.tiers.NeoBlock;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class UpgradeSpiral extends UpgradeAnimation {
-    private final int interval;
-    private final int length;
+public class SpiralAnimation extends UpgradeProgressAnimation {
+    @AnimationConfig private int length = 50;
+    @AnimationConfig private int count = 5;
 
     private final List<Integer> animations = new ArrayList<>();
 
-    public UpgradeSpiral() {
-        super();
-        this.interval = Config.AnimateBlockSpiralInterval.get();
-        this.length = Math.min(0, Config.AnimateBlockSpiralLength.get());
+    public SpiralAnimation() {
+        super("spiral");
     }
 
-    @Override public void upgradeTick(ServerLevel level, LevelAccessor access, int tick) {
-        if (tick % interval == 0) animations.add(0);
+    @Override
+    public void processConfig() {
+        interval = Math.max(interval, 5);
+        length = Math.max(0, length);
+        count = Math.max(1, count);
     }
+
+    @Override public void animate(ServerLevel level, LevelAccessor access) {
+        animations.add(0);
+    }
+
     @Override public void tick(ServerLevel level, LevelAccessor access) {
         Iterator<Integer> iterator = new ArrayList<>(animations).iterator();
         animations.clear();
@@ -33,10 +38,9 @@ public class UpgradeSpiral extends UpgradeAnimation {
         while (iterator.hasNext()) {
             int tick = iterator.next();
             double progress = (double) tick / length;
-            int points = 5;
 
-            for (int i = 0; i < points; i++) {
-                double angle = (tick + (i * (360.0 / points))) * (Math.PI / 10);
+            for (int i = 0; i < count; i++) {
+                double angle = (tick + (i * (360.0 / count))) * (Math.PI / 10);
                 double radius = 0.5;
                 double xOffset = Math.cos(angle) * radius;
                 double zOffset = Math.sin(angle) * radius;

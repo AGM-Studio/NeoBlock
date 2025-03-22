@@ -77,10 +77,10 @@ public final class NeoListener {
     }
 
     @SubscribeEvent
-    public static void onWanderingSpawn(EntityJoinLevelEvent event) {
+    public static void onEntitySpawn(EntityJoinLevelEvent event) {
         if (!(event.getLevel() instanceof ServerLevel level)) return;
         if (event.getEntity() instanceof WanderingTrader trader) NeoMerchant.handleTrader(trader);
-        if (event.getEntity() instanceof ServerPlayer player && NeoBlock.UPGRADE.isOnUpgrade()) NeoBlock.UPGRADE.showTo(player);
+        if (event.getEntity() instanceof ServerPlayer player && NeoBlock.UPGRADE.isOnUpgrade()) NeoBlock.UPGRADE.addPlayer(player);
         if (event.getEntity() instanceof ItemEntity item && NeoOffer.handlePossibleMobTrade(item.getItem())) event.setCanceled(true);
     }
 

@@ -1,19 +1,17 @@
-package xyz.agmstudio.neoblock.tiers.animations;
+package xyz.agmstudio.neoblock.tiers.animations.phase;
 
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.LevelAccessor;
-import xyz.agmstudio.neoblock.data.Config;
 import xyz.agmstudio.neoblock.tiers.NeoBlock;
 
-public class ExplosionAnimation extends Animation {
-    private final float volume;
+public class ExplosionAnimation extends UpgradePhaseAnimation {
+    @AnimationConfig private float volume = 0.7f;
 
     public ExplosionAnimation() {
-        super();
-        this.volume = Math.min(0, Config.AnimateBlockBreakingVolume.get());
+        super("explosion");
     }
 
     @Override public void animate(ServerLevel level, LevelAccessor access) {
