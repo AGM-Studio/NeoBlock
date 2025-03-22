@@ -7,6 +7,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.saveddata.SavedData;
 import org.jetbrains.annotations.NotNull;
+import xyz.agmstudio.neoblock.NeoBlockMod;
 
 import java.util.HashMap;
 
@@ -25,16 +26,18 @@ public class WorldData extends SavedData {
         data.updateTier();
         CompoundTag upgrade = tag.getCompound("Upgrade");
         data.upgrade.configure(
-                tag.getInt("Goal"),
-                tag.getInt("Tick")
+                upgrade.getInt("Goal"),
+                upgrade.getInt("Tick")
         );
+
+        NeoBlockMod.LOGGER.debug("Loaded WorldData from {}", tag);
 
         return data;
     }
     private int worldState;
     private int blockCount;
     private int traderFailedAttempts;
-    private NeoTier tier = null;
+    private NeoTier tier;
 
     private final NeoBlock.Upgrade upgrade = new NeoBlock.Upgrade();
     private final HashMap<EntityType<?>, Integer> tradedMobs = new HashMap<>();
@@ -43,6 +46,9 @@ public class WorldData extends SavedData {
         worldState = 0;
         blockCount = 0;
         traderFailedAttempts = 0;
+
+        tier = NeoBlock.TIERS.getFirst();
+        NeoBlock.UPGRADE = this.fetchUpgrade();
     }
 
     public void setActive() {
@@ -118,6 +124,7 @@ public class WorldData extends SavedData {
         tradedMobs.forEach((key, value) -> mobs.putInt(BuiltInRegistries.ENTITY_TYPE.getKey(key).toString(), value));
         tag.put("TradedMobs", mobs);
 
+        NeoBlockMod.LOGGER.debug("Saving WorldData to {}", tag);
         return tag;
     }
 
