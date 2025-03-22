@@ -61,20 +61,24 @@ public final class NeoBlockMod extends ModXRegistration {
 
         NeoMerchant.loadConfig();
 
+        NeoBlockMod.LOGGER.info("Loaded animations: " + UpgradePhaseAnimation.getAnimations().size());
+
         UpgradePhaseAnimation.getAnimations().forEach(Animation::register);
         UpgradeProgressAnimation.getAnimations().forEach(Animation::register);
     }
 
     @Override
     protected void setup(FMLCommonSetupEvent event) {
-        NeoBlockMod.reload();
-
         UpgradePhaseAnimation.addAnimation(ExplosionAnimation.class);
         UpgradePhaseAnimation.addAnimation(FuseAnimation.class);
 
         UpgradeProgressAnimation.addAnimation(BreakingAnimation.class);
         UpgradeProgressAnimation.addAnimation(SparkleAnimation.class);
         UpgradeProgressAnimation.addAnimation(SpiralAnimation.class);
+
+        Animation.disableRegisteringNewAnimations();
+
+        NeoBlockMod.reload();
     }
     @Override
     protected void clientSetup(FMLClientSetupEvent event) {}

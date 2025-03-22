@@ -20,9 +20,17 @@ import java.util.List;
 
 @EventBusSubscriber
 public abstract class Animation {
+    private static boolean registeringNewAnimations = true;
     private static final List<Animation> animations = new ArrayList<>();
     public static void addAnimation(Animation animation) {
         animations.add(animation);
+    }
+    public static void disableRegisteringNewAnimations() {
+        registeringNewAnimations = false;
+    }
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
+    public static boolean canRegisterNewAnimations() {
+        return registeringNewAnimations;
     }
     @SubscribeEvent public static void onWorldTick(LevelTickEvent.@NotNull Post event) {
         if (!(event.getLevel() instanceof ServerLevel level)) return;
@@ -32,33 +40,47 @@ public abstract class Animation {
     private static String createPath(String category, String name) {
         if (category.contains(" ")) category = "\"%s\"".formatted(category);
         if (name.contains(" ")) name = "\"%s\"".formatted(name);
-        return "animations." + category + "." + name + ".%s";
+        return "animations." + category + "." + name + ".";
     }
 
     @SuppressWarnings("FieldMayBeFinal")
     protected boolean enabled;
 
     public Animation(String path) {
+        if (!path.isEmpty() && !path.endsWith(".")) path += ".";
         CommentedFileConfig config = NeoBlockMod.getConfig();
-        this.enabled = config.getOrElse(path.formatted("enabled"), false);
-        for (Field field : this.getClass().getDeclaredFields()) {
-            if (field.isAnnotationPresent(AnimationConfig.class)) {
-                AnimationConfig annotation = field.getAnnotation(AnimationConfig.class);
-                String configPath = annotation.value().isEmpty() ? field.getName() : annotation.value();
-                String fullPath = path.formatted(StringUtil.convertToSnakeCase(configPath));
+        this.enabled = config.getOrElse(path + "enabled", false);
+        StringBuilder debug = new StringBuilder("Loaded animation: " + path + "\n\tenabled: " + enabled);
+        Class<?> clazz = this.getClass();
+        while (clazz != null) {
+            for (Field field : clazz.getDeclaredFields()) {
+                if (field.isAnnotationPresent(AnimationConfig.class)) {
+                    AnimationConfig annotation = field.getAnnotation(AnimationConfig.class);
+                    String configPath = annotation.value().isEmpty() ? field.getName() : annotation.value();
+                    String fullPath = path + StringUtil.convertToSnakeCase(configPath);
 
-                try {
-                    field.setAccessible(true);
-                    Object def = field.get(this);
-                    Object value = config.getOrElse(fullPath, def);
-                    field.set(this, value);
-                } catch (IllegalAccessException e) {
-                    NeoBlockMod.LOGGER.error("Failed to load animation config value for: {}", field.getName(), e);
+                    try {
+                        field.setAccessible(true);
+                        Object def = field.get(this);
+                        Object value = config.getOrElse(fullPath, def);
+                        switch (value) {
+                            case Double v when field.getType() == float.class -> field.set(this, v.floatValue());
+                            case Number number when field.getType() == int.class -> field.set(this, number.intValue());
+                            case null, default -> field.set(this, value);
+                        }
+
+                        debug.append("\n\t").append(field.getName()).append(": ").append(value);
+                    } catch (IllegalAccessException e) {
+                        NeoBlockMod.LOGGER.error("Failed to load animation config value for: {}", field.getName(), e);
+                    }
                 }
             }
+
+            clazz = clazz.getSuperclass();
         }
 
         processConfig();
+        NeoBlockMod.LOGGER.debug(debug.toString());
     }
 
     public Animation(String category, String name) {

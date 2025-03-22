@@ -38,6 +38,7 @@ public abstract class UpgradeProgressAnimation extends Animation {
 
     private static final HashSet<Class<? extends UpgradeProgressAnimation>> animations = new HashSet<>();
     public static void addAnimation(Class<? extends UpgradeProgressAnimation> clazz) {
+        if (!Animation.canRegisterNewAnimations()) return;
         animations.add(clazz);
     }
     public static @NotNull HashSet<UpgradeProgressAnimation> getAnimations() {

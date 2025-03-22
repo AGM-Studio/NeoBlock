@@ -42,7 +42,7 @@ public class ResourceUtil {
      */
     public static void processResourceFile(String resourcePath, Path outputPath, Map<String, String> placeholders) throws IOException {
         NeoBlockMod.LOGGER.debug("Processing resource {} to {}", resourcePath, outputPath.toAbsolutePath());
-        try (InputStream inputStream = clazz.getResourceAsStream(resourcePath);
+        try (InputStream inputStream = clazz.getResourceAsStream(resourcePath.replace("\\", "/"));
              BufferedReader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(inputStream)));
              BufferedWriter writer = Files.newBufferedWriter(outputPath, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)) {
 
@@ -82,10 +82,10 @@ public class ResourceUtil {
         Path configPath = folder.resolve(name.endsWith(".toml") ? name : name + ".toml");
         if (!Files.exists(configPath)) try {
             Path path = Paths.get(FMLPaths.CONFIGDIR.get().toAbsolutePath().toString(), NeoBlockMod.MOD_ID);
-            String resource = configPath.toAbsolutePath().toString().replace(path.toAbsolutePath().toString(), "/");
+            String resource = configPath.toAbsolutePath().toString().replace(path.toAbsolutePath().toString(), "\\configs");
             NeoBlockMod.LOGGER.debug("Loading resource {} for {}", resource, configPath);
             processResourceFile(resource, configPath, new HashMap<>());
-        } catch (IOException ignored) {}
+        } catch (Exception ignored) {}
         if (!Files.exists(configPath)) return null;
 
         CommentedFileConfig config = CommentedFileConfig.builder(configPath).sync().build();

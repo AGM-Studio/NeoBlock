@@ -136,8 +136,8 @@ public class NeoBlock {
         }
 
         public void tick(ServerLevel level, LevelAccessor access) {
-            for (UpgradeProgressAnimation animation: progressAnimations) animation.tick(level, access);
             if (!isOnUpgrade()) return;
+            for (UpgradeProgressAnimation animation: progressAnimations) animation.tick(level, access);
             if (++UPGRADE_TICKS >= UPGRADE_GOAL) finishUpgrade(level, access);
             else {
                 if (progressbar != null) progressbar.update(UPGRADE_TICKS, UPGRADE_GOAL);

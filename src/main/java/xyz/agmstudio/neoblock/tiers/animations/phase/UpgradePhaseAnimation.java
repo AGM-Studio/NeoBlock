@@ -30,6 +30,7 @@ public abstract class UpgradePhaseAnimation extends Animation {
 
     private static final HashSet<Class<? extends UpgradePhaseAnimation>> animations = new HashSet<>();
     public static void addAnimation(Class<? extends UpgradePhaseAnimation> clazz) {
+        if (!Animation.canRegisterNewAnimations()) return;
         animations.add(clazz);
     }
     public static @NotNull HashSet<UpgradePhaseAnimation> getAnimations() {

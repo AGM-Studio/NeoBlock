@@ -21,7 +21,8 @@ public class MainCommand {
     // Method that executes when the command is run
     private static int showInfo(CommandContext<CommandSourceStack> context) {
         CommandSourceStack source = context.getSource();
-        source.sendSuccess(() -> Component.translatable("command.neoblock.info", NeoBlock.DATA.getBlockCount(), NeoBlock.DATA.getTier().TIER), true);
+        source.sendSuccess(() -> Component.translatable("command.neoblock.info", NeoBlock.DATA.getBlockCount(), NeoBlock.DATA.getTier().TIER)
+                .append("\n  On upgrade:" + NeoBlock.UPGRADE.isOnUpgrade()), true);
 
         return 1;
     }
