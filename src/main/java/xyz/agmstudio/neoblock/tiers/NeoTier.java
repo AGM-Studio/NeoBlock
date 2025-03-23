@@ -4,6 +4,7 @@ import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.fml.loading.FMLPaths;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.tiers.merchants.NeoMerchant;
@@ -17,6 +18,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.random.RandomGenerator;
+import java.util.zip.CRC32;
 
 public class NeoTier {
     protected static final Path FOLDER = Paths.get(FMLPaths.CONFIGDIR.get().toAbsolutePath().toString(), NeoBlockMod.MOD_ID, "tiers");
@@ -131,7 +133,21 @@ public class NeoTier {
         }
     }
 
+    public boolean isUnlocked(@NotNull WorldData data) {
+        if (UNLOCK > 0) return data.getBlockCount() >= UNLOCK;
+        return false;
+    }
     public boolean isUnlocked() {
-        return NeoBlock.DATA != null && NeoBlock.DATA.getBlockCount() >= UNLOCK;
+        return NeoBlock.DATA != null && isUnlocked(NeoBlock.DATA);
+    }
+
+    // Coding methods to help validate world using matching config.
+    // Only hash game breaking data, no need for general data like blocks, weight, etc...
+    protected String getHashCode() {
+        String data = "ID:" + TIER + ", U:" + UNLOCK;
+
+        CRC32 crc = new CRC32();
+        crc.update(data.getBytes());
+        return Long.toHexString(crc.getValue());
     }
 }

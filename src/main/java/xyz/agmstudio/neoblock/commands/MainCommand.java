@@ -14,15 +14,17 @@ public class MainCommand {
         dispatcher.register(
                 Commands.literal("neoblock").executes(MainCommand::showInfo)
                         .then(Commands.literal("force")
-                                .then(Commands.literal("trader").executes(MainCommand::forceTrader)))
+                                .then(Commands.literal("trader").executes(MainCommand::forceTrader))
+                                .then(Commands.literal("update").executes(MainCommand::forceUpdate))
+                        )
         );
     }
 
     // Method that executes when the command is run
     private static int showInfo(CommandContext<CommandSourceStack> context) {
         CommandSourceStack source = context.getSource();
-        source.sendSuccess(() -> Component.translatable("command.neoblock.info", NeoBlock.DATA.getBlockCount(), NeoBlock.DATA.getTier().TIER)
-                .append("\n  On upgrade:" + NeoBlock.UPGRADE.isOnUpgrade()), true);
+        source.sendSuccess(() -> Component.translatable("command.neoblock.info", NeoBlock.DATA.getBlockCount())
+                .append("\n  On upgrade:" + NeoBlock.isOnUpgrade()), true);
 
         return 1;
     }
@@ -32,6 +34,13 @@ public class MainCommand {
         if (trader != null)
             source.sendSuccess(() -> Component.translatable("command.neoblock.force_trader.success"), true);
         else source.sendFailure(Component.translatable("command.neoblock.force_trader.failure"));
+        return 1;
+    }
+    private static int forceUpdate(CommandContext<CommandSourceStack> context) {
+        CommandSourceStack source = context.getSource();
+        if (NeoBlock.DATA.updateTiers())
+            source.sendSuccess(() -> Component.translatable("command.neoblock.update.success"), true);
+        else source.sendFailure(Component.translatable("command.neoblock.update.failure"));
         return 1;
     }
 }

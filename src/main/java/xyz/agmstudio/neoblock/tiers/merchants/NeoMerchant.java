@@ -90,7 +90,7 @@ public class NeoMerchant {
                     if (mob instanceof Leashable leashable) leashable.setLeashedTo(trader, true);
                 }
             });
-            tradedMobs.clear();
+            NeoBlock.DATA.clearTradedMobs();
 
             return trader;
         } return null;

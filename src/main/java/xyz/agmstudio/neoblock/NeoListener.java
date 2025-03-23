@@ -40,25 +40,15 @@ public final class NeoListener {
     }
 
     @SubscribeEvent
-    public static void onWorldUnload(LevelEvent.@NotNull Unload event) {
-        if (!(event.getLevel() instanceof ServerLevel level) || level.dimension() != Level.OVERWORLD) return;
-        NeoBlock.setupWorldData(null);
-    }
-
-    @SubscribeEvent
     public static void onWorldTick(LevelTickEvent.@NotNull Post event) {
-        if (!(event.getLevel() instanceof ServerLevel level) || level.dimension() != Level.OVERWORLD) return;
+        if (!(event.getLevel() instanceof ServerLevel level) || level.dimension() != Level.OVERWORLD || NeoBlock.DATA.isDisabled()) return;
         final LevelAccessor access = event.getLevel();
         final BlockState block = access.getBlockState(NeoBlock.POS);
 
         // Upgrading the neoblock... Nothing else should happen meanwhile
-        if (NeoBlock.UPGRADE == null) NeoBlock.UPGRADE = NeoBlock.DATA.fetchUpgrade();
-        if (NeoBlock.UPGRADE == null) NeoBlockMod.LOGGER.info("NeoBlock upgrade not available!");
-        else if (NeoBlock.UPGRADE.isOnUpgrade()) {
-            NeoBlock.UPGRADE.tick(level, access);
-            if (block.isAir() || block.canBeReplaced())
-                NeoBlock.setNeoBlock(access, Blocks.BEDROCK.defaultBlockState());
-
+        if (NeoBlock.DATA.isUpdated() || NeoBlock.isOnUpgrade()) {
+            if (block.getBlock() != Blocks.BEDROCK) NeoBlock.setNeoBlock(access, Blocks.BEDROCK.defaultBlockState());
+            if (NeoBlock.isOnUpgrade()) NeoBlock.DATA.getUpgradeManager().tick(level, access);  // Todo better ticking
             return;
         }
 
@@ -84,7 +74,7 @@ public final class NeoListener {
     public static void onEntitySpawn(EntityJoinLevelEvent event) {
         if (!(event.getLevel() instanceof ServerLevel level)) return;
         if (event.getEntity() instanceof WanderingTrader trader) NeoMerchant.handleTrader(trader);
-        if (event.getEntity() instanceof ServerPlayer player && NeoBlock.UPGRADE.isOnUpgrade()) NeoBlock.UPGRADE.addPlayer(player);
+        if (event.getEntity() instanceof ServerPlayer player && NeoBlock.isOnUpgrade()) NeoBlock.DATA.getUpgradeManager().addPlayer(player);
         if (event.getEntity() instanceof ItemEntity item && NeoOffer.handlePossibleMobTrade(item.getItem())) event.setCanceled(true);
     }
 

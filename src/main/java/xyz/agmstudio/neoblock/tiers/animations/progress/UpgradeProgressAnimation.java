@@ -4,7 +4,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.LevelAccessor;
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlockMod;
-import xyz.agmstudio.neoblock.tiers.NeoBlock;
+import xyz.agmstudio.neoblock.tiers.UpgradeManager;
 import xyz.agmstudio.neoblock.tiers.animations.Animation;
 
 import java.util.HashSet;
@@ -21,7 +21,7 @@ public abstract class UpgradeProgressAnimation extends Animation {
 
     @Override public boolean register() {
         if (!super.register()) return false;
-        NeoBlock.Upgrade.addProgressAnimation(this);
+        UpgradeManager.addProgressAnimation(this);
         return true;
     }
 
