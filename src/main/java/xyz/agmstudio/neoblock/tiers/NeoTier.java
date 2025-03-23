@@ -4,7 +4,6 @@ import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.fml.loading.FMLPaths;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.tiers.merchants.NeoMerchant;
@@ -133,12 +132,9 @@ public class NeoTier {
         }
     }
 
-    public boolean isUnlocked(@NotNull WorldData data) {
-        if (UNLOCK > 0) return data.getBlockCount() >= UNLOCK;
-        return false;
-    }
     public boolean isUnlocked() {
-        return NeoBlock.DATA != null && isUnlocked(NeoBlock.DATA);
+        if (UNLOCK > 0) return WorldData.getBlockCount() >= UNLOCK;
+        return false;
     }
 
     // Coding methods to help validate world using matching config.

@@ -7,8 +7,10 @@ import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.npc.WanderingTrader;
 import xyz.agmstudio.neoblock.tiers.NeoBlock;
+import xyz.agmstudio.neoblock.tiers.WorldData;
 import xyz.agmstudio.neoblock.tiers.merchants.NeoMerchant;
 
+@SuppressWarnings("SameReturnValue")
 public class MainCommand {
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(
@@ -23,7 +25,7 @@ public class MainCommand {
     // Method that executes when the command is run
     private static int showInfo(CommandContext<CommandSourceStack> context) {
         CommandSourceStack source = context.getSource();
-        source.sendSuccess(() -> Component.translatable("command.neoblock.info", NeoBlock.DATA.getBlockCount())
+        source.sendSuccess(() -> Component.translatable("command.neoblock.info", WorldData.getBlockCount())
                 .append("\n  On upgrade:" + NeoBlock.isOnUpgrade()), true);
 
         return 1;
@@ -38,7 +40,7 @@ public class MainCommand {
     }
     private static int forceUpdate(CommandContext<CommandSourceStack> context) {
         CommandSourceStack source = context.getSource();
-        if (NeoBlock.DATA.updateTiers())
+        if (WorldData.updateTiers())
             source.sendSuccess(() -> Component.translatable("command.neoblock.update.success"), true);
         else source.sendFailure(Component.translatable("command.neoblock.update.failure"));
         return 1;

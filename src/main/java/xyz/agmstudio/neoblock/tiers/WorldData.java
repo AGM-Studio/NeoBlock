@@ -17,27 +17,31 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 public class WorldData extends SavedData {
-    private static final String DATA_NAME = "custom_data";
+    private static final String DATA_NAME = "neo_block_data";
+    private static WorldData instance;
 
-    public static @NotNull WorldData get(@NotNull ServerLevel level) {
+    public static WorldData getInstance() {
+        return instance;
+    }
+
+    public static @NotNull WorldData load(@NotNull ServerLevel level) {
         WorldData data = level.getDataStorage().computeIfAbsent(new Factory<>(WorldData::create, WorldData::load), DATA_NAME);
         data.level = level;
         return data;
     }
-    public static @NotNull WorldData create() {
+    private static @NotNull WorldData create() {
         WorldData data = new WorldData();
 
         for (NeoTier tier: NeoBlock.TIERS) {
             data.encoding.add(tier.getHashCode());
-            if (tier.TIER == 0 || tier.isUnlocked(data))
+            if (tier.TIER == 0 || tier.isUnlocked())
                 data.unlocked.add(tier);
         }
-        NeoBlock.TIERS.stream().map(NeoTier::getHashCode).forEach(data.encoding::add);
 
         NeoBlockMod.LOGGER.debug("Creating new world data");
         return data;
     }
-    public static @NotNull WorldData load(@NotNull CompoundTag tag, HolderLookup.Provider lookupProvider) {
+    private static @NotNull WorldData load(@NotNull CompoundTag tag, HolderLookup.Provider lookupProvider) {
         WorldData data = new WorldData();
         data.state = WorldState.fromId(tag.getInt("WorldState"));
         data.blockCount = tag.getInt("BlockCount");
@@ -55,14 +59,16 @@ public class WorldData extends SavedData {
         ListTag hash = tag.getList("Hashes", StringTag.TAG_STRING);
         for (int i = 0; i < hash.size(); ++i) data.encoding.add(hash.getString(i));
 
+        ListTag unlocked = tag.getList("Unlocked", StringTag.TAG_INT);
+        for (int i = 0; i < unlocked.size(); ++i) data.unlockedIDs.add(unlocked.getInt(i));
+
         NeoBlockMod.LOGGER.debug("Loaded WorldData from {}", tag);
 
-        if (!data.isValid()) {
-            data.setUpdated();
-            NeoBlockMod.LOGGER.warn("Tiers has already been updated. NeoTier will be disabled till (/neoblock force update) is executed.");
+        if (WorldData.isValid()) {
+            for (int i: data.unlockedIDs) data.unlocked.add(NeoBlock.TIERS.get(i));
         } else {
-            ListTag unlocked = tag.getList("Unlocked", StringTag.TAG_INT);
-            for (int i = 0; i < unlocked.size(); ++i) data.unlocked.add(NeoBlock.TIERS.get(unlocked.getInt(i)));
+            data.state = WorldState.UPDATED;
+            NeoBlockMod.LOGGER.warn("Tiers has been modified. NeoBlock will be disabled till (/neoblock force update) is executed.");
         }
 
         return data;
@@ -93,107 +99,107 @@ public class WorldData extends SavedData {
         return tag;
     }
 
+    private ServerLevel level = null;
+    private WorldState state = WorldState.INACTIVE;
+    private int blockCount = 0;
+    private int traderFailedAttempts = 0;
 
-    private ServerLevel level;
-    private WorldState state;
-    private int blockCount;
-    private int traderFailedAttempts;
-
+    private final HashSet<Integer> unlockedIDs = new HashSet<>();
     private final HashSet<NeoTier> unlocked = new HashSet<>();
     private final HashSet<String> encoding = new HashSet<>();
 
     private final UpgradeManager upgrade = new UpgradeManager();
     private final HashMap<EntityType<?>, Integer> tradedMobs = new HashMap<>();
 
-    public WorldData() {
-        state = WorldState.INACTIVE;
-        blockCount = 0;
-        traderFailedAttempts = 0;
+    private WorldData() {
+        instance = this;
     }
 
-    public boolean isInactive() {
-        return state == WorldState.INACTIVE;
+    public static boolean isInactive() {
+        return instance.state == WorldState.INACTIVE;
     }
-    public void setActive() {
-        state = WorldState.ACTIVE;
-        setDirty();
+    public static void setActive() {
+        instance.state = WorldState.ACTIVE;
+        instance.setDirty();
     }
-    public boolean isActive() {
-        return state == WorldState.ACTIVE;
+    public static boolean isActive() {
+        return instance.state == WorldState.ACTIVE;
     }
     public void setDisabled() {
-        state = WorldState.DISABLED;
-        setDirty();
+        instance.state = WorldState.DISABLED;
+        instance.setDirty();
     }
-    public boolean isDisabled() {
-        return state == WorldState.DISABLED;
+    public static boolean isDisabled() {
+        return instance.state == WorldState.DISABLED;
     }
-    public void setUpdated() {
-        state = WorldState.UPDATED;
-        setDirty();
+    public static void setUpdated() {
+        instance.state = WorldState.UPDATED;
+        instance.setDirty();
     }
-    public boolean isUpdated() {
-        return state == WorldState.UPDATED;
-    }
-
-    public int getBlockCount() {
-        return blockCount;
-    }
-    public void setBlockCount(int count) {
-        blockCount = count;
-        setDirty();
-    }
-    public void addBlockCount(int count) {
-        blockCount += count;
-        setDirty();
+    public static boolean isUpdated() {
+        return instance.state == WorldState.UPDATED;
     }
 
-    public int getTraderFailedAttempts() {
-        return traderFailedAttempts;
+    public static int getBlockCount() {
+        return instance.blockCount;
     }
-    public void resetTraderFailedAttempts() {
-        traderFailedAttempts = 0;
-        setDirty();
+    public static void setBlockCount(int count) {
+        instance.blockCount = count;
+        instance.setDirty();
     }
-    public void addTraderFailedAttempts() {
-        traderFailedAttempts += 1;
-        setDirty();
-    }
-
-    public HashSet<NeoTier> getUnlocked() {
-        return unlocked;
+    public static void addBlockCount(int count) {
+        instance.blockCount += count;
+        instance.setDirty();
     }
 
-    @Override public String toString() {
-        return "NeoWorldData[blockCount=" + blockCount + ", worldState=" + state + "]";
+    public static int getTraderFailedAttempts() {
+        return instance.traderFailedAttempts;
+    }
+    public static void resetTraderFailedAttempts() {
+        instance.traderFailedAttempts = 0;
+        instance.setDirty();
+    }
+    public static void addTraderFailedAttempts() {
+        instance.traderFailedAttempts += 1;
+        instance.setDirty();
     }
 
-    public UpgradeManager getUpgradeManager() {
-        return upgrade;
+    public static HashMap<EntityType<?>, Integer> getTradedMobs() {
+        return instance.tradedMobs;
     }
-    public HashMap<EntityType<?>, Integer> getTradedMobs() {
-        return tradedMobs;
+    public static void addTradedMob(EntityType<?> entityType, int count) {
+        instance.tradedMobs.merge(entityType, count, Integer::sum);
+        instance.setDirty();
     }
-    public void addTradedMob(EntityType<?> entityType, int count) {
-        tradedMobs.merge(entityType, count, Integer::sum);
-        setDirty();
-    }
-    public void clearTradedMobs() {
-        tradedMobs.clear();
-        setDirty();
+    public static void clearTradedMobs() {
+        instance.tradedMobs.clear();
+        instance.setDirty();
     }
 
-    public boolean isValid() {
-        HashSet<String> current = new HashSet<>();
-        NeoBlock.TIERS.stream().map(NeoTier::getHashCode).forEach(current::add);
-
-        return encoding.equals(current);
+    public static HashSet<NeoTier> getUnlocked() {
+        return instance.unlocked;
     }
-    public boolean updateTiers() {
-        // todo unlocked tiers
+    public static UpgradeManager getUpgradeManager() {
+        return instance.upgrade;
+    }
 
-        encoding.clear();
-        NeoBlock.TIERS.stream().map(NeoTier::getHashCode).forEach(encoding::add);
+    public static boolean isValid() {
+        return NeoBlock.hash.equals(instance.encoding);
+    }
+    public static boolean updateTiers() {
+        instance.encoding.clear();
+        instance.unlocked.clear();
+        instance.unlockedIDs.clear();
+        for (NeoTier tier: NeoBlock.TIERS) {
+            instance.encoding.add(tier.getHashCode());
+            if (tier.TIER == 0 || tier.isUnlocked()) {
+                instance.unlocked.add(tier);
+                instance.unlockedIDs.add(tier.TIER);
+            }
+        }
+
+        instance.encoding.clear();
+        NeoBlock.TIERS.stream().map(NeoTier::getHashCode).forEach(instance.encoding::add);
 
         return true;
     }

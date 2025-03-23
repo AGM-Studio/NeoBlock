@@ -17,6 +17,7 @@ import xyz.agmstudio.neoblock.util.MessagingUtil;
 
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.random.RandomGenerator;
 
@@ -25,11 +26,12 @@ public class NeoBlock {
     public static final BlockPos POS = new BlockPos(0, 64, 0);
     public static BlockState DEFAULT_STATE = Blocks.GRASS_BLOCK.defaultBlockState();
 
+    protected static HashSet<String> hash = new HashSet<>();
+
     public static List<NeoTier> TIERS = new ArrayList<>();
-    public static WorldData DATA = null;
 
     public static BlockState getRandomBlock() {
-        int breaks = DATA.getBlockCount();
+        int breaks = WorldData.getBlockCount();
         List<NeoTier> availableTiers = TIERS.stream().filter(tier -> tier.getUnlock() <= breaks).toList();
         if (availableTiers.isEmpty()) {
             NeoBlockMod.LOGGER.error("No available tiers for {} blocks", breaks);
@@ -56,35 +58,36 @@ public class NeoBlock {
     }
 
     public static void setupWorldData(@NotNull ServerLevel level) {
-        DATA = WorldData.get(level);
-        if (DATA.isInactive()) {
+        WorldData.load(level);
+
+        if (WorldData.isInactive()) {
             boolean isNeoBlock = true;
             for (int y : List.of(-64, -61, 0, 64))
                 if (!level.getBlockState(new BlockPos(0, y, 0)).isAir()) isNeoBlock = false;
 
             if (isNeoBlock) {
                 level.setBlock(NeoBlock.POS, NeoBlock.DEFAULT_STATE, 3);
-                DATA.setActive();
+                WorldData.setActive();
             } else {
                 NeoBlockMod.LOGGER.info("NeoBlock has been disabled.");
                 MessagingUtil.sendMessage("message.neoblock.disabled_world_1", level, false);
                 MessagingUtil.sendMessage("message.neoblock.disabled_world_2", level, false);
-                DATA.setActive();
+                WorldData.setActive();
             }
-        } else if (DATA.isUpdated()) {
+        } else if (WorldData.isUpdated()) {
             NeoBlockMod.LOGGER.info("NeoBlock tiers has been updated.");
             Component command = Component.literal("/neoblock force update").withStyle(
                     Style.EMPTY.withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/neoblock force update"))
             );
             MessagingUtil.sendMessage("message.neoblock.updated_world", level, false, command);
-            DATA.setActive();
+            WorldData.setActive();
         }
     }
 
     public static void onBlockBroken(ServerLevel level, LevelAccessor access, boolean triggered) {
-        if (triggered) DATA.addBlockCount(1);
+        if (triggered) WorldData.addBlockCount(1);
         for (NeoTier tier: TIERS) if (tier.isUnlocked())
-            DATA.getUpgradeManager().startUpgrade(level, access, tier);
+            WorldData.getUpgradeManager().startUpgrade(level, access, tier);
 
         else setNeoBlock(access, getRandomBlock());
     }
@@ -102,10 +105,13 @@ public class NeoBlock {
         while (Files.exists(NeoTier.FOLDER.resolve("tier-" + i + ".toml")))
             NeoBlock.TIERS.add(new NeoTier(i++));
 
+        hash.clear();
+        NeoBlock.TIERS.stream().map(NeoTier::getHashCode).forEach(hash::add);
+
         NeoBlockMod.LOGGER.info("Loaded {} tiers from the tiers folder.", NeoBlock.TIERS.size());
     }
 
     public static boolean isOnUpgrade() {
-        return DATA.getUpgradeManager().isOnUpgrade();
+        return WorldData.getUpgradeManager().isOnUpgrade();
     }
 }

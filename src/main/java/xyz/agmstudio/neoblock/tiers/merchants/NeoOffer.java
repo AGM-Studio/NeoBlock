@@ -9,7 +9,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.trading.MerchantOffer;
 import xyz.agmstudio.neoblock.data.Range;
-import xyz.agmstudio.neoblock.tiers.NeoBlock;
+import xyz.agmstudio.neoblock.tiers.WorldData;
 import xyz.agmstudio.neoblock.util.StringUtil;
 
 import java.util.Optional;
@@ -72,7 +72,7 @@ public final class NeoOffer {
         EntityType<?> mob = getMobTradeEntity(item);
         if (mob == null) return false;
 
-        NeoBlock.DATA.addTradedMob(mob, item.getCount());
+        WorldData.addTradedMob(mob, item.getCount());
         return true;
     }
 }

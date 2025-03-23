@@ -61,8 +61,6 @@ public final class NeoBlockMod extends ModXRegistration {
 
         NeoMerchant.loadConfig();
 
-        NeoBlockMod.LOGGER.info("Loaded animations: " + UpgradePhaseAnimation.getAnimations().size());
-
         UpgradePhaseAnimation.getAnimations().forEach(Animation::register);
         UpgradeProgressAnimation.getAnimations().forEach(Animation::register);
     }

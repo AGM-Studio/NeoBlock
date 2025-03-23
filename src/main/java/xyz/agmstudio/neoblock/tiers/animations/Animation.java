@@ -43,7 +43,6 @@ public abstract class Animation {
         return "animations." + category + "." + name + ".";
     }
 
-    @SuppressWarnings("FieldMayBeFinal")
     protected boolean enabled;
 
     public Animation(String path) {

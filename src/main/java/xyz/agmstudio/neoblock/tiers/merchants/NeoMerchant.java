@@ -14,6 +14,7 @@ import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.data.Range;
 import xyz.agmstudio.neoblock.tiers.NeoBlock;
 import xyz.agmstudio.neoblock.tiers.NeoTier;
+import xyz.agmstudio.neoblock.tiers.WorldData;
 import xyz.agmstudio.neoblock.util.MessagingUtil;
 
 import java.util.ArrayList;
@@ -64,17 +65,17 @@ public class NeoMerchant {
         return false;
     }
     public static WanderingTrader attemptSpawnTrader(ServerLevel level) {
-        if (NeoBlock.DATA.getBlockCount() % attemptInterval != 0 || exists(level, "NeoMerchant")) return null;
-        double chance = NeoMerchant.chance + (increment * NeoBlock.DATA.getTraderFailedAttempts());
+        if (WorldData.getBlockCount() % attemptInterval != 0 || exists(level, "NeoMerchant")) return null;
+        double chance = NeoMerchant.chance + (increment * WorldData.getTraderFailedAttempts());
         if (RandomGenerator.getDefault().nextFloat() > chance) {
-            NeoBlock.DATA.addTraderFailedAttempts();
-            NeoBlockMod.LOGGER.debug("Trader chance {} failed for {} times in a row", chance, NeoBlock.DATA.getTraderFailedAttempts());
+            WorldData.addTraderFailedAttempts();
+            NeoBlockMod.LOGGER.debug("Trader chance {} failed for {} times in a row", chance, WorldData.getTraderFailedAttempts());
             return null;
         }
         return forceSpawnTrader(level);
     }
     public static WanderingTrader forceSpawnTrader(ServerLevel level) {
-        NeoBlock.DATA.resetTraderFailedAttempts();
+        WorldData.resetTraderFailedAttempts();
         List<NeoOffer> trades = new ArrayList<>();
         NeoBlock.TIERS.stream().filter(NeoTier::isUnlocked)
                 .forEach(tier -> trades.addAll(tier.getRandomTrades()));
@@ -83,14 +84,14 @@ public class NeoMerchant {
             WanderingTrader trader = spawnTraderWith(trades, level);
             MessagingUtil.sendInstantMessage("message.neoblock.trader_spawned", level, true);
 
-            HashMap<EntityType<?>, Integer> tradedMobs = NeoBlock.DATA.getTradedMobs();
+            HashMap<EntityType<?>, Integer> tradedMobs = WorldData.getTradedMobs();
             tradedMobs.forEach((type, count) -> {
                 for (int i = 0; i < count; i++) {
                     Entity mob = type.spawn(level, trader.getOnPos(), MobSpawnType.SPAWN_EGG);
                     if (mob instanceof Leashable leashable) leashable.setLeashedTo(trader, true);
                 }
             });
-            NeoBlock.DATA.clearTradedMobs();
+            WorldData.clearTradedMobs();
 
             return trader;
         } return null;

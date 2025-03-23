@@ -52,11 +52,10 @@ public class UpgradeManager {
             for (UpgradeProgressAnimation animation : progressAnimations)
                 animation.upgradeTick(level, access, UPGRADE_TICKS);
         }
-        NeoBlock.DATA.setDirty();
+        WorldData.getInstance().setDirty();
     }
 
     public void finishUpgrade(ServerLevel level, LevelAccessor access) {
-        if (NeoBlock.DATA == null) return;
         // todo fix this
         // NeoTier tier = NeoBlock.DATA.getTier().next();
         // if (tier != null && tier.isUnlocked()) {
