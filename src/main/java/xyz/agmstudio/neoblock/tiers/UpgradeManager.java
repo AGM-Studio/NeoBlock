@@ -1,14 +1,19 @@
 package xyz.agmstudio.neoblock.tiers;
 
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Blocks;
+import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.tiers.animations.ProgressbarAnimation;
 import xyz.agmstudio.neoblock.tiers.animations.phase.UpgradePhaseAnimation;
 import xyz.agmstudio.neoblock.tiers.animations.progress.UpgradeProgressAnimation;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
 public class UpgradeManager {
     private static final HashSet<UpgradeProgressAnimation> progressAnimations = new HashSet<>();
@@ -32,64 +37,101 @@ public class UpgradeManager {
         if (!progressbar.isEnabled()) progressbar = null;
     }
 
-    protected int UPGRADE_TICKS = 0;
-    protected int UPGRADE_GOAL = 0;
-
-    protected UpgradeManager() {
-    }
+    private final List<Upgrade> upgrades = new ArrayList<>();
 
     public boolean isOnUpgrade() {
-        return UPGRADE_GOAL > 0;
+        return !upgrades.isEmpty();
     }
 
     public void tick(ServerLevel level, LevelAccessor access) {
-        if (!isOnUpgrade()) return;
-        for (UpgradeProgressAnimation animation : progressAnimations) animation.tick(level, access);
-        if (++UPGRADE_TICKS >= UPGRADE_GOAL) finishUpgrade(level, access);
-        else {
-            if (progressbar != null) progressbar.update(UPGRADE_TICKS, UPGRADE_GOAL);
+        if (upgrades.isEmpty()) return;
+        Upgrade upgrade = upgrades.getFirst();
+        if (upgrade.tick()) {
+            finishUpgrade(level, access, upgrade);
+            upgrades.removeFirst();
+        } else {
+            if (progressbar != null) progressbar.update(upgrade.tick, upgrade.goal);
             for (UpgradeProgressAnimation animation : progressAnimations)
-                animation.upgradeTick(level, access, UPGRADE_TICKS);
+                animation.upgradeTick(level, access, upgrade.tick);
         }
+        // Some animations might need to be finished
+        for (UpgradeProgressAnimation animation : progressAnimations) animation.tick(level, access);
         WorldData.getInstance().setDirty();
     }
 
-    public void finishUpgrade(ServerLevel level, LevelAccessor access) {
-        // todo fix this
-        // NeoTier tier = NeoBlock.DATA.getTier().next();
-        // if (tier != null && tier.isUnlocked()) {
-        //     tier.onFinishUpgrade(level);
-        //     NeoBlock.DATA.setTier(tier);
-        // }
+    public void startUpgrade(ServerLevel level, LevelAccessor access, @NotNull NeoTier tier) {
+        Upgrade upgrade = new Upgrade(tier);
+        upgrades.add(upgrade);
 
+        NeoBlock.setNeoBlock(access, Blocks.BEDROCK.defaultBlockState());
+        tier.onStartUpgrade(level);
+
+        if (progressbar != null) level.players().forEach(progressbar::addPlayer);
+        for (UpgradePhaseAnimation animation : phaseAnimations)
+            if (animation.isActiveOnUpgradeStart()) animation.animate(level, access);
+    }
+
+    private void finishUpgrade(ServerLevel level, LevelAccessor access, @NotNull Upgrade upgrade) {
+        WorldData.unlockTier(upgrade.tier);
+        upgrade.tier.onFinishUpgrade(level);
+
+        if (!upgrades.isEmpty()) return;
         if (progressbar != null) progressbar.removeAllPlayers();
         for (UpgradePhaseAnimation animation : phaseAnimations)
             if (animation.isActiveOnUpgradeFinish()) animation.animate(level, access);
 
         NeoBlock.setNeoBlock(access, NeoBlock.getRandomBlock());
-
-        UPGRADE_TICKS = 0;
-        UPGRADE_GOAL = 0;
-    }
-
-    public void startUpgrade(ServerLevel level, LevelAccessor access, NeoTier tier) {
-        if (tier == null || !tier.isUnlocked()) return;
-        NeoBlock.setNeoBlock(access, Blocks.BEDROCK.defaultBlockState());
-        UPGRADE_GOAL += tier.UNLOCK_TIME;
-        tier.onStartUpgrade(level);
-        if (UPGRADE_GOAL == 0) finishUpgrade(level, access);
-        else if (progressbar != null) level.players().forEach(progressbar::addPlayer);
-
-        for (UpgradePhaseAnimation animation : phaseAnimations)
-            if (animation.isActiveOnUpgradeStart()) animation.animate(level, access);
-    }
-
-    protected void configure(int goal, int tick) {
-        UPGRADE_GOAL = goal;
-        UPGRADE_TICKS = tick;
     }
 
     public void addPlayer(ServerPlayer player) {
         if (progressbar != null) progressbar.addPlayer(player);
+    }
+
+    public void save(@NotNull CompoundTag tag) {
+        ListTag upgrades = new ListTag();
+        for (Upgrade upgrade: this.upgrades) upgrades.add(upgrade.getTag());
+        tag.put("Upgrades", upgrades);
+    }
+    public void load(@NotNull ListTag tag) {
+        for (int i = 0; i < tag.size(); i++) {
+            Upgrade upgrade = Upgrade.fromTag(tag.getCompound(i));
+            if (upgrade != null) upgrades.add(upgrade);
+        }
+    }
+
+    private static class Upgrade {
+        private final NeoTier tier;
+        private final int goal;
+
+        private int tick = 0;
+
+        protected Upgrade(@NotNull NeoTier tier) {
+            this.tier = tier;
+            this.goal = tier.UNLOCK_TIME;
+        }
+        private Upgrade(@NotNull NeoTier tier, int tick) {
+            this.tier = tier;
+            this.goal = tier.UNLOCK_TIME;
+            this.tick = tick;
+        }
+
+        public static Upgrade fromTag(CompoundTag tag) {
+            try {
+                NeoTier tier = NeoBlock.TIERS.get(tag.getInt("Tier"));
+                return new Upgrade(tier, tag.getInt("Tick"));
+            } catch (Exception ignored) {}
+            return null;
+        }
+
+        protected boolean tick() {
+            return ++tick >= goal;
+        }
+
+        public CompoundTag getTag() {
+            CompoundTag tag = new CompoundTag();
+            tag.putInt("Tier", tier.TIER);
+            tag.putInt("Tick", tick);
+            return tag;
+        }
     }
 }

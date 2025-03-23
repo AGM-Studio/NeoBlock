@@ -40,9 +40,8 @@ public class MainCommand {
     }
     private static int forceUpdate(CommandContext<CommandSourceStack> context) {
         CommandSourceStack source = context.getSource();
-        if (WorldData.updateTiers())
-            source.sendSuccess(() -> Component.translatable("command.neoblock.update.success"), true);
-        else source.sendFailure(Component.translatable("command.neoblock.update.failure"));
+        WorldData.updateTiers();
+        source.sendSuccess(() -> Component.translatable("command.neoblock.update.success"), true);
         return 1;
     }
 }

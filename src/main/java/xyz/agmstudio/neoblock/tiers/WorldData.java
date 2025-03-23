@@ -47,26 +47,22 @@ public class WorldData extends SavedData {
         data.blockCount = tag.getInt("BlockCount");
         data.traderFailedAttempts = tag.getInt("TraderFailedAttempts");
 
-        CompoundTag upgrade = tag.getCompound("Upgrade");
-        data.upgrade.configure(
-                upgrade.getInt("Goal"),
-                upgrade.getInt("Tick")
-        );
+        final ListTag upgrade = tag.getList("Upgrade", StringTag.TAG_COMPOUND);
+        data.upgrade.load(upgrade);
 
-        CompoundTag mobs = upgrade.getCompound("TradedMobs");
+        final CompoundTag mobs = tag.getCompound("TradedMobs");
         mobs.getAllKeys().forEach(key -> data.tradedMobs.merge(BuiltInRegistries.ENTITY_TYPE.get(ResourceLocation.parse(key)), mobs.getInt(key), Integer::sum));
 
-        ListTag hash = tag.getList("Hashes", StringTag.TAG_STRING);
+        final ListTag hash = tag.getList("Hashes", StringTag.TAG_STRING);
         for (int i = 0; i < hash.size(); ++i) data.encoding.add(hash.getString(i));
 
-        ListTag unlocked = tag.getList("Unlocked", StringTag.TAG_INT);
+        final ListTag unlocked = tag.getList("Unlocked", StringTag.TAG_INT);
         for (int i = 0; i < unlocked.size(); ++i) data.unlockedIDs.add(unlocked.getInt(i));
 
         NeoBlockMod.LOGGER.debug("Loaded WorldData from {}", tag);
 
-        if (WorldData.isValid()) {
-            for (int i: data.unlockedIDs) data.unlocked.add(NeoBlock.TIERS.get(i));
-        } else {
+        if (WorldData.isValid()) for (int i : data.unlockedIDs) data.unlocked.add(NeoBlock.TIERS.get(i));
+        else {
             data.state = WorldState.UPDATED;
             NeoBlockMod.LOGGER.warn("Tiers has been modified. NeoBlock will be disabled till (/neoblock force update) is executed.");
         }
@@ -78,12 +74,9 @@ public class WorldData extends SavedData {
         tag.putInt("BlockCount", blockCount);
         tag.putInt("TraderFailedAttempts", traderFailedAttempts);
 
-        final CompoundTag upgrade = tag.getCompound("Upgrade");
-        upgrade.putInt("Goal", this.upgrade.UPGRADE_GOAL);
-        upgrade.putInt("Tick", this.upgrade.UPGRADE_TICKS);
-        tag.put("Upgrade", upgrade);
+        this.upgrade.save(tag);
 
-        final CompoundTag mobs = tag.getCompound("TradedMobs");
+        final CompoundTag mobs = new CompoundTag();
         tradedMobs.forEach((key, value) -> mobs.putInt(BuiltInRegistries.ENTITY_TYPE.getKey(key).toString(), value));
         tag.put("TradedMobs", mobs);
 
@@ -179,6 +172,9 @@ public class WorldData extends SavedData {
     public static HashSet<NeoTier> getUnlocked() {
         return instance.unlocked;
     }
+    public static void unlockTier(NeoTier tier) {
+        instance.unlocked.add(tier);
+    }
     public static UpgradeManager getUpgradeManager() {
         return instance.upgrade;
     }
@@ -186,21 +182,15 @@ public class WorldData extends SavedData {
     public static boolean isValid() {
         return NeoBlock.hash.equals(instance.encoding);
     }
-    public static boolean updateTiers() {
+    public static void updateTiers() {
         instance.encoding.clear();
         instance.unlocked.clear();
-        instance.unlockedIDs.clear();
         for (NeoTier tier: NeoBlock.TIERS) {
             instance.encoding.add(tier.getHashCode());
-            if (tier.TIER == 0 || tier.isUnlocked()) {
+            if (tier.TIER == 0 || tier.isUnlocked() || instance.unlockedIDs.contains(tier.TIER))
                 instance.unlocked.add(tier);
-                instance.unlockedIDs.add(tier.TIER);
-            }
         }
-
-        instance.encoding.clear();
-        NeoBlock.TIERS.stream().map(NeoTier::getHashCode).forEach(instance.encoding::add);
-
-        return true;
+        instance.unlockedIDs.clear();
+        instance.unlocked.forEach(tier -> instance.unlockedIDs.add(tier.TIER));
     }
 }

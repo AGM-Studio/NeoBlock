@@ -32,15 +32,9 @@ public class NeoBlock {
 
     public static BlockState getRandomBlock() {
         int breaks = WorldData.getBlockCount();
-        List<NeoTier> availableTiers = TIERS.stream().filter(tier -> tier.getUnlock() <= breaks).toList();
-        if (availableTiers.isEmpty()) {
-            NeoBlockMod.LOGGER.error("No available tiers for {} blocks", breaks);
-            return DEFAULT_STATE;
-        }
-
-        int totalChance = availableTiers.stream().mapToInt(NeoTier::getWeight).sum();
+        int totalChance = WorldData.getUnlocked().stream().mapToInt(NeoTier::getWeight).sum();
         int randomValue = RandomGenerator.getDefault().nextInt(totalChance);
-        for (NeoTier tier: availableTiers) {
+        for (NeoTier tier: WorldData.getUnlocked()) {
             randomValue -= tier.getWeight();
             if (randomValue < 0) return tier.getRandomBlock();
         }
