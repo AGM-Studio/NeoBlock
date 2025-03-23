@@ -10,6 +10,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.moddingx.libx.mod.ModXRegistration;
 import xyz.agmstudio.neoblock.tiers.NeoBlock;
+import xyz.agmstudio.neoblock.tiers.UpgradeManager;
 import xyz.agmstudio.neoblock.tiers.animations.Animation;
 import xyz.agmstudio.neoblock.tiers.animations.phase.ExplosionAnimation;
 import xyz.agmstudio.neoblock.tiers.animations.phase.FuseAnimation;
@@ -61,7 +62,10 @@ public final class NeoBlockMod extends ModXRegistration {
 
         NeoMerchant.loadConfig();
 
+        UpgradeManager.reloadProgressbarAnimations();
+        UpgradeManager.clearPhaseAnimations();
         UpgradePhaseAnimation.getAnimations().forEach(Animation::register);
+        UpgradeManager.clearProgressAnimations();
         UpgradeProgressAnimation.getAnimations().forEach(Animation::register);
     }
 

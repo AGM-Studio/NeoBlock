@@ -18,25 +18,24 @@ public class UpgradeManager {
     public static void clearProgressAnimations() {
         progressAnimations.clear();
     }
-
     public static void addProgressAnimation(UpgradeProgressAnimation animation) {
         progressAnimations.add(animation);
     }
-
     public static void clearPhaseAnimations() {
         phaseAnimations.clear();
     }
-
     public static void addPhaseAnimation(UpgradePhaseAnimation animation) {
         phaseAnimations.add(animation);
+    }
+    public static void reloadProgressbarAnimations() {
+        progressbar = new ProgressbarAnimation();
+        if (!progressbar.isEnabled()) progressbar = null;
     }
 
     protected int UPGRADE_TICKS = 0;
     protected int UPGRADE_GOAL = 0;
 
     protected UpgradeManager() {
-        progressbar = new ProgressbarAnimation();
-        if (!progressbar.isEnabled()) progressbar = null;
     }
 
     public boolean isOnUpgrade() {
