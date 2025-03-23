@@ -1,14 +1,13 @@
 package xyz.agmstudio.neoblock;
 
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
+import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.moddingx.libx.mod.ModXRegistration;
 import xyz.agmstudio.neoblock.tiers.NeoBlock;
 import xyz.agmstudio.neoblock.tiers.UpgradeManager;
 import xyz.agmstudio.neoblock.tiers.WorldData;
@@ -27,7 +26,7 @@ import xyz.agmstudio.neoblock.util.ResourceUtil;
 import java.nio.file.Path;
 
 @Mod(NeoBlockMod.MOD_ID)
-public final class NeoBlockMod extends ModXRegistration {
+public final class NeoBlockMod {
     public static final String MOD_ID = "neoblock";
     public static final Logger LOGGER = LogManager.getLogger();
 
@@ -50,11 +49,12 @@ public final class NeoBlockMod extends ModXRegistration {
         return config;
     }
 
-    public NeoBlockMod(ModContainer container) {
+    public NeoBlockMod(IEventBus bus, ModContainer container) {
         NeoBlockMod.container = container;
         NeoBlockMod.instance = this;
         NeoBlockMod.config = ResourceUtil.getConfig(folder, "config.toml");
 
+        bus.addListener(this::setup);
         NeoForge.EVENT_BUS.addListener(MessagingUtil::onPlayerJoin);
     }
 
@@ -70,8 +70,7 @@ public final class NeoBlockMod extends ModXRegistration {
         UpgradeProgressAnimation.getAnimations().forEach(Animation::register);
     }
 
-    @Override
-    protected void setup(FMLCommonSetupEvent event) {
+    public void setup(FMLCommonSetupEvent event) {
         UpgradePhaseAnimation.addAnimation(ExplosionAnimation.class);
         UpgradePhaseAnimation.addAnimation(FuseAnimation.class);
 
@@ -86,6 +85,4 @@ public final class NeoBlockMod extends ModXRegistration {
 
         NeoBlockMod.reload();
     }
-    @Override
-    protected void clientSetup(FMLClientSetupEvent event) {}
 }
