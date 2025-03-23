@@ -10,13 +10,15 @@ import xyz.agmstudio.neoblock.tiers.animations.Animation;
 import java.util.HashSet;
 
 public abstract class UpgradeProgressAnimation extends Animation {
-    @AnimationConfig protected int interval = 40;
+    protected int interval = 40;
 
     public UpgradeProgressAnimation(String name) {
-        super("upgrade", name);
+        this("upgrade", name);
     }
     public UpgradeProgressAnimation(String category, String name) {
         super(category, name);
+
+        interval = NeoBlockMod.getConfig().getOrElse(getPath("interval"), interval);
     }
 
     @Override public boolean register() {

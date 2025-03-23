@@ -17,6 +17,7 @@ import java.util.List;
 public abstract class Animation {
     private static boolean registeringNewAnimations = true;
     private static final List<Animation> animations = new ArrayList<>();
+
     public static void addAnimation(Animation animation) {
         animations.add(animation);
     }
@@ -37,21 +38,27 @@ public abstract class Animation {
         if (name.contains(" ")) name = "\"%s\"".formatted(name);
         return "animations." + category + "." + name + ".";
     }
+    protected String getPath(String label) {
+        return path + StringUtil.convertToSnakeCase(label);
+    }
 
+    private final String path;
     protected boolean enabled;
 
     public Animation(String path) {
         if (!path.isEmpty() && !path.endsWith(".")) path += ".";
+        this.path = StringUtil.convertToSnakeCase(path);
+
         CommentedFileConfig config = NeoBlockMod.getConfig();
-        this.enabled = config.getOrElse(path + "enabled", false);
+        this.enabled = config.getOrElse(getPath("enabled"), false);
         StringBuilder debug = new StringBuilder("Loaded animation: " + path + "\n\tenabled: " + enabled);
         Class<?> clazz = this.getClass();
         while (clazz != null) {
             for (Field field : clazz.getDeclaredFields()) {
                 if (field.isAnnotationPresent(AnimationConfig.class)) {
                     AnimationConfig annotation = field.getAnnotation(AnimationConfig.class);
-                    String configPath = annotation.value().isEmpty() ? field.getName() : annotation.value();
-                    String fullPath = path + StringUtil.convertToSnakeCase(configPath);
+                    String label = annotation.value().isEmpty() ? field.getName() : annotation.value();
+                    String fullPath = getPath(label);
 
                     try {
                         field.setAccessible(true);
