@@ -17,7 +17,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.random.RandomGenerator;
-import java.util.zip.CRC32;
 
 public class NeoTier {
     protected static final Path FOLDER = Paths.get(FMLPaths.CONFIGDIR.get().toAbsolutePath().toString(), NeoBlockMod.MOD_ID, "tiers");
@@ -140,10 +139,9 @@ public class NeoTier {
     // Coding methods to help validate world using matching config.
     // Only hash game breaking data, no need for general data like blocks, weight, etc...
     protected String getHashCode() {
-        String data = "ID:" + TIER + ", U:" + UNLOCK;
+        String data = "ID:" + TIER + "|U:" + UNLOCK;
+        Base64.Encoder encoder = Base64.getEncoder();
 
-        CRC32 crc = new CRC32();
-        crc.update(data.getBytes());
-        return Long.toHexString(crc.getValue());
+        return encoder.encodeToString(data.getBytes());
     }
 }

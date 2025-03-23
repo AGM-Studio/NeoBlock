@@ -8,13 +8,15 @@
 
   "message.neoblock.disabled_world_1": "This world is not using the §bNeoBlock§r world preset. §bNeoBlock§r has set to dormant.",
   "message.neoblock.disabled_world_2": "If you are a modpack developer, it's recommended to use §4DefaultWorldType§r to prevent this issue.",
-  "message.neoblock.updated_world_1": "This world has been using an old tier config. You need to force update the world with %s.",
+  "message.neoblock.updated_world": "This world has been using an old tier config. You need to force update the world with %s.",
   "message.neoblock.unlocked_tier": "Tier %d has been unlocked!",
   "message.neoblock.unlocking_tier": "Tier %d is going to be unlocked!",
   "message.neoblock.unlocking_trader": "As a reward for unlocking this tier, a trader with significant trades has been spawned.",
   "message.neoblock.trader_spawned": "§cA trader has spawned!§r",
 
   "command.neoblock.info": "Stats:\n  Blocks broken: %d",
+
+  "command.neoblock.update.success": "Tiers has been overwritten with the new config. It might have caused some changes in unlocked tiers.",
 
   "command.neoblock.force_trader.success": "Summoning the trader has been successful.",
   "command.neoblock.force_trader.failure": "Unable to summon another trader. There is no valid trade for trder."

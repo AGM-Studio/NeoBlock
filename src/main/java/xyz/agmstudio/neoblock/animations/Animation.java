@@ -1,4 +1,4 @@
-package xyz.agmstudio.neoblock.tiers.animations;
+package xyz.agmstudio.neoblock.animations;
 
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import net.minecraft.server.level.ServerLevel;

@@ -1,4 +1,4 @@
-package xyz.agmstudio.neoblock.tiers.animations.phase;
+package xyz.agmstudio.neoblock.animations.phase;
 
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;

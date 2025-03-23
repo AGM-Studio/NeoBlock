@@ -1,4 +1,4 @@
-package xyz.agmstudio.neoblock.tiers.animations;
+package xyz.agmstudio.neoblock.animations;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerBossEvent;

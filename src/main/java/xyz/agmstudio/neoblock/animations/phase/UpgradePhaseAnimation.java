@@ -1,9 +1,9 @@
-package xyz.agmstudio.neoblock.tiers.animations.phase;
+package xyz.agmstudio.neoblock.animations.phase;
 
 
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlockMod;
-import xyz.agmstudio.neoblock.tiers.animations.Animation;
+import xyz.agmstudio.neoblock.animations.Animation;
 
 import java.util.HashSet;
 

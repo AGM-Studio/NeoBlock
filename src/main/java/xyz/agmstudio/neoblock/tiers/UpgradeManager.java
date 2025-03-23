@@ -7,9 +7,9 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Blocks;
 import org.jetbrains.annotations.NotNull;
-import xyz.agmstudio.neoblock.tiers.animations.ProgressbarAnimation;
-import xyz.agmstudio.neoblock.tiers.animations.phase.UpgradePhaseAnimation;
-import xyz.agmstudio.neoblock.tiers.animations.progress.UpgradeProgressAnimation;
+import xyz.agmstudio.neoblock.animations.ProgressbarAnimation;
+import xyz.agmstudio.neoblock.animations.phase.UpgradePhaseAnimation;
+import xyz.agmstudio.neoblock.animations.progress.UpgradeProgressAnimation;
 
 import java.util.ArrayList;
 import java.util.HashSet;

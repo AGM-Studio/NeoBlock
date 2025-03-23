@@ -54,7 +54,7 @@ public class WorldData extends SavedData {
         final CompoundTag mobs = tag.getCompound("TradedMobs");
         mobs.getAllKeys().forEach(key -> data.tradedMobs.merge(BuiltInRegistries.ENTITY_TYPE.get(ResourceLocation.parse(key)), mobs.getInt(key), Integer::sum));
 
-        final ListTag hash = tag.getList("Hashes", StringTag.TAG_STRING);
+        final ListTag hash = tag.getList("Encoding", StringTag.TAG_STRING);
         for (int i = 0; i < hash.size(); ++i) data.encoding.add(hash.getString(i));
 
         final ListTag unlocked = tag.getList("Unlocked", StringTag.TAG_INT);
@@ -63,10 +63,7 @@ public class WorldData extends SavedData {
         NeoBlockMod.LOGGER.debug("Loaded WorldData from {}", tag);
 
         if (WorldData.isValid()) for (int i : data.unlockedIDs) data.unlocked.add(NeoBlock.TIERS.get(i));
-        else {
-            data.state = WorldState.UPDATED;
-            NeoBlockMod.LOGGER.warn("Tiers has been modified. NeoBlock will be disabled till (/neoblock force update) is executed.");
-        }
+        else data.state = WorldState.UPDATED;
 
         return data;
     }

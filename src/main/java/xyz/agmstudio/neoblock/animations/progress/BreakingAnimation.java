@@ -1,4 +1,4 @@
-package xyz.agmstudio.neoblock.tiers.animations.progress;
+package xyz.agmstudio.neoblock.animations.progress;
 
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;

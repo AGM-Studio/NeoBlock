@@ -1,11 +1,11 @@
-package xyz.agmstudio.neoblock.tiers.animations.progress;
+package xyz.agmstudio.neoblock.animations.progress;
 
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.LevelAccessor;
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.tiers.UpgradeManager;
-import xyz.agmstudio.neoblock.tiers.animations.Animation;
+import xyz.agmstudio.neoblock.animations.Animation;
 
 import java.util.HashSet;
 
