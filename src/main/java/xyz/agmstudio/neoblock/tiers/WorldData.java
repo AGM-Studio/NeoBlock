@@ -9,6 +9,7 @@ import net.minecraft.nbt.StringTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.saveddata.SavedData;
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlockMod;
@@ -192,5 +193,9 @@ public class WorldData extends SavedData {
         }
         instance.unlockedIDs.clear();
         instance.unlocked.forEach(tier -> instance.unlockedIDs.add(tier.TIER));
+    }
+
+    public static void tick(ServerLevel level, LevelAccessor access) {
+        if (instance != null) instance.upgrade.tick(level, access);
     }
 }

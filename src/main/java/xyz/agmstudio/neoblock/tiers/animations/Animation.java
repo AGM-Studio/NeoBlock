@@ -3,10 +3,6 @@ package xyz.agmstudio.neoblock.tiers.animations;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.LevelAccessor;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.tick.LevelTickEvent;
-import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.util.StringUtil;
 
@@ -18,7 +14,6 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-@EventBusSubscriber
 public abstract class Animation {
     private static boolean registeringNewAnimations = true;
     private static final List<Animation> animations = new ArrayList<>();
@@ -32,9 +27,9 @@ public abstract class Animation {
     public static boolean canRegisterNewAnimations() {
         return registeringNewAnimations;
     }
-    @SubscribeEvent public static void onWorldTick(LevelTickEvent.@NotNull Post event) {
-        if (!(event.getLevel() instanceof ServerLevel level)) return;
-        animations.forEach(animation -> animation.tick(level, event.getLevel()));
+
+    public static void tickAll(ServerLevel level, LevelAccessor access) {
+        animations.forEach(animation -> animation.tick(level, access));
     }
 
     private static String createPath(String category, String name) {

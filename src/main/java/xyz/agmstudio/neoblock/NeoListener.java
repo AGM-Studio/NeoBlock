@@ -27,12 +27,25 @@ import xyz.agmstudio.neoblock.tiers.WorldData;
 import xyz.agmstudio.neoblock.tiers.merchants.NeoMerchant;
 import xyz.agmstudio.neoblock.tiers.merchants.NeoOffer;
 
+import java.util.HashSet;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.BiConsumer;
 
 @EventBusSubscriber(modid = NeoBlockMod.MOD_ID)
 public final class NeoListener {
     private static final ExecutorService executor = Executors.newSingleThreadExecutor();
+
+    public static <T> void execute(Callable<T> callable) {
+        executor.submit(callable);
+    }
+
+    private static final HashSet<BiConsumer<ServerLevel, LevelAccessor>> tickers = new HashSet<>();
+
+    public static void registerTicker(BiConsumer<ServerLevel, LevelAccessor> ticker) {
+        tickers.add(ticker);
+    }
 
     @SubscribeEvent
     public static void onWorldLoad(LevelEvent.@NotNull Load event) {
@@ -42,19 +55,15 @@ public final class NeoListener {
 
     @SubscribeEvent
     public static void onWorldTick(LevelTickEvent.@NotNull Post event) {
-        if (!(event.getLevel() instanceof ServerLevel level) || level.dimension() != Level.OVERWORLD || WorldData.isDisabled()) return;
+        if (!(event.getLevel() instanceof ServerLevel level) || level.dimension() != Level.OVERWORLD || WorldData.isDisabled())
+            return;
         final LevelAccessor access = event.getLevel();
         final BlockState block = access.getBlockState(NeoBlock.POS);
 
-        // Upgrading the neoblock... Nothing else should happen meanwhile
-        if (WorldData.isUpdated() || NeoBlock.isOnUpgrade()) {
-            if (block.getBlock() != Blocks.BEDROCK) NeoBlock.setNeoBlock(access, Blocks.BEDROCK.defaultBlockState());
-            if (NeoBlock.isOnUpgrade()) WorldData.getUpgradeManager().tick(level, access);  // Todo better ticking
-            return;
-        }
+        tickers.forEach(ticker -> ticker.accept(level, access));
 
         // Handle items in inventory
-        for (Player player: level.players()) {
+        for (Player player : level.players()) {
             for (int slot = 0; slot < player.getInventory().getContainerSize(); slot++) {
                 ItemStack stack = player.getInventory().getItem(slot);
                 if (!stack.isEmpty() && NeoOffer.handlePossibleMobTrade(stack)) {
@@ -64,19 +73,21 @@ public final class NeoListener {
             }
         }
 
-        // NeoBlock has been broken logic
-        if (!block.isAir() && !block.canBeReplaced()) return;
-        NeoBlock.onBlockBroken(level, access, true);
-
-        executor.submit(() -> NeoMerchant.attemptSpawnTrader(level));
+        // Upgrading the neoblock... Nothing else should happen meanwhile
+        if (WorldData.isUpdated() || NeoBlock.isOnUpgrade()) {
+            if (block.getBlock() != Blocks.BEDROCK) NeoBlock.setNeoBlock(access, Blocks.BEDROCK.defaultBlockState());
+        } else if (block.isAir() || block.canBeReplaced())          // NeoBlock has been broken logic
+            NeoBlock.onBlockBroken(level, access, true);
     }
 
     @SubscribeEvent
     public static void onEntitySpawn(EntityJoinLevelEvent event) {
-        if (!(event.getLevel() instanceof ServerLevel level)) return;
+        if (!(event.getLevel() instanceof ServerLevel level) || WorldData.isDisabled()) return;
         if (event.getEntity() instanceof WanderingTrader trader) NeoMerchant.handleTrader(trader);
-        if (event.getEntity() instanceof ServerPlayer player && NeoBlock.isOnUpgrade()) WorldData.getUpgradeManager().addPlayer(player);
-        if (event.getEntity() instanceof ItemEntity item && NeoOffer.handlePossibleMobTrade(item.getItem())) event.setCanceled(true);
+        if (event.getEntity() instanceof ServerPlayer player && NeoBlock.isOnUpgrade())
+            WorldData.getUpgradeManager().addPlayer(player);
+        if (event.getEntity() instanceof ItemEntity item && NeoOffer.handlePossibleMobTrade(item.getItem()))
+            event.setCanceled(true);
     }
 
     @SubscribeEvent

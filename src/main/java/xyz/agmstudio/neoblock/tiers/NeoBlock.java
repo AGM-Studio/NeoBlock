@@ -13,6 +13,8 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlockMod;
+import xyz.agmstudio.neoblock.NeoListener;
+import xyz.agmstudio.neoblock.tiers.merchants.NeoMerchant;
 import xyz.agmstudio.neoblock.util.MessagingUtil;
 
 import java.nio.file.Files;
@@ -84,6 +86,8 @@ public class NeoBlock {
             WorldData.getUpgradeManager().startUpgrade(level, access, tier);
 
         else setNeoBlock(access, getRandomBlock());
+
+        NeoListener.execute(() -> NeoMerchant.attemptSpawnTrader(level));
     }
 
     public static void reload() {
