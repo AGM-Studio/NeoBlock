@@ -15,11 +15,7 @@ public class ProgressbarAnimation extends Animation {
 
     public ProgressbarAnimation() {
         super("animations.progressbar");
-        bar = new ServerBossEvent(
-                Component.literal(""),
-                BossEvent.BossBarColor.byName(color),
-                BossEvent.BossBarOverlay.PROGRESS
-        );
+        bar = new ServerBossEvent(Component.literal(""), BossEvent.BossBarColor.RED, BossEvent.BossBarOverlay.PROGRESS);
     }
 
     public void update(int ticks, int goal) {
@@ -47,4 +43,9 @@ public class ProgressbarAnimation extends Animation {
 
         return timeString.toString().trim();
     }
+
+    @Override protected void onRegister() {
+        bar.setColor(BossEvent.BossBarColor.byName(color));
+    }
+    @Override protected void processConfig() {}
 }

@@ -5,8 +5,11 @@ import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.entity.npc.WanderingTrader;
+import xyz.agmstudio.neoblock.animations.Animation;
 import xyz.agmstudio.neoblock.tiers.NeoBlock;
+import xyz.agmstudio.neoblock.tiers.UpgradeManager;
 import xyz.agmstudio.neoblock.tiers.WorldData;
 import xyz.agmstudio.neoblock.tiers.merchants.NeoMerchant;
 
@@ -25,8 +28,13 @@ public class MainCommand {
     // Method that executes when the command is run
     private static int showInfo(CommandContext<CommandSourceStack> context) {
         CommandSourceStack source = context.getSource();
-        source.sendSuccess(() -> Component.translatable("command.neoblock.info", WorldData.getBlockCount())
-                .append("\n  On upgrade:" + NeoBlock.isOnUpgrade()), true);
+        MutableComponent message = Component.translatable("command.neoblock.info", WorldData.getBlockCount())
+                .append("\n  On upgrade:" + NeoBlock.isOnUpgrade())
+                .append("\n  Animations:");
+
+        for (Animation animation: UpgradeManager.getAllAnimations()) message.append("\n  - " + animation);
+
+        source.sendSuccess(() -> message, true);
 
         return 1;
     }

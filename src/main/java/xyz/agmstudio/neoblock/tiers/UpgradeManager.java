@@ -7,6 +7,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Blocks;
 import org.jetbrains.annotations.NotNull;
+import xyz.agmstudio.neoblock.animations.Animation;
 import xyz.agmstudio.neoblock.animations.ProgressbarAnimation;
 import xyz.agmstudio.neoblock.animations.phase.UpgradePhaseAnimation;
 import xyz.agmstudio.neoblock.animations.progress.UpgradeProgressAnimation;
@@ -37,6 +38,13 @@ public class UpgradeManager {
         if (!progressbar.isEnabled()) progressbar = null;
     }
 
+    public static List<Animation> getAllAnimations() {
+        List<Animation> list = new ArrayList<>();
+        list.addAll(progressAnimations);
+        list.addAll(phaseAnimations);
+        return list;
+    }
+
     private final List<Upgrade> upgrades = new ArrayList<>();
 
     public boolean isOnUpgrade() {
@@ -47,8 +55,8 @@ public class UpgradeManager {
         if (upgrades.isEmpty()) return;
         Upgrade upgrade = upgrades.getFirst();
         if (upgrade.tick()) {
-            finishUpgrade(level, access, upgrade);
             upgrades.removeFirst();
+            finishUpgrade(level, access, upgrade);
         } else {
             if (progressbar != null) progressbar.update(upgrade.tick, upgrade.goal);
             for (UpgradeProgressAnimation animation : progressAnimations)

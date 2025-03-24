@@ -4,29 +4,24 @@ package xyz.agmstudio.neoblock.animations.phase;
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.animations.Animation;
+import xyz.agmstudio.neoblock.tiers.UpgradeManager;
 
 import java.util.HashSet;
 
 public abstract class UpgradePhaseAnimation extends Animation {
-    @AnimationConfig("at-start")
-    private boolean activeOnUpgradeStart = false;
-    @AnimationConfig("at-finish")
-    private boolean activeOnUpgradeFinish = true;
-
     public UpgradePhaseAnimation(String name) {
-        this("phase", name);
+        super("phase", name);
     }
     public UpgradePhaseAnimation(String category, String name) {
         super(category, name);
-        this.enabled = activeOnUpgradeStart || activeOnUpgradeFinish;
     }
 
-    public boolean isActiveOnUpgradeFinish() {
-        return activeOnUpgradeFinish;
+    @Override protected void onRegister() {
+        UpgradeManager.addPhaseAnimation(this);
     }
-    public boolean isActiveOnUpgradeStart() {
-        return activeOnUpgradeStart;
-    }
+
+    public abstract boolean isActiveOnUpgradeFinish();
+    public abstract boolean isActiveOnUpgradeStart();
 
     private static final HashSet<Class<? extends UpgradePhaseAnimation>> animations = new HashSet<>();
     public static void addAnimation(Class<? extends UpgradePhaseAnimation> clazz) {
@@ -37,7 +32,9 @@ public abstract class UpgradePhaseAnimation extends Animation {
         HashSet<UpgradePhaseAnimation> animations = new HashSet<>();
         for (Class<? extends UpgradePhaseAnimation> animation: UpgradePhaseAnimation.animations) {
             try {
-                animations.add(animation.getConstructor().newInstance());
+                UpgradePhaseAnimation instance = animation.getConstructor().newInstance();
+                NeoBlockMod.LOGGER.debug("Instanced animation: {}", instance);
+                animations.add(instance);
             } catch (Exception e) {
                 NeoBlockMod.LOGGER.error("Error while instantiating {}", animation, e);
             }

@@ -11,6 +11,7 @@ import java.util.Iterator;
 import java.util.List;
 
 public class SpiralAnimation extends UpgradeProgressAnimation {
+    @AnimationConfig private int interval = 40;
     @AnimationConfig private int length = 50;
     @AnimationConfig private int count = 5;
 
@@ -20,11 +21,14 @@ public class SpiralAnimation extends UpgradeProgressAnimation {
         super("spiral");
     }
 
-    @Override
-    public void processConfig() {
+    @Override public void processConfig() {
         interval = Math.max(interval, 5);
         length = Math.max(0, length);
         count = Math.max(1, count);
+    }
+
+    @Override public void upgradeTick(ServerLevel level, LevelAccessor access, int tick) {
+        if (tick % interval == 0) animate(level, access);
     }
 
     @Override public void animate(ServerLevel level, LevelAccessor access) {

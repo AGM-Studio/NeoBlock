@@ -5,16 +5,35 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.LevelAccessor;
+import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.tiers.NeoBlock;
 
 public class ExplosionAnimation extends UpgradePhaseAnimation {
+    @AnimationConfig("at-start")
+    private boolean activeOnUpgradeStart = false;
+    @AnimationConfig("at-finish")
+    private boolean activeOnUpgradeFinish = true;
     @AnimationConfig private float volume = 0.7f;
 
     public ExplosionAnimation() {
         super("explosion");
     }
 
+    @Override public boolean isActiveOnUpgradeStart() {
+        return activeOnUpgradeStart;
+    }
+    @Override public boolean isActiveOnUpgradeFinish() {
+        return activeOnUpgradeFinish;
+    }
+
+    @Override public void processConfig() {
+        this.volume = Math.max(0, volume);
+
+        this.enabled = activeOnUpgradeStart || activeOnUpgradeFinish;
+    }
+
     @Override public void animate(ServerLevel level, LevelAccessor access) {
+        NeoBlockMod.LOGGER.debug("Animating {}", this.getClass().getSimpleName());
         level.sendParticles(ParticleTypes.EXPLOSION_EMITTER,
                 NeoBlock.POS.getX() + 0.5,
                 NeoBlock.POS.getY() + 0.5,

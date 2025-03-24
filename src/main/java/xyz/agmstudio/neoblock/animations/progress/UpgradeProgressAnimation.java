@@ -10,33 +10,25 @@ import xyz.agmstudio.neoblock.animations.Animation;
 import java.util.HashSet;
 
 public abstract class UpgradeProgressAnimation extends Animation {
-    protected int interval = 40;
-
     public UpgradeProgressAnimation(String name) {
-        this("upgrade", name);
+        super("upgrade", name);
     }
     public UpgradeProgressAnimation(String category, String name) {
         super(category, name);
-
-        interval = NeoBlockMod.getConfig().getOrElse(getPath("interval"), interval);
     }
 
-    @Override public boolean register() {
-        if (!super.register()) return false;
+    @Override protected void onRegister() {
         UpgradeManager.addProgressAnimation(this);
-        return true;
     }
 
     /**
      * Will tick while upgrading is active. The default will call animate on interval tick.
      *
-     * @param level the level to play animation
+     * @param level  the level to play animation
      * @param access the world access if needed
-     * @param tick the tick upgrade is in
+     * @param tick   the tick upgrade is in
      */
-    public void upgradeTick(ServerLevel level, LevelAccessor access, int tick) {
-        if (tick % interval == 0) animate(level, access);
-    }
+    public abstract void upgradeTick(ServerLevel level, LevelAccessor access, int tick);
 
     private static final HashSet<Class<? extends UpgradeProgressAnimation>> animations = new HashSet<>();
     public static void addAnimation(Class<? extends UpgradeProgressAnimation> clazz) {

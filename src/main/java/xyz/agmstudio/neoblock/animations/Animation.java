@@ -11,7 +11,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public abstract class Animation {
@@ -48,10 +50,19 @@ public abstract class Animation {
     public Animation(String path) {
         if (!path.isEmpty() && !path.endsWith(".")) path += ".";
         this.path = StringUtil.convertToSnakeCase(path);
+    }
 
+    public Animation(String category, String name) {
+        this(createPath(category, name));
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public final boolean register() {
         CommentedFileConfig config = NeoBlockMod.getConfig();
         this.enabled = config.getOrElse(getPath("enabled"), false);
-        StringBuilder debug = new StringBuilder("Loaded animation: " + path + "\n\tenabled: " + enabled);
         Class<?> clazz = this.getClass();
         while (clazz != null) {
             for (Field field : clazz.getDeclaredFields()) {
@@ -69,8 +80,6 @@ public abstract class Animation {
                             case Number number when field.getType() == int.class -> field.set(this, number.intValue());
                             case null, default -> field.set(this, value);
                         }
-
-                        debug.append("\n\t").append(field.getName()).append(": ").append(value);
                     } catch (IllegalAccessException e) {
                         NeoBlockMod.LOGGER.error("Failed to load animation config value for: {}", field.getName(), e);
                     }
@@ -81,23 +90,15 @@ public abstract class Animation {
         }
 
         processConfig();
-        NeoBlockMod.LOGGER.debug(debug.toString());
-    }
 
-    public Animation(String category, String name) {
-        this(createPath(category, name));
-    }
-
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    public boolean register() {
         if (!enabled) return false;
         Animation.addAnimation(this);
+        onRegister();
         return true;
     }
-    public void processConfig() {}
+
+    protected abstract void onRegister();
+    protected abstract void processConfig();
 
     /**
      * Will always tick...
@@ -114,6 +115,27 @@ public abstract class Animation {
      * @param access the world access if needed
      */
     public void animate(ServerLevel level, LevelAccessor access) {}
+
+    @Override public String toString() {
+        StringBuilder sb = new StringBuilder();
+        Class<?> clazz = this.getClass();
+
+        while (clazz != null) {
+            for (Field field : clazz.getDeclaredFields()) {
+                field.setAccessible(true);
+                if ((field.getModifiers() & 0x00000008) != 0 || field.getName().equals("path")) continue;
+                try {
+                    sb.append(field.getName()).append(": ").append(field.get(this)).append(", ");
+                } catch (IllegalAccessException e) {
+                    sb.append(field.getName()).append(field.getName()).append(": NO_ACCESS, ");
+                }
+            }
+            clazz = clazz.getSuperclass();
+        }
+
+        if (sb.length() > 2) sb.setLength(sb.length() - 2);
+        return getClass().getSimpleName() + "{" + sb + "}";
+    }
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)

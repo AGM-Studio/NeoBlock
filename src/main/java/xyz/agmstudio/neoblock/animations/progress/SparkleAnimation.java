@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 public class SparkleAnimation extends UpgradeProgressAnimation {
+    @AnimationConfig private int interval = 40;
     @AnimationConfig private int length = 10;
     @AnimationConfig private int factor = 3;
     @AnimationConfig private int count = 5;
@@ -26,6 +27,10 @@ public class SparkleAnimation extends UpgradeProgressAnimation {
         length = Math.clamp(length, 0, interval);
         factor = Math.max(1, factor);
         count = Math.max(1, count);
+    }
+
+    @Override public void upgradeTick(ServerLevel level, LevelAccessor access, int tick) {
+        if (tick % interval == 0) animate(level, access);
     }
 
     @Override

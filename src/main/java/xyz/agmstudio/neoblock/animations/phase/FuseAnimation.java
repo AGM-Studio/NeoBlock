@@ -6,6 +6,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.phys.Vec3;
+import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.tiers.NeoBlock;
 
 import java.util.ArrayList;
@@ -13,15 +14,34 @@ import java.util.Iterator;
 import java.util.List;
 
 public class FuseAnimation extends UpgradePhaseAnimation {
+    @AnimationConfig("at-start")
+    private boolean activeOnUpgradeStart = false;
+    @AnimationConfig("at-finish")
+    private boolean activeOnUpgradeFinish = true;
     @AnimationConfig private float volume = 1.5f;
 
     private final List<Integer> animations = new ArrayList<>();
 
     public FuseAnimation() {
         super("fuse");
+        NeoBlockMod.LOGGER.debug("Fuse animation: {}", this);
+    }
+
+    @Override public boolean isActiveOnUpgradeStart() {
+        return activeOnUpgradeStart;
+    }
+    @Override public boolean isActiveOnUpgradeFinish() {
+        return activeOnUpgradeFinish;
+    }
+
+    @Override public void processConfig() {
+        this.volume = Math.max(0, volume);
+
+        this.enabled = activeOnUpgradeStart || activeOnUpgradeFinish;
     }
 
     @Override public void animate(ServerLevel level, LevelAccessor access) {
+        NeoBlockMod.LOGGER.debug("Animating {}", this.getClass().getSimpleName());
         animations.add(0);
     }
 
