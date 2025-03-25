@@ -7,6 +7,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Blocks;
 import org.jetbrains.annotations.NotNull;
+import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.animations.Animation;
 import xyz.agmstudio.neoblock.animations.ProgressbarAnimation;
 import xyz.agmstudio.neoblock.animations.phase.UpgradePhaseAnimation;
@@ -35,6 +36,7 @@ public class UpgradeManager {
     }
     public static void reloadProgressbarAnimations() {
         progressbar = new ProgressbarAnimation();
+        progressbar.reload();
         if (!progressbar.isEnabled()) progressbar = null;
     }
 
@@ -103,6 +105,7 @@ public class UpgradeManager {
     public void load(@NotNull ListTag tag) {
         for (int i = 0; i < tag.size(); i++) {
             Upgrade upgrade = Upgrade.fromTag(tag.getCompound(i));
+            NeoBlockMod.LOGGER.debug("Loading upgrade from {} and got {}", tag.getCompound(i), upgrade);
             if (upgrade != null) upgrades.add(upgrade);
         }
     }
@@ -140,6 +143,10 @@ public class UpgradeManager {
             tag.putInt("Tier", tier.TIER);
             tag.putInt("Tick", tick);
             return tag;
+        }
+
+        @Override public String toString() {
+            return getClass().getSimpleName() + "{tier=" + tier + ", goal=" + goal + ", tick=" + tick + '}';
         }
     }
 }

@@ -61,6 +61,14 @@ public abstract class Animation {
     }
 
     public final boolean register() {
+        this.reload();
+        if (!enabled) return false;
+        Animation.addAnimation(this);
+        onRegister();
+        return true;
+    }
+
+    public final void reload() {
         CommentedFileConfig config = NeoBlockMod.getConfig();
         this.enabled = config.getOrElse(getPath("enabled"), false);
         Class<?> clazz = this.getClass();
@@ -90,11 +98,6 @@ public abstract class Animation {
         }
 
         processConfig();
-
-        if (!enabled) return false;
-        Animation.addAnimation(this);
-        onRegister();
-        return true;
     }
 
     protected abstract void onRegister();

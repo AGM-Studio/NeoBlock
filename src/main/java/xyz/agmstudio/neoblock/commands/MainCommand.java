@@ -28,14 +28,9 @@ public class MainCommand {
     // Method that executes when the command is run
     private static int showInfo(CommandContext<CommandSourceStack> context) {
         CommandSourceStack source = context.getSource();
-        MutableComponent message = Component.translatable("command.neoblock.info", WorldData.getBlockCount())
-                .append("\n  On upgrade:" + NeoBlock.isOnUpgrade())
-                .append("\n  Animations:");
-
-        for (Animation animation: UpgradeManager.getAllAnimations()) message.append("\n  - " + animation);
+        MutableComponent message = Component.translatable("command.neoblock.info", WorldData.getBlockCount());
 
         source.sendSuccess(() -> message, true);
-
         return 1;
     }
     private static int forceTrader(CommandContext<CommandSourceStack> context) {

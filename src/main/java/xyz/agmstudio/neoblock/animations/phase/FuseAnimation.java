@@ -24,7 +24,6 @@ public class FuseAnimation extends UpgradePhaseAnimation {
 
     public FuseAnimation() {
         super("fuse");
-        NeoBlockMod.LOGGER.debug("Fuse animation: {}", this);
     }
 
     @Override public boolean isActiveOnUpgradeStart() {
@@ -41,7 +40,6 @@ public class FuseAnimation extends UpgradePhaseAnimation {
     }
 
     @Override public void animate(ServerLevel level, LevelAccessor access) {
-        NeoBlockMod.LOGGER.debug("Animating {}", this.getClass().getSimpleName());
         animations.add(0);
     }
 

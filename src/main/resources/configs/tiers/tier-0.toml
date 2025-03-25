@@ -1,5 +1,5 @@
 # Amount of blocks broken to unlock.
-unlock = 0    # Green phase
+# Green phase - This tier is unlocked by default!
 # List of all blocks in this tier. All of them have equal chance to be chosen in this tier.
 blocks = [
     "16xminecraft:grass_block",

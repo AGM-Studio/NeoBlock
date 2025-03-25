@@ -32,9 +32,7 @@ public abstract class UpgradePhaseAnimation extends Animation {
         HashSet<UpgradePhaseAnimation> animations = new HashSet<>();
         for (Class<? extends UpgradePhaseAnimation> animation: UpgradePhaseAnimation.animations) {
             try {
-                UpgradePhaseAnimation instance = animation.getConstructor().newInstance();
-                NeoBlockMod.LOGGER.debug("Instanced animation: {}", instance);
-                animations.add(instance);
+                animations.add(animation.getConstructor().newInstance());
             } catch (Exception e) {
                 NeoBlockMod.LOGGER.error("Error while instantiating {}", animation, e);
             }

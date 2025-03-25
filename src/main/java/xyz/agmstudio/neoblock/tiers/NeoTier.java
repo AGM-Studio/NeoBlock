@@ -144,4 +144,8 @@ public class NeoTier {
 
         return encoder.encodeToString(data.getBytes());
     }
+
+    public boolean canBeUnlocked() {
+        return !WorldData.getUnlocked().contains(this) && isUnlocked();
+    }
 }

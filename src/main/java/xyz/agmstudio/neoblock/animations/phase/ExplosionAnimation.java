@@ -33,7 +33,6 @@ public class ExplosionAnimation extends UpgradePhaseAnimation {
     }
 
     @Override public void animate(ServerLevel level, LevelAccessor access) {
-        NeoBlockMod.LOGGER.debug("Animating {}", this.getClass().getSimpleName());
         level.sendParticles(ParticleTypes.EXPLOSION_EMITTER,
                 NeoBlock.POS.getX() + 0.5,
                 NeoBlock.POS.getY() + 0.5,

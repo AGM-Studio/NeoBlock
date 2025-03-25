@@ -48,7 +48,7 @@ public class WorldData extends SavedData {
         data.blockCount = tag.getInt("BlockCount");
         data.traderFailedAttempts = tag.getInt("TraderFailedAttempts");
 
-        final ListTag upgrade = tag.getList("Upgrade", StringTag.TAG_COMPOUND);
+        final ListTag upgrade = tag.getList("Upgrades", StringTag.TAG_COMPOUND);
         data.upgrade.load(upgrade);
 
         final CompoundTag mobs = tag.getCompound("TradedMobs");
