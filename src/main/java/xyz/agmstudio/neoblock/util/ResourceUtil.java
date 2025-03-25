@@ -4,6 +4,7 @@ import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import net.neoforged.fml.loading.FMLPaths;
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlockMod;
+import xyz.agmstudio.neoblock.tiers.NeoTier;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -104,5 +105,43 @@ public class ResourceUtil {
         Path path = Paths.get(FMLPaths.CONFIGDIR.get().toAbsolutePath().toString(), paths);
         if (!path.toFile().exists() && path.toFile().mkdirs()) NeoBlockMod.LOGGER.debug("Creating folder {}", path);
         return path;
+    }
+
+    /**
+     * Loads all available tier configuration files from resources if they do not exist.
+     */
+    public static void loadAllTierConfigs() {
+        // If tier-0.toml is present, no need to proceed
+        if (Files.exists(NeoTier.FOLDER.resolve("tier-0.toml"))) return;
+        if (NeoTier.FOLDER.toFile().mkdirs())
+            NeoBlockMod.LOGGER.debug("Created config folder: {}", NeoTier.FOLDER);
+
+        int tier = 0;
+        while (true) {
+            Path location = NeoTier.FOLDER.resolve("tier-" + tier + ".toml");
+            String resource = "/configs/tiers/tier-" + tier + ".toml";
+            Map<String, String> map = Map.of("[TIER]", Integer.toString(tier ++));
+
+            if (Files.exists(location)) continue;
+            if (!doesResourceExist(resource)) break;
+
+            try {
+                processResourceFile(resource, location, map);
+                NeoBlockMod.LOGGER.debug("Loaded tier config from resource: {}", resource);
+            } catch (IOException e) {
+                NeoBlockMod.LOGGER.error("Unable to process resource {}", resource, e);
+                break;
+            }
+        }
+
+        Path templateLocation = NeoTier.FOLDER.resolve("tier-template.toml");
+        if (!Files.exists(templateLocation)) {
+            try {
+                processResourceFile("/configs/tiers/tier-template.toml", templateLocation, Map.of("[TIER]", "10"));
+                NeoBlockMod.LOGGER.debug("Loaded tier template config.");
+            } catch (IOException e) {
+                NeoBlockMod.LOGGER.error("Unable to process tier template resource", e);
+            }
+        }
     }
 }

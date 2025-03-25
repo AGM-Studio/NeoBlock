@@ -21,7 +21,6 @@ import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import org.jetbrains.annotations.NotNull;
-import xyz.agmstudio.neoblock.commands.MainCommand;
 import xyz.agmstudio.neoblock.tiers.NeoBlock;
 import xyz.agmstudio.neoblock.tiers.WorldData;
 import xyz.agmstudio.neoblock.tiers.merchants.NeoMerchant;
@@ -92,7 +91,7 @@ public final class NeoListener {
 
     @SubscribeEvent
     public static void onRegisterCommands(RegisterCommandsEvent event) {
-        MainCommand.register(event.getDispatcher());
+        NeoCommand.register(event.getDispatcher());
     }
 
     @SubscribeEvent

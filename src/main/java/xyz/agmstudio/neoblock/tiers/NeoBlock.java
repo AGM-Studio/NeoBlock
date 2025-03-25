@@ -5,6 +5,7 @@ import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Blocks;
@@ -16,6 +17,7 @@ import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.NeoListener;
 import xyz.agmstudio.neoblock.tiers.merchants.NeoMerchant;
 import xyz.agmstudio.neoblock.util.MessagingUtil;
+import xyz.agmstudio.neoblock.util.ResourceUtil;
 
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -91,12 +93,7 @@ public class NeoBlock {
     }
 
     public static void reload() {
-        if (!Files.exists(NeoTier.FOLDER)) {
-            for (int i = 0; i < 10; i++) try {
-                NeoTier.loadFromResources(i, false);
-            } catch (Exception ignored) { break; }
-            NeoTier.loadFromResources("template", true);
-        }
+        ResourceUtil.loadAllTierConfigs();
 
         int i = 0;
         NeoBlock.TIERS.clear();

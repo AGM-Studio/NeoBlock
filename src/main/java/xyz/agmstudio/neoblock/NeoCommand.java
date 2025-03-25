@@ -1,4 +1,4 @@
-package xyz.agmstudio.neoblock.commands;
+package xyz.agmstudio.neoblock;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
@@ -7,20 +7,16 @@ import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.entity.npc.WanderingTrader;
-import xyz.agmstudio.neoblock.animations.Animation;
-import xyz.agmstudio.neoblock.tiers.NeoBlock;
-import xyz.agmstudio.neoblock.tiers.UpgradeManager;
 import xyz.agmstudio.neoblock.tiers.WorldData;
 import xyz.agmstudio.neoblock.tiers.merchants.NeoMerchant;
 
-@SuppressWarnings("SameReturnValue")
-public class MainCommand {
+public class NeoCommand {
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(
-                Commands.literal("neoblock").executes(MainCommand::showInfo)
+                Commands.literal("neoblock").executes(NeoCommand::showInfo)
                         .then(Commands.literal("force")
-                                .then(Commands.literal("trader").executes(MainCommand::forceTrader))
-                                .then(Commands.literal("update").executes(MainCommand::forceUpdate))
+                                .then(Commands.literal("trader").executes(NeoCommand::forceTrader))
+                                .then(Commands.literal("update").executes(NeoCommand::forceUpdate))
                         )
         );
     }
