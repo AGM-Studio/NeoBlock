@@ -118,11 +118,11 @@ public class UpgradeManager {
 
         protected Upgrade(@NotNull NeoTier tier) {
             this.tier = tier;
-            this.goal = tier.UNLOCK_TIME;
+            this.goal = tier.lock.getTime();
         }
         private Upgrade(@NotNull NeoTier tier, int tick) {
             this.tier = tier;
-            this.goal = tier.UNLOCK_TIME;
+            this.goal = tier.lock.getTime();
             this.tick = tick;
         }
 
@@ -140,7 +140,7 @@ public class UpgradeManager {
 
         public CompoundTag getTag() {
             CompoundTag tag = new CompoundTag();
-            tag.putInt("Tier", tier.TIER);
+            tag.putInt("Tier", tier.id);
             tag.putInt("Tick", tick);
             return tag;
         }

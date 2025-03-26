@@ -35,7 +35,7 @@ public class WorldData extends SavedData {
 
         for (NeoTier tier: NeoBlock.TIERS) {
             data.encoding.add(tier.getHashCode());
-            if (tier.TIER == 0 || tier.isUnlocked())
+            if (tier.id == 0 || tier.isUnlocked())
                 data.unlocked.add(tier);
         }
 
@@ -60,6 +60,9 @@ public class WorldData extends SavedData {
         final ListTag unlocked = tag.getList("Unlocked", StringTag.TAG_INT);
         for (int i = 0; i < unlocked.size(); ++i) data.unlockedIDs.add(unlocked.getInt(i));
 
+        final ListTag commanded = tag.getList("Commanded", StringTag.TAG_INT);
+        for (int i = 0; i < commanded.size(); ++i) data.commanded.add(commanded.getInt(i));
+
         NeoBlockMod.LOGGER.debug("Loaded WorldData from {}", tag);
 
         if (WorldData.isValid()) for (int i : data.unlockedIDs) data.unlocked.add(NeoBlock.TIERS.get(i));
@@ -83,8 +86,12 @@ public class WorldData extends SavedData {
         tag.put("Encoding", hash);
 
         final ListTag utg = new ListTag();
-        unlocked.forEach(tier -> utg.add(IntTag.valueOf(tier.TIER)));
+        unlocked.forEach(tier -> utg.add(IntTag.valueOf(tier.id)));
         tag.put("Unlocked", utg);
+
+        final ListTag ctg = new ListTag();
+        commanded.forEach(id -> ctg.add(IntTag.valueOf(id)));
+        tag.put("Commanded", ctg);
 
         NeoBlockMod.LOGGER.debug("Saving WorldData to {}", tag);
         return tag;
@@ -97,6 +104,7 @@ public class WorldData extends SavedData {
 
     private final HashSet<Integer> unlockedIDs = new HashSet<>();
     private final HashSet<NeoTier> unlocked = new HashSet<>();
+    private final HashSet<Integer> commanded = new HashSet<>();
     private final HashSet<String> encoding = new HashSet<>();
 
     private final UpgradeManager upgrade = new UpgradeManager();
@@ -143,6 +151,10 @@ public class WorldData extends SavedData {
         instance.setDirty();
     }
 
+    public static long getGameTime() {
+        return instance.level.getGameTime();
+    }
+
     public static int getTraderFailedAttempts() {
         return instance.traderFailedAttempts;
     }
@@ -177,6 +189,20 @@ public class WorldData extends SavedData {
         return instance.upgrade;
     }
 
+    public static boolean isCommanded(int id) {
+        return instance.commanded.contains(id);
+    }
+    public static boolean toggleCommanded(int id) {
+        instance.setDirty();
+        if (instance.commanded.contains(id)) {
+            instance.commanded.remove(id);
+            return false;
+        } else {
+            instance.commanded.add(id);
+            return true;
+        }
+    }
+
     public static boolean isValid() {
         return NeoBlock.hash.equals(instance.encoding);
     }
@@ -185,11 +211,11 @@ public class WorldData extends SavedData {
         instance.unlocked.clear();
         for (NeoTier tier: NeoBlock.TIERS) {
             instance.encoding.add(tier.getHashCode());
-            if (tier.TIER == 0 || tier.isUnlocked() || instance.unlockedIDs.contains(tier.TIER))
+            if (tier.id == 0 || tier.isUnlocked() || instance.unlockedIDs.contains(tier.id))
                 instance.unlocked.add(tier);
         }
         instance.unlockedIDs.clear();
-        instance.unlocked.forEach(tier -> instance.unlockedIDs.add(tier.TIER));
+        instance.unlocked.forEach(tier -> instance.unlockedIDs.add(tier.id));
     }
 
     public static void tick(ServerLevel level, LevelAccessor access) {

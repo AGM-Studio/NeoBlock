@@ -1,10 +1,10 @@
 package xyz.agmstudio.neoblock.tiers;
 
+import com.electronwill.nightconfig.core.concurrent.ConcurrentCommentedConfig;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.fml.loading.FMLPaths;
-import org.jetbrains.annotations.Nullable;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.tiers.merchants.NeoMerchant;
 import xyz.agmstudio.neoblock.tiers.merchants.NeoOffer;
@@ -12,113 +12,100 @@ import xyz.agmstudio.neoblock.util.MessagingUtil;
 import xyz.agmstudio.neoblock.util.ResourceUtil;
 import xyz.agmstudio.neoblock.util.StringUtil;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.random.RandomGenerator;
 
 public class NeoTier {
     public static final Path FOLDER = FMLPaths.CONFIGDIR.get().resolve(NeoBlockMod.MOD_ID + "/tiers");
 
-    public final CommentedFileConfig CONFIG;
-    public final int TIER;
-    public final int WEIGHT;
-    public final int UNLOCK;
-    public final int UNLOCK_TIME;
+    public final CommentedFileConfig config;
+    public final int id;
+    public final int weight;
 
-    public final HashMap<BlockState, Integer> BLOCKS = new HashMap<>();
-    public final NeoMerchant UNLOCK_TRADE;
-    public final List<NeoOffer> TRADES;
-    public final int TRADE_COUNT;
+    public final String name;
+    public final Lock lock;
 
-    public @Nullable NeoTier previous() {
-        return TIER > 0 ? NeoBlock.TIERS.get(this.TIER - 1) : null;
-    }
-    public @Nullable NeoTier next() {
-        return TIER < NeoBlock.TIERS.size() - 1 ? NeoBlock.TIERS.get(this.TIER + 1) : null;
-    }
-    public List<NeoTier> allPrevious() {
-        return NeoBlock.TIERS.subList(0, this.TIER + 1);
-    }
-    public List<NeoTier> allNext() {
-        return NeoBlock.TIERS.subList(this.TIER + 1, NeoBlock.TIERS.size());
-    }
+    public final HashMap<BlockState, Integer> blocks = new HashMap<>();
+    public final NeoMerchant tradeOffer;
+    public final List<NeoOffer> trades;
+    public final int tradeCount;
 
-    protected NeoTier(int tier) {
-        TIER = tier;
-        CONFIG = ResourceUtil.getConfig(FOLDER, "tier-" + tier);
-        if (CONFIG == null) throw new RuntimeException("Unable to find config for tier " + tier);
+    protected NeoTier(int id) {
+        this.id = id;
+        config = ResourceUtil.getConfig(FOLDER, "tier-" + id);
+        if (config == null) throw new RuntimeException("Unable to find config for tier " + id);
 
-        NeoTier previous = previous();
-        WEIGHT = Math.max(1, CONFIG.getIntOrElse("weight", 1));
-        UNLOCK = Math.max(
-                previous == null ? 0 : previous.getUnlock() + 1,
-                CONFIG.getIntOrElse("unlock", 100 * TIER)
-        );
-        UNLOCK_TIME = Math.max(0, CONFIG.getIntOrElse("unlock-time", 0));
+        NeoBlockMod.LOGGER.debug("Loading tier {}...", id);
+        name = config.getOrElse("name", "Tier-" + id);
 
-        List<String> blocks = CONFIG.getOrElse("blocks", List.of("minecraft:grass_block"));
-        blocks.stream().map(StringUtil::parseBlock).forEach(parsed -> BLOCKS.merge(parsed.getKey().defaultBlockState(), parsed.getValue().get(), Integer::sum));
-        if (BLOCKS.isEmpty()) {
-            NeoBlockMod.LOGGER.error("No blocks found for tier {}", TIER);
-            BLOCKS.put(NeoBlock.DEFAULT_STATE, 1);
+        weight = Math.max(1, config.getIntOrElse("weight", 1));
+        ConcurrentCommentedConfig lockConfig = config.get("unlock");
+        lock = id > 0 ? lockConfig != null ? new Lock(this.id, lockConfig) : Lock.CommandOnly(this.id) : null;
+
+        List<String> blocks = config.getOrElse("blocks", List.of("minecraft:grass_block"));
+        blocks.stream().map(StringUtil::parseBlock).forEach(parsed -> this.blocks.merge(parsed.getKey().defaultBlockState(), parsed.getValue().get(), Integer::sum));
+        if (this.blocks.isEmpty()) {
+            NeoBlockMod.LOGGER.error("No blocks found for tier {}", this.id);
+            this.blocks.put(NeoBlock.DEFAULT_STATE, 1);
         }
 
-        List<String> unlockTrades = CONFIG.getOrElse("unlock-trades", List.of());
-        UNLOCK_TRADE = NeoMerchant.parse(unlockTrades);
+        List<String> unlockTrades = config.getOrElse("unlock-trades", List.of());
+        tradeOffer = NeoMerchant.parse(unlockTrades);
 
-        List<String> trades = CONFIG.getOrElse("trader-trades", List.of());
-        TRADES = trades.stream().map(NeoOffer::parse).toList();
-        TRADE_COUNT = Math.clamp(CONFIG.getIntOrElse("trader-count", 0), 0, TRADES.size());
+        List<String> trades = config.getOrElse("trader-trades", List.of());
+        this.trades = trades.stream().map(NeoOffer::parse).toList();
+        tradeCount = Math.clamp(config.getIntOrElse("trader-count", 0), 0, this.trades.size());
     }
 
     public List<NeoOffer> getRandomTrades() {
-        List<NeoOffer> trades = new ArrayList<>(TRADES);
+        List<NeoOffer> trades = new ArrayList<>(this.trades);
         Collections.shuffle(trades);
-        return trades.subList(0, TRADE_COUNT);
+        return trades.subList(0, tradeCount);
     }
     public BlockState getRandomBlock() {
-        if (BLOCKS.isEmpty()) return NeoBlock.DEFAULT_STATE;
+        if (blocks.isEmpty()) return NeoBlock.DEFAULT_STATE;
 
-        int totalWeight = BLOCKS.values().stream().mapToInt(Integer::intValue).sum();
+        int totalWeight = blocks.values().stream().mapToInt(Integer::intValue).sum();
         int randomValue = RandomGenerator.getDefault().nextInt(totalWeight);
-        for (Map.Entry<BlockState, Integer> entry: BLOCKS.entrySet()) {
+        for (Map.Entry<BlockState, Integer> entry: blocks.entrySet()) {
             randomValue -= entry.getValue();
             if (randomValue < 0) return entry.getKey();
         }
 
-        NeoBlockMod.LOGGER.error("Unable to get a random block from tier {}", TIER);
-        return BLOCKS.keySet().stream().findFirst().orElse(NeoBlock.DEFAULT_STATE);
+        NeoBlockMod.LOGGER.error("Unable to get a random block from tier {}", id);
+        return blocks.keySet().stream().findFirst().orElse(NeoBlock.DEFAULT_STATE);
     }
 
-    public int getUnlock() {
-        return UNLOCK;
+    public String getName() {
+        return name;
+    }
+    public Lock getLock() {
+        return lock;
     }
     public int getWeight() {
-        return WEIGHT;
+        return weight;
     }
 
     public void onFinishUpgrade(ServerLevel level) {
-        MessagingUtil.sendInstantMessage("message.neoblock.unlocked_tier", level, false, TIER);
+        MessagingUtil.sendInstantMessage("message.neoblock.unlocked_tier", level, false, id);
     }
     public void onStartUpgrade(ServerLevel level) {
-        MessagingUtil.sendInstantMessage("message.neoblock.unlocking_tier", level, false, TIER);
-        if (UNLOCK_TRADE != null) {
-            UNLOCK_TRADE.spawnTrader(level, "UnlockTrader");
-            MessagingUtil.sendInstantMessage("message.neoblock.unlocking_trader", level, false, TIER);
+        MessagingUtil.sendInstantMessage("message.neoblock.unlocking_tier", level, false, id);
+        if (tradeOffer != null) {
+            tradeOffer.spawnTrader(level, "UnlockTrader");
+            MessagingUtil.sendInstantMessage("message.neoblock.unlocking_trader", level, false, id);
         }
     }
 
     public boolean isUnlocked() {
-        if (UNLOCK > 0) return WorldData.getBlockCount() >= UNLOCK;
-        return false;
+        return lock == null || lock.isUnlocked();
     }
 
     // Coding methods to help validate world using matching config.
     // Only hash game breaking data, no need for general data like blocks, weight, etc...
     protected String getHashCode() {
-        String data = "ID:" + TIER + "|U:" + UNLOCK;
+        String data = id + ":" + (lock == null ? "" : lock.hash());
         Base64.Encoder encoder = Base64.getEncoder();
 
         return encoder.encodeToString(data.getBytes());
@@ -126,5 +113,46 @@ public class NeoTier {
 
     public boolean canBeUnlocked() {
         return !WorldData.getUnlocked().contains(this) && isUnlocked();
+    }
+
+    public static class Lock {
+        private final int id;
+        private final int time;         // Time to unlock.
+        private final int blocks;       // Blocks broken to unlock.
+        private final int game;         // Game time to unlock.
+        private final boolean command;  // If command execution is needed to unlock.
+
+        private Lock(int id, ConcurrentCommentedConfig config) {
+            this.id = id;
+            time = config.getIntOrElse("unlock-time", 0);
+            blocks = config.getIntOrElse("blocks", -1);
+            game = config.getIntOrElse("game-time", -1);
+            command = config.getOrElse("command", blocks < 0 && game < 0);
+        }
+        private Lock(int id, int time, int blocks, int game, boolean command) {
+            this.id = id;
+            this.time = time;
+            this.blocks = blocks;
+            this.game = game;
+            this.command = command || (blocks < 0 && game < 0);
+        }
+
+        public static Lock CommandOnly(int id) {
+            return new Lock(id, 0, -1, -1, true);
+        }
+
+        protected String hash() {
+            return time + ":" + blocks + ":" + game + ":" + command;
+        }
+
+        public int getTime() {
+            return time;
+        }
+
+        public boolean isUnlocked() {
+            if (blocks > 0 && WorldData.getBlockCount() < blocks) return false;
+            if (game > 0 && WorldData.getGameTime() < game) return false;
+            return !command || WorldData.isCommanded(id);
+        }
     }
 }
