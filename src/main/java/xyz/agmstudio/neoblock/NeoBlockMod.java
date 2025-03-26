@@ -8,10 +8,10 @@ import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import xyz.agmstudio.neoblock.tiers.NeoBlock;
-import xyz.agmstudio.neoblock.tiers.UpgradeManager;
-import xyz.agmstudio.neoblock.tiers.WorldData;
 import xyz.agmstudio.neoblock.animations.Animation;
+import xyz.agmstudio.neoblock.animations.idle.IdleAnimation;
+import xyz.agmstudio.neoblock.animations.idle.NeoFlowAnimation;
+import xyz.agmstudio.neoblock.animations.idle.PulseAnimation;
 import xyz.agmstudio.neoblock.animations.phase.ExplosionAnimation;
 import xyz.agmstudio.neoblock.animations.phase.FuseAnimation;
 import xyz.agmstudio.neoblock.animations.phase.UpgradePhaseAnimation;
@@ -19,6 +19,9 @@ import xyz.agmstudio.neoblock.animations.progress.BreakingAnimation;
 import xyz.agmstudio.neoblock.animations.progress.SparkleAnimation;
 import xyz.agmstudio.neoblock.animations.progress.SpiralAnimation;
 import xyz.agmstudio.neoblock.animations.progress.UpgradeProgressAnimation;
+import xyz.agmstudio.neoblock.tiers.NeoBlock;
+import xyz.agmstudio.neoblock.tiers.UpgradeManager;
+import xyz.agmstudio.neoblock.tiers.WorldData;
 import xyz.agmstudio.neoblock.tiers.merchants.NeoMerchant;
 import xyz.agmstudio.neoblock.util.MessagingUtil;
 import xyz.agmstudio.neoblock.util.ResourceUtil;
@@ -63,11 +66,15 @@ public final class NeoBlockMod {
 
         NeoMerchant.loadConfig();
 
+        Animation.clearAnimations();
+
         UpgradeManager.reloadProgressbarAnimations();
         UpgradeManager.clearPhaseAnimations();
         UpgradePhaseAnimation.getAnimations().forEach(Animation::register);
         UpgradeManager.clearProgressAnimations();
         UpgradeProgressAnimation.getAnimations().forEach(Animation::register);
+
+        IdleAnimation.getAnimations().forEach(Animation::register);
     }
 
     public void setup(FMLCommonSetupEvent event) {
@@ -77,6 +84,9 @@ public final class NeoBlockMod {
         UpgradeProgressAnimation.addAnimation(BreakingAnimation.class);
         UpgradeProgressAnimation.addAnimation(SparkleAnimation.class);
         UpgradeProgressAnimation.addAnimation(SpiralAnimation.class);
+
+        IdleAnimation.addAnimation(NeoFlowAnimation.class);
+        IdleAnimation.addAnimation(PulseAnimation.class);
 
         Animation.disableRegisteringNewAnimations();
 

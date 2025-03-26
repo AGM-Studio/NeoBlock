@@ -11,6 +11,18 @@ enabled = true              # If the progressbar should be shown to players
 show-time = true            # If the remaining time should be shown to players
 color = "red"               # Supported colors are `red`, `green`, `blue`, `pink`, `yellow`, `purple`, `white`
 
+[animations.idle.neo-flow]
+enabled = false
+wait-for = 100
+color-speed = 1.0
+speed = 0.05
+count = 5
+
+[animations.idle.pulse]
+enabled = true
+wait-for = 100
+interval = 100
+
 [animations.phase.fuse]
 at-start = true
 at-finish = false

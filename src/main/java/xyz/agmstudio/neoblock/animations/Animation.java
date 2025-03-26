@@ -4,6 +4,7 @@ import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.LevelAccessor;
 import xyz.agmstudio.neoblock.NeoBlockMod;
+import xyz.agmstudio.neoblock.animations.idle.IdleAnimation;
 import xyz.agmstudio.neoblock.util.StringUtil;
 
 import java.lang.annotation.ElementType;
@@ -21,6 +22,9 @@ public abstract class Animation {
     public static void addAnimation(Animation animation) {
         animations.add(animation);
     }
+    public static void clearAnimations() {
+        animations.clear();
+    }
     public static void disableRegisteringNewAnimations() {
         registeringNewAnimations = false;
     }
@@ -31,6 +35,11 @@ public abstract class Animation {
 
     public static void tickAll(ServerLevel level, LevelAccessor access) {
         animations.forEach(animation -> animation.tick(level, access));
+    }
+    public static void resetIdleTick() {
+        for (Animation animation : animations)
+            if (animation instanceof IdleAnimation idle)
+                idle.resetTick();
     }
 
     private static String createPath(String category, String name) {

@@ -14,6 +14,7 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.NeoListener;
+import xyz.agmstudio.neoblock.animations.Animation;
 import xyz.agmstudio.neoblock.tiers.merchants.NeoMerchant;
 import xyz.agmstudio.neoblock.util.MessagingUtil;
 import xyz.agmstudio.neoblock.util.ResourceUtil;
@@ -88,6 +89,7 @@ public class NeoBlock {
 
         else setNeoBlock(access, getRandomBlock());
 
+        Animation.resetIdleTick();
         NeoListener.execute(() -> NeoMerchant.attemptSpawnTrader(level));
     }
 
