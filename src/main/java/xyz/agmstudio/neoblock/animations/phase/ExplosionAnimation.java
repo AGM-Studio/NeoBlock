@@ -5,7 +5,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.LevelAccessor;
-import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.tiers.NeoBlock;
 
 public class ExplosionAnimation extends UpgradePhaseAnimation {

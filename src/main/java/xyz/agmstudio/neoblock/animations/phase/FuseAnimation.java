@@ -6,7 +6,6 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.phys.Vec3;
-import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.tiers.NeoBlock;
 
 import java.util.ArrayList;
