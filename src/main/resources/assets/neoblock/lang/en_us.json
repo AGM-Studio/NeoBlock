@@ -23,6 +23,5 @@
   "command.neoblock.force_trader.success": "Summoning the trader has been successful.",
   "command.neoblock.force_trader.failure": "Unable to summon another trader. There is no valid trade for trder.",
 
-  "command.neoblock.unlock_tier.enabled": "Command condition for this tier is now satisfied. The tier should unlock as soon as all conditions are met.",
-  "command.neoblock.unlock_tier.disabled": "Command condition for this tier has been removed. Run the command again to add it back."
+  "command.neoblock.unlock_tier": "Command condition for this tier is now satisfied. The tier should unlock as soon as all conditions are met."
 }

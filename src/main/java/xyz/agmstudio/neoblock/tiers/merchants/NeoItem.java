@@ -8,7 +8,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.trading.ItemCost;
 import org.apache.commons.lang3.tuple.Pair;
-import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.data.Range;
 import xyz.agmstudio.neoblock.util.StringUtil;
 
@@ -17,9 +16,7 @@ public class NeoItem {
         value = value.toLowerCase();
         if (value.startsWith("mob:")) return MobItem.parse(value.substring(4));
         Pair<Item, Range> parsed = StringUtil.parseItem(value);
-        NeoItem result = new NeoItem(parsed.getKey(), parsed.getValue());
-        NeoBlockMod.LOGGER.info("Parsing NeoItem {} resulted {}.", value, result);
-        return result;
+        return new NeoItem(parsed.getKey(), parsed.getValue());
     }
 
     protected final Item item;
@@ -47,9 +44,7 @@ public class NeoItem {
         public static MobItem parse(String value) {
             Pair<EntityType<?>, Range> parsed = StringUtil.parseEntityType(value);
             Item item = StringUtil.parseItem(value + "_spawn_egg").getKey();
-            MobItem result = new MobItem(item, parsed.getValue(), parsed.getKey());
-            NeoBlockMod.LOGGER.info("Parsing MobItem {} resulted {} with {}.", value, result, item);
-            return result;
+            return new MobItem(item, parsed.getValue(), parsed.getKey());
         }
 
         public MobItem(Item item, Range count, EntityType<?> mob) {

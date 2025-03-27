@@ -68,8 +68,8 @@ public class NeoCommand {
             return 0;
         }
 
-        boolean result = WorldData.toggleCommanded(index);
-        context.getSource().sendSuccess(() -> Component.translatable("command.neoblock.unlock_tier." + (result ? "enabled" : "disabled")), false);
+        WorldData.setCommanded(index);
+        context.getSource().sendSuccess(() -> Component.translatable("command.neoblock.unlock_tier"), false);
         return 1;
     }
 }

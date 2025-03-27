@@ -39,16 +39,13 @@ public class NeoTier {
         NeoBlockMod.LOGGER.debug("Loading tier {}...", id);
         name = config.getOrElse("name", "Tier-" + id);
 
-        weight = Math.max(1, config.getIntOrElse("weight", 1));
         ConcurrentCommentedConfig lockConfig = config.get("unlock");
         lock = id > 0 ? lockConfig != null ? new Lock(this.id, lockConfig) : Lock.CommandOnly(this.id) : null;
 
         List<String> blocks = config.getOrElse("blocks", List.of("minecraft:grass_block"));
         blocks.stream().map(StringUtil::parseBlock).forEach(parsed -> this.blocks.merge(parsed.getKey().defaultBlockState(), parsed.getValue().get(), Integer::sum));
-        if (this.blocks.isEmpty()) {
-            NeoBlockMod.LOGGER.error("No blocks found for tier {}", this.id);
-            this.blocks.put(NeoBlock.DEFAULT_STATE, 1);
-        }
+        if (this.blocks.isEmpty()) weight = 0;
+        else weight = Math.max(0, config.getIntOrElse("weight", 1));
 
         List<String> unlockTrades = config.getOrElse("unlock-trades", List.of());
         tradeOffer = NeoMerchant.parse(unlockTrades);

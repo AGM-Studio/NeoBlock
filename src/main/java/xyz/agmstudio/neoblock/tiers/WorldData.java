@@ -192,15 +192,9 @@ public class WorldData extends SavedData {
     public static boolean isCommanded(int id) {
         return instance.commanded.contains(id);
     }
-    public static boolean toggleCommanded(int id) {
+    public static void setCommanded(int id) {
         instance.setDirty();
-        if (instance.commanded.contains(id)) {
-            instance.commanded.remove(id);
-            return false;
-        } else {
-            instance.commanded.add(id);
-            return true;
-        }
+        instance.commanded.add(id);
     }
 
     public static boolean isValid() {

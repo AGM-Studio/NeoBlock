@@ -4,7 +4,6 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.phys.Vec3;
-import xyz.agmstudio.neoblock.NeoBlockMod;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -31,7 +30,6 @@ public class PulseAnimation extends IdleAnimation {
 
     @Override public void tick(ServerLevel level, LevelAccessor access) {
         if (tick++ % interval != 0 || tick < delay) return;
-        NeoBlockMod.LOGGER.info("PulseAnimation tick: " + tick);
         animate(level, access);
     }
 
