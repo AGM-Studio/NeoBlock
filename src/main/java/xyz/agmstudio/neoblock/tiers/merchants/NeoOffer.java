@@ -46,6 +46,8 @@ public final class NeoOffer {
             uses = StringUtil.parseRange(parts[3]);
         }
 
+        if (result == null) return null;
+        if (costA == null && costB == null) return null;
         return new NeoOffer(result, costA, costB, uses);
     }
 

@@ -17,10 +17,7 @@ import xyz.agmstudio.neoblock.tiers.NeoTier;
 import xyz.agmstudio.neoblock.tiers.WorldData;
 import xyz.agmstudio.neoblock.util.MessagingUtil;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.random.RandomGenerator;
 
 public class NeoMerchant {
@@ -48,7 +45,7 @@ public class NeoMerchant {
         if (trades.isEmpty()) return null;
 
         NeoMerchant trader = new NeoMerchant();
-        trades.stream().map(NeoOffer::parse).forEach(trader.trades::add);
+        trades.stream().map(NeoOffer::parse).filter(Objects::nonNull).forEach(trader.trades::add);
 
         return trader;
     }

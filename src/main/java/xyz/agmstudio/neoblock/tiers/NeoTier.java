@@ -51,7 +51,7 @@ public class NeoTier {
         tradeOffer = NeoMerchant.parse(unlockTrades);
 
         List<String> trades = config.getOrElse("trader-trades", List.of());
-        this.trades = trades.stream().map(NeoOffer::parse).toList();
+        this.trades = trades.stream().map(NeoOffer::parse).filter(Objects::nonNull).toList();
         tradeCount = Math.clamp(config.getIntOrElse("trader-count", 0), 0, this.trades.size());
     }
 
