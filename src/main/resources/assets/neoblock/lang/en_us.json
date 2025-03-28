@@ -4,7 +4,7 @@
 
   "bossbar.neoblock.upgrade_bar": "Upgrading... (%s)",
 
-  "tooltip.neoblock.spawn_lore": "Purchasing this will ask the trader to bring a %s next time they visit.",
+  "tooltip.neoblock.spawn_lore": "Using this will ask the trader to bring a %s next time they visit.\nThis doesn't spawn any mob on use.",
 
   "message.neoblock.disabled_world_1": "This world is not using the §bNeoBlock§r world preset. §bNeoBlock§r has set to dormant.",
   "message.neoblock.disabled_world_2": "If you are a modpack developer, it's recommended to use §4DefaultWorldType§r to prevent this issue.",
@@ -13,6 +13,7 @@
   "message.neoblock.unlocking_tier": "Tier %d is going to be unlocked!",
   "message.neoblock.unlocking_trader": "As a reward for unlocking this tier, a trader with significant trades has been spawned.",
   "message.neoblock.trader_spawned": "§cA trader has spawned!§r",
+  "message.neoblock.trades.mob": "The trader will bring %dx %s next time they visit.",
 
   "command.neoblock.invalid_tier": "Tier mentioned not found",
 
