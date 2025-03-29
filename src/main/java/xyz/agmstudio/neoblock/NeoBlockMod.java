@@ -1,11 +1,11 @@
 package xyz.agmstudio.neoblock;
 
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.ModContainer;
-import net.neoforged.fml.common.Mod;
-import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.neoforged.neoforge.common.NeoForge;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.ModContainer;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import xyz.agmstudio.neoblock.animations.Animation;
@@ -58,7 +58,7 @@ public final class NeoBlockMod {
         NeoBlockMod.config = ResourceUtil.getConfig(folder, "config.toml");
 
         bus.addListener(this::setup);
-        NeoForge.EVENT_BUS.addListener(MessagingUtil::onPlayerJoin);
+        MinecraftForge.EVENT_BUS.addListener(MessagingUtil::onPlayerJoin);
     }
 
     public static void reload() {

@@ -5,6 +5,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.phys.Vec3;
 import xyz.agmstudio.neoblock.tiers.NeoBlock;
+import xyz.agmstudio.neoblock.util.MathUtil;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -24,7 +25,7 @@ public class SparkleAnimation extends UpgradeProgressAnimation {
     @Override
     public void processConfig() {
         interval = Math.max(interval, 5);
-        length = Math.clamp(length, 0, interval);
+        length = MathUtil.clamp(length, 0, interval);
         factor = Math.max(1, factor);
         count = Math.max(1, count);
     }

@@ -55,9 +55,9 @@ public class UpgradeManager {
 
     public void tick(ServerLevel level, LevelAccessor access) {
         if (upgrades.isEmpty()) return;
-        Upgrade upgrade = upgrades.getFirst();
+        Upgrade upgrade = upgrades.get(0);
         if (upgrade.tick()) {
-            upgrades.removeFirst();
+            upgrades.remove(0);
             finishUpgrade(level, access, upgrade);
         } else {
             if (progressbar != null) progressbar.update(upgrade.tick, upgrade.goal);

@@ -1,7 +1,7 @@
 package xyz.agmstudio.neoblock.util;
 
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
-import net.neoforged.fml.loading.FMLPaths;
+import net.minecraftforge.fml.loading.FMLPaths;
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.tiers.NeoTier;

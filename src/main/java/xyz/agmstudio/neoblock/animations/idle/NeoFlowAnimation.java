@@ -6,6 +6,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
+import xyz.agmstudio.neoblock.util.MathUtil;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -35,7 +36,7 @@ public class NeoFlowAnimation extends IdleAnimation {
     @Override protected void processConfig() {
         count = Math.max(count, 1);
         speed = Math.max(0.01f, speed);
-        hueSpeed = Math.clamp(hueSpeed / 20, 0, 0.05f);
+        hueSpeed = MathUtil.clamp(hueSpeed / 20, 0, 0.05f);
         delay = Math.max(delay, 0);
     }
 
@@ -88,7 +89,7 @@ public class NeoFlowAnimation extends IdleAnimation {
             if (current.distanceTo(goal) < speed) {
                 current = goal;
                 updateGoal(current);
-            } else current = current.add(direction.scale(speed));;
+            } else current = current.add(direction.scale(speed));
             return current;
         }
 

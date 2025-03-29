@@ -90,12 +90,14 @@ public abstract class Animation {
                         field.setAccessible(true);
                         Object def = field.get(this);
                         Object value = config.getOrElse(fullPath, def);
-                        switch (value) {
-                            case Double v when field.getType() == float.class -> field.set(this, v.floatValue());
-                            case Number number when field.getType() == int.class -> field.set(this, number.intValue());
-                            case null, default -> field.set(this, value);
-                        }
-                    } catch (IllegalAccessException e) {
+                        if (value instanceof Double v) {
+                            if (field.getType() == float.class) field.set(this, v.floatValue());
+                            else field.set(this, def);
+                        } else if (value instanceof Number number) {
+                            if (field.getType() == int.class) field.set(this, number.intValue());
+                            else field.set(this, def);
+                        } else field.set(this, value);
+                    } catch (Exception e) {
                         NeoBlockMod.LOGGER.error("Failed to load animation config value for: {}", field.getName(), e);
                     }
                 }

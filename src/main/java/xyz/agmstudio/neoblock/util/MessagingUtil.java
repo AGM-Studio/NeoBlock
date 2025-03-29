@@ -3,8 +3,8 @@ package xyz.agmstudio.neoblock.util;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
+import net.minecraftforge.event.entity.EntityJoinLevelEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 
 import java.util.ArrayList;

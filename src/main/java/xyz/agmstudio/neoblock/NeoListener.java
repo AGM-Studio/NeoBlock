@@ -10,14 +10,14 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.RegisterCommandsEvent;
-import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
-import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
-import net.neoforged.neoforge.event.level.LevelEvent;
-import net.neoforged.neoforge.event.tick.LevelTickEvent;
+import net.minecraftforge.event.RegisterCommandsEvent;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.EntityJoinLevelEvent;
+import net.minecraftforge.event.entity.player.ItemTooltipEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.level.LevelEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.tiers.NeoBlock;
 import xyz.agmstudio.neoblock.tiers.WorldData;
@@ -30,7 +30,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.BiConsumer;
 
-@EventBusSubscriber(modid = NeoBlockMod.MOD_ID)
+@Mod.EventBusSubscriber(modid = NeoBlockMod.MOD_ID)
 public final class NeoListener {
     private static final ExecutorService executor = Executors.newSingleThreadExecutor();
 
@@ -51,10 +51,10 @@ public final class NeoListener {
     }
 
     @SubscribeEvent
-    public static void onWorldTick(LevelTickEvent.@NotNull Post event) {
-        if (!(event.getLevel() instanceof ServerLevel level) || level.dimension() != Level.OVERWORLD || WorldData.isDisabled())
+    public static void onWorldTick(TickEvent.LevelTickEvent event) {
+        if (!(event.level instanceof ServerLevel level) || level.dimension() != Level.OVERWORLD || WorldData.isDisabled())
             return;
-        final LevelAccessor access = event.getLevel();
+        final LevelAccessor access = event.level;
         final BlockState block = access.getBlockState(NeoBlock.POS);
 
         tickers.forEach(ticker -> ticker.accept(level, access));

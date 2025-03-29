@@ -1,6 +1,6 @@
 package xyz.agmstudio.neoblock.tiers;
 
-import com.electronwill.nightconfig.core.concurrent.ConcurrentCommentedConfig;
+import com.electronwill.nightconfig.core.UnmodifiableConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
@@ -66,7 +66,7 @@ public class NeoBlock {
 
             if (isNeoBlock) {
                 level.setBlock(NeoBlock.POS, NeoBlock.DEFAULT_STATE, 3);
-                ConcurrentCommentedConfig rules = NeoBlockMod.getConfig().get("rules");
+                UnmodifiableConfig rules = NeoBlockMod.getConfig().get("rules");
                 if (rules != null) WorldRules.applyGameRules(level, rules);
                 WorldData.setActive();
             } else {

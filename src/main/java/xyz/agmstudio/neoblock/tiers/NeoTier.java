@@ -1,13 +1,14 @@
 package xyz.agmstudio.neoblock.tiers;
 
-import com.electronwill.nightconfig.core.concurrent.ConcurrentCommentedConfig;
+import com.electronwill.nightconfig.core.UnmodifiableConfig;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.fml.loading.FMLPaths;
+import net.minecraftforge.fml.loading.FMLPaths;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.tiers.merchants.NeoMerchant;
 import xyz.agmstudio.neoblock.tiers.merchants.NeoOffer;
+import xyz.agmstudio.neoblock.util.MathUtil;
 import xyz.agmstudio.neoblock.util.MessagingUtil;
 import xyz.agmstudio.neoblock.util.ResourceUtil;
 import xyz.agmstudio.neoblock.util.StringUtil;
@@ -39,7 +40,7 @@ public class NeoTier {
         NeoBlockMod.LOGGER.debug("Loading tier {}...", id);
         name = config.getOrElse("name", "Tier-" + id);
 
-        ConcurrentCommentedConfig lockConfig = config.get("unlock");
+        UnmodifiableConfig lockConfig = config.get("unlock");
         lock = id > 0 ? lockConfig != null ? new Lock(this.id, lockConfig) : Lock.CommandOnly(this.id) : null;
 
         List<String> blocks = config.getOrElse("blocks", List.of("minecraft:grass_block"));
@@ -52,7 +53,7 @@ public class NeoTier {
 
         List<String> trades = config.getOrElse("trader-trades", List.of());
         this.trades = trades.stream().map(NeoOffer::parse).filter(Objects::nonNull).toList();
-        tradeCount = Math.clamp(config.getIntOrElse("trader-count", 0), 0, this.trades.size());
+        tradeCount = MathUtil.clamp(config.getIntOrElse("trader-count", 0), 0, this.trades.size());
     }
 
     public List<NeoOffer> getRandomTrades() {
@@ -119,7 +120,7 @@ public class NeoTier {
         private final int game;         // Game time to unlock.
         private final boolean command;  // If command execution is needed to unlock.
 
-        private Lock(int id, ConcurrentCommentedConfig config) {
+        private Lock(int id, UnmodifiableConfig config) {
             this.id = id;
             time = config.getIntOrElse("unlock-time", 0);
             blocks = config.getIntOrElse("blocks", -1);

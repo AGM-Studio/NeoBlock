@@ -1,6 +1,6 @@
 package xyz.agmstudio.neoblock.tiers;
 
-import com.electronwill.nightconfig.core.concurrent.ConcurrentCommentedConfig;
+import com.electronwill.nightconfig.core.UnmodifiableConfig;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.GameRules;
 import xyz.agmstudio.neoblock.NeoBlockMod;
@@ -8,7 +8,7 @@ import xyz.agmstudio.neoblock.NeoBlockMod;
 import java.lang.reflect.Field;
 
 public class WorldRules {
-    public static void applyGameRules(ServerLevel level, ConcurrentCommentedConfig config) {
+    public static void applyGameRules(ServerLevel level, UnmodifiableConfig config) {
         for (String key : config.valueMap().keySet()) {
             GameRules.Key<?> rule = getGameRuleByName(key);
             if (rule == null) return;

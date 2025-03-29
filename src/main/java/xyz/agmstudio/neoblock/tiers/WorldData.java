@@ -1,7 +1,5 @@
 package xyz.agmstudio.neoblock.tiers;
 
-import net.minecraft.core.HolderLookup;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.IntTag;
 import net.minecraft.nbt.ListTag;
@@ -11,6 +9,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.saveddata.SavedData;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 
@@ -26,7 +25,7 @@ public class WorldData extends SavedData {
     }
 
     public static @NotNull WorldData load(@NotNull ServerLevel level) {
-        WorldData data = level.getDataStorage().computeIfAbsent(new Factory<>(WorldData::create, WorldData::load), DATA_NAME);
+        WorldData data = level.getDataStorage().computeIfAbsent(WorldData::load, WorldData::create, DATA_NAME);
         data.level = level;
         return data;
     }
@@ -42,7 +41,7 @@ public class WorldData extends SavedData {
         NeoBlockMod.LOGGER.debug("Creating new world data");
         return data;
     }
-    private static @NotNull WorldData load(@NotNull CompoundTag tag, HolderLookup.Provider lookupProvider) {
+    private static @NotNull WorldData load(@NotNull CompoundTag tag) {
         WorldData data = new WorldData();
         data.state = WorldState.fromId(tag.getInt("WorldState"));
         data.blockCount = tag.getInt("BlockCount");
@@ -52,7 +51,7 @@ public class WorldData extends SavedData {
         data.upgrade.load(upgrade);
 
         final CompoundTag mobs = tag.getCompound("TradedMobs");
-        mobs.getAllKeys().forEach(key -> data.tradedMobs.merge(BuiltInRegistries.ENTITY_TYPE.get(ResourceLocation.parse(key)), mobs.getInt(key), Integer::sum));
+        mobs.getAllKeys().forEach(key -> data.tradedMobs.merge(ForgeRegistries.ENTITY_TYPES.getValue(ResourceLocation.tryParse(key)), mobs.getInt(key), Integer::sum));
 
         final ListTag hash = tag.getList("Encoding", StringTag.TAG_STRING);
         for (int i = 0; i < hash.size(); ++i) data.encoding.add(hash.getString(i));
@@ -70,7 +69,7 @@ public class WorldData extends SavedData {
 
         return data;
     }
-    @Override public @NotNull CompoundTag save(@NotNull CompoundTag tag, HolderLookup.@NotNull Provider registries) {
+    @Override public @NotNull CompoundTag save(@NotNull CompoundTag tag) {
         tag.putInt("WorldState", state.getId());
         tag.putInt("BlockCount", blockCount);
         tag.putInt("TraderFailedAttempts", traderFailedAttempts);
@@ -78,7 +77,7 @@ public class WorldData extends SavedData {
         this.upgrade.save(tag);
 
         final CompoundTag mobs = new CompoundTag();
-        tradedMobs.forEach((key, value) -> mobs.putInt(BuiltInRegistries.ENTITY_TYPE.getKey(key).toString(), value));
+        tradedMobs.forEach((key, value) -> mobs.putInt(ForgeRegistries.ENTITY_TYPES.getKey(key).toString(), value));
         tag.put("TradedMobs", mobs);
 
         final ListTag hash = new ListTag();

@@ -4,7 +4,7 @@ import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.Leashable;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.npc.WanderingTrader;
@@ -85,7 +85,7 @@ public class NeoMerchant {
             tradedMobs.forEach((type, count) -> {
                 for (int i = 0; i < count; i++) {
                     Entity mob = type.spawn(level, trader.getOnPos(), MobSpawnType.SPAWN_EGG);
-                    if (mob instanceof Leashable leashable) leashable.setLeashedTo(trader, true);
+                    if (mob instanceof Mob casted) casted.setLeashedTo(trader, true);
                 }
             });
             WorldData.clearTradedMobs();
