@@ -5,6 +5,11 @@ attempt-interval = 10       # How many blocks should be broken to attempt to spa
 life-span-min = 24000       # The minimum ticks the trader should exist before despawning.
 life-span-max = 48000       # The maximum ticks the trader should exist before despawning.
 
+[rules]                     # Gamerules that should be applied when the world is generated.
+doFireTick = false
+doPatrolSpawning = false
+doInsomnia = false
+doMobSpawning = false
 
 [animations.progressbar]
 enabled = true              # If the progressbar should be shown to players
