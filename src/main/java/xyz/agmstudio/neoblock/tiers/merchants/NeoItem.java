@@ -8,22 +8,24 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.tuple.Pair;
+import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.data.Range;
 import xyz.agmstudio.neoblock.util.StringUtil;
 
 public class NeoItem {
     private static final ResourceLocation air = ResourceLocation.tryParse("minecraft:air");
-    private static boolean isNotValid(Item item) {
+    private static boolean isValid(Item item) {
         ResourceLocation key = ForgeRegistries.ITEMS.getKey(item);
-        return key == null || air.equals(key);
+        return key != null && key != air;
     }
 
     public static NeoItem parse(String value) {
         value = value.toLowerCase();
         if (value.startsWith("mob:")) return MobItem.parse(value.substring(4));
         Pair<Item, Range> parsed = StringUtil.parseItem(value);
-        if (isNotValid(parsed.getKey())) return null;
-        return new NeoItem(parsed.getKey(), parsed.getValue());
+        if (isValid(parsed.getKey())) return new NeoItem(parsed.getKey(), parsed.getValue());
+        NeoBlockMod.LOGGER.warn("Invalid item: {}", value);
+        return null;
     }
 
     protected final Item item;
@@ -48,8 +50,9 @@ public class NeoItem {
         public static MobItem parse(String value) {
             Pair<EntityType<?>, Range> parsed = StringUtil.parseEntityType(value);
             Item item = StringUtil.parseItem(value + "_spawn_egg").getKey();
-            if (isNotValid(item)) item = Items.BEE_SPAWN_EGG;
-            return new MobItem(item, parsed.getValue(), parsed.getKey());
+            if (isValid(item)) return new MobItem(item, parsed.getValue(), parsed.getKey());
+            NeoBlockMod.LOGGER.warn("Unable to find the spawn egg: {}", value);
+            return new MobItem(Items.BEE_SPAWN_EGG, parsed.getValue(), parsed.getKey());
         }
 
         public MobItem(Item item, Range count, EntityType<?> mob) {

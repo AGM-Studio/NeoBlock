@@ -5,6 +5,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.trading.MerchantOffer;
+import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.data.Range;
 import xyz.agmstudio.neoblock.tiers.WorldData;
 import xyz.agmstudio.neoblock.util.MessagingUtil;
@@ -40,9 +41,13 @@ public final class NeoOffer {
             uses = StringUtil.parseRange(parts[3]);
         }
 
-        if (result == null) return null;
-        if (costA == null && costB == null) return null;
-        return new NeoOffer(result, costA, costB, uses);
+        if (costA == null) {    // Switch costs if first one is invalid.
+            costA = costB;
+            costB = null;
+        }
+        if (result != null && costA != null) return new NeoOffer(result, costA, costB, uses);
+        NeoBlockMod.LOGGER.warn("Unable to parse trade: {}", trade);
+        return null;
     }
 
     public String toString() {
