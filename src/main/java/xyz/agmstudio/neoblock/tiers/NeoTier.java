@@ -15,7 +15,6 @@ import xyz.agmstudio.neoblock.util.StringUtil;
 
 import java.nio.file.Path;
 import java.util.*;
-import java.util.random.RandomGenerator;
 
 public class NeoTier {
     public static final Path FOLDER = FMLPaths.CONFIGDIR.get().resolve(NeoBlockMod.MOD_ID + "/tiers");
@@ -65,7 +64,7 @@ public class NeoTier {
         if (blocks.isEmpty()) return NeoBlock.DEFAULT_STATE;
 
         int totalWeight = blocks.values().stream().mapToInt(Integer::intValue).sum();
-        int randomValue = RandomGenerator.getDefault().nextInt(totalWeight);
+        int randomValue = NeoBlock.random.nextInt(totalWeight);
         for (Map.Entry<BlockState, Integer> entry: blocks.entrySet()) {
             randomValue -= entry.getValue();
             if (randomValue < 0) return entry.getKey();

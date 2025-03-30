@@ -19,7 +19,7 @@ authors = "${mod_authors}"
 description = '''${mod_description}'''
 
 [[dependencies.neoblock]]
-modId = "neoforge"
+modId = "forge"
 mandatory=true
 versionRange = "${forge_version_range}"
 ordering = "NONE"

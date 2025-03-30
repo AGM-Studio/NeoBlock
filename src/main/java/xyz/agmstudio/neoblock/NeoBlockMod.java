@@ -4,8 +4,10 @@ import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModContainer;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import xyz.agmstudio.neoblock.animations.Animation;
@@ -52,7 +54,17 @@ public final class NeoBlockMod {
         return config;
     }
 
+    public NeoBlockMod() {
+        IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
+        ModContainer container = ModList.get().getModContainerById(MOD_ID).get();
+        this.install(bus, container);
+    }
+
     public NeoBlockMod(IEventBus bus, ModContainer container) {
+        this.install(bus, container);
+    }
+
+    private void install(IEventBus bus, ModContainer container) {
         NeoBlockMod.container = container;
         NeoBlockMod.instance = this;
         NeoBlockMod.config = ResourceUtil.getConfig(folder, "config.toml");
