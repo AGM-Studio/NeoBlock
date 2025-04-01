@@ -50,7 +50,7 @@ public class WorldData extends SavedData {
         data.traderFailedAttempts = tag.getInt("TraderFailedAttempts");
 
         final ListTag upgrade = tag.getList("Upgrades", StringTag.TAG_COMPOUND);
-        data.upgrade.load(upgrade);
+        data.tierManager.load(upgrade);
 
         final CompoundTag mobs = tag.getCompound("TradedMobs");
         mobs.getAllKeys().forEach(key -> data.tradedMobs.merge(BuiltInRegistries.ENTITY_TYPE.get(ResourceLocation.parse(key)), mobs.getInt(key), Integer::sum));
@@ -76,7 +76,7 @@ public class WorldData extends SavedData {
         tag.putInt("BlockCount", blockCount);
         tag.putInt("TraderFailedAttempts", traderFailedAttempts);
 
-        this.upgrade.save(tag);
+        this.tierManager.save(tag);
 
         final CompoundTag mobs = new CompoundTag();
         tradedMobs.forEach((key, value) -> mobs.putInt(BuiltInRegistries.ENTITY_TYPE.getKey(key).toString(), value));
@@ -108,7 +108,7 @@ public class WorldData extends SavedData {
     private final HashSet<Integer> commanded = new HashSet<>();
     private final HashSet<String> encoding = new HashSet<>();
 
-    private final UpgradeManager upgrade = new UpgradeManager();
+    private final TierManager tierManager = new TierManager();
     private final HashMap<EntityType<?>, Integer> tradedMobs = new HashMap<>();
 
     private WorldData() {
@@ -186,8 +186,8 @@ public class WorldData extends SavedData {
     public static void unlockTier(NeoTier tier) {
         instance.unlocked.add(tier);
     }
-    public static UpgradeManager getUpgradeManager() {
-        return instance.upgrade;
+    public static TierManager getTierManager() {
+        return instance.tierManager;
     }
 
     public static boolean isCommanded(int id) {
@@ -218,6 +218,6 @@ public class WorldData extends SavedData {
     }
 
     public static void tick(ServerLevel level, LevelAccessor access) {
-        if (instance != null) instance.upgrade.tick(level, access);
+        if (instance != null) instance.tierManager.tick(level, access);
     }
 }

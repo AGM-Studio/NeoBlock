@@ -91,7 +91,7 @@ public class NeoBlock {
     public static void onBlockBroken(ServerLevel level, LevelAccessor access, boolean triggered) {
         if (triggered) WorldData.addBlockCount(1);
         for (NeoTier tier: TIERS) if (tier.canBeUnlocked())
-            WorldData.getUpgradeManager().startUpgrade(level, access, tier);
+            WorldData.getTierManager().startUpgrade(level, access, tier);
 
         else setNeoBlock(access, getRandomBlock());
 
@@ -114,6 +114,6 @@ public class NeoBlock {
     }
 
     public static boolean isOnUpgrade() {
-        return WorldData.getUpgradeManager().isOnUpgrade();
+        return WorldData.getTierManager().isOnUpgrade();
     }
 }

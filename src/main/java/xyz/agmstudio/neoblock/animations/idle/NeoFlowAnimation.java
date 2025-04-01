@@ -84,7 +84,7 @@ public class NeoFlowAnimation extends IdleAnimation {
             if (current.distanceTo(goal) < speed) {
                 current = goal;
                 updateGoal(current);
-            } else current = current.add(direction.scale(speed));;
+            } else current = current.add(direction.scale(speed));
             return current;
         }
 

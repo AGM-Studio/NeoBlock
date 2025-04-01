@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-public class UpgradeManager {
+public class TierManager {
     private static final HashSet<UpgradeProgressAnimation> progressAnimations = new HashSet<>();
     private static final HashSet<UpgradePhaseAnimation> phaseAnimations = new HashSet<>();
     private static ProgressbarAnimation progressbar = null;

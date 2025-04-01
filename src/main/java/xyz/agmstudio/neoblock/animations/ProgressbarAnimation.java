@@ -49,5 +49,4 @@ public class ProgressbarAnimation extends Animation {
     @Override protected void onRegister() {
         bar.setColor(BossEvent.BossBarColor.byName(color));
     }
-    @Override protected void processConfig() {}
 }

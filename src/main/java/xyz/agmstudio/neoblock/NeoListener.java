@@ -71,7 +71,7 @@ public final class NeoListener {
         if (!(event.getLevel() instanceof ServerLevel level) || WorldData.isDisabled()) return;
         if (event.getEntity() instanceof WanderingTrader trader) NeoMerchant.handleTrader(trader);
         if (event.getEntity() instanceof ServerPlayer player && NeoBlock.isOnUpgrade())
-            WorldData.getUpgradeManager().addPlayer(player);
+            WorldData.getTierManager().addPlayer(player);
     }
 
     @SubscribeEvent

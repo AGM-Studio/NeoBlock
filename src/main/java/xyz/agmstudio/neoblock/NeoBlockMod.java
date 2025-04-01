@@ -20,7 +20,7 @@ import xyz.agmstudio.neoblock.animations.progress.SparkleAnimation;
 import xyz.agmstudio.neoblock.animations.progress.SpiralAnimation;
 import xyz.agmstudio.neoblock.animations.progress.UpgradeProgressAnimation;
 import xyz.agmstudio.neoblock.tiers.NeoBlock;
-import xyz.agmstudio.neoblock.tiers.UpgradeManager;
+import xyz.agmstudio.neoblock.tiers.TierManager;
 import xyz.agmstudio.neoblock.tiers.WorldData;
 import xyz.agmstudio.neoblock.tiers.merchants.NeoMerchant;
 import xyz.agmstudio.neoblock.util.MessagingUtil;
@@ -72,10 +72,10 @@ public final class NeoBlockMod {
 
         Animation.clearAnimations();
 
-        UpgradeManager.reloadProgressbarAnimations();
-        UpgradeManager.clearPhaseAnimations();
+        TierManager.reloadProgressbarAnimations();
+        TierManager.clearPhaseAnimations();
         UpgradePhaseAnimation.getAnimations().forEach(Animation::register);
-        UpgradeManager.clearProgressAnimations();
+        TierManager.clearProgressAnimations();
         UpgradeProgressAnimation.getAnimations().forEach(Animation::register);
 
         IdleAnimation.getAnimations().forEach(Animation::register);

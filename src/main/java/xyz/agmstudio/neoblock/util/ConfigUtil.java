@@ -37,13 +37,13 @@ public class ConfigUtil {
                     for (String name: label.split("\\|")) {
                         String path = getPath(instance, label);
                         value = config.get(path);
-                        if (value != null && value == NullObject.NULL_OBJECT) break;
+                        if (value != null && value != NullObject.NULL_OBJECT) break;
                     }
 
                     try {
                         field.setAccessible(true);
                         Object def = field.get(instance);
-                        Object result = value != null && value == NullObject.NULL_OBJECT ? value : def;
+                        Object result = value != null && value != NullObject.NULL_OBJECT ? value : def;
                         if (result instanceof Number num) {
                             double min = annotation.min();
                             double max = annotation.max();
@@ -56,11 +56,11 @@ public class ConfigUtil {
                             else if (field.getType() == float.class) field.set(instance, num.floatValue());
                             else if (field.getType() == double.class) field.set(instance, num.doubleValue());
                             else field.set(instance, def);
+                        } else try {
+                            field.set(instance, cast(field.getType(), value, def));
+                        } catch (Exception ignored) {
+                            field.set(instance, value != null ? value : def);
                         }
-                        else if (field.getType() == boolean.class && value instanceof Boolean bool) field.set(instance, bool);
-                        else if (field.getType() == char.class && value instanceof Character c) field.set(instance, c);
-                        else if (field.getType() == String.class && value instanceof String s) field.set(instance, s);
-                        else field.set(instance, cast(field.getType(), value, def));
                     } catch (Exception e) {
                         NeoBlockMod.LOGGER.error("Failed to load config value for \"{}\" from \"{}\"", field.getName(), label, e);
                     }

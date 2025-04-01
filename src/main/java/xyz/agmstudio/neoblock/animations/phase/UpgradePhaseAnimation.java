@@ -4,7 +4,7 @@ package xyz.agmstudio.neoblock.animations.phase;
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.animations.Animation;
-import xyz.agmstudio.neoblock.tiers.UpgradeManager;
+import xyz.agmstudio.neoblock.tiers.TierManager;
 
 import java.util.HashSet;
 
@@ -17,7 +17,7 @@ public abstract class UpgradePhaseAnimation extends Animation {
     }
 
     @Override protected void onRegister() {
-        UpgradeManager.addPhaseAnimation(this);
+        TierManager.addPhaseAnimation(this);
     }
 
     public abstract boolean isActiveOnUpgradeFinish();
