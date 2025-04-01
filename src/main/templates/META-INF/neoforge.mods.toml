@@ -18,6 +18,10 @@ credits = ""
 authors = "${mod_authors}"
 description = '''${mod_description}'''
 
+
+[[mixins]]
+config="neoblock.mixins.json"
+
 [[dependencies.neoblock]]
 modId = "neoforge"
 type = "required"
