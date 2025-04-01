@@ -63,7 +63,7 @@ public class NeoTier {
         if (blocks.isEmpty()) return NeoBlock.DEFAULT_STATE;
 
         int totalWeight = blocks.values().stream().mapToInt(Integer::intValue).sum();
-        int randomValue = NeoBlock.random.nextInt(totalWeight);
+        int randomValue = WorldData.getRandom().nextInt(totalWeight);
         for (Map.Entry<BlockState, Integer> entry: blocks.entrySet()) {
             randomValue -= entry.getValue();
             if (randomValue < 0) return entry.getKey();

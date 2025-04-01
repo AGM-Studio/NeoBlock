@@ -6,7 +6,6 @@ import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Blocks;
@@ -27,8 +26,6 @@ import java.util.HashSet;
 import java.util.List;
 
 public class NeoBlock {
-    public static RandomSource random;
-
     public static final double AABB_RANGE = 1.05;
     public static final BlockPos POS = new BlockPos(0, 64, 0);
     public static final BlockState DEFAULT_STATE = Blocks.GRASS_BLOCK.defaultBlockState();
@@ -44,7 +41,7 @@ public class NeoBlock {
     public static BlockState getRandomBlock() {
         int breaks = WorldData.getBlockCount();
         int totalChance = WorldData.getUnlocked().stream().mapToInt(NeoTier::getWeight).sum();
-        int randomValue = NeoBlock.random.nextInt(totalChance);
+        int randomValue = WorldData.getRandom().nextInt(totalChance);
         for (NeoTier tier: WorldData.getUnlocked()) {
             randomValue -= tier.getWeight();
             if (randomValue < 0) return tier.getRandomBlock();
@@ -64,7 +61,6 @@ public class NeoBlock {
 
     public static void setupWorldData(@NotNull ServerLevel level) {
         WorldData.load(level);
-        NeoBlock.random = level.getRandom();
 
         if (WorldData.isInactive()) {
             boolean isNeoBlock = true;

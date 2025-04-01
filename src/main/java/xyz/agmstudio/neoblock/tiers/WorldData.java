@@ -8,6 +8,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.saveddata.SavedData;
@@ -210,6 +211,10 @@ public class WorldData extends SavedData {
         }
         instance.unlockedIDs.clear();
         instance.unlocked.forEach(tier -> instance.unlockedIDs.add(tier.id));
+    }
+
+    public static @NotNull RandomSource getRandom() {
+        return instance.level.getRandom();
     }
 
     public static void tick(ServerLevel level, LevelAccessor access) {

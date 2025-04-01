@@ -63,7 +63,7 @@ public class NeoMerchant {
     public static WanderingTrader attemptSpawnTrader(ServerLevel level) {
         if (WorldData.getBlockCount() % attemptInterval != 0 || exists(level, "NeoMerchant")) return null;
         double chance = NeoMerchant.chance + (increment * WorldData.getTraderFailedAttempts());
-        if (NeoBlock.random.nextFloat() > chance) {
+        if (WorldData.getRandom().nextFloat() > chance) {
             WorldData.addTraderFailedAttempts();
             NeoBlockMod.LOGGER.debug("Trader chance {} failed for {} times in a row", chance, WorldData.getTraderFailedAttempts());
             return null;
