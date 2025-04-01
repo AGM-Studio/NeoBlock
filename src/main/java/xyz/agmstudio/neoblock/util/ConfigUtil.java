@@ -1,5 +1,6 @@
 package xyz.agmstudio.neoblock.util;
 
+import com.electronwill.nightconfig.core.NullObject;
 import com.electronwill.nightconfig.core.UnmodifiableConfig;
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlockMod;
@@ -9,6 +10,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 public class ConfigUtil {
     public interface CategorizedConfig {
@@ -31,13 +33,18 @@ public class ConfigUtil {
                 if (field.isAnnotationPresent(ConfigField.class)) {
                     ConfigField annotation = field.getAnnotation(ConfigField.class);
                     String label = annotation.value().isEmpty() ? field.getName() : annotation.value();
-                    String path = getPath(instance, label);
+                    Object value = null;
+                    for (String name: label.split("\\|")) {
+                        String path = getPath(instance, label);
+                        value = config.get(path);
+                        if (value != null && value == NullObject.NULL_OBJECT) break;
+                    }
 
                     try {
                         field.setAccessible(true);
                         Object def = field.get(instance);
-                        Object value = config.getOrElse(path, def);
-                        if (value instanceof Number num) {
+                        Object result = value != null && value == NullObject.NULL_OBJECT ? value : def;
+                        if (result instanceof Number num) {
                             double min = annotation.min();
                             double max = annotation.max();
                             if (!Double.isNaN(min) && num.doubleValue() < min) num = min;
@@ -49,15 +56,32 @@ public class ConfigUtil {
                             else if (field.getType() == float.class) field.set(instance, num.floatValue());
                             else if (field.getType() == double.class) field.set(instance, num.doubleValue());
                             else field.set(instance, def);
-                        } else field.set(instance, value);
+                        }
+                        else if (field.getType() == boolean.class && value instanceof Boolean bool) field.set(instance, bool);
+                        else if (field.getType() == char.class && value instanceof Character c) field.set(instance, c);
+                        else if (field.getType() == String.class && value instanceof String s) field.set(instance, s);
+                        else field.set(instance, cast(field.getType(), value, def));
                     } catch (Exception e) {
-                        NeoBlockMod.LOGGER.error("Failed to load config value for \"{}\" from \"{}\"", field.getName(), path, e);
+                        NeoBlockMod.LOGGER.error("Failed to load config value for \"{}\" from \"{}\"", field.getName(), label, e);
                     }
                 }
             }
 
             clazz = clazz.getSuperclass();
         } while (deep && clazz != null);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <R> R cast(Class<? extends R> type, Object value, R def) {
+        try {
+            Method factoryMethod = type.getDeclaredMethod("fromConfig", value.getClass());
+            return (R) factoryMethod.invoke(null, value);
+        } catch (Exception ignored) {}
+        try {
+            return (R) value;
+        } catch (Exception ignored) {
+            return null;
+        }
     }
 
     @Retention(RetentionPolicy.RUNTIME)
