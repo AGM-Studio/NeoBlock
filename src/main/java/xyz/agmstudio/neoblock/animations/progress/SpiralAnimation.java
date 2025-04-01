@@ -5,30 +5,22 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.phys.Vec3;
 import xyz.agmstudio.neoblock.tiers.NeoBlock;
+import xyz.agmstudio.neoblock.util.ConfigUtil;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 public class SpiralAnimation extends UpgradeProgressAnimation {
-    @AnimationConfig private int interval = 40;
-    @AnimationConfig private int length = 50;
-    @AnimationConfig private int count = 5;
+    @ConfigUtil.ConfigField(min = 1)
+    private int length = 50;
+    @ConfigUtil.ConfigField(min = 1)
+    private int count = 5;
 
     private final List<Integer> animations = new ArrayList<>();
 
     public SpiralAnimation() {
         super("spiral");
-    }
-
-    @Override public void processConfig() {
-        interval = Math.max(interval, 5);
-        length = Math.max(0, length);
-        count = Math.max(1, count);
-    }
-
-    @Override public void upgradeTick(ServerLevel level, LevelAccessor access, int tick) {
-        if (tick % interval == 0) animate(level, access);
     }
 
     @Override public void animate(ServerLevel level, LevelAccessor access) {

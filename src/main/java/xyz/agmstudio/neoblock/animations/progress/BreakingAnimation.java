@@ -7,23 +7,14 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import xyz.agmstudio.neoblock.tiers.NeoBlock;
+import xyz.agmstudio.neoblock.util.ConfigUtil;
 
 public class BreakingAnimation extends UpgradeProgressAnimation {
-    @AnimationConfig private int interval = 40;
-    @AnimationConfig private float volume = 0.7f;
+    @ConfigUtil.ConfigField(min = 0)
+    private float volume = 0.7f;
 
     public BreakingAnimation() {
         super("breaking");
-    }
-
-    @Override
-    public void processConfig() {
-        interval = Math.max(interval, 5);
-        volume = Math.max(volume, 0.0f);
-    }
-
-    @Override public void upgradeTick(ServerLevel level, LevelAccessor access, int tick) {
-        if (tick % interval == 0) animate(level, access);
     }
 
     @Override public void animate(ServerLevel level, LevelAccessor access) {

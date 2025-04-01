@@ -4,13 +4,15 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.phys.Vec3;
+import xyz.agmstudio.neoblock.util.ConfigUtil;
 
 import java.util.HashSet;
 import java.util.Iterator;
 
 public class PulseAnimation extends IdleAnimation {
-    @AnimationConfig private int interval = 100;
-    @AnimationConfig("wait-for")
+    @ConfigUtil.ConfigField(min = 5)
+    private int interval = 100;
+    @ConfigUtil.ConfigField(value = "wait-for", min = 0)
     private int delay = 200;
 
     private long tick = 0;
@@ -21,11 +23,6 @@ public class PulseAnimation extends IdleAnimation {
 
     @Override public void resetTick() {
         tick = 0;
-    }
-
-    @Override public void processConfig() {
-        interval = Math.max(interval, 5);
-        delay = Math.max(delay, 0);
     }
 
     @Override public void tick(ServerLevel level, LevelAccessor access) {

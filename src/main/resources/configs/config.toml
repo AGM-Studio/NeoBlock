@@ -1,3 +1,6 @@
+[world]                     # Added in 0.4.0! Effects only the client single player, for servers you need to change the level type
+no-nether = true            # in servers.properties. "neoblock:neoblock" or "neoblock:neoblock_no_nether"
+
 [neo-trader]
 chance = 0.3                # Chance of spawning a NeoMerchant per interval. If no trades are available or another trader lives, no NeoMerchant will be spawned.
 chance-increment = 0.075    # On a failed attempt, will increase the chance of NeoMerchant per interval by this amount.
