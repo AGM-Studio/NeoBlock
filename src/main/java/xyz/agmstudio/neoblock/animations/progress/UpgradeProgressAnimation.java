@@ -4,12 +4,16 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.LevelAccessor;
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlockMod;
-import xyz.agmstudio.neoblock.tiers.UpgradeManager;
 import xyz.agmstudio.neoblock.animations.Animation;
+import xyz.agmstudio.neoblock.tiers.UpgradeManager;
+import xyz.agmstudio.neoblock.util.ConfigUtil;
 
 import java.util.HashSet;
 
 public abstract class UpgradeProgressAnimation extends Animation {
+    @ConfigUtil.ConfigField(min = 5)
+    protected int interval = 40;
+
     public UpgradeProgressAnimation(String name) {
         super("upgrade", name);
     }
@@ -28,7 +32,9 @@ public abstract class UpgradeProgressAnimation extends Animation {
      * @param access the world access if needed
      * @param tick   the tick upgrade is in
      */
-    public abstract void upgradeTick(ServerLevel level, LevelAccessor access, int tick);
+    public void upgradeTick(ServerLevel level, LevelAccessor access, int tick) {
+        if (tick % interval == 0) animate(level, access);
+    }
 
     private static final HashSet<Class<? extends UpgradeProgressAnimation>> animations = new HashSet<>();
     public static void addAnimation(Class<? extends UpgradeProgressAnimation> clazz) {

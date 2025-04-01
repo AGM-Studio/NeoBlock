@@ -6,13 +6,15 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.LevelAccessor;
 import xyz.agmstudio.neoblock.tiers.NeoBlock;
+import xyz.agmstudio.neoblock.util.ConfigUtil;
 
 public class ExplosionAnimation extends UpgradePhaseAnimation {
-    @AnimationConfig("at-start")
+    @ConfigUtil.ConfigField("at-start")
     private boolean activeOnUpgradeStart = false;
-    @AnimationConfig("at-finish")
+    @ConfigUtil.ConfigField("at-finish")
     private boolean activeOnUpgradeFinish = true;
-    @AnimationConfig private float volume = 0.7f;
+    @ConfigUtil.ConfigField(min = 0)
+    private float volume = 0.7f;
 
     public ExplosionAnimation() {
         super("explosion");
@@ -26,8 +28,6 @@ public class ExplosionAnimation extends UpgradePhaseAnimation {
     }
 
     @Override public void processConfig() {
-        this.volume = Math.max(0, volume);
-
         this.enabled = activeOnUpgradeStart || activeOnUpgradeFinish;
     }
 

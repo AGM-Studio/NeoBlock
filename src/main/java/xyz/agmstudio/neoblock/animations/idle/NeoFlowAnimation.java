@@ -6,6 +6,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
+import xyz.agmstudio.neoblock.util.ConfigUtil;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -13,11 +14,13 @@ import java.util.Arrays;
 import java.util.List;
 
 public class NeoFlowAnimation extends IdleAnimation {
-    @AnimationConfig private int count = 1;
-    @AnimationConfig private float speed = 0.05f;
-    @AnimationConfig("color-speed")
+    @ConfigUtil.ConfigField(min = 1)
+    private int count = 1;
+    @ConfigUtil.ConfigField(min = 0.01)
+    private float speed = 0.05f;
+    @ConfigUtil.ConfigField(value = "color-speed", min = 0, max = 1)
     private float hueSpeed = 1.0f;
-    @AnimationConfig("wait-for")
+    @ConfigUtil.ConfigField(value = "wait-for", min = 0)
     private int delay = 200;
     
     private final List<AnimationParticle> particles = new ArrayList<>();
@@ -30,13 +33,6 @@ public class NeoFlowAnimation extends IdleAnimation {
 
     @Override public void resetTick() {
         tick = 0;
-    }
-
-    @Override protected void processConfig() {
-        count = Math.max(count, 1);
-        speed = Math.max(0.01f, speed);
-        hueSpeed = Math.clamp(hueSpeed / 20, 0, 0.05f);
-        delay = Math.max(delay, 0);
     }
 
     @Override public void tick(ServerLevel level, LevelAccessor access) {
@@ -55,7 +51,7 @@ public class NeoFlowAnimation extends IdleAnimation {
     }
 
     private Vector3f getRainbowColor() {
-        hue += hueSpeed;
+        hue += hueSpeed / 20.0f;
         while (hue > 1.0f) hue -= 1.0f;
 
         int rgb = Color.HSBtoRGB(hue, 1.0f, 1.0f);

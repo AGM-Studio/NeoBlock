@@ -1,21 +1,17 @@
 package xyz.agmstudio.neoblock.animations;
 
-import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.LevelAccessor;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.animations.idle.IdleAnimation;
+import xyz.agmstudio.neoblock.util.ConfigUtil;
 import xyz.agmstudio.neoblock.util.StringUtil;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class Animation {
+public abstract class Animation implements ConfigUtil.CategorizedConfig {
     private static boolean registeringNewAnimations = true;
     private static final List<Animation> animations = new ArrayList<>();
 
@@ -47,12 +43,14 @@ public abstract class Animation {
         if (name.contains(" ")) name = "\"%s\"".formatted(name);
         return "animations." + category + "." + name + ".";
     }
-    protected String getPath(String label) {
-        return path + StringUtil.convertToSnakeCase(label);
+
+    public String getPath() {
+        return path;
     }
 
-    private final String path;
+    @ConfigUtil.ConfigField
     protected boolean enabled;
+    private final String path;
 
     public Animation(String path) {
         if (!path.isEmpty() && !path.endsWith(".")) path += ".";
@@ -76,39 +74,12 @@ public abstract class Animation {
     }
 
     public final void reload() {
-        CommentedFileConfig config = NeoBlockMod.getConfig();
-        this.enabled = config.getOrElse(getPath("enabled"), false);
-        Class<?> clazz = this.getClass();
-        while (clazz != null) {
-            for (Field field : clazz.getDeclaredFields()) {
-                if (field.isAnnotationPresent(AnimationConfig.class)) {
-                    AnimationConfig annotation = field.getAnnotation(AnimationConfig.class);
-                    String label = annotation.value().isEmpty() ? field.getName() : annotation.value();
-                    String fullPath = getPath(label);
-
-                    try {
-                        field.setAccessible(true);
-                        Object def = field.get(this);
-                        Object value = config.getOrElse(fullPath, def);
-                        switch (value) {
-                            case Double v when field.getType() == float.class -> field.set(this, v.floatValue());
-                            case Number number when field.getType() == int.class -> field.set(this, number.intValue());
-                            case null, default -> field.set(this, value);
-                        }
-                    } catch (IllegalAccessException e) {
-                        NeoBlockMod.LOGGER.error("Failed to load animation config value for: {}", field.getName(), e);
-                    }
-                }
-            }
-
-            clazz = clazz.getSuperclass();
-        }
-
+        ConfigUtil.loadValues(NeoBlockMod.getConfig(), this, true);
         processConfig();
     }
 
     protected abstract void onRegister();
-    protected abstract void processConfig();
+    protected void processConfig() {}
 
     /**
      * Will always tick...
@@ -146,14 +117,4 @@ public abstract class Animation {
         if (sb.length() > 2) sb.setLength(sb.length() - 2);
         return getClass().getSimpleName() + "{" + sb + "}";
     }
-
-    @Retention(RetentionPolicy.RUNTIME)
-    @Target(ElementType.FIELD)
-    public @interface AnimationConfig {
-        String value() default "";
-    }
-
-    @Target(ElementType.TYPE)
-    @Retention(RetentionPolicy.RUNTIME)
-    public @interface Register {}
 }

@@ -5,10 +5,12 @@ import net.minecraft.server.level.ServerBossEvent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.BossEvent;
 import org.jetbrains.annotations.NotNull;
+import xyz.agmstudio.neoblock.util.ConfigUtil;
 
 public class ProgressbarAnimation extends Animation {
-    @AnimationConfig private String color = "red";
-    @AnimationConfig("show-time")
+    @ConfigUtil.ConfigField
+    private String color = "red";
+    @ConfigUtil.ConfigField("show-time")
     private boolean dynamicName = true;
 
     private final ServerBossEvent bar;

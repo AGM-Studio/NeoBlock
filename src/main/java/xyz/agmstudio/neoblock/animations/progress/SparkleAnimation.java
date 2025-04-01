@@ -5,15 +5,18 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.phys.Vec3;
 import xyz.agmstudio.neoblock.tiers.NeoBlock;
+import xyz.agmstudio.neoblock.util.ConfigUtil;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 public class SparkleAnimation extends UpgradeProgressAnimation {
-    @AnimationConfig private int interval = 40;
-    @AnimationConfig private int length = 10;
-    @AnimationConfig private int factor = 3;
-    @AnimationConfig private int count = 5;
+    @ConfigUtil.ConfigField(min = 1)
+    private int length = 10;
+    @ConfigUtil.ConfigField(min = 1)
+    private int factor = 3;
+    @ConfigUtil.ConfigField(min = 1)
+    private int count = 5;
 
     private final List<Integer> animations = new ArrayList<>();
 
@@ -23,14 +26,7 @@ public class SparkleAnimation extends UpgradeProgressAnimation {
 
     @Override
     public void processConfig() {
-        interval = Math.max(interval, 5);
-        length = Math.clamp(length, 0, interval);
-        factor = Math.max(1, factor);
-        count = Math.max(1, count);
-    }
-
-    @Override public void upgradeTick(ServerLevel level, LevelAccessor access, int tick) {
-        if (tick % interval == 0) animate(level, access);
+        length = Math.min(length, interval);
     }
 
     @Override
