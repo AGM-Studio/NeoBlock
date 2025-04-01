@@ -1,6 +1,6 @@
 package xyz.agmstudio.neoblock.tiers;
 
-import com.electronwill.nightconfig.core.concurrent.ConcurrentCommentedConfig;
+import com.electronwill.nightconfig.core.UnmodifiableConfig;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.state.BlockState;
@@ -14,7 +14,6 @@ import xyz.agmstudio.neoblock.util.StringUtil;
 
 import java.nio.file.Path;
 import java.util.*;
-import java.util.random.RandomGenerator;
 
 public class NeoTier {
     public static final Path FOLDER = FMLPaths.CONFIGDIR.get().resolve(NeoBlockMod.MOD_ID + "/tiers");
@@ -39,7 +38,7 @@ public class NeoTier {
         NeoBlockMod.LOGGER.debug("Loading tier {}...", id);
         name = config.getOrElse("name", "Tier-" + id);
 
-        ConcurrentCommentedConfig lockConfig = config.get("unlock");
+        UnmodifiableConfig lockConfig = config.get("unlock");
         lock = id > 0 ? lockConfig != null ? new Lock(this.id, lockConfig) : Lock.CommandOnly(this.id) : null;
 
         List<String> blocks = config.getOrElse("blocks", List.of("minecraft:grass_block"));
@@ -64,7 +63,7 @@ public class NeoTier {
         if (blocks.isEmpty()) return NeoBlock.DEFAULT_STATE;
 
         int totalWeight = blocks.values().stream().mapToInt(Integer::intValue).sum();
-        int randomValue = RandomGenerator.getDefault().nextInt(totalWeight);
+        int randomValue = NeoBlock.random.nextInt(totalWeight);
         for (Map.Entry<BlockState, Integer> entry: blocks.entrySet()) {
             randomValue -= entry.getValue();
             if (randomValue < 0) return entry.getKey();
@@ -119,7 +118,7 @@ public class NeoTier {
         private final int game;         // Game time to unlock.
         private final boolean command;  // If command execution is needed to unlock.
 
-        private Lock(int id, ConcurrentCommentedConfig config) {
+        private Lock(int id, UnmodifiableConfig config) {
             this.id = id;
             time = config.getIntOrElse("unlock-time", 0);
             blocks = config.getIntOrElse("blocks", -1);

@@ -18,7 +18,6 @@ import xyz.agmstudio.neoblock.tiers.WorldData;
 import xyz.agmstudio.neoblock.util.MessagingUtil;
 
 import java.util.*;
-import java.util.random.RandomGenerator;
 
 public class NeoMerchant {
     public static double chance;
@@ -64,7 +63,7 @@ public class NeoMerchant {
     public static WanderingTrader attemptSpawnTrader(ServerLevel level) {
         if (WorldData.getBlockCount() % attemptInterval != 0 || exists(level, "NeoMerchant")) return null;
         double chance = NeoMerchant.chance + (increment * WorldData.getTraderFailedAttempts());
-        if (RandomGenerator.getDefault().nextFloat() > chance) {
+        if (NeoBlock.random.nextFloat() > chance) {
             WorldData.addTraderFailedAttempts();
             NeoBlockMod.LOGGER.debug("Trader chance {} failed for {} times in a row", chance, WorldData.getTraderFailedAttempts());
             return null;

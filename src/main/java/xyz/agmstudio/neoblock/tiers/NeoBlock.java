@@ -1,11 +1,12 @@
 package xyz.agmstudio.neoblock.tiers;
 
-import com.electronwill.nightconfig.core.concurrent.ConcurrentCommentedConfig;
+import com.electronwill.nightconfig.core.UnmodifiableConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Blocks;
@@ -24,12 +25,17 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.random.RandomGenerator;
 
 public class NeoBlock {
+    public static RandomSource random;
+
     public static final double AABB_RANGE = 1.05;
     public static final BlockPos POS = new BlockPos(0, 64, 0);
     public static final BlockState DEFAULT_STATE = Blocks.GRASS_BLOCK.defaultBlockState();
+
+    public static Vec3 getCorner() {
+        return new Vec3(POS.getX(), POS.getY(), POS.getZ());
+    }
 
     protected static HashSet<String> hash = new HashSet<>();
 
@@ -38,7 +44,7 @@ public class NeoBlock {
     public static BlockState getRandomBlock() {
         int breaks = WorldData.getBlockCount();
         int totalChance = WorldData.getUnlocked().stream().mapToInt(NeoTier::getWeight).sum();
-        int randomValue = RandomGenerator.getDefault().nextInt(totalChance);
+        int randomValue = NeoBlock.random.nextInt(totalChance);
         for (NeoTier tier: WorldData.getUnlocked()) {
             randomValue -= tier.getWeight();
             if (randomValue < 0) return tier.getRandomBlock();
@@ -58,6 +64,7 @@ public class NeoBlock {
 
     public static void setupWorldData(@NotNull ServerLevel level) {
         WorldData.load(level);
+        NeoBlock.random = level.getRandom();
 
         if (WorldData.isInactive()) {
             boolean isNeoBlock = true;
@@ -66,7 +73,7 @@ public class NeoBlock {
 
             if (isNeoBlock) {
                 level.setBlock(NeoBlock.POS, NeoBlock.DEFAULT_STATE, 3);
-                ConcurrentCommentedConfig rules = NeoBlockMod.getConfig().get("rules");
+                UnmodifiableConfig rules = NeoBlockMod.getConfig().get("rules");
                 if (rules != null) WorldRules.applyGameRules(level, rules);
                 WorldData.setActive();
             } else {

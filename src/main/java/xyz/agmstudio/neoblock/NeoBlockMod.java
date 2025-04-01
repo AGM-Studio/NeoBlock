@@ -53,6 +53,10 @@ public final class NeoBlockMod {
     }
 
     public NeoBlockMod(IEventBus bus, ModContainer container) {
+        this.install(bus, container);
+    }
+
+    private void install(IEventBus bus, ModContainer container) {
         NeoBlockMod.container = container;
         NeoBlockMod.instance = this;
         NeoBlockMod.config = ResourceUtil.getConfig(folder, "config.toml");
