@@ -29,7 +29,7 @@ public abstract class CreateWorldScreenMixin {
     @Inject(method = "<init>", at = @At("TAIL"))
     private void CreateWorldScreen(Minecraft minecraft, Screen lastScreen, WorldCreationContext settings, Optional<ResourceKey<WorldPreset>> preset, OptionalLong seed, CallbackInfo ci) {
         List<WorldCreationUiState.WorldTypeEntry> list = uiState.getNormalPresetList();
-        ResourceLocation location = NeoBlockMod.getConfig().getOrElse("world.no-nether", true) ? ResourceLocation.parse("neoblock:neoblock_no_nether") : ResourceLocation.parse("neoblock:neoblock");
+        ResourceLocation location = NeoBlockMod.getConfig().getOrElse("world.no-nether", true) ? new ResourceLocation("neoblock", "neoblock_no_nether") : new ResourceLocation("neoblock", "neoblock");
 
         WorldCreationUiState.WorldTypeEntry type = uiState.getWorldType();
         for (WorldCreationUiState.WorldTypeEntry entry : list) {

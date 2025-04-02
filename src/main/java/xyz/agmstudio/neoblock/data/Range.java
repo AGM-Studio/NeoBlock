@@ -1,6 +1,6 @@
 package xyz.agmstudio.neoblock.data;
 
-import xyz.agmstudio.neoblock.tiers.NeoBlock;
+import xyz.agmstudio.neoblock.tiers.WorldData;
 
 public final class Range {
     final int min, max;
@@ -17,7 +17,7 @@ public final class Range {
 
     public int get() {
         if (min == max) return min;
-        return NeoBlock.random.nextInt(min, max + 1);
+        return WorldData.getRandom().nextInt(min, max + 1);
     }
 
     public String toString() {
