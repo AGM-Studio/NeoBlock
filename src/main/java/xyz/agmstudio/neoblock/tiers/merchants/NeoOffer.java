@@ -1,18 +1,15 @@
 package xyz.agmstudio.neoblock.tiers.merchants;
 
-import net.minecraft.core.component.DataComponents;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.trading.MerchantOffer;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.data.Range;
 import xyz.agmstudio.neoblock.tiers.WorldData;
 import xyz.agmstudio.neoblock.util.MessagingUtil;
+import xyz.agmstudio.neoblock.util.MinecraftUtil;
 import xyz.agmstudio.neoblock.util.StringUtil;
 
 import java.util.Optional;
@@ -69,14 +66,11 @@ public final class NeoOffer {
     public static EntityType<?> getMobTradeEntity(ItemStack item) {
         if (item == null) return null;
 
-        CustomData data = item.getComponents().get(DataComponents.CUSTOM_DATA);
-        if (data == null) return null;
-
-        CompoundTag tag = data.copyTag();
+        CompoundTag tag = MinecraftUtil.Items.getItemTag(item);
         if (!tag.getBoolean("isNeoMob")) return null;
 
         String type = tag.getString("neoMobType");
-        return BuiltInRegistries.ENTITY_TYPE.get(ResourceLocation.parse(type));
+        return MinecraftUtil.getEntityType(type);
     }
 
     public static boolean handlePossibleMobTrade(ItemStack item, ServerLevel level) {

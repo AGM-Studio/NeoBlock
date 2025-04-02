@@ -16,6 +16,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xyz.agmstudio.neoblock.NeoBlockMod;
+import xyz.agmstudio.neoblock.util.MinecraftUtil;
 
 import java.util.List;
 import java.util.Optional;
@@ -29,13 +30,15 @@ public abstract class CreateWorldScreenMixin {
     @Inject(method = "<init>", at = @At("TAIL"))
     private void CreateWorldScreen(Minecraft minecraft, Screen lastScreen, WorldCreationContext settings, Optional<ResourceKey<WorldPreset>> preset, OptionalLong seed, CallbackInfo ci) {
         List<WorldCreationUiState.WorldTypeEntry> list = uiState.getNormalPresetList();
-        ResourceLocation location = NeoBlockMod.getConfig().getOrElse("world.no-nether", true) ? ResourceLocation.parse("neoblock:neoblock_no_nether") : ResourceLocation.parse("neoblock:neoblock");
+        ResourceLocation location = NeoBlockMod.getConfig().getOrElse("world.no-nether", true) ?
+                MinecraftUtil.getResourceLocation("neoblock:neoblock_no_nether") :
+                MinecraftUtil.getResourceLocation("neoblock:neoblock");
 
         WorldCreationUiState.WorldTypeEntry type = uiState.getWorldType();
         for (WorldCreationUiState.WorldTypeEntry entry : list) {
             Holder<WorldPreset> world = entry.preset();
             if (world == null) continue;
-            if (world.is(location)) {
+            if (location != null && world.is(location)) {
                 type = entry;
                 break;
             }
