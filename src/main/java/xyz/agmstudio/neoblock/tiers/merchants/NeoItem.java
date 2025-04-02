@@ -6,17 +6,18 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.tuple.Pair;
+import org.jetbrains.annotations.Nullable;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.data.Range;
+import xyz.agmstudio.neoblock.util.MinecraftUtil;
 import xyz.agmstudio.neoblock.util.StringUtil;
 
 public class NeoItem {
-    private static final ResourceLocation air = ResourceLocation.tryParse("minecraft:air");
+    private static final ResourceLocation air = MinecraftUtil.getResourceLocation("minecraft:air");
     private static boolean isValid(Item item) {
-        ResourceLocation key = ForgeRegistries.ITEMS.getKey(item);
-        return key != null && key != air;
+        @Nullable ResourceLocation resource = MinecraftUtil.getItemResource(item);
+        return resource != null && resource != air;
     }
 
     public static NeoItem parse(String value) {
@@ -41,7 +42,7 @@ public class NeoItem {
     }
     
     public String toString() {
-        return count.toString() + ForgeRegistries.ITEMS.getKey(item);
+        return count.toString() + MinecraftUtil.getItemResource(item);
     }
 
     public static class MobItem extends NeoItem {
@@ -52,7 +53,7 @@ public class NeoItem {
             Item item = StringUtil.parseItem(value + "_spawn_egg").getKey();
             if (isValid(item)) return new MobItem(item, parsed.getValue(), parsed.getKey());
             NeoBlockMod.LOGGER.warn("Unable to find the spawn egg: {}", value);
-            return new MobItem(Items.BEE_SPAWN_EGG, parsed.getValue(), parsed.getKey());
+            return new MobItem(Items.EGG, parsed.getValue(), parsed.getKey());
         }
 
         public MobItem(Item item, Range count, EntityType<?> mob) {
@@ -63,19 +64,19 @@ public class NeoItem {
         @Override
         public ItemStack getStack() {
             ItemStack item = super.getStack();
-            ResourceLocation key = ForgeRegistries.ENTITY_TYPES.getKey(mob);
+            ResourceLocation key = MinecraftUtil.getEntityTypeResource(mob);
             if (key == null) return item;
 
-            CompoundTag tag = item.getOrCreateTag();
+            CompoundTag tag = MinecraftUtil.Items.getItemTag(item);
             tag.putBoolean("isNeoMob", true);
             tag.putString("neoMobType", key.toString());
 
-            item.setTag(tag);
+            MinecraftUtil.Items.setItemTag(item, tag);
             return item;
         }
 
         public String toString() {
-            return "mob:" + count.toString() + ForgeRegistries.ENTITY_TYPES.getKey(mob);
+            return "mob:" + count.toString() + MinecraftUtil.getEntityTypeResource(mob);
         }
     }
 }

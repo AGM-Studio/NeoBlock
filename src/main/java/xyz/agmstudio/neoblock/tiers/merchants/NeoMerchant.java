@@ -4,7 +4,6 @@ import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.npc.WanderingTrader;
@@ -16,6 +15,7 @@ import xyz.agmstudio.neoblock.tiers.NeoBlock;
 import xyz.agmstudio.neoblock.tiers.NeoTier;
 import xyz.agmstudio.neoblock.tiers.WorldData;
 import xyz.agmstudio.neoblock.util.MessagingUtil;
+import xyz.agmstudio.neoblock.util.MinecraftUtil;
 
 import java.util.*;
 
@@ -84,7 +84,7 @@ public class NeoMerchant {
             tradedMobs.forEach((type, count) -> {
                 for (int i = 0; i < count; i++) {
                     Entity mob = type.spawn(level, trader.getOnPos(), MobSpawnType.SPAWN_EGG);
-                    if (mob instanceof Mob casted) casted.setLeashedTo(trader, true);
+                    MinecraftUtil.Entities.leash(mob, trader);
                 }
             });
             WorldData.clearTradedMobs();

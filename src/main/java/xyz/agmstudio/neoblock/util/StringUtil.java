@@ -1,10 +1,8 @@
 package xyz.agmstudio.neoblock.util;
 
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -90,7 +88,7 @@ public class StringUtil {
      */
     public static Pair<Block, Range> parseBlock(String value) {
         Pair<String, Range> parsed = parseCount(value, new Range(1, 1));
-        Block block = ForgeRegistries.BLOCKS.getValue(ResourceLocation.tryParse(parsed.getLeft()));
+        Block block = MinecraftUtil.getBlock(parsed.getLeft());
         return Pair.of(block, parsed.getRight());
     }
 
@@ -103,7 +101,7 @@ public class StringUtil {
      */
     public static Pair<Item, Range> parseItem(String value) {
         Pair<String, Range> parsed = parseCount(value, new Range(1, 1));
-        Item item = ForgeRegistries.ITEMS.getValue(ResourceLocation.tryParse(parsed.getLeft()));
+        Item item = MinecraftUtil.getItem(parsed.getLeft());
         return Pair.of(item, parsed.getRight());
     }
 
@@ -116,7 +114,7 @@ public class StringUtil {
      */
     public static Pair<EntityType<?>, Range> parseEntityType(String value) {
         Pair<String, Range> parsed = parseCount(value, new Range(1, 1));
-        EntityType<?> type = ForgeRegistries.ENTITY_TYPES.getValue(ResourceLocation.tryParse(parsed.getLeft()));
+        EntityType<?> type = MinecraftUtil.getEntityType(parsed.getLeft());
         return Pair.of(type, parsed.getRight());
     }
 }

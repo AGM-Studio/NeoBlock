@@ -9,6 +9,7 @@ import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.data.Range;
 import xyz.agmstudio.neoblock.tiers.WorldData;
 import xyz.agmstudio.neoblock.util.MessagingUtil;
+import xyz.agmstudio.neoblock.util.MinecraftUtil;
 import xyz.agmstudio.neoblock.util.StringUtil;
 
 public final class NeoOffer {
@@ -63,11 +64,11 @@ public final class NeoOffer {
     public static EntityType<?> getMobTradeEntity(ItemStack item) {
         if (item == null) return null;
 
-        CompoundTag tag = item.getOrCreateTag();
+        CompoundTag tag = MinecraftUtil.Items.getItemTag(item);
         if (!tag.getBoolean("isNeoMob")) return null;
 
         String type = tag.getString("neoMobType");
-        return EntityType.byString(type).orElse(null);
+        return MinecraftUtil.getEntityType(type);
     }
 
     public static boolean handlePossibleMobTrade(ItemStack item, ServerLevel level) {
