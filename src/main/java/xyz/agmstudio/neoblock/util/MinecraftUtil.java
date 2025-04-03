@@ -3,15 +3,19 @@ package xyz.agmstudio.neoblock.util;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.trading.ItemCost;
 import net.minecraft.world.item.trading.MerchantOffer;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.bus.api.IEventBus;
@@ -19,11 +23,12 @@ import net.neoforged.fml.loading.FMLPaths;
 import net.neoforged.neoforge.common.NeoForge;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.data.Range;
 import xyz.agmstudio.neoblock.tiers.merchants.NeoItem;
 
 import java.nio.file.Path;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * This class a utility class and based on the version of minecraft build should help to keep all code similar
@@ -114,6 +119,51 @@ public final class MinecraftUtil {
                     Optional.empty();
 
             return new MerchantOffer(a, b, r, uses.get(), 0, 0);
+        }
+    }
+
+    public static class Messenger {
+        private static final HashMap<ServerLevel, List<MessageHolder>> messages = new HashMap<>();
+
+        public static void sendMessage(String key, ServerLevel level, boolean action, Object... args) {
+            sendMessage(Component.translatable(key, args), level, action);
+        }
+        public static void sendMessage(Component message, ServerLevel level, boolean action) {
+            NeoBlockMod.LOGGER.info(message.getString());
+
+            MessageHolder holder = new MessageHolder(message, action);
+            for (Player player: level.players()) holder.send(player);
+
+            messages.computeIfAbsent(level, k -> new ArrayList<>()).add(holder);
+        }
+        public static void sendInstantMessage(String key, Level level, boolean action, Object... args) {
+            sendInstantMessage(Component.translatable(key, args), level, action);
+        }
+        public static void sendInstantMessage(Component message, Level level, boolean action) {
+            NeoBlockMod.LOGGER.info(message.getString());
+
+            MessageHolder holder = new MessageHolder(message, action);
+            for (Player player: level.players()) holder.send(player);
+        }
+
+        public static void onPlayerJoin(ServerLevel level, Player player) {
+            messages.getOrDefault(null, new ArrayList<>()).forEach(holder -> holder.send(player));
+            messages.getOrDefault(level, new ArrayList<>()).forEach(holder -> holder.send(player));
+        }
+
+        static class MessageHolder {
+            private final Set<Player> players = new HashSet<>();
+            private final Component message;
+            private final boolean action;
+
+            protected MessageHolder(Component message, boolean action) {
+                this.message = message;
+                this.action = action;
+            }
+
+            public void send(Player player) {
+                if (players.add(player)) player.displayClientMessage(message, action);
+            }
         }
     }
 }

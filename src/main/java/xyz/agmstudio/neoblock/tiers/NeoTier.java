@@ -8,7 +8,7 @@ import net.neoforged.fml.loading.FMLPaths;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.tiers.merchants.NeoMerchant;
 import xyz.agmstudio.neoblock.tiers.merchants.NeoOffer;
-import xyz.agmstudio.neoblock.util.MessagingUtil;
+import xyz.agmstudio.neoblock.util.MinecraftUtil;
 import xyz.agmstudio.neoblock.util.ResourceUtil;
 import xyz.agmstudio.neoblock.util.StringUtil;
 
@@ -84,13 +84,13 @@ public class NeoTier {
     }
 
     public void onFinishUpgrade(ServerLevel level) {
-        MessagingUtil.sendInstantMessage("message.neoblock.unlocked_tier", level, false, id);
+        MinecraftUtil.Messenger.sendInstantMessage("message.neoblock.unlocked_tier", level, false, id);
     }
     public void onStartUpgrade(ServerLevel level) {
-        MessagingUtil.sendInstantMessage("message.neoblock.unlocking_tier", level, false, id);
+        MinecraftUtil.Messenger.sendInstantMessage("message.neoblock.unlocking_tier", level, false, id);
         if (tradeOffer != null) {
             tradeOffer.spawnTrader(level, "UnlockTrader");
-            MessagingUtil.sendInstantMessage("message.neoblock.unlocking_trader", level, false, id);
+            MinecraftUtil.Messenger.sendInstantMessage("message.neoblock.unlocking_trader", level, false, id);
         }
     }
 

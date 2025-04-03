@@ -8,7 +8,6 @@ import net.minecraft.world.item.trading.MerchantOffer;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.data.Range;
 import xyz.agmstudio.neoblock.tiers.WorldData;
-import xyz.agmstudio.neoblock.util.MessagingUtil;
 import xyz.agmstudio.neoblock.util.MinecraftUtil;
 import xyz.agmstudio.neoblock.util.StringUtil;
 
@@ -75,7 +74,7 @@ public final class NeoOffer {
         EntityType<?> mob = getMobTradeEntity(item);
         if (mob == null) return false;
 
-        MessagingUtil.sendInstantMessage("message.neoblock.trades.mob", level, true, item.getCount(), mob.getDescription());
+        MinecraftUtil.Messenger.sendInstantMessage("message.neoblock.trades.mob", level, true, item.getCount(), mob.getDescription());
         WorldData.addTradedMob(mob, item.getCount());
         item.setCount(0);
 

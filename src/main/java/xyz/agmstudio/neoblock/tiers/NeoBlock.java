@@ -17,7 +17,7 @@ import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.NeoListener;
 import xyz.agmstudio.neoblock.animations.Animation;
 import xyz.agmstudio.neoblock.tiers.merchants.NeoMerchant;
-import xyz.agmstudio.neoblock.util.MessagingUtil;
+import xyz.agmstudio.neoblock.util.MinecraftUtil;
 import xyz.agmstudio.neoblock.util.ResourceUtil;
 
 import java.nio.file.Files;
@@ -74,8 +74,8 @@ public class NeoBlock {
                 WorldData.setActive();
             } else {
                 NeoBlockMod.LOGGER.info("NeoBlock has been disabled.");
-                MessagingUtil.sendMessage("message.neoblock.disabled_world_1", level, false);
-                MessagingUtil.sendMessage("message.neoblock.disabled_world_2", level, false);
+                MinecraftUtil.Messenger.sendMessage("message.neoblock.disabled_world_1", level, false);
+                MinecraftUtil.Messenger.sendMessage("message.neoblock.disabled_world_2", level, false);
                 WorldData.setActive();
             }
         } else if (WorldData.isUpdated()) {
@@ -83,7 +83,7 @@ public class NeoBlock {
             Component command = Component.literal("/neoblock force update").withStyle(
                     Style.EMPTY.withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/neoblock force update"))
             );
-            MessagingUtil.sendMessage("message.neoblock.updated_world", level, false, command);
+            MinecraftUtil.Messenger.sendMessage("message.neoblock.updated_world", level, false, command);
             WorldData.setActive();
         }
     }

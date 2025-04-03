@@ -22,8 +22,6 @@ import xyz.agmstudio.neoblock.tiers.NeoBlock;
 import xyz.agmstudio.neoblock.tiers.TierManager;
 import xyz.agmstudio.neoblock.tiers.WorldData;
 import xyz.agmstudio.neoblock.tiers.merchants.NeoMerchant;
-import xyz.agmstudio.neoblock.util.MessagingUtil;
-import xyz.agmstudio.neoblock.util.MinecraftUtil;
 import xyz.agmstudio.neoblock.util.ResourceUtil;
 
 import java.nio.file.Path;
@@ -62,7 +60,6 @@ public final class NeoBlockMod {
         NeoBlockMod.config = ResourceUtil.getConfig(folder, "config.toml");
 
         bus.addListener(this::setup);
-        MinecraftUtil.EVENT_BUS.addListener(MessagingUtil::onPlayerJoin);
     }
 
     public static void reload() {
