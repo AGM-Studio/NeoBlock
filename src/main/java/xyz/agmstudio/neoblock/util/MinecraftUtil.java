@@ -10,15 +10,28 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.CustomData;
+import net.minecraft.world.item.trading.ItemCost;
+import net.minecraft.world.item.trading.MerchantOffer;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.loading.FMLPaths;
+import net.neoforged.neoforge.common.NeoForge;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import xyz.agmstudio.neoblock.data.Range;
+import xyz.agmstudio.neoblock.tiers.merchants.NeoItem;
+
+import java.nio.file.Path;
+import java.util.Optional;
 
 /**
  * This class a utility class and based on the version of minecraft build should help to keep all code similar
  */
 public final class MinecraftUtil {
+    public static final Path CONFIG_DIR = FMLPaths.CONFIGDIR.get();
+    public static final IEventBus EVENT_BUS = NeoForge.EVENT_BUS;
+
     public static @Nullable ResourceLocation getResourceLocation(String name) {
         return ResourceLocation.tryParse(name);
     }
@@ -89,6 +102,18 @@ public final class MinecraftUtil {
     public static final class Entities {
         public static void leash(Entity mob, Entity to) {
             if (mob instanceof Mob leashable) leashable.setLeashedTo(to, true);
+        }
+    }
+
+    public static final class Merchant {
+        public static MerchantOffer getOfferOf(NeoItem costA, NeoItem costB, NeoItem result, Range uses) {
+            ItemStack r = new ItemStack(result.getItem(), result.getCount().get());
+            ItemCost a = new ItemCost(costA.getItem(), costA.getCount().get());
+            Optional<ItemCost> b = costB != null ?
+                    Optional.of(new ItemCost(costB.getItem(), costB.getCount().get())) :
+                    Optional.empty();
+
+            return new MerchantOffer(a, b, r, uses.get(), 0, 0);
         }
     }
 }

@@ -12,8 +12,6 @@ import xyz.agmstudio.neoblock.util.MessagingUtil;
 import xyz.agmstudio.neoblock.util.MinecraftUtil;
 import xyz.agmstudio.neoblock.util.StringUtil;
 
-import java.util.Optional;
-
 public final class NeoOffer {
     private final NeoItem result;
     private final NeoItem costA;
@@ -60,7 +58,7 @@ public final class NeoOffer {
     }
 
     public MerchantOffer getOffer() {
-        return new MerchantOffer(costA.getCost(), costB == null ? Optional.empty() : Optional.of(costB.getCost()), result.getStack(), uses.get(), 0, 0);
+        return MinecraftUtil.Merchant.getOfferOf(costA, costB, result, uses);
     }
 
     public static EntityType<?> getMobTradeEntity(ItemStack item) {

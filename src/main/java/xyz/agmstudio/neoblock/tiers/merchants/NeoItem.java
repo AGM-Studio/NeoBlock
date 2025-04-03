@@ -1,13 +1,11 @@
 package xyz.agmstudio.neoblock.tiers.merchants;
 
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.trading.ItemCost;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
 import xyz.agmstudio.neoblock.NeoBlockMod;
@@ -39,15 +37,18 @@ public class NeoItem {
         this.count = count;
     }
 
-    public ItemStack getStack() {
-        return new ItemStack(item, count.get());
+    public Item getItem() {
+        return item;
     }
-    public ItemCost getCost() {
-        return new ItemCost(item, count.get());
+    public Range getCount() {
+        return count;
     }
-    
+    public ItemStack modify(ItemStack stack) {
+        return stack;
+    }
+
     public String toString() {
-        return count.toString() + BuiltInRegistries.ITEM.getKey(item);
+        return count.toString() + MinecraftUtil.getItemResource(item);
     }
 
     public static class MobItem extends NeoItem {
@@ -67,19 +68,18 @@ public class NeoItem {
         }
 
         @Override
-        public ItemStack getStack() {
-            ItemStack item = super.getStack();
-            CompoundTag tag = MinecraftUtil.Items.getItemTag(item);
+        public ItemStack modify(ItemStack stack) {
+            CompoundTag tag = MinecraftUtil.Items.getItemTag(stack);
 
             tag.putBoolean("isNeoMob", true);
-            tag.putString("neoMobType", BuiltInRegistries.ENTITY_TYPE.getKey(mob).toString());
+            tag.putString("neoMobType", MinecraftUtil.getEntityTypeResource(mob).toString());
 
-            MinecraftUtil.Items.setItemTag(item, tag);
-            return item;
+            MinecraftUtil.Items.setItemTag(stack, tag);
+            return stack;
         }
 
         public String toString() {
-            return "mob:" + count.toString() + BuiltInRegistries.ENTITY_TYPE.getKey(mob);
+            return "mob:" + count.toString() + MinecraftUtil.getEntityTypeResource(mob);
         }
     }
 }

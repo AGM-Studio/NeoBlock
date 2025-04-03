@@ -5,7 +5,6 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.neoforged.neoforge.common.NeoForge;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import xyz.agmstudio.neoblock.animations.Animation;
@@ -24,6 +23,7 @@ import xyz.agmstudio.neoblock.tiers.TierManager;
 import xyz.agmstudio.neoblock.tiers.WorldData;
 import xyz.agmstudio.neoblock.tiers.merchants.NeoMerchant;
 import xyz.agmstudio.neoblock.util.MessagingUtil;
+import xyz.agmstudio.neoblock.util.MinecraftUtil;
 import xyz.agmstudio.neoblock.util.ResourceUtil;
 
 import java.nio.file.Path;
@@ -62,7 +62,7 @@ public final class NeoBlockMod {
         NeoBlockMod.config = ResourceUtil.getConfig(folder, "config.toml");
 
         bus.addListener(this::setup);
-        NeoForge.EVENT_BUS.addListener(MessagingUtil::onPlayerJoin);
+        MinecraftUtil.EVENT_BUS.addListener(MessagingUtil::onPlayerJoin);
     }
 
     public static void reload() {

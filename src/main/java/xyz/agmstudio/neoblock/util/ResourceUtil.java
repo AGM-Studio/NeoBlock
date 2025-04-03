@@ -1,7 +1,6 @@
 package xyz.agmstudio.neoblock.util;
 
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
-import net.neoforged.fml.loading.FMLPaths;
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.tiers.NeoTier;
@@ -82,7 +81,7 @@ public class ResourceUtil {
         } catch (IOException ignored) {}
         Path configPath = folder.resolve(name.endsWith(".toml") ? name : name + ".toml");
         if (!Files.exists(configPath)) try {
-            Path path = Paths.get(FMLPaths.CONFIGDIR.get().toAbsolutePath().toString(), NeoBlockMod.MOD_ID);
+            Path path = Paths.get(MinecraftUtil.CONFIG_DIR.toAbsolutePath().toString(), NeoBlockMod.MOD_ID);
             String resource = configPath.toAbsolutePath().toString().replace(path.toAbsolutePath().toString(), "\\configs");
             NeoBlockMod.LOGGER.debug("Loading resource {} for {}", resource, configPath);
             processResourceFile(resource, configPath, new HashMap<>());
@@ -102,7 +101,7 @@ public class ResourceUtil {
      * @return path to desired folder
      */
     public static @NotNull Path getConfigFolder(String... paths) {
-        Path path = Paths.get(FMLPaths.CONFIGDIR.get().toAbsolutePath().toString(), paths);
+        Path path = Paths.get(MinecraftUtil.CONFIG_DIR.toAbsolutePath().toString(), paths);
         if (!path.toFile().exists() && path.toFile().mkdirs()) NeoBlockMod.LOGGER.debug("Creating folder {}", path);
         return path;
     }
