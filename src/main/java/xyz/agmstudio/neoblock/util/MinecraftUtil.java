@@ -1,5 +1,6 @@
 package xyz.agmstudio.neoblock.util;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
@@ -18,6 +19,7 @@ import net.minecraft.world.item.trading.MerchantOffer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.saveddata.SavedData;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.loading.FMLPaths;
 import net.neoforged.neoforge.common.NeoForge;
@@ -25,6 +27,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.data.Range;
+import xyz.agmstudio.neoblock.tiers.WorldData;
 import xyz.agmstudio.neoblock.tiers.merchants.NeoItem;
 
 import java.nio.file.Path;
@@ -164,6 +167,23 @@ public final class MinecraftUtil {
             public void send(Player player) {
                 if (players.add(player)) player.displayClientMessage(message, action);
             }
+        }
+    }
+
+    public static abstract class AbstractWorldData extends SavedData {
+        private static final String DATA_NAME = "neo_block_data";
+        public static @NotNull WorldData load(@NotNull ServerLevel level) {
+            return level.getDataStorage().computeIfAbsent(
+                    new Factory<>(
+                            () -> WorldData.create(level),
+                            (tag, provider) -> WorldData.load(tag, level)
+                    ), DATA_NAME);
+        }
+
+        public abstract @NotNull CompoundTag save(@NotNull CompoundTag tag);
+
+        @Override public @NotNull CompoundTag save(@NotNull CompoundTag tag, HolderLookup.@NotNull Provider provider) {
+            return save(tag);
         }
     }
 }
