@@ -37,10 +37,16 @@ public class NeoItem {
         this.count = count;
     }
 
-    public ItemStack getStack() {
-        return new ItemStack(item, count.get());
+    public Item getItem() {
+        return item;
     }
-    
+    public Range getCount() {
+        return count;
+    }
+    public ItemStack modify(ItemStack stack) {
+        return stack;
+    }
+
     public String toString() {
         return count.toString() + MinecraftUtil.getItemResource(item);
     }
@@ -62,17 +68,15 @@ public class NeoItem {
         }
 
         @Override
-        public ItemStack getStack() {
-            ItemStack item = super.getStack();
-            ResourceLocation key = MinecraftUtil.getEntityTypeResource(mob);
-            if (key == null) return item;
+        public ItemStack modify(ItemStack stack) {
+            CompoundTag tag = MinecraftUtil.Items.getItemTag(stack);
 
-            CompoundTag tag = MinecraftUtil.Items.getItemTag(item);
             tag.putBoolean("isNeoMob", true);
-            tag.putString("neoMobType", key.toString());
+            //noinspection DataFlowIssue
+            tag.putString("neoMobType", MinecraftUtil.getEntityTypeResource(mob).toString());
 
-            MinecraftUtil.Items.setItemTag(item, tag);
-            return item;
+            MinecraftUtil.Items.setItemTag(stack, tag);
+            return stack;
         }
 
         public String toString() {

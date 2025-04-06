@@ -4,12 +4,10 @@ import com.electronwill.nightconfig.core.UnmodifiableConfig;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.fml.loading.FMLPaths;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.tiers.merchants.NeoMerchant;
 import xyz.agmstudio.neoblock.tiers.merchants.NeoOffer;
-import xyz.agmstudio.neoblock.util.MathUtil;
-import xyz.agmstudio.neoblock.util.MessagingUtil;
+import xyz.agmstudio.neoblock.util.MinecraftUtil;
 import xyz.agmstudio.neoblock.util.ResourceUtil;
 import xyz.agmstudio.neoblock.util.StringUtil;
 
@@ -17,7 +15,7 @@ import java.nio.file.Path;
 import java.util.*;
 
 public class NeoTier {
-    public static final Path FOLDER = FMLPaths.CONFIGDIR.get().resolve(NeoBlockMod.MOD_ID + "/tiers");
+    public static final Path FOLDER = MinecraftUtil.CONFIG_DIR.resolve(NeoBlockMod.MOD_ID + "/tiers");
 
     public final CommentedFileConfig config;
     public final int id;
@@ -52,7 +50,7 @@ public class NeoTier {
 
         List<String> trades = config.getOrElse("trader-trades", List.of());
         this.trades = trades.stream().map(NeoOffer::parse).filter(Objects::nonNull).toList();
-        tradeCount = MathUtil.clamp(config.getIntOrElse("trader-count", 0), 0, this.trades.size());
+        tradeCount = MinecraftUtil.MathUtil.clamp(config.getIntOrElse("trader-count", 0), 0, this.trades.size());
     }
 
     public List<NeoOffer> getRandomTrades() {
@@ -85,13 +83,13 @@ public class NeoTier {
     }
 
     public void onFinishUpgrade(ServerLevel level) {
-        MessagingUtil.sendInstantMessage("message.neoblock.unlocked_tier", level, false, id);
+        MinecraftUtil.Messenger.sendInstantMessage("message.neoblock.unlocked_tier", level, false, id);
     }
     public void onStartUpgrade(ServerLevel level) {
-        MessagingUtil.sendInstantMessage("message.neoblock.unlocking_tier", level, false, id);
+        MinecraftUtil.Messenger.sendInstantMessage("message.neoblock.unlocking_tier", level, false, id);
         if (tradeOffer != null) {
             tradeOffer.spawnTrader(level, "UnlockTrader");
-            MessagingUtil.sendInstantMessage("message.neoblock.unlocking_trader", level, false, id);
+            MinecraftUtil.Messenger.sendInstantMessage("message.neoblock.unlocking_trader", level, false, id);
         }
     }
 

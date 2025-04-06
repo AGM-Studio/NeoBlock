@@ -4,34 +4,25 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.IntTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.saveddata.SavedData;
-import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlockMod;
+import xyz.agmstudio.neoblock.util.MinecraftUtil;
 
 import java.util.HashMap;
 import java.util.HashSet;
 
-public class WorldData extends SavedData {
-    private static final String DATA_NAME = "neo_block_data";
+public class WorldData extends MinecraftUtil.AbstractWorldData {
     private static WorldData instance;
-
     public static WorldData getInstance() {
         return instance;
     }
 
-    public static @NotNull WorldData load(@NotNull ServerLevel level) {
-        WorldData data = level.getDataStorage().computeIfAbsent(WorldData::load, WorldData::create, DATA_NAME);
-        data.level = level;
-        return data;
-    }
-    private static @NotNull WorldData create() {
-        WorldData data = new WorldData();
+    public static @NotNull WorldData create(@NotNull ServerLevel level) {
+        WorldData data = new WorldData(level);
 
         for (NeoTier tier: NeoBlock.TIERS) {
             data.encoding.add(tier.getHashCode());
@@ -42,8 +33,8 @@ public class WorldData extends SavedData {
         NeoBlockMod.LOGGER.debug("Creating new world data");
         return data;
     }
-    private static @NotNull WorldData load(@NotNull CompoundTag tag) {
-        WorldData data = new WorldData();
+    public static @NotNull WorldData load(@NotNull CompoundTag tag, ServerLevel level) {
+        WorldData data = new WorldData(level);
         data.state = WorldState.fromId(tag.getInt("WorldState"));
         data.blockCount = tag.getInt("BlockCount");
         data.traderFailedAttempts = tag.getInt("TraderFailedAttempts");
@@ -52,7 +43,7 @@ public class WorldData extends SavedData {
         data.tierManager.load(upgrade);
 
         final CompoundTag mobs = tag.getCompound("TradedMobs");
-        mobs.getAllKeys().forEach(key -> data.tradedMobs.merge(ForgeRegistries.ENTITY_TYPES.getValue(ResourceLocation.tryParse(key)), mobs.getInt(key), Integer::sum));
+        mobs.getAllKeys().forEach(key -> data.tradedMobs.merge(MinecraftUtil.getEntityType(key), mobs.getInt(key), Integer::sum));
 
         final ListTag hash = tag.getList("Encoding", StringTag.TAG_STRING);
         for (int i = 0; i < hash.size(); ++i) data.encoding.add(hash.getString(i));
@@ -70,6 +61,7 @@ public class WorldData extends SavedData {
 
         return data;
     }
+
     @Override public @NotNull CompoundTag save(@NotNull CompoundTag tag) {
         tag.putInt("WorldState", state.getId());
         tag.putInt("BlockCount", blockCount);
@@ -78,7 +70,7 @@ public class WorldData extends SavedData {
         this.tierManager.save(tag);
 
         final CompoundTag mobs = new CompoundTag();
-        tradedMobs.forEach((key, value) -> mobs.putInt(ForgeRegistries.ENTITY_TYPES.getKey(key).toString(), value));
+        tradedMobs.forEach((key, value) -> mobs.putInt(String.valueOf(MinecraftUtil.getEntityTypeResource(key)), value));
         tag.put("TradedMobs", mobs);
 
         final ListTag hash = new ListTag();
@@ -97,7 +89,7 @@ public class WorldData extends SavedData {
         return tag;
     }
 
-    private ServerLevel level = null;
+    private final ServerLevel level;
     private WorldState state = WorldState.INACTIVE;
     private int blockCount = 0;
     private int traderFailedAttempts = 0;
@@ -110,8 +102,9 @@ public class WorldData extends SavedData {
     private final TierManager tierManager = new TierManager();
     private final HashMap<EntityType<?>, Integer> tradedMobs = new HashMap<>();
 
-    private WorldData() {
+    private WorldData(ServerLevel level) {
         instance = this;
+        this.level = level;
     }
 
     public static boolean isInactive() {

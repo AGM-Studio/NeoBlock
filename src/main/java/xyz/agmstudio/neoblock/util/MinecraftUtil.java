@@ -1,22 +1,41 @@
 package xyz.agmstudio.neoblock.util;
 
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.trading.MerchantOffer;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.saveddata.SavedData;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import xyz.agmstudio.neoblock.NeoBlockMod;
+import xyz.agmstudio.neoblock.data.Range;
+import xyz.agmstudio.neoblock.tiers.WorldData;
+import xyz.agmstudio.neoblock.tiers.merchants.NeoItem;
+
+import java.nio.file.Path;
+import java.util.*;
 
 /**
  * This class a utility class and based on the version of minecraft build should help to keep all code similar
  */
 public final class MinecraftUtil {
+    public static final Path CONFIG_DIR = FMLPaths.CONFIGDIR.get();
+    public static final IEventBus EVENT_BUS = MinecraftForge.EVENT_BUS;
+
     public static @Nullable ResourceLocation getResourceLocation(String name) {
         return ResourceLocation.tryParse(name);
     }
@@ -87,6 +106,87 @@ public final class MinecraftUtil {
     public static final class Entities {
         public static void leash(Entity mob, Entity to) {
             if (mob instanceof Mob leashable) leashable.setLeashedTo(to, true);
+        }
+    }
+
+    public static final class Merchant {
+        public static MerchantOffer getOfferOf(NeoItem costA, NeoItem costB, NeoItem result, Range uses) {
+            ItemStack r = new ItemStack(result.getItem(), result.getCount().get());
+            ItemStack a = new ItemStack(costA.getItem(), costA.getCount().get());
+            ItemStack b = costB != null ? new ItemStack(costB.getItem(), costB.getCount().get()) : null;
+
+            if (b != null) return new MerchantOffer(a, b, r, uses.get(), 0, 0);
+            return new MerchantOffer(a, r, uses.get(), 0, 0);
+        }
+    }
+
+    public static class Messenger {
+        private static final HashMap<ServerLevel, List<MessageHolder>> messages = new HashMap<>();
+
+        public static void sendMessage(String key, ServerLevel level, boolean action, Object... args) {
+            sendMessage(Component.translatable(key, args), level, action);
+        }
+        public static void sendMessage(Component message, ServerLevel level, boolean action) {
+            NeoBlockMod.LOGGER.info(message.getString());
+
+            MessageHolder holder = new MessageHolder(message, action);
+            for (Player player: level.players()) holder.send(player);
+
+            messages.computeIfAbsent(level, k -> new ArrayList<>()).add(holder);
+        }
+        public static void sendInstantMessage(String key, Level level, boolean action, Object... args) {
+            sendInstantMessage(Component.translatable(key, args), level, action);
+        }
+        public static void sendInstantMessage(Component message, Level level, boolean action) {
+            NeoBlockMod.LOGGER.info(message.getString());
+
+            MessageHolder holder = new MessageHolder(message, action);
+            for (Player player: level.players()) holder.send(player);
+        }
+
+        public static void onPlayerJoin(ServerLevel level, Player player) {
+            messages.getOrDefault(null, new ArrayList<>()).forEach(holder -> holder.send(player));
+            messages.getOrDefault(level, new ArrayList<>()).forEach(holder -> holder.send(player));
+        }
+
+        static class MessageHolder {
+            private final Set<Player> players = new HashSet<>();
+            private final Component message;
+            private final boolean action;
+
+            protected MessageHolder(Component message, boolean action) {
+                this.message = message;
+                this.action = action;
+            }
+
+            public void send(Player player) {
+                if (players.add(player)) player.displayClientMessage(message, action);
+            }
+        }
+    }
+
+    public static abstract class AbstractWorldData extends SavedData {
+        private static final String DATA_NAME = "neo_block_data";
+        public static @NotNull WorldData load(@NotNull ServerLevel level) {
+            return level.getDataStorage().computeIfAbsent(
+                    (tag) -> WorldData.load(tag, level),
+                    () -> WorldData.create(level),
+                    DATA_NAME);
+        }
+    }
+
+    public static class MathUtil {
+        public static long clamp(long min, long max, long value) {
+            return Math.max(min, Math.min(max, value));
+        }
+        public static int clamp(int value, int min, int max) {
+            return Math.max(min, Math.min(max, value));
+        }
+        public static float clamp(float value, float min, float max) {
+            return Math.max(min, Math.min(max, value));
+        }
+        public static double clamp(double value, double min, double max) {
+            return Math.max(min, Math.min(max, value));
         }
     }
 }
