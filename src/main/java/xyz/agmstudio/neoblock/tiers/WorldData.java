@@ -1,11 +1,9 @@
 package xyz.agmstudio.neoblock.tiers;
 
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.IntTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.EntityType;
@@ -45,7 +43,7 @@ public class WorldData extends MinecraftUtil.AbstractWorldData {
         data.tierManager.load(upgrade);
 
         final CompoundTag mobs = tag.getCompound("TradedMobs");
-        mobs.getAllKeys().forEach(key -> data.tradedMobs.merge(BuiltInRegistries.ENTITY_TYPE.get(ResourceLocation.parse(key)), mobs.getInt(key), Integer::sum));
+        mobs.getAllKeys().forEach(key -> data.tradedMobs.merge(MinecraftUtil.getEntityType(key), mobs.getInt(key), Integer::sum));
 
         final ListTag hash = tag.getList("Encoding", StringTag.TAG_STRING);
         for (int i = 0; i < hash.size(); ++i) data.encoding.add(hash.getString(i));
@@ -72,7 +70,7 @@ public class WorldData extends MinecraftUtil.AbstractWorldData {
         this.tierManager.save(tag);
 
         final CompoundTag mobs = new CompoundTag();
-        tradedMobs.forEach((key, value) -> mobs.putInt(BuiltInRegistries.ENTITY_TYPE.getKey(key).toString(), value));
+        tradedMobs.forEach((key, value) -> mobs.putInt(String.valueOf(MinecraftUtil.getEntityTypeResource(key)), value));
         tag.put("TradedMobs", mobs);
 
         final ListTag hash = new ListTag();

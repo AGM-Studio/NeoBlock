@@ -4,7 +4,6 @@ import com.electronwill.nightconfig.core.UnmodifiableConfig;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.fml.loading.FMLPaths;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.tiers.merchants.NeoMerchant;
 import xyz.agmstudio.neoblock.tiers.merchants.NeoOffer;
@@ -16,7 +15,7 @@ import java.nio.file.Path;
 import java.util.*;
 
 public class NeoTier {
-    public static final Path FOLDER = FMLPaths.CONFIGDIR.get().resolve(NeoBlockMod.MOD_ID + "/tiers");
+    public static final Path FOLDER = MinecraftUtil.CONFIG_DIR.resolve(NeoBlockMod.MOD_ID + "/tiers");
 
     public final CommentedFileConfig config;
     public final int id;
@@ -51,7 +50,7 @@ public class NeoTier {
 
         List<String> trades = config.getOrElse("trader-trades", List.of());
         this.trades = trades.stream().map(NeoOffer::parse).filter(Objects::nonNull).toList();
-        tradeCount = Math.clamp(config.getIntOrElse("trader-count", 0), 0, this.trades.size());
+        tradeCount = MinecraftUtil.MathUtil.clamp(config.getIntOrElse("trader-count", 0), 0, this.trades.size());
     }
 
     public List<NeoOffer> getRandomTrades() {

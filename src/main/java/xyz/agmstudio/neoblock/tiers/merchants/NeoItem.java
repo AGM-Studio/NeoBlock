@@ -71,8 +71,9 @@ public class NeoItem {
         public ItemStack modify(ItemStack stack) {
             CompoundTag tag = MinecraftUtil.Items.getItemTag(stack);
 
+            @Nullable ResourceLocation location = MinecraftUtil.getEntityTypeResource(mob);
             tag.putBoolean("isNeoMob", true);
-            tag.putString("neoMobType", MinecraftUtil.getEntityTypeResource(mob).toString());
+            tag.putString("neoMobType", location != null ? location.toString() : "minecraft:pig");
 
             MinecraftUtil.Items.setItemTag(stack, tag);
             return stack;
