@@ -1,5 +1,6 @@
 package xyz.agmstudio.neoblock.mixin;
 
+import com.mojang.serialization.Lifecycle;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
@@ -14,6 +15,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.util.MinecraftUtil;
@@ -45,5 +47,11 @@ public abstract class CreateWorldScreenMixin {
         }
 
         uiState.setWorldType(type);
+    }
+
+    @ModifyArg(method = "onCreate", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/worldselection/WorldOpenFlows;confirmWorldCreation(Lnet/minecraft/client/Minecraft;Lnet/minecraft/client/gui/screens/worldselection/CreateWorldScreen;Lcom/mojang/serialization/Lifecycle;Ljava/lang/Runnable;Z)V"), index = 2)
+    private Lifecycle modifyLifecycle(Lifecycle original) {
+        if (original == Lifecycle.experimental()) return Lifecycle.stable();
+        return original;
     }
 }
