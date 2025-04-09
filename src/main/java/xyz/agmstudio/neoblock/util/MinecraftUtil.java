@@ -1,9 +1,11 @@
 package xyz.agmstudio.neoblock.util;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.nbt.*;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -18,6 +20,7 @@ import net.minecraft.world.item.trading.ItemCost;
 import net.minecraft.world.item.trading.MerchantOffer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.neoforged.bus.api.IEventBus;
@@ -30,6 +33,10 @@ import xyz.agmstudio.neoblock.data.Range;
 import xyz.agmstudio.neoblock.tiers.WorldData;
 import xyz.agmstudio.neoblock.tiers.merchants.NeoItem;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
@@ -199,6 +206,43 @@ public final class MinecraftUtil {
         }
         public static double clamp(double value, double min, double max) {
             return Math.max(min, Math.min(max, value));
+        }
+    }
+
+    public static class NBT {
+        public static class IO {
+            public static void write(Path file, CompoundTag nbt) throws IOException {
+                OutputStream os = Files.newOutputStream(file);
+                NbtIo.writeCompressed(nbt, os);
+            }
+            public static CompoundTag read(Path file) throws IOException {
+                InputStream is = Files.newInputStream(file);
+                return NbtIo.readCompressed(is, NbtAccounter.unlimitedHeap());
+            }
+        }
+
+        public static Tag writeBlockPos(BlockPos pos) {
+            return NbtUtils.writeBlockPos(pos);
+        }
+        public static Tag writeBlockState(BlockState state) {
+            return NbtUtils.writeBlockState(state);
+        }
+
+        public static BlockPos readBlockPos(CompoundTag tag, String key, BlockPos def) {
+            return NbtUtils.readBlockPos(tag, key).orElse(def);
+        }
+        public static BlockState readBlockState(CompoundTag tag, String key, ServerLevel level) {
+            return NbtUtils.readBlockState(level.holderLookup(Registries.BLOCK), tag.getCompound(key));
+        }
+
+        public static CompoundTag getBlockEntity(BlockEntity blockEntity, ServerLevel level) {
+            if (blockEntity == null) return null;
+            return blockEntity.saveWithFullMetadata(level.registryAccess());
+        }
+        public static void loadBlockEntity(BlockEntity be, CompoundTag tag, ServerLevel level) {
+            if (be == null || tag == null) return;
+            be.loadWithComponents(tag, level.registryAccess());
+            be.setChanged();
         }
     }
 }

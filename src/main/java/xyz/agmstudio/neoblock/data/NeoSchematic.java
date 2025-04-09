@@ -1,60 +1,51 @@
 package xyz.agmstudio.neoblock.data;
 
-import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.nbt.*;
-import net.minecraft.network.chat.Component;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.LevelResource;
 import org.jetbrains.annotations.Nullable;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.tiers.NeoBlock;
+import xyz.agmstudio.neoblock.util.MinecraftUtil;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class NeoSchematic {
-    public static void saveSchematic(ServerLevel level, BlockPos pos1, BlockPos pos2, @Nullable BlockPos center, @Nullable String name, CommandSourceStack source) {
+    public static final Path folder = MinecraftUtil.CONFIG_DIR.resolve("schematics");
+    static {
+        if (folder.toFile().mkdirs()) NeoBlockMod.LOGGER.debug("Created {}", folder);
+    }
+
+    public static @Nullable Path saveSchematic(ServerLevel level, BlockPos pos1, BlockPos pos2, @Nullable BlockPos center, @Nullable String name) {
         CompoundTag nbt = new NeoSchematic(level, pos1, pos2, center).toNBT();
 
         try {
-            Path folder = level.getServer().getWorldPath(LevelResource.ROOT).resolve("schematics");
-            Files.createDirectories(folder);
-
             if (name == null) {
                 int i = 0;
                 do name = "NeoBlockSchematic_" + i++ + ".nbt"; while (!folder.resolve(name).toFile().exists());
-            } else if (!name.endsWith(".nbt")) {
-                name = name + ".nbt";
-            }
+            } else if (!name.endsWith(".nbt")) name = name + ".nbt";
 
             Path file = folder.resolve(name);
-            try (OutputStream os = Files.newOutputStream(file)) {
-                NbtIo.writeCompressed(nbt, os);
-            }
-
-            source.sendSuccess(() -> Component.literal("Schematic saved to " + file.getFileName()), false);
+            MinecraftUtil.NBT.IO.write(file, nbt);
+            return file;
         } catch (IOException e) {
-            source.sendFailure(Component.literal("Failed to save schematic: " + e.getMessage()));
             NeoBlockMod.LOGGER.error("Failed to save schematic", e);
+            return null;
         }
     }
-    public static void loadSchematic(ServerLevel level, BlockPos origin, @Nullable String name, CommandSourceStack source) {
+    public static int loadSchematic(ServerLevel level, BlockPos origin, @Nullable String name) {
         try {
-            Path folder = level.getServer().getWorldPath(LevelResource.ROOT).resolve("schematics");
-
             if (name == null) {
                 File[] files = folder.toFile().listFiles((file) -> file.getName().endsWith(".nbt"));
                 String file = files != null && files.length > 0 ? files[0].getName() : "NeoBlockSchematic_0.nbt";
@@ -63,41 +54,32 @@ public class NeoSchematic {
             }
 
             Path file = name != null ? folder.resolve(name) : null;
-            if (file == null || !Files.exists(file)) {
-                source.sendFailure(Component.literal("Schematic file not found."));
-                return;
-            }
+            if (file == null || !Files.exists(file)) return 0;
 
-            CompoundTag tag;
-            try (InputStream is = Files.newInputStream(file)) {
-                tag = NbtIo.readCompressed(is, NbtAccounter.unlimitedHeap());
-            }
-
+            CompoundTag tag = MinecraftUtil.NBT.IO.read(file);
             NeoSchematic data = NeoSchematic.fromNBT(tag, level);
             data.place(level, origin);
-
-            source.sendSuccess(() -> Component.literal("Schematic loaded at " + origin), false);
+            return 1;
         } catch (Exception e) {
-            source.sendFailure(Component.literal("Failed to load schematic: " + e.getMessage()));
             NeoBlockMod.LOGGER.error("Failed to load schematic", e);
+            return -1;
         }
     }
 
     public static NeoSchematic fromNBT(CompoundTag tag, ServerLevel level) {
-        Optional<BlockPos> origin = NbtUtils.readBlockPos(tag, "origin");
+        BlockPos origin = MinecraftUtil.NBT.readBlockPos(tag, "origin", NeoBlock.POS);
         List<NeoSchematic.BlockInfo> blocks = new ArrayList<>();
         ListTag blockList = tag.getList("blocks", Tag.TAG_COMPOUND);
 
         for (Tag t : blockList) {
             CompoundTag blockTag = (CompoundTag) t;
-            Optional<BlockPos> offset = NbtUtils.readBlockPos(blockTag, "pos");
-            BlockState state = NbtUtils.readBlockState(level.holderLookup(Registries.BLOCK), blockTag.getCompound("state"));
-
+            BlockPos offset = MinecraftUtil.NBT.readBlockPos(blockTag, "pos", BlockPos.ZERO);
+            BlockState state = MinecraftUtil.NBT.readBlockState(tag, "state", level);
             CompoundTag nbt = blockTag.contains("be") ? blockTag.getCompound("be") : null;
-            blocks.add(new NeoSchematic.BlockInfo(offset.orElse(BlockPos.ZERO), state, nbt));
+            blocks.add(new NeoSchematic.BlockInfo(offset, state, nbt));
         }
 
-        return new NeoSchematic(origin.orElse(NeoBlock.POS), blocks);
+        return new NeoSchematic(origin, blocks);
     }
 
     public record BlockInfo(BlockPos offset, BlockState state, @Nullable CompoundTag nbt) {}
@@ -111,8 +93,6 @@ public class NeoSchematic {
     }
 
     public NeoSchematic(ServerLevel level, BlockPos pos1, BlockPos pos2, BlockPos center) {
-        HolderLookup.Provider registries = level.registryAccess();
-
         BlockPos min = new BlockPos(Math.min(pos1.getX(), pos2.getX()), Math.min(pos1.getY(), pos2.getY()), Math.min(pos1.getZ(), pos2.getZ()));
         BlockPos max = new BlockPos(Math.max(pos1.getX(), pos2.getX()), Math.max(pos1.getY(), pos2.getY()), Math.max(pos1.getZ(), pos2.getZ()));
 
@@ -121,10 +101,8 @@ public class NeoSchematic {
 
         for (BlockPos pos : BlockPos.betweenClosed(min, max)) {
             BlockState state = level.getBlockState(pos);
-            CompoundTag nbt = null;
-
             BlockEntity block = level.getBlockEntity(pos);
-            if (block != null) nbt = block.saveWithFullMetadata(registries);
+            CompoundTag nbt = MinecraftUtil.NBT.getBlockEntity(block, level);
 
             blocks.add(new BlockInfo(pos.subtract(origin), state, nbt));
         }
@@ -132,13 +110,13 @@ public class NeoSchematic {
 
     public CompoundTag toNBT() {
         CompoundTag tag = new CompoundTag();
-        tag.put("origin", NbtUtils.writeBlockPos(origin));
+        tag.put("origin", MinecraftUtil.NBT.writeBlockPos(origin));
 
         ListTag blockList = new ListTag();
         for (BlockInfo info : blocks) {
             CompoundTag blockTag = new CompoundTag();
-            blockTag.put("pos", NbtUtils.writeBlockPos(info.offset()));
-            blockTag.put("state", NbtUtils.writeBlockState(info.state()));
+            blockTag.put("pos", MinecraftUtil.NBT.writeBlockPos(info.offset()));
+            blockTag.put("state", MinecraftUtil.NBT.writeBlockState(info.state()));
             if (info.nbt() != null) blockTag.put("be", info.nbt());
             blockList.add(blockTag);
         }
@@ -153,14 +131,8 @@ public class NeoSchematic {
         for (BlockInfo info : blocks) {
             BlockPos pos = targetOrigin.offset(info.offset());
             level.setBlock(pos, info.state(), Block.UPDATE_ALL);
-
-            if (info.nbt() != null) {
-                BlockEntity be = level.getBlockEntity(pos);
-                if (be != null) {
-                    be.loadWithComponents(info.nbt(), registries);
-                    be.setChanged();
-                }
-            }
+            BlockEntity be = level.getBlockEntity(pos);
+            MinecraftUtil.NBT.loadBlockEntity(be, info.nbt, level);
         }
     }
 }
