@@ -18,10 +18,7 @@ import xyz.agmstudio.neoblock.NeoListener;
 import xyz.agmstudio.neoblock.animations.Animation;
 import xyz.agmstudio.neoblock.tiers.merchants.NeoMerchant;
 import xyz.agmstudio.neoblock.util.MinecraftUtil;
-import xyz.agmstudio.neoblock.util.ResourceUtil;
 
-import java.nio.file.Files;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
@@ -35,8 +32,6 @@ public class NeoBlock {
     }
 
     protected static HashSet<String> hash = new HashSet<>();
-
-    public static List<NeoTier> TIERS = new ArrayList<>();
 
     public static BlockState getRandomBlock() {
         int breaks = WorldData.getBlockCount();
@@ -90,27 +85,13 @@ public class NeoBlock {
 
     public static void onBlockBroken(ServerLevel level, LevelAccessor access, boolean triggered) {
         if (triggered) WorldData.addBlockCount(1);
-        for (NeoTier tier: TIERS) if (tier.canBeUnlocked())
+        for (NeoTier tier: TierManager.TIERS) if (tier.canBeUnlocked())
             WorldData.getTierManager().startUpgrade(level, access, tier);
 
         else setNeoBlock(access, getRandomBlock());
 
         Animation.resetIdleTick();
         NeoListener.execute(() -> NeoMerchant.attemptSpawnTrader(level));
-    }
-
-    public static void reload() {
-        ResourceUtil.loadAllTierConfigs();
-
-        int i = 0;
-        NeoBlock.TIERS.clear();
-        while (Files.exists(NeoTier.FOLDER.resolve("tier-" + i + ".toml")))
-            NeoBlock.TIERS.add(new NeoTier(i++));
-
-        hash.clear();
-        NeoBlock.TIERS.stream().map(NeoTier::getHashCode).forEach(hash::add);
-
-        NeoBlockMod.LOGGER.info("Loaded {} tiers from the tiers folder.", NeoBlock.TIERS.size());
     }
 
     public static boolean isOnUpgrade() {

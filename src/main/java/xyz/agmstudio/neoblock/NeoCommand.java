@@ -21,8 +21,8 @@ import net.minecraft.world.entity.npc.WanderingTrader;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import xyz.agmstudio.neoblock.data.NeoSchematic;
-import xyz.agmstudio.neoblock.tiers.NeoBlock;
 import xyz.agmstudio.neoblock.tiers.NeoTier;
+import xyz.agmstudio.neoblock.tiers.TierManager;
 import xyz.agmstudio.neoblock.tiers.WorldData;
 import xyz.agmstudio.neoblock.tiers.merchants.NeoMerchant;
 
@@ -65,7 +65,7 @@ public class NeoCommand {
 
     // Methods that suggests arguments
     private static CompletableFuture<Suggestions> suggestTiersIndex(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
-        IntStream.range(0, NeoBlock.TIERS.size()).forEach(builder::suggest);
+        IntStream.range(0, TierManager.TIERS.size()).forEach(builder::suggest);
         return builder.buildFuture();
     }
     public static final SuggestionProvider<CommandSourceStack> LOOKING_BLOCK_SUGGESTION = (ctx, builder) -> {
@@ -104,8 +104,8 @@ public class NeoCommand {
     private static int unlockTier(CommandContext<CommandSourceStack> context) {
         CommandSourceStack source = context.getSource();
         int index = IntegerArgumentType.getInteger(context, "id");
-        if (index < 0 || index > NeoBlock.TIERS.size()) {
-            context.getSource().sendFailure(Component.translatable("command.neoblock.invalid_tier", NeoBlock.TIERS.size() - 1));
+        if (index < 0 || index > TierManager.TIERS.size()) {
+            context.getSource().sendFailure(Component.translatable("command.neoblock.invalid_tier", TierManager.TIERS.size() - 1));
             return 0;
         }
 
