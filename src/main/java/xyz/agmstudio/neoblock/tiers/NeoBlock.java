@@ -16,9 +16,11 @@ import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.NeoListener;
 import xyz.agmstudio.neoblock.animations.Animation;
+import xyz.agmstudio.neoblock.data.NeoSchematic;
 import xyz.agmstudio.neoblock.tiers.merchants.NeoMerchant;
 import xyz.agmstudio.neoblock.util.MinecraftUtil;
 
+import java.io.FileNotFoundException;
 import java.util.HashSet;
 import java.util.List;
 
@@ -66,6 +68,22 @@ public class NeoBlock {
                 level.setBlock(NeoBlock.POS, NeoBlock.DEFAULT_STATE, 3);
                 UnmodifiableConfig rules = NeoBlockMod.getConfig().get("rules");
                 if (rules != null) WorldRules.applyGameRules(level, rules);
+
+                // Load schematics from config!
+                NeoSchematic.loadSchematic(level, NeoBlock.POS, "main.nbt");
+                int iterator = 0;
+                while (NeoBlockMod.getConfig().contains("schematics.custom_" + iterator)) {
+                    try {
+                        UnmodifiableConfig scheme = NeoBlockMod.getConfig().get("schematics.custom_" + iterator);
+                        String name = scheme.getOrElse("name", "NeoBlockSchematic_" + iterator);
+                        BlockPos pos = new BlockPos(scheme.getInt("x"), scheme.getInt("y"), scheme.getInt("z"));
+                        int result = NeoSchematic.loadSchematic(level, pos, name);
+                        if (result == 0) throw new FileNotFoundException("File \"" + name + "\" not found");
+                    } catch (Exception e) {
+                        NeoBlockMod.LOGGER.error("Unable to load schematic {}", iterator, e);
+                    }
+                    iterator++;
+                }
                 WorldData.setActive();
             } else {
                 NeoBlockMod.LOGGER.info("NeoBlock has been disabled.");

@@ -1,6 +1,12 @@
 [world]                     # Added in 0.4.0! Effects only the client single player, for servers you need to change the level type
 no-nether = true            # in servers.properties. "neoblock:neoblock" or "neoblock:neoblock_no_nether"
 
+# [schematics.custom_0]       # You can add as many custom schematics to be loaded when the world is generated. Remove the `#` at the beginning of the lines to start and for more duplicte this.
+# name = "NeoBlockSchematic_0.nbt"
+# x = 20                      # The title must increase in order (schematics.custom_0, schematics.custom_1, schematics.custom_2, ...)
+# y = 67                      # The name of file in the schematics folder and the position you want the structure be placed.
+# z = 12                      # Note: "main.nbt" is always loaded over the NeoBlock and is centered around 0, 64, 0
+
 [neo-trader]
 chance = 0.3                # Chance of spawning a NeoMerchant per interval. If no trades are available or another trader lives, no NeoMerchant will be spawned.
 chance-increment = 0.075    # On a failed attempt, will increase the chance of NeoMerchant per interval by this amount.

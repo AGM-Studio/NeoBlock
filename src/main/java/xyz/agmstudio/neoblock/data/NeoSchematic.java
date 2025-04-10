@@ -1,12 +1,10 @@
 package xyz.agmstudio.neoblock.data;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
@@ -22,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class NeoSchematic {
-    public static final Path folder = MinecraftUtil.CONFIG_DIR.resolve("schematics");
+    public static final Path folder = MinecraftUtil.CONFIG_DIR.resolve(NeoBlockMod.MOD_ID + File.separator + "schematics");
     static {
         if (folder.toFile().mkdirs()) NeoBlockMod.LOGGER.debug("Created {}", folder);
     }
@@ -57,8 +55,7 @@ public class NeoSchematic {
             if (file == null || !Files.exists(file)) return 0;
 
             CompoundTag tag = MinecraftUtil.NBT.IO.read(file);
-            NeoSchematic data = NeoSchematic.fromNBT(tag, level);
-            data.place(level, origin);
+            NeoSchematic.fromNBT(tag, level).place(level, origin);
             return 1;
         } catch (Exception e) {
             NeoBlockMod.LOGGER.error("Failed to load schematic", e);
@@ -74,7 +71,7 @@ public class NeoSchematic {
         for (Tag t : blockList) {
             CompoundTag blockTag = (CompoundTag) t;
             BlockPos offset = MinecraftUtil.NBT.readBlockPos(blockTag, "pos", BlockPos.ZERO);
-            BlockState state = MinecraftUtil.NBT.readBlockState(tag, "state", level);
+            BlockState state = MinecraftUtil.NBT.readBlockState(blockTag, "state", level);
             CompoundTag nbt = blockTag.contains("be") ? blockTag.getCompound("be") : null;
             blocks.add(new NeoSchematic.BlockInfo(offset, state, nbt));
         }
@@ -125,12 +122,10 @@ public class NeoSchematic {
         return tag;
     }
 
-    public void place(ServerLevel level, BlockPos targetOrigin) {
-        HolderLookup.Provider registries = level.registryAccess();
-
+    public void place(ServerLevel level, BlockPos target) {
         for (BlockInfo info : blocks) {
-            BlockPos pos = targetOrigin.offset(info.offset());
-            level.setBlock(pos, info.state(), Block.UPDATE_ALL);
+            BlockPos pos = target.offset(info.offset());
+            level.setBlock(pos, info.state(), 3);
             BlockEntity be = level.getBlockEntity(pos);
             MinecraftUtil.NBT.loadBlockEntity(be, info.nbt, level);
         }

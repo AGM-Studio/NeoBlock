@@ -131,7 +131,7 @@ public class NeoCommand {
 
         Path result = NeoSchematic.saveSchematic(level, pos1, pos2, center, name);
         if (result == null) source.sendFailure(Component.translatable("command.neoblock.scheme.save.fail"));
-        else source.sendSuccess(() -> Component.translatable("command.neoblock.scheme.save.success", result.getFileName()), true);
+        else source.sendSuccess(() -> Component.translatable("command.neoblock.scheme.save.success", result.getFileName().toString()), true);
         return result != null ? 1 : 0;
     }
     private static int schemeLoad(CommandContext<CommandSourceStack> context) {
@@ -147,7 +147,7 @@ public class NeoCommand {
         int result = NeoSchematic.loadSchematic(level, origin, name);
         if (result == 0) source.sendFailure(Component.translatable("command.neoblock.scheme.load.not_found"));
         else if (result == -1) source.sendFailure(Component.translatable("command.neoblock.scheme.load.fail"));
-        else source.sendSuccess(() -> Component.translatable("command.neoblock.scheme.load.success", origin), true);
+        else source.sendSuccess(() -> Component.translatable("command.neoblock.scheme.load.success", origin.toShortString()), true);
         return result == 1 ? 1 : 0;
     }
 }
