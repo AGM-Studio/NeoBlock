@@ -24,7 +24,7 @@ public class WorldData extends MinecraftUtil.AbstractWorldData {
     public static @NotNull WorldData create(@NotNull ServerLevel level) {
         WorldData data = new WorldData(level);
 
-        for (NeoTier tier: NeoBlock.TIERS) {
+        for (NeoTier tier: TierManager.TIERS) {
             data.encoding.add(tier.getHashCode());
             if (tier.id == 0 || tier.isUnlocked())
                 data.unlocked.add(tier);
@@ -56,7 +56,7 @@ public class WorldData extends MinecraftUtil.AbstractWorldData {
 
         NeoBlockMod.LOGGER.debug("Loaded WorldData from {}", tag);
 
-        if (WorldData.isValid()) for (int i : data.unlockedIDs) data.unlocked.add(NeoBlock.TIERS.get(i));
+        if (WorldData.isValid()) for (int i : data.unlockedIDs) data.unlocked.add(TierManager.TIERS.get(i));
         else data.state = WorldState.UPDATED;
 
         return data;
@@ -196,7 +196,7 @@ public class WorldData extends MinecraftUtil.AbstractWorldData {
     public static void updateTiers() {
         instance.encoding.clear();
         instance.unlocked.clear();
-        for (NeoTier tier: NeoBlock.TIERS) {
+        for (NeoTier tier: TierManager.TIERS) {
             instance.encoding.add(tier.getHashCode());
             if (tier.id == 0 || tier.isUnlocked() || instance.unlockedIDs.contains(tier.id))
                 instance.unlocked.add(tier);

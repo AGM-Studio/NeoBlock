@@ -12,12 +12,32 @@ import xyz.agmstudio.neoblock.animations.Animation;
 import xyz.agmstudio.neoblock.animations.ProgressbarAnimation;
 import xyz.agmstudio.neoblock.animations.phase.UpgradePhaseAnimation;
 import xyz.agmstudio.neoblock.animations.progress.UpgradeProgressAnimation;
+import xyz.agmstudio.neoblock.util.ResourceUtil;
 
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
 public class TierManager {
+    public static List<NeoTier> TIERS = new ArrayList<>();
+
+    public static void reload() {
+        ResourceUtil.loadAllTierConfigs();
+
+        int i = 0;
+        TIERS.clear();
+        while (Files.exists(NeoTier.FOLDER.resolve("tier-" + i + ".toml")))
+            TIERS.add(new NeoTier(i++));
+
+        NeoBlock.hash.clear();
+        TIERS.stream().map(NeoTier::getHashCode).forEach(NeoBlock.hash::add);
+
+        NeoBlockMod.LOGGER.info("Loaded {} tiers from the tiers folder.", TIERS.size());
+    }
+
+
+    // Animations
     private static final HashSet<UpgradeProgressAnimation> progressAnimations = new HashSet<>();
     private static final HashSet<UpgradePhaseAnimation> phaseAnimations = new HashSet<>();
     private static ProgressbarAnimation progressbar = null;
@@ -47,6 +67,7 @@ public class TierManager {
         return list;
     }
 
+    // Upgrades
     private final List<Upgrade> upgrades = new ArrayList<>();
 
     public boolean isOnUpgrade() {
@@ -80,7 +101,6 @@ public class TierManager {
         for (UpgradePhaseAnimation animation : phaseAnimations)
             if (animation.isActiveOnUpgradeStart()) animation.animate(level, access);
     }
-
     private void finishUpgrade(ServerLevel level, LevelAccessor access, @NotNull Upgrade upgrade) {
         WorldData.unlockTier(upgrade.tier);
         upgrade.tier.onFinishUpgrade(level);
@@ -95,19 +115,6 @@ public class TierManager {
 
     public void addPlayer(ServerPlayer player) {
         if (progressbar != null) progressbar.addPlayer(player);
-    }
-
-    public void save(@NotNull CompoundTag tag) {
-        ListTag upgrades = new ListTag();
-        for (Upgrade upgrade: this.upgrades) upgrades.add(upgrade.getTag());
-        tag.put("Upgrades", upgrades);
-    }
-    public void load(@NotNull ListTag tag) {
-        for (int i = 0; i < tag.size(); i++) {
-            Upgrade upgrade = Upgrade.fromTag(tag.getCompound(i));
-            NeoBlockMod.LOGGER.debug("Loading upgrade from {} and got {}", tag.getCompound(i), upgrade);
-            if (upgrade != null) upgrades.add(upgrade);
-        }
     }
 
     private static class Upgrade {
@@ -128,7 +135,7 @@ public class TierManager {
 
         public static Upgrade fromTag(CompoundTag tag) {
             try {
-                NeoTier tier = NeoBlock.TIERS.get(tag.getInt("Tier"));
+                NeoTier tier = TIERS.get(tag.getInt("Tier"));
                 return new Upgrade(tier, tag.getInt("Tick"));
             } catch (Exception ignored) {}
             return null;
@@ -147,6 +154,20 @@ public class TierManager {
 
         @Override public String toString() {
             return getClass().getSimpleName() + "{tier=" + tier + ", goal=" + goal + ", tick=" + tick + '}';
+        }
+    }
+
+    // Data managements
+    public void save(@NotNull CompoundTag tag) {
+        ListTag upgrades = new ListTag();
+        for (Upgrade upgrade: this.upgrades) upgrades.add(upgrade.getTag());
+        tag.put("Upgrades", upgrades);
+    }
+    public void load(@NotNull ListTag tag) {
+        for (int i = 0; i < tag.size(); i++) {
+            Upgrade upgrade = Upgrade.fromTag(tag.getCompound(i));
+            NeoBlockMod.LOGGER.debug("Loading upgrade from {} and got {}", tag.getCompound(i), upgrade);
+            if (upgrade != null) upgrades.add(upgrade);
         }
     }
 }

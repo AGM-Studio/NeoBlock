@@ -13,6 +13,7 @@ import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.data.Range;
 import xyz.agmstudio.neoblock.tiers.NeoBlock;
 import xyz.agmstudio.neoblock.tiers.NeoTier;
+import xyz.agmstudio.neoblock.tiers.TierManager;
 import xyz.agmstudio.neoblock.tiers.WorldData;
 import xyz.agmstudio.neoblock.util.MinecraftUtil;
 
@@ -72,7 +73,7 @@ public class NeoMerchant {
     public static WanderingTrader forceSpawnTrader(ServerLevel level) {
         WorldData.resetTraderFailedAttempts();
         List<NeoOffer> trades = new ArrayList<>();
-        NeoBlock.TIERS.stream().filter(NeoTier::isUnlocked)
+        TierManager.TIERS.stream().filter(NeoTier::isUnlocked)
                 .forEach(tier -> trades.addAll(tier.getRandomTrades()));
 
         if (!trades.isEmpty()) {

@@ -189,4 +189,41 @@ public final class MinecraftUtil {
             return Math.max(min, Math.min(max, value));
         }
     }
+
+    public static class NBT {
+        public static class IO {
+            public static void write(Path file, CompoundTag nbt) throws IOException {
+                OutputStream os = Files.newOutputStream(file);
+                NbtIo.writeCompressed(nbt, os);
+            }
+            public static CompoundTag read(Path file) throws IOException {
+                InputStream is = Files.newInputStream(file);
+                return NbtIo.readCompressed(is, NbtAccounter.unlimitedHeap());
+            }
+        }
+
+        public static Tag writeBlockPos(BlockPos pos) {
+            return NbtUtils.writeBlockPos(pos);
+        }
+        public static Tag writeBlockState(BlockState state) {
+            return NbtUtils.writeBlockState(state);
+        }
+
+        public static BlockPos readBlockPos(CompoundTag tag, String key, BlockPos def) {
+            return NbtUtils.readBlockPos(tag, key).orElse(def);
+        }
+        public static BlockState readBlockState(CompoundTag tag, String key, ServerLevel level) {
+            return NbtUtils.readBlockState(level.holderLookup(Registries.BLOCK), tag.getCompound(key));
+        }
+
+        public static CompoundTag getBlockEntity(BlockEntity blockEntity, ServerLevel level) {
+            if (blockEntity == null) return null;
+            return blockEntity.saveWithFullMetadata(level.registryAccess());
+        }
+        public static void loadBlockEntity(BlockEntity be, CompoundTag tag, ServerLevel level) {
+            if (be == null || tag == null) return;
+            be.loadWithComponents(tag, level.registryAccess());
+            be.setChanged();
+        }
+    }
 }

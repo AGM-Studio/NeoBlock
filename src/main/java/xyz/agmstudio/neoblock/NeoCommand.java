@@ -21,11 +21,12 @@ import net.minecraft.world.entity.npc.WanderingTrader;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import xyz.agmstudio.neoblock.data.NeoSchematic;
-import xyz.agmstudio.neoblock.tiers.NeoBlock;
 import xyz.agmstudio.neoblock.tiers.NeoTier;
+import xyz.agmstudio.neoblock.tiers.TierManager;
 import xyz.agmstudio.neoblock.tiers.WorldData;
 import xyz.agmstudio.neoblock.tiers.merchants.NeoMerchant;
 
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.IntStream;
@@ -64,7 +65,7 @@ public class NeoCommand {
 
     // Methods that suggests arguments
     private static CompletableFuture<Suggestions> suggestTiersIndex(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
-        IntStream.range(0, NeoBlock.TIERS.size()).forEach(builder::suggest);
+        IntStream.range(0, TierManager.TIERS.size()).forEach(builder::suggest);
         return builder.buildFuture();
     }
     public static final SuggestionProvider<CommandSourceStack> LOOKING_BLOCK_SUGGESTION = (ctx, builder) -> {
@@ -103,8 +104,8 @@ public class NeoCommand {
     private static int unlockTier(CommandContext<CommandSourceStack> context) {
         CommandSourceStack source = context.getSource();
         int index = IntegerArgumentType.getInteger(context, "id");
-        if (index < 0 || index > NeoBlock.TIERS.size()) {
-            context.getSource().sendFailure(Component.translatable("command.neoblock.invalid_tier", NeoBlock.TIERS.size() - 1));
+        if (index < 0 || index > TierManager.TIERS.size()) {
+            context.getSource().sendFailure(Component.translatable("command.neoblock.invalid_tier", TierManager.TIERS.size() - 1));
             return 0;
         }
 
@@ -114,6 +115,7 @@ public class NeoCommand {
     }
 
     private static int schemeSave(CommandContext<CommandSourceStack> context)  {
+        CommandSourceStack source = context.getSource();
         ServerLevel level = context.getSource().getLevel();
         BlockPos pos1 = BlockPosArgument.getBlockPos(context, "pos1");
         BlockPos pos2 = BlockPosArgument.getBlockPos(context, "pos2");
@@ -127,10 +129,13 @@ public class NeoCommand {
             name = StringArgumentType.getString(context, "name");
         } catch (IllegalArgumentException ignored) {}
 
-        NeoSchematic.saveSchematic(level, pos1, pos2, center, name, context.getSource());
-        return 1;
+        Path result = NeoSchematic.saveSchematic(level, pos1, pos2, center, name);
+        if (result == null) source.sendFailure(Component.translatable("command.neoblock.scheme.save.fail"));
+        else source.sendSuccess(() -> Component.translatable("command.neoblock.scheme.save.success", result.getFileName().toString()), true);
+        return result != null ? 1 : 0;
     }
     private static int schemeLoad(CommandContext<CommandSourceStack> context) {
+        CommandSourceStack source = context.getSource();
         ServerLevel level = context.getSource().getLevel();
         BlockPos origin = BlockPosArgument.getBlockPos(context, "pos");
 
@@ -139,7 +144,10 @@ public class NeoCommand {
             name = StringArgumentType.getString(context, "name");
         } catch (IllegalArgumentException ignored) {}
 
-        NeoSchematic.loadSchematic(level, origin, name, context.getSource());
-        return 1;
+        int result = NeoSchematic.loadSchematic(level, origin, name);
+        if (result == 0) source.sendFailure(Component.translatable("command.neoblock.scheme.load.not_found"));
+        else if (result == -1) source.sendFailure(Component.translatable("command.neoblock.scheme.load.fail"));
+        else source.sendSuccess(() -> Component.translatable("command.neoblock.scheme.load.success", origin.toShortString()), true);
+        return result == 1 ? 1 : 0;
     }
 }
