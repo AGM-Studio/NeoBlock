@@ -9,7 +9,7 @@ version = "${mod_version}"
 displayName = "${mod_name}"
 
 # A URL to query for updates for this mod. See the JSON update specification https://docs.neoforged.net/docs/misc/updatechecker/
-#updateJSONURL="https://change.me.example.invalid/updates.json" #optional
+updateJSONURL="https://raw.githubusercontent.com/AGM-Studio/NeoBlock/refs/heads/General/update.json"
 #logoFile = "logo.png"
 
 displayURL = "https://www.curseforge.com/minecraft/mc-mods/neoblock"
