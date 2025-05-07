@@ -6,21 +6,16 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.npc.WanderingTrader;
-import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.HitResult;
 import xyz.agmstudio.neoblock.data.NeoSchematic;
 import xyz.agmstudio.neoblock.tiers.NeoTier;
 import xyz.agmstudio.neoblock.tiers.TierManager;
@@ -28,9 +23,7 @@ import xyz.agmstudio.neoblock.tiers.WorldData;
 import xyz.agmstudio.neoblock.tiers.merchants.NeoMerchant;
 
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.IntStream;
 
 @SuppressWarnings("SameReturnValue")
 public class NeoCommand {
@@ -67,9 +60,19 @@ public class NeoCommand {
         FORCE_COMMAND.then(Commands.literal("update").executes(NeoCommand::forceUpdate));
         COMMAND.then(FORCE_COMMAND);
 
+        final LiteralArgumentBuilder<CommandSourceStack> DISABLE = Commands.literal("disable")
+                .then(Commands.argument("id", IntegerArgumentType.integer(0))
+                        .suggests(NeoCommand::suggestEnabledTiersIndex)).executes(NeoCommand::disableTier);
+        COMMAND.then(DISABLE);
+
+        final LiteralArgumentBuilder<CommandSourceStack> ENABLE = Commands.literal("enable")
+                .then(Commands.argument("id", IntegerArgumentType.integer(0))
+                        .suggests(NeoCommand::suggestDisabledTiersIndex)).executes(NeoCommand::enableTier);
+        COMMAND.then(ENABLE);
+
         final LiteralArgumentBuilder<CommandSourceStack> UNLOCK = Commands.literal("unlock")
                 .then(Commands.argument("id", IntegerArgumentType.integer(0))
-                        .suggests(NeoCommand::suggestTiersIndex).executes(NeoCommand::unlockTier)
+                        .suggests(NeoCommand::suggestLockedTiersIndex).executes(NeoCommand::unlockTier)
                         .then(Commands.argument("force", BoolArgumentType.bool()).executes(NeoCommand::unlockTier)));
         COMMAND.then(UNLOCK);
 
@@ -91,20 +94,18 @@ public class NeoCommand {
     }
 
     // Methods that suggests arguments
-    private static CompletableFuture<Suggestions> suggestTiersIndex(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
-        IntStream.range(0, TierManager.TIERS.size()).forEach(builder::suggest);
+    private static CompletableFuture<Suggestions> suggestLockedTiersIndex(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
+        TierManager.TIERS.stream().filter(tier -> !tier.isUnlocked()).mapToInt(tier -> tier.id).forEach(builder::suggest);
         return builder.buildFuture();
     }
-    public static final SuggestionProvider<CommandSourceStack> LOOKING_BLOCK_SUGGESTION = (ctx, builder) -> {
-        ServerPlayer player = ctx.getSource().getPlayer();
-        if (player == null) return Suggestions.empty();
-
-        HitResult hit = player.pick(20, 0.0F, false);
-        if (hit.getType() != HitResult.Type.BLOCK) return Suggestions.empty();
-        BlockPos pos = ((BlockHitResult) hit).getBlockPos();
-        String suggestion = pos.getX() + " " + pos.getY() + " " + pos.getZ();
-        return SharedSuggestionProvider.suggest(Collections.singletonList(suggestion), builder);
-    };
+    private static CompletableFuture<Suggestions> suggestDisabledTiersIndex(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
+        TierManager.TIERS.stream().filter(tier -> WorldData.getDisabled().contains(tier)).mapToInt(tier -> tier.id).forEach(builder::suggest);
+        return builder.buildFuture();
+    }
+    private static CompletableFuture<Suggestions> suggestEnabledTiersIndex(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
+        TierManager.TIERS.stream().filter(tier -> !WorldData.getDisabled().contains(tier)).mapToInt(tier -> tier.id).forEach(builder::suggest);
+        return builder.buildFuture();
+    }
 
     // Methods that executes when the command is run
     private static int showInfo(CommandContext<CommandSourceStack> context) {
@@ -140,6 +141,30 @@ public class NeoCommand {
 
         WorldData.setCommanded(index, force);
         context.getSource().sendSuccess(() -> Component.translatable("command.neoblock.unlock_tier"), false);
+        return 1;
+    }
+    private static int disableTier(CommandContext<CommandSourceStack> context) {
+        CommandSourceStack source = context.getSource();
+        int index = IntegerArgumentType.getInteger(context, "id");
+        if (index < 0 || index > TierManager.TIERS.size()) {
+            context.getSource().sendFailure(Component.translatable("command.neoblock.invalid_tier", TierManager.TIERS.size() - 1));
+            return 0;
+        }
+
+        WorldData.disableTier(TierManager.TIERS.get(index));
+        context.getSource().sendSuccess(() -> Component.translatable("command.neoblock.disable_tier"), false);
+        return 1;
+    }
+    private static int enableTier(CommandContext<CommandSourceStack> context) {
+        CommandSourceStack source = context.getSource();
+        int index = IntegerArgumentType.getInteger(context, "id");
+        if (index < 0 || index > TierManager.TIERS.size()) {
+            context.getSource().sendFailure(Component.translatable("command.neoblock.invalid_tier", TierManager.TIERS.size() - 1));
+            return 0;
+        }
+
+        WorldData.enableTier(TierManager.TIERS.get(index));
+        context.getSource().sendSuccess(() -> Component.translatable("command.neoblock.enable_tier"), false);
         return 1;
     }
 

@@ -51,12 +51,16 @@ public class WorldData extends MinecraftUtil.AbstractWorldData {
         final ListTag unlocked = tag.getList("Unlocked", StringTag.TAG_INT);
         for (int i = 0; i < unlocked.size(); ++i) data.unlockedIDs.add(unlocked.getInt(i));
 
+        final ListTag disabled = tag.getList("Disabled", StringTag.TAG_INT);
+        for (int i = 0; i < disabled.size(); ++i) data.disabledIDs.add(disabled.getInt(i));
+
         final ListTag commanded = tag.getList("Commanded", StringTag.TAG_INT);
         for (int i = 0; i < commanded.size(); ++i) data.commanded.add(commanded.getInt(i));
 
         NeoBlockMod.LOGGER.debug("Loaded WorldData from {}", tag);
 
         if (WorldData.isValid()) for (int i : data.unlockedIDs) data.unlocked.add(TierManager.TIERS.get(i));
+        if (WorldData.isValid()) for (int i : data.disabledIDs) data.disabled.add(TierManager.TIERS.get(i));
         else data.state = WorldState.UPDATED;
 
         return data;
@@ -95,7 +99,9 @@ public class WorldData extends MinecraftUtil.AbstractWorldData {
     private int traderFailedAttempts = 0;
 
     private final HashSet<Integer> unlockedIDs = new HashSet<>();
+    private final HashSet<Integer> disabledIDs = new HashSet<>();
     private final HashSet<NeoTier> unlocked = new HashSet<>();
+    private final HashSet<NeoTier> disabled = new HashSet<>();
     private final HashSet<Integer> commanded = new HashSet<>();
     private final HashSet<String> encoding = new HashSet<>();
 
@@ -179,6 +185,15 @@ public class WorldData extends MinecraftUtil.AbstractWorldData {
     }
     public static void unlockTier(NeoTier tier) {
         instance.unlocked.add(tier);
+    }
+    public static HashSet<NeoTier> getDisabled() {
+        return instance.disabled;
+    }
+    public static void disableTier(NeoTier tier) {
+        instance.disabled.add(tier);
+    }
+    public static void enableTier(NeoTier tier) {
+        instance.disabled.remove(tier);
     }
     public static TierManager getTierManager() {
         return instance.tierManager;
