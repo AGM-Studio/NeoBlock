@@ -1,6 +1,7 @@
 package xyz.agmstudio.neoblock;
 
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -33,6 +34,31 @@ import java.util.stream.IntStream;
 
 @SuppressWarnings("SameReturnValue")
 public class NeoCommand {
+    private static BlockPos getBlockPos(CommandContext<CommandSourceStack> context, String name) {
+        try {
+            return BlockPosArgument.getBlockPos(context, name);
+        } catch (IllegalArgumentException ignored) {
+            return null;
+        }
+    }
+    private static String getString(CommandContext<CommandSourceStack> context, String name) {
+        try {
+            return StringArgumentType.getString(context, name);
+        } catch (IllegalArgumentException ignored) {
+            return null;
+        }
+    }
+    private static boolean getBool(CommandContext<CommandSourceStack> context, String name) {
+        return getBool(context, name, false);
+    }
+    private static boolean getBool(CommandContext<CommandSourceStack> context, String name, boolean defaultValue) {
+        try {
+            return BoolArgumentType.getBool(context, name);
+        } catch (IllegalArgumentException ignored) {
+            return defaultValue;
+        }
+    }
+
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         final LiteralArgumentBuilder<CommandSourceStack> COMMAND = Commands.literal("neoblock").executes(NeoCommand::showInfo);
 
@@ -43,7 +69,8 @@ public class NeoCommand {
 
         final LiteralArgumentBuilder<CommandSourceStack> UNLOCK = Commands.literal("unlock")
                 .then(Commands.argument("id", IntegerArgumentType.integer(0))
-                        .suggests(NeoCommand::suggestTiersIndex).executes(NeoCommand::unlockTier));
+                        .suggests(NeoCommand::suggestTiersIndex).executes(NeoCommand::unlockTier)
+                        .then(Commands.argument("force", BoolArgumentType.bool()).executes(NeoCommand::unlockTier)));
         COMMAND.then(UNLOCK);
 
         final LiteralArgumentBuilder<CommandSourceStack> SCHEME = Commands.literal("scheme");
@@ -104,12 +131,14 @@ public class NeoCommand {
     private static int unlockTier(CommandContext<CommandSourceStack> context) {
         CommandSourceStack source = context.getSource();
         int index = IntegerArgumentType.getInteger(context, "id");
+        boolean force = getBool(context, "force", true);
+
         if (index < 0 || index > TierManager.TIERS.size()) {
             context.getSource().sendFailure(Component.translatable("command.neoblock.invalid_tier", TierManager.TIERS.size() - 1));
             return 0;
         }
 
-        WorldData.setCommanded(index);
+        WorldData.setCommanded(index, force);
         context.getSource().sendSuccess(() -> Component.translatable("command.neoblock.unlock_tier"), false);
         return 1;
     }
@@ -117,17 +146,12 @@ public class NeoCommand {
     private static int schemeSave(CommandContext<CommandSourceStack> context)  {
         CommandSourceStack source = context.getSource();
         ServerLevel level = context.getSource().getLevel();
-        BlockPos pos1 = BlockPosArgument.getBlockPos(context, "pos1");
-        BlockPos pos2 = BlockPosArgument.getBlockPos(context, "pos2");
-        BlockPos center = null;
-        try {
-            center = BlockPosArgument.getBlockPos(context, "neoblock");
-        } catch (IllegalArgumentException ignored) {}
+        BlockPos pos1 = getBlockPos(context, "pos1");
+        BlockPos pos2 = getBlockPos(context, "pos2");
+        BlockPos center = getBlockPos(context, "neoblock");
+        String name = getString(context, "name");
 
-        String name = null;
-        try {
-            name = StringArgumentType.getString(context, "name");
-        } catch (IllegalArgumentException ignored) {}
+        assert pos1 != null && pos2 != null;    // required
 
         Path result = NeoSchematic.saveSchematic(level, pos1, pos2, center, name);
         if (result == null) source.sendFailure(Component.translatable("command.neoblock.scheme.save.fail"));
@@ -137,12 +161,10 @@ public class NeoCommand {
     private static int schemeLoad(CommandContext<CommandSourceStack> context) {
         CommandSourceStack source = context.getSource();
         ServerLevel level = context.getSource().getLevel();
-        BlockPos origin = BlockPosArgument.getBlockPos(context, "pos");
+        BlockPos origin = getBlockPos(context, "pos");
+        String name = getString(context, "name");
 
-        String name = null;
-        try {
-            name = StringArgumentType.getString(context, "name");
-        } catch (IllegalArgumentException ignored) {}
+        assert origin != null;
 
         int result = NeoSchematic.loadSchematic(level, origin, name);
         if (result == 0) source.sendFailure(Component.translatable("command.neoblock.scheme.load.not_found"));

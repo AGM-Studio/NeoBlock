@@ -60,7 +60,7 @@ public final class NeoListener {
 
         tickers.forEach(ticker -> ticker.accept(level, access));
 
-        // Upgrading the neoblock... Nothing else should happen meanwhile
+        WorldData.forceUnlockTick(level, access);
         if (WorldData.isUpdated() || NeoBlock.isOnUpgrade()) {
             if (block.getBlock() != Blocks.BEDROCK) NeoBlock.setNeoBlock(access, Blocks.BEDROCK.defaultBlockState());
         } else if (block.isAir() || block.canBeReplaced())          // NeoBlock has been broken logic

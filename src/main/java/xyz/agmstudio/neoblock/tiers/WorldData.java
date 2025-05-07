@@ -102,6 +102,8 @@ public class WorldData extends MinecraftUtil.AbstractWorldData {
     private final TierManager tierManager = new TierManager();
     private final HashMap<EntityType<?>, Integer> tradedMobs = new HashMap<>();
 
+    private final HashSet<NeoTier> forced = new HashSet<>();
+
     private WorldData(ServerLevel level) {
         instance = this;
         this.level = level;
@@ -185,9 +187,21 @@ public class WorldData extends MinecraftUtil.AbstractWorldData {
     public static boolean isCommanded(int id) {
         return instance.commanded.contains(id);
     }
-    public static void setCommanded(int id) {
+    public static void setCommanded(int id, boolean force) {
+        NeoTier tier = TierManager.TIERS.get(id);
+        if (tier == null) return;
+
         instance.setDirty();
         instance.commanded.add(id);
+        if (force && tier.canBeUnlocked())
+            instance.forced.add(tier);
+    }
+
+    public static void forceUnlockTick(ServerLevel level, LevelAccessor access) {
+        for (NeoTier tier: instance.forced)
+            WorldData.getTierManager().startUpgrade(level, access, tier);
+
+        instance.forced.clear();
     }
 
     public static boolean isValid() {
