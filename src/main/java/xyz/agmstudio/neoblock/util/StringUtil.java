@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.agmstudio.neoblock.data.Range;
 
+import java.util.Base64;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -116,5 +117,15 @@ public class StringUtil {
         Pair<String, Range> parsed = parseCount(value, new Range(1, 1));
         EntityType<?> type = MinecraftUtil.getEntityType(parsed.getLeft());
         return Pair.of(type, parsed.getRight());
+    }
+
+    /**
+     * Encodes a string into Base64 format.
+     *
+     * @param input the string to be encoded
+     * @return the Base64 encoded string
+     */
+    public static @NotNull String encodeToBase64(@NotNull String input) {
+        return Base64.getEncoder().encodeToString(input.getBytes());
     }
 }
