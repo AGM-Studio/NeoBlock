@@ -6,7 +6,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import xyz.agmstudio.neoblock.tiers.NeoBlock;
+import xyz.agmstudio.neoblock.neo.world.WorldData;
 import xyz.agmstudio.neoblock.util.ConfigUtil;
 
 public class BreakingAnimation extends UpgradeProgressAnimation {
@@ -18,7 +18,7 @@ public class BreakingAnimation extends UpgradeProgressAnimation {
     }
 
     @Override public void animate(ServerLevel level, LevelAccessor access) {
-        level.levelEvent(2001, NeoBlock.POS, Block.getId(Blocks.BEDROCK.defaultBlockState()));
-        level.playSound(null, NeoBlock.POS, SoundEvents.STONE_BREAK, SoundSource.BLOCKS, volume, 1.0f);
+        level.levelEvent(2001, WorldData.POS, Block.getId(Blocks.BEDROCK.defaultBlockState()));
+        level.playSound(null, WorldData.POS, SoundEvents.STONE_BREAK, SoundSource.BLOCKS, volume, 1.0f);
     }
 }

@@ -19,10 +19,9 @@ import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import org.jetbrains.annotations.NotNull;
-import xyz.agmstudio.neoblock.tiers.NeoBlock;
-import xyz.agmstudio.neoblock.tiers.WorldData;
-import xyz.agmstudio.neoblock.tiers.merchants.NeoMerchant;
-import xyz.agmstudio.neoblock.tiers.merchants.NeoOffer;
+import xyz.agmstudio.neoblock.neo.world.WorldData;
+import xyz.agmstudio.neoblock.neo.merchants.NeoMerchant;
+import xyz.agmstudio.neoblock.neo.merchants.NeoOffer;
 import xyz.agmstudio.neoblock.util.MinecraftUtil;
 
 import java.util.HashSet;
@@ -48,7 +47,7 @@ public final class NeoListener {
     @SubscribeEvent
     public static void onWorldLoad(LevelEvent.@NotNull Load event) {
         if (!(event.getLevel() instanceof ServerLevel level) || level.dimension() != Level.OVERWORLD) return;
-        NeoBlock.setupWorldData(level);
+        WorldData.setup(level);
     }
 
     @SubscribeEvent
@@ -56,15 +55,14 @@ public final class NeoListener {
         if (!(event.getLevel() instanceof ServerLevel level) || level.dimension() != Level.OVERWORLD || WorldData.isDisabled())
             return;
         final LevelAccessor access = event.getLevel();
-        final BlockState block = access.getBlockState(NeoBlock.POS);
+        final BlockState block = access.getBlockState(WorldData.POS);
 
         tickers.forEach(ticker -> ticker.accept(level, access));
 
-        WorldData.forceUnlockTick(level, access);
-        if (WorldData.isUpdated() || NeoBlock.isOnUpgrade()) {
-            if (block.getBlock() != Blocks.BEDROCK) NeoBlock.setNeoBlock(access, Blocks.BEDROCK.defaultBlockState());
+        if (WorldData.isUpdated() || WorldData.isOnUpgrade()) {
+            if (block.getBlock() != Blocks.BEDROCK) WorldData.setNeoBlock(access, Blocks.BEDROCK.defaultBlockState());
         } else if (block.isAir() || block.canBeReplaced())          // NeoBlock has been broken logic
-            NeoBlock.onBlockBroken(level, access, true);
+            WorldData.onBlockBroken(level, access, true);
     }
 
     @SubscribeEvent
@@ -72,7 +70,7 @@ public final class NeoListener {
         if (!(event.getLevel() instanceof ServerLevel level) || WorldData.isDisabled()) return;
         if (event.getEntity() instanceof WanderingTrader trader) NeoMerchant.handleTrader(trader);
         if (event.getEntity() instanceof ServerPlayer player) {
-            if (NeoBlock.isOnUpgrade()) WorldData.getTierManager().addPlayer(player);
+            if (WorldData.isOnUpgrade()) WorldData.addPlayer(player);
             MinecraftUtil.Messenger.onPlayerJoin(level, player);
         }
     }

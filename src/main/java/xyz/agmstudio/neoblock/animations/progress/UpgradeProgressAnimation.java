@@ -5,7 +5,6 @@ import net.minecraft.world.level.LevelAccessor;
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.animations.Animation;
-import xyz.agmstudio.neoblock.tiers.TierManager;
 import xyz.agmstudio.neoblock.util.ConfigUtil;
 
 import java.util.HashSet;

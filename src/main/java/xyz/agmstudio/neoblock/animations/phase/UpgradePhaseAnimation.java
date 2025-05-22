@@ -4,7 +4,6 @@ package xyz.agmstudio.neoblock.animations.phase;
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.animations.Animation;
-import xyz.agmstudio.neoblock.tiers.TierManager;
 
 import java.util.HashSet;
 

@@ -3,7 +3,7 @@ package xyz.agmstudio.neoblock.util;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlockMod;
-import xyz.agmstudio.neoblock.tiers.NeoTier;
+import xyz.agmstudio.neoblock.data.TierData;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -111,13 +111,13 @@ public class ResourceUtil {
      */
     public static void loadAllTierConfigs() {
         // If tier-0.toml is present, no need to proceed
-        if (Files.exists(NeoTier.FOLDER.resolve("tier-0.toml"))) return;
-        if (NeoTier.FOLDER.toFile().mkdirs())
-            NeoBlockMod.LOGGER.debug("Created config folder: {}", NeoTier.FOLDER);
+        if (Files.exists(TierData.FOLDER.resolve("tier-0.toml"))) return;
+        if (TierData.FOLDER.toFile().mkdirs())
+            NeoBlockMod.LOGGER.debug("Created config folder: {}", TierData.FOLDER);
 
         int tier = 0;
         while (true) {
-            Path location = NeoTier.FOLDER.resolve("tier-" + tier + ".toml");
+            Path location = TierData.FOLDER.resolve("tier-" + tier + ".toml");
             String resource = "/configs/tiers/tier-" + tier + ".toml";
             Map<String, String> map = Map.of("[TIER]", Integer.toString(tier ++));
 
@@ -133,7 +133,7 @@ public class ResourceUtil {
             }
         }
 
-        Path templateLocation = NeoTier.FOLDER.resolve("tier-template.toml");
+        Path templateLocation = TierData.FOLDER.resolve("tier-template.toml");
         if (!Files.exists(templateLocation)) {
             try {
                 processResourceFile("/configs/tiers/tier-template.toml", templateLocation, Map.of("[TIER]", "10"));

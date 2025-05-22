@@ -51,6 +51,6 @@ public class TierLock {
     public boolean isUnlocked(WorldData data) {
         if (blocks > 0 && data.getStatus().getBlockCount() < blocks) return false;
         if (game > 0 && data.getLevel().getGameTime() < game) return false;
-        return !command || data.getTier(id).isUnlocked();
+        return !command || data.getTier(id).isCommanded();
     }
 }

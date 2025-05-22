@@ -1,4 +1,4 @@
-package xyz.agmstudio.neoblock.tiers.merchants;
+package xyz.agmstudio.neoblock.neo.merchants;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;

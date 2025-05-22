@@ -9,7 +9,6 @@ import xyz.agmstudio.neoblock.data.NBTData;
 import xyz.agmstudio.neoblock.data.NBTSaveable;
 import xyz.agmstudio.neoblock.data.TierData;
 import xyz.agmstudio.neoblock.data.TierLock;
-import xyz.agmstudio.neoblock.neo.NeoBlock;
 import xyz.agmstudio.neoblock.neo.merchants.NeoOffer;
 import xyz.agmstudio.neoblock.util.MinecraftUtil;
 
@@ -23,9 +22,7 @@ public class WorldTier extends NBTSaveable {
         WorldTier instance = new WorldTier();
         instance.id = tier.id;
         instance.enabled = tier.lock.isUnlocked(data);
-        instance.upgraded = instance.enabled;
-        instance.unlocked = instance.enabled;
-        instance.process = false;
+        instance.lock = new Lock();
 
         instance.data = tier;
         instance.world = data;
@@ -37,18 +34,16 @@ public class WorldTier extends NBTSaveable {
     @NBTData private int id;
     /** If the tier should be counted in randomizer. */
     @NBTData private boolean enabled;
-    /** If the tier has been researched. */
-    @NBTData private boolean upgraded;
-    /** If the tier has been unlocked using commands. */
-    @NBTData private boolean unlocked;
     /** Upgrade status if needed. */
-    @NBTData private boolean process;
+    @NBTData protected Lock lock;
 
     private TierData data = null;
     private WorldData world = null;
     @Override public void onLoad(CompoundTag tag) {
         data = TierData.get(id);
         world = WorldData.getInstance();
+
+        lock.tier = this;
     }
 
     public List<NeoOffer> getRandomTrades() {
@@ -57,7 +52,7 @@ public class WorldTier extends NBTSaveable {
         return trades.subList(0, data.tradeCount);
     }
     public BlockState getRandomBlock() {
-        if (data.blocks.isEmpty()) return NeoBlock.DEFAULT_STATE;
+        if (data.blocks.isEmpty()) return WorldData.DEFAULT_STATE;
 
         int totalWeight = data.blocks.values().stream().mapToInt(Integer::intValue).sum();
         int randomValue = WorldData.getRandom().nextInt(totalWeight);
@@ -67,7 +62,7 @@ public class WorldTier extends NBTSaveable {
         }
 
         NeoBlockMod.LOGGER.error("Unable to get a random block from tier {}", id);
-        return data.blocks.keySet().stream().findFirst().orElse(NeoBlock.DEFAULT_STATE);
+        return data.blocks.keySet().stream().findFirst().orElse(WorldData.DEFAULT_STATE);
     }
 
     public @NotNull String getName() {
@@ -92,14 +87,18 @@ public class WorldTier extends NBTSaveable {
     }
 
     public boolean isUnlocked() {
-        return unlocked;
+        return lock.unlocked;
     }
     public boolean canBeUnlocked() {
         return data.lock.isUnlocked(WorldData.getInstance());
     }
 
+    public boolean isCommanded() {
+        return lock.commanded;
+    }
+
     public boolean isEnabled() {
-        return upgraded && enabled;
+        return lock.unlocked && enabled;
     }
     public void enable() {
         enabled = true;
@@ -113,5 +112,17 @@ public class WorldTier extends NBTSaveable {
     }
     public TierData getData() {
         return data;
+    }
+
+    public static class Lock extends NBTSaveable {
+        public WorldTier tier;
+
+        @NBTData protected boolean unlocked = false;
+        // Conditions - Should match with tier data - For future updates
+        @NBTData protected boolean commanded = false;
+        // The lock process
+        @NBTData protected int line = 0;
+        @NBTData protected int tick = 0;
+        @NBTData protected int goal = 0;
     }
 }

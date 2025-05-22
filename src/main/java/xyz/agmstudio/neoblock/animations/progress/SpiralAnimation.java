@@ -4,7 +4,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.phys.Vec3;
-import xyz.agmstudio.neoblock.tiers.NeoBlock;
+import xyz.agmstudio.neoblock.neo.world.WorldData;
 import xyz.agmstudio.neoblock.util.ConfigUtil;
 
 import java.util.ArrayList;
@@ -42,7 +42,7 @@ public class SpiralAnimation extends UpgradeProgressAnimation {
                 double zOffset = Math.sin(angle) * radius;
                 double yOffset = progress * 1.2;
 
-                Vec3 particlePos = Vec3.atCenterOf(NeoBlock.POS).add(xOffset, yOffset, zOffset);
+                Vec3 particlePos = Vec3.atCenterOf(WorldData.POS).add(xOffset, yOffset, zOffset);
                 level.sendParticles(ParticleTypes.ENCHANT,
                         particlePos.x, particlePos.y, particlePos.z,
                         1, 0, 0, 0, 0.02);

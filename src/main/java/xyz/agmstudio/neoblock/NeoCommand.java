@@ -16,11 +16,10 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.npc.WanderingTrader;
-import xyz.agmstudio.neoblock.data.NeoSchematic;
-import xyz.agmstudio.neoblock.tiers.NeoTier;
-import xyz.agmstudio.neoblock.tiers.TierManager;
-import xyz.agmstudio.neoblock.tiers.WorldData;
-import xyz.agmstudio.neoblock.tiers.merchants.NeoMerchant;
+import xyz.agmstudio.neoblock.data.Schematic;
+import xyz.agmstudio.neoblock.neo.world.WorldTier;
+import xyz.agmstudio.neoblock.neo.world.WorldData;
+import xyz.agmstudio.neoblock.neo.merchants.NeoMerchant;
 
 import java.nio.file.Path;
 import java.util.concurrent.CompletableFuture;
@@ -50,6 +49,15 @@ public class NeoCommand {
         } catch (IllegalArgumentException ignored) {
             return defaultValue;
         }
+    }
+    private static WorldTier getTier(CommandContext<CommandSourceStack> context, String name) {
+        int index = IntegerArgumentType.getInteger(context, "id");
+        if (index < 0 || index > WorldData.getTiers().size()) {
+            context.getSource().sendFailure(Component.translatable("command.neoblock.invalid_tier", WorldData.getTiers().size() - 1));
+            return null;
+        }
+
+        return WorldData.getInstance().getTier(index);
     }
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
@@ -95,22 +103,22 @@ public class NeoCommand {
 
     // Methods that suggests arguments
     private static CompletableFuture<Suggestions> suggestLockedTiersIndex(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
-        TierManager.TIERS.stream().filter(tier -> !tier.isUnlocked()).mapToInt(tier -> tier.id).forEach(builder::suggest);
+        WorldData.getTiers().stream().filter(tier -> !tier.isUnlocked()).mapToInt(WorldTier::getID).forEach(builder::suggest);
         return builder.buildFuture();
     }
     private static CompletableFuture<Suggestions> suggestDisabledTiersIndex(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
-        TierManager.TIERS.stream().filter(tier -> WorldData.getDisabled().contains(tier)).mapToInt(tier -> tier.id).forEach(builder::suggest);
+        WorldData.getTiers().stream().filter(tier -> !tier.isEnabled()).mapToInt(WorldTier::getID).forEach(builder::suggest);
         return builder.buildFuture();
     }
     private static CompletableFuture<Suggestions> suggestEnabledTiersIndex(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
-        TierManager.TIERS.stream().filter(tier -> !WorldData.getDisabled().contains(tier)).mapToInt(tier -> tier.id).forEach(builder::suggest);
+        WorldData.getTiers().stream().filter(WorldTier::isEnabled).mapToInt(WorldTier::getID).forEach(builder::suggest);
         return builder.buildFuture();
     }
 
     // Methods that executes when the command is run
     private static int showInfo(CommandContext<CommandSourceStack> context) {
         CommandSourceStack source = context.getSource();
-        MutableComponent message = Component.translatable("command.neoblock.info", WorldData.getBlockCount(), WorldData.getUnlocked().stream().map(NeoTier::getName).toArray());
+        MutableComponent message = Component.translatable("command.neoblock.info", WorldData.getBlockCount(), WorldData.getTiers().stream().filter(tier -> !tier.isUnlocked()).map(WorldTier::getName).toArray());
 
         source.sendSuccess(() -> message, true);
         return 1;
@@ -131,39 +139,29 @@ public class NeoCommand {
     }
     private static int unlockTier(CommandContext<CommandSourceStack> context) {
         CommandSourceStack source = context.getSource();
-        int index = IntegerArgumentType.getInteger(context, "id");
+        WorldTier tier = getTier(context, "id");
         boolean force = getBool(context, "force", true);
 
-        if (index < 0 || index > TierManager.TIERS.size()) {
-            context.getSource().sendFailure(Component.translatable("command.neoblock.invalid_tier", TierManager.TIERS.size() - 1));
-            return 0;
-        }
-
-        WorldData.setCommanded(index, force);
+        if (tier == null) return 0;
+        WorldData.setCommanded(tier, force);
         context.getSource().sendSuccess(() -> Component.translatable("command.neoblock.unlock_tier"), false);
         return 1;
     }
     private static int disableTier(CommandContext<CommandSourceStack> context) {
         CommandSourceStack source = context.getSource();
-        int index = IntegerArgumentType.getInteger(context, "id");
-        if (index < 0 || index > TierManager.TIERS.size()) {
-            context.getSource().sendFailure(Component.translatable("command.neoblock.invalid_tier", TierManager.TIERS.size() - 1));
-            return 0;
-        }
+        WorldTier tier = getTier(context, "id");
+        if (tier == null) return 0;
+        else tier.disable();
 
-        WorldData.disableTier(TierManager.TIERS.get(index));
         context.getSource().sendSuccess(() -> Component.translatable("command.neoblock.disable_tier"), false);
         return 1;
     }
     private static int enableTier(CommandContext<CommandSourceStack> context) {
         CommandSourceStack source = context.getSource();
-        int index = IntegerArgumentType.getInteger(context, "id");
-        if (index < 0 || index > TierManager.TIERS.size()) {
-            context.getSource().sendFailure(Component.translatable("command.neoblock.invalid_tier", TierManager.TIERS.size() - 1));
-            return 0;
-        }
+        WorldTier tier = getTier(context, "id");
+        if (tier == null) return 0;
+        else tier.enable();
 
-        WorldData.enableTier(TierManager.TIERS.get(index));
         context.getSource().sendSuccess(() -> Component.translatable("command.neoblock.enable_tier"), false);
         return 1;
     }
@@ -178,7 +176,7 @@ public class NeoCommand {
 
         assert pos1 != null && pos2 != null;    // required
 
-        Path result = NeoSchematic.saveSchematic(level, pos1, pos2, center, name);
+        Path result = Schematic.saveSchematic(level, pos1, pos2, center, name);
         if (result == null) source.sendFailure(Component.translatable("command.neoblock.scheme.save.fail"));
         else source.sendSuccess(() -> Component.translatable("command.neoblock.scheme.save.success", result.getFileName().toString()), true);
         return result != null ? 1 : 0;
@@ -191,7 +189,7 @@ public class NeoCommand {
 
         assert origin != null;
 
-        int result = NeoSchematic.loadSchematic(level, origin, name);
+        int result = Schematic.loadSchematic(level, origin, name);
         if (result == 0) source.sendFailure(Component.translatable("command.neoblock.scheme.load.not_found"));
         else if (result == -1) source.sendFailure(Component.translatable("command.neoblock.scheme.load.fail"));
         else source.sendSuccess(() -> Component.translatable("command.neoblock.scheme.load.success", origin.toShortString()), true);

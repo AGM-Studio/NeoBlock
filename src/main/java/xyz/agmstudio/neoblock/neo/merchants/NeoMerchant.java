@@ -1,4 +1,4 @@
-package xyz.agmstudio.neoblock.tiers.merchants;
+package xyz.agmstudio.neoblock.neo.merchants;
 
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import net.minecraft.server.level.ServerLevel;
@@ -11,10 +11,8 @@ import net.minecraft.world.item.trading.MerchantOffers;
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.data.Range;
-import xyz.agmstudio.neoblock.tiers.NeoBlock;
-import xyz.agmstudio.neoblock.tiers.NeoTier;
-import xyz.agmstudio.neoblock.tiers.TierManager;
-import xyz.agmstudio.neoblock.tiers.WorldData;
+import xyz.agmstudio.neoblock.neo.world.WorldTier;
+import xyz.agmstudio.neoblock.neo.world.WorldData;
 import xyz.agmstudio.neoblock.util.MinecraftUtil;
 
 import java.util.*;
@@ -73,7 +71,7 @@ public class NeoMerchant {
     public static WanderingTrader forceSpawnTrader(ServerLevel level) {
         WorldData.resetTraderFailedAttempts();
         List<NeoOffer> trades = new ArrayList<>();
-        TierManager.TIERS.stream().filter(NeoTier::isUnlocked)
+        WorldData.getTiers().stream().filter(WorldTier::isUnlocked)
                 .forEach(tier -> trades.addAll(tier.getRandomTrades()));
 
         if (!trades.isEmpty()) {
@@ -108,7 +106,7 @@ public class NeoMerchant {
     public static final HashMap<UUID, MerchantOffers> offerMap = new HashMap<>();
     public WanderingTrader spawnTrader(ServerLevel level, String... tags) {
         WanderingTrader trader = new WanderingTrader(EntityType.WANDERING_TRADER, level);
-        trader.setPos(NeoBlock.POS.getCenter().add(0, 2, 0));
+        trader.setPos(WorldData.POS.getCenter().add(0, 2, 0));
         trader.setDespawnDelay(lifespan.get());
         for (String tag: tags) trader.addTag(tag);
 

@@ -30,8 +30,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.data.Range;
-import xyz.agmstudio.neoblock.tiers.WorldData;
-import xyz.agmstudio.neoblock.tiers.merchants.NeoItem;
+import xyz.agmstudio.neoblock.neo.world.WorldData;
+import xyz.agmstudio.neoblock.neo.merchants.NeoItem;
 
 import java.io.IOException;
 import java.io.InputStream;

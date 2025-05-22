@@ -4,7 +4,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.phys.Vec3;
-import xyz.agmstudio.neoblock.tiers.NeoBlock;
+import xyz.agmstudio.neoblock.neo.world.WorldData;
 import xyz.agmstudio.neoblock.util.ConfigUtil;
 
 import java.util.ArrayList;
@@ -43,7 +43,7 @@ public class SparkleAnimation extends UpgradeProgressAnimation {
             int tick = iterator.next();
             if (tick % factor == 0) {
                 for (int i = 0; i < 1 + (length / 2) - Math.abs(tick - (length / 2)); i++) {
-                    Vec3 glowPos = Vec3.atCenterOf(NeoBlock.POS).add(
+                    Vec3 glowPos = Vec3.atCenterOf(WorldData.POS).add(
                             (level.getRandom().nextDouble() - 0.5) * 1.2,
                             level.getRandom().nextDouble() * 1.5,
                             (level.getRandom().nextDouble() - 0.5) * 1.2
