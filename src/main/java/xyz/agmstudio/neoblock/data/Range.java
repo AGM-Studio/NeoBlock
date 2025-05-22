@@ -1,6 +1,6 @@
 package xyz.agmstudio.neoblock.data;
 
-import xyz.agmstudio.neoblock.tiers.WorldData;
+import xyz.agmstudio.neoblock.neo.world.WorldData;
 
 public final class Range {
     final int min, max;

@@ -83,6 +83,16 @@ public class WorldData extends MinecraftUtil.AbstractWorldData {
         instance = this;
         this.level = level;
     }
+    public WorldStatus getStatus() {
+        return status;
+    }
+    public ServerLevel getLevel() {
+        return level;
+    }
+    public WorldTier getTier(int id) {
+        for (WorldTier tier: tiers) if (tier.getID() == id) return tier;
+        return null;
+    }
 
     public static boolean isInactive() {
         return instance.status.state == WorldState.INACTIVE;
