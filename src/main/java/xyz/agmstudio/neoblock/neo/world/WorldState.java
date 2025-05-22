@@ -1,10 +1,10 @@
-package xyz.agmstudio.neoblock.tiers;
+package xyz.agmstudio.neoblock.neo.world;
 
 public enum WorldState {
     INACTIVE(0),    // Default, before activation
     ACTIVE(1),      // NeoBlock is running
-    DISABLED(2),     // NeoBlock is disabled
-    UPDATED(3);     // NeoBlock configs has been updated
+    DISABLED(2),    // NeoBlock is disabled
+    UPDATED(3);     // NeoBlock configs has been updated / Incompatible HASH
 
     private final int id;
 

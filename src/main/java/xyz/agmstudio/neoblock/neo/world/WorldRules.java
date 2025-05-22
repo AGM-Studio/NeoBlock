@@ -1,4 +1,4 @@
-package xyz.agmstudio.neoblock.tiers;
+package xyz.agmstudio.neoblock.neo.world;
 
 import com.electronwill.nightconfig.core.UnmodifiableConfig;
 import net.minecraft.server.level.ServerLevel;
