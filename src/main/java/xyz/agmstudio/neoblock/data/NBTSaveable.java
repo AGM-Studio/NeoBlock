@@ -47,6 +47,7 @@ public abstract class NBTSaveable {
                 try {
                     Object value = field.get(this);
                     if (value instanceof Integer) tag.putInt(key, (Integer) value);
+                    else if (value instanceof Double) tag.putDouble(key, (Double) value);
                     else if (value instanceof Boolean) tag.putBoolean(key, (Boolean) value);
                     else if (value instanceof String) tag.putString(key, (String) value);
                     else if (value instanceof Enum<?>) {
@@ -65,6 +66,7 @@ public abstract class NBTSaveable {
 
                             Object val = entry.getValue();
                             if (val instanceof Integer i) entryTag.putInt("value", i);
+                            else if (val instanceof Double d) tag.putDouble("value", d);
                             else if (val instanceof Boolean b) entryTag.putBoolean("value", b);
                             else if (val instanceof String s) entryTag.putString("value", s);
                             else if (val instanceof NBTSaveable saveable) entryTag.put("value", saveable.save());
@@ -76,6 +78,7 @@ public abstract class NBTSaveable {
                         ListTag list = new ListTag();
                         for (Object item : set) {
                             if (item instanceof Integer i) list.add(IntTag.valueOf(i));
+                            else if (item instanceof Double d) list.add(DoubleTag.valueOf(d));
                             else if (item instanceof Boolean b) list.add(ByteTag.valueOf(b));
                             else if (item instanceof String s) list.add(StringTag.valueOf(s));
                             else if (item instanceof NBTSaveable saveable) list.add(saveable.save());
@@ -109,6 +112,7 @@ public abstract class NBTSaveable {
                     Class<?> type = field.getType();
 
                     if (type == int.class || type == Integer.class) field.set(instance, tag.getInt(key));
+                    else if (type == double.class || type == Double.class) field.set(instance, tag.getDouble(key));
                     else if (type == boolean.class || type == Boolean.class) field.set(instance, tag.getBoolean(key));
                     else if (type == String.class) field.set(instance, tag.getString(key));
                     else if (type.isEnum()) {
@@ -132,6 +136,7 @@ public abstract class NBTSaveable {
 
                             Object mapValue = null;
                             if (valueType == Integer.class) mapValue = entry.getInt("value");
+                            else if (valueType == Double.class) entry.getDouble("value");
                             else if (valueType == Boolean.class) mapValue = entry.getBoolean("value");
                             else if (valueType == String.class) mapValue = entry.getString("value");
                             else if (NBTSaveable.class.isAssignableFrom(valueType))
@@ -151,6 +156,7 @@ public abstract class NBTSaveable {
                         for (Tag t: list) {
                             Object val = null;
                             if (elemType == Integer.class) val = ((IntTag) t).getAsInt();
+                            else if (elemType == Double.class) val = ((DoubleTag) t).getAsDouble();
                             else if (elemType == String.class) val = t.getAsString();
                             else if (NBTSaveable.class.isAssignableFrom(elemType))
                                 //noinspection unchecked
