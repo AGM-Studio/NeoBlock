@@ -275,13 +275,12 @@ public class WorldData extends MinecraftUtil.AbstractWorldData {
     }
 
     public static void onBlockBroken(ServerLevel level, LevelAccessor access, boolean triggered) {
-        if (triggered) addBlockCount(1);
-        for (WorldTier tier: instance.tiers) if (tier.canBeUnlocked())
-            instance.upgrade.addUpgrade(tier);
+        Animation.resetIdleTick();if (triggered) addBlockCount(1);
 
-        else setNeoBlock(access, getRandomBlock());
+        for (WorldTier tier: instance.tiers)
+            if (tier.canBeUnlocked()) instance.upgrade.addUpgrade(tier);
 
-        Animation.resetIdleTick();
+        if (instance.upgrade.upgrades.isEmpty()) setNeoBlock(access, getRandomBlock());
         NeoListener.execute(() -> NeoMerchant.attemptSpawnTrader(level));
     }
 

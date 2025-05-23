@@ -92,6 +92,10 @@ public class TierData {
         NeoBlockMod.LOGGER.debug("Tier {} loaded. Hash key: {}", id, getHashCode());
     }
 
+    public static int size() {
+        return DATA.size();
+    }
+
     // Coding methods to help validate world using matching config.
     // Only hash game breaking data, no need for general data like blocks, weight, etc...
     public String getHashCode() {

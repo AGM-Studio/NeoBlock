@@ -19,9 +19,11 @@ import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import org.jetbrains.annotations.NotNull;
-import xyz.agmstudio.neoblock.neo.world.WorldData;
+import xyz.agmstudio.neoblock.commands.*;
+import xyz.agmstudio.neoblock.commands.util.NeoCommand;
 import xyz.agmstudio.neoblock.neo.merchants.NeoMerchant;
 import xyz.agmstudio.neoblock.neo.merchants.NeoOffer;
+import xyz.agmstudio.neoblock.neo.world.WorldData;
 import xyz.agmstudio.neoblock.neo.world.WorldUpgrade;
 import xyz.agmstudio.neoblock.util.MinecraftUtil;
 
@@ -78,7 +80,19 @@ public final class NeoListener {
 
     @SubscribeEvent
     public static void onRegisterCommands(RegisterCommandsEvent event) {
-        NeoCommand.register(event.getDispatcher());
+        new MainCommand();
+
+        new DisableTierCommand();
+        new EnableTierCommand();
+        new CommandTierCommand();
+
+        new ForceResetTiersCommand();
+        new ForceTraderSpawnCommand();
+
+        new SchematicSaveCommand();
+        new SchematicLoadCommand();
+
+        NeoCommand.registerAll(event.getDispatcher());
     }
 
     @SubscribeEvent

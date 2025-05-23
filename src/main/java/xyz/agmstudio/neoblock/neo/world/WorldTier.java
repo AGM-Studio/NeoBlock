@@ -79,6 +79,7 @@ public class WorldTier extends NBTSaveable {
     }
 
     public void onFinishUpgrade(ServerLevel level) {
+        this.enable();
         MinecraftUtil.Messenger.sendInstantMessage("message.neoblock.unlocked_tier", level, false, id);
     }
     public void onStartUpgrade(ServerLevel level) {
