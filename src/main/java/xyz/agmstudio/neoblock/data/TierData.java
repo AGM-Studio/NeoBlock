@@ -21,7 +21,7 @@ import java.util.stream.Stream;
 public class TierData {
     public static final Path FOLDER = MinecraftUtil.CONFIG_DIR.resolve(NeoBlockMod.MOD_ID + "/tiers");
     public static final List<TierData> DATA = new ArrayList<>();
-    private static String HASH;
+    private static String HASH = "";
 
     public static void reload() {
         ResourceUtil.loadAllTierConfigs();

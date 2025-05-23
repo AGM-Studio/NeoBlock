@@ -22,6 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
 import xyz.agmstudio.neoblock.neo.merchants.NeoMerchant;
 import xyz.agmstudio.neoblock.neo.merchants.NeoOffer;
+import xyz.agmstudio.neoblock.neo.world.WorldUpgrade;
 import xyz.agmstudio.neoblock.util.MinecraftUtil;
 
 import java.util.HashSet;
@@ -70,7 +71,7 @@ public final class NeoListener {
         if (!(event.getLevel() instanceof ServerLevel level) || WorldData.isDisabled()) return;
         if (event.getEntity() instanceof WanderingTrader trader) NeoMerchant.handleTrader(trader);
         if (event.getEntity() instanceof ServerPlayer player) {
-            if (WorldData.isOnUpgrade()) WorldData.addPlayer(player);
+            if (WorldData.isOnUpgrade()) WorldUpgrade.addPlayer(player);
             MinecraftUtil.Messenger.onPlayerJoin(level, player);
         }
     }

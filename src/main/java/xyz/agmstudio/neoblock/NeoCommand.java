@@ -23,6 +23,7 @@ import xyz.agmstudio.neoblock.neo.merchants.NeoMerchant;
 
 import java.nio.file.Path;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 @SuppressWarnings("SameReturnValue")
 public class NeoCommand {
@@ -118,7 +119,7 @@ public class NeoCommand {
     // Methods that executes when the command is run
     private static int showInfo(CommandContext<CommandSourceStack> context) {
         CommandSourceStack source = context.getSource();
-        MutableComponent message = Component.translatable("command.neoblock.info", WorldData.getBlockCount(), WorldData.getTiers().stream().filter(tier -> !tier.isUnlocked()).map(WorldTier::getName).toArray());
+        MutableComponent message = Component.translatable("command.neoblock.info", WorldData.getBlockCount(), WorldData.getTiers().stream().filter(WorldTier::isUnlocked).map(WorldTier::getName).collect(Collectors.joining("\n\t")));
 
         source.sendSuccess(() -> message, true);
         return 1;

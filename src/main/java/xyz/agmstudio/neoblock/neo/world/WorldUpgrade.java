@@ -28,7 +28,7 @@ public class WorldUpgrade {
             for (UpgradePhaseAnimation animation : phaseAnimations)
                 if (animation.isActiveOnUpgradeStart()) animation.animate(level, access);
         }
-        if (lock.tick >= lock.goal) {
+        if (lock.isDone()) {
             lock.unlocked = true;
             lock.tier.onFinishUpgrade(level);
 
@@ -42,7 +42,7 @@ public class WorldUpgrade {
                 WorldData.setNeoBlock(access, WorldData.getRandomBlock());
             }
         } else {
-            if (progressbar != null) progressbar.update(lock.tick, lock.goal);
+            if (progressbar != null) progressbar.update(lock.tick, lock.getGoal());
             for (UpgradeProgressAnimation animation : progressAnimations)
                 animation.upgradeTick(level, access, lock.tick);
         }

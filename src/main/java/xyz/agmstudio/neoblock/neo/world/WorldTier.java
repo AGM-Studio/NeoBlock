@@ -21,8 +21,10 @@ public class WorldTier extends NBTSaveable {
     public static WorldTier of(@NotNull TierData tier, WorldData data) {
         WorldTier instance = new WorldTier();
         instance.id = tier.id;
-        instance.enabled = tier.lock.isUnlocked(data);
         instance.lock = new Lock();
+        instance.lock.unlocked = tier.lock.isUnlocked(data);
+        instance.lock.tier = instance;
+        instance.enabled = instance.lock.unlocked;
 
         instance.data = tier;
         instance.world = data;
@@ -43,6 +45,7 @@ public class WorldTier extends NBTSaveable {
         data = TierData.get(id);
         world = WorldData.getInstance();
 
+        if (lock == null) lock = new Lock();
         lock.tier = this;
     }
 
@@ -90,7 +93,7 @@ public class WorldTier extends NBTSaveable {
         return lock.unlocked;
     }
     public boolean canBeUnlocked() {
-        return data.lock.isUnlocked(WorldData.getInstance());
+        return !isUnlocked() && data.lock.isUnlocked(WorldData.getInstance());
     }
 
     public boolean isCommanded() {
@@ -123,6 +126,12 @@ public class WorldTier extends NBTSaveable {
         // The lock process
         @NBTData protected int line = 0;
         @NBTData protected int tick = 0;
-        @NBTData protected int goal = 0;
+
+        public boolean isDone() {
+            return tick >= tier.data.lock.getTime();
+        }
+        public int getGoal() {
+            return tier.data.lock.getTime();
+        }
     }
 }

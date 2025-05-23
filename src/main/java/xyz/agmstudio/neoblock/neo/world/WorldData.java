@@ -44,8 +44,7 @@ public class WorldData extends MinecraftUtil.AbstractWorldData {
 
     private static void resetTiers(WorldData data) {
         data.tiers.clear();
-        TierData.stream().map(tier -> WorldTier.of(tier, data))
-                .forEach(tier -> data.tiers.add(tier));
+        TierData.stream().map(tier -> WorldTier.of(tier, data)).forEach(data.tiers::add);
 
         instance.status.hash = TierData.getHash();
     }
@@ -117,6 +116,7 @@ public class WorldData extends MinecraftUtil.AbstractWorldData {
         final ListTag tiers = tag.getList("Tiers", StringTag.TAG_COMPOUND);
         for (int i = 0; i < tiers.size(); i++) {
             WorldTier tier = NBTSaveable.load(WorldTier.class, tiers.getCompound(i));
+            if (tier.canBeUnlocked()) data.upgrade.addUpgrade(tier);
             data.tiers.add(tier);
         }
 
@@ -138,7 +138,7 @@ public class WorldData extends MinecraftUtil.AbstractWorldData {
     private final ServerLevel level;
 
     private WorldStatus status;
-    private HashSet<WorldTier> tiers;
+    private final HashSet<WorldTier> tiers = new HashSet<>();
     private final WorldUpgrade upgrade = new WorldUpgrade();
 
     private WorldData(ServerLevel level) {
