@@ -6,6 +6,7 @@ import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.tree.LiteralCommandNode;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 
@@ -47,7 +48,7 @@ public abstract class NeoCommand {
     }
     public abstract int execute(CommandContext<CommandSourceStack> context) throws CommandExtermination, CommandSyntaxException;
 
-    public void register(CommandDispatcher<CommandSourceStack> dispatcher) {
+    public LiteralCommandNode<CommandSourceStack> register(CommandDispatcher<CommandSourceStack> dispatcher) {
         Command<CommandSourceStack> executor = (context) -> {
             try {
                 this.execute(context);
@@ -63,24 +64,24 @@ public abstract class NeoCommand {
         ArgumentBuilder<CommandSourceStack, ?> current = null;
         NeoArgument<?> previous = null;
         for (NeoArgument<?> argument: arguments.reversed().sequencedValues()) {
-            ArgumentBuilder<CommandSourceStack, ?> build = argument.build();
-            if (previous == null || previous.isOptional()) build.requires(permission).executes(executor);
+            ArgumentBuilder<CommandSourceStack, ?> build = argument.build().requires(permission);
+            if (previous == null || previous.isOptional()) build.executes(executor);
             if (current != null) build.then(current);
             previous = argument;
             current = build;
         }
 
         while (!parts.isEmpty()) {
-            ArgumentBuilder<CommandSourceStack, ?> build = Commands.literal(parts.remove(parts.size() - 1));
-            if (current == null) build.requires(permission).executes(executor);
+            ArgumentBuilder<CommandSourceStack, ?> build = Commands.literal(parts.remove(parts.size() - 1)).requires(permission);
+            if (current == null) build.executes(executor);
             else build.then(current);
             current = build;
         }
 
-        if (current == null) root.requires(permission).executes(executor);
+        if (current == null) root.executes(executor);
         else root.then(current);
 
-        dispatcher.register(root);
+        return dispatcher.register(root);
     }
 
     public static class CommandExtermination extends Exception {}
