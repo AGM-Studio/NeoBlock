@@ -19,7 +19,14 @@ group = mod_group_id
 
 repositories {
     mavenLocal()
-    maven { url = 'https://maven.moddingx.org/release' }
+    maven {
+        name = "Jared's maven"
+        url = "https://maven.blamejared.com/"
+    }
+    maven {
+        name = "ModMaven"
+        url = "https://modmaven.dev"
+    }
 }
 
 base {
@@ -114,7 +121,7 @@ configurations {
 }
 
 dependencies {
-    annotationProcessor "org.moddingx:LibX:1.21.1-6.0.4"
+    compileOnly("mezz.jei:jei-${minecraft_version}-neoforge-api:${jei_version}")
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.

@@ -6,6 +6,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.neo.merchants.NeoMerchant;
 import xyz.agmstudio.neoblock.neo.merchants.NeoOffer;
+import xyz.agmstudio.neoblock.neo.world.WorldData;
+import xyz.agmstudio.neoblock.neo.world.WorldTier;
 import xyz.agmstudio.neoblock.util.MinecraftUtil;
 import xyz.agmstudio.neoblock.util.ResourceUtil;
 import xyz.agmstudio.neoblock.util.StringUtil;
@@ -101,5 +103,9 @@ public class TierData {
     public String getHashCode() {
         String data = id + ":" + (lock == null ? "" : lock.hash());
         return StringUtil.encodeToBase64(data);
+    }
+
+    public WorldTier getWorldTier() {
+        return WorldData.getInstance().getTier(id);
     }
 }

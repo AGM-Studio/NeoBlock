@@ -24,14 +24,15 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModList;
 import net.neoforged.fml.loading.FMLPaths;
 import net.neoforged.neoforge.common.NeoForge;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.data.Range;
-import xyz.agmstudio.neoblock.neo.world.WorldData;
 import xyz.agmstudio.neoblock.neo.merchants.NeoItem;
+import xyz.agmstudio.neoblock.neo.world.WorldData;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -46,6 +47,10 @@ import java.util.*;
 public final class MinecraftUtil {
     public static final Path CONFIG_DIR = FMLPaths.CONFIGDIR.get();
     public static final IEventBus EVENT_BUS = NeoForge.EVENT_BUS;
+
+    public static boolean isLoaded(String mod) {
+        return ModList.get().isLoaded(mod);
+    }
 
     public static @Nullable ResourceLocation getResourceLocation(String name) {
         return ResourceLocation.tryParse(name);
