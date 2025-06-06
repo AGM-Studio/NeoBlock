@@ -4,6 +4,18 @@
 
   "bossbar.neoblock.upgrade_bar": "Upgrading... (%s)",
 
+  "block.neoblock.neoblock": "NeoBlock Generation",
+
+  "jei.neoblock.title": "NeoBlock Generation",
+  "jei.neoblock.tier": "Tier %s: %s",
+  "jei.neoblock.chance": "Tier chance: %s",
+  "jei.neoblock.unlock_time": "Unlock time: %s",
+  "jei.neoblock.requirements.header": "Requirements:",
+  "jei.neoblock.requirement.blocks_broken": "Break %s blocks (%s broken)",
+  "jei.neoblock.requirement.play_time": "Play for %s (Played for %s)",
+  "jei.neoblock.requirement.command": "Has special requirement by modpack.",
+  "jei.neoblock.requirement.command.me": "✅ Special requirement met.",
+
   "tooltip.neoblock.spawn_lore": "Using this will ask the trader to bring a %s next time they visit.\nThis doesn't spawn any mob on use.",
   "tooltip.neoblock.tier_chance": "Tier chance: %f%%",
   "tooltip.neoblock.total_chance": "Total chance: %f%%",
