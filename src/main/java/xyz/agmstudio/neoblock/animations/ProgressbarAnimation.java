@@ -4,8 +4,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerBossEvent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.BossEvent;
-import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.util.ConfigUtil;
+import xyz.agmstudio.neoblock.util.StringUtil;
 
 public class ProgressbarAnimation extends Animation {
     @ConfigUtil.ConfigField
@@ -22,7 +22,7 @@ public class ProgressbarAnimation extends Animation {
 
     public void update(int ticks, int goal) {
         bar.setProgress((float) ticks / goal);
-        bar.setName(Component.translatable("bossbar.neoblock.upgrade_bar", formatTicks(goal - ticks)));
+        bar.setName(Component.translatable("bossbar.neoblock.upgrade_bar", StringUtil.formatTicks(goal - ticks)));
     }
 
     public void addPlayer(ServerPlayer player) {
@@ -30,20 +30,6 @@ public class ProgressbarAnimation extends Animation {
     }
     public void removeAllPlayers() {
         bar.removeAllPlayers();
-    }
-
-    private static @NotNull String formatTicks(int ticks) {
-        int totalSeconds = ticks / 20;
-        int hours = totalSeconds / 3600;
-        int minutes = (totalSeconds % 3600) / 60;
-        int seconds = totalSeconds % 60;
-
-        StringBuilder timeString = new StringBuilder();
-        if (hours > 0) timeString.append(hours).append("h ");
-        if (minutes > 0 || hours > 0) timeString.append(minutes).append("m ");
-        timeString.append(seconds).append("s");
-
-        return timeString.toString().trim();
     }
 
     @Override protected void onRegister() {

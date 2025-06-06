@@ -128,4 +128,53 @@ public class StringUtil {
     public static @NotNull String encodeToBase64(@NotNull String input) {
         return Base64.getEncoder().encodeToString(input.getBytes());
     }
+
+    /**
+     * Converts amount of ticks into a readable format
+     *
+     * @param ticks the amount of ticks
+     * @return readable time format
+     */
+    public static @NotNull String formatTicks(long ticks) {
+        long totalSeconds = ticks / 20;
+        long hours = totalSeconds / 3600;
+        long minutes = (totalSeconds % 3600) / 60;
+        long seconds = totalSeconds % 60;
+
+        StringBuilder timeString = new StringBuilder();
+        if (hours > 0) {
+            timeString.append(hours).append(":");
+            timeString.append(String.format("%02d:", minutes));
+            timeString.append(String.format("%02d", seconds));
+        } else if (minutes > 0) {
+            timeString.append(minutes).append(":");
+            timeString.append(String.format("%02d", seconds));
+        } else timeString.append(seconds).append(" seconds");
+        return timeString.toString().trim();
+    }
+    public static @NotNull String formatTicks(int ticks) {
+        return formatTicks((long) ticks);
+    }
+
+    /**
+     * Formats the double into the digits requested.
+     *
+     * @param value the value to be rounded
+     * @param digits the amount of digits
+     * @return formatted text
+     */
+    public static @NotNull String round(double value, int digits) {
+        return String.format("%%.%df".formatted(digits), value);
+    }
+
+    /**
+     * Formats the double into percentage with specified digits
+     *
+     * @param value  the value to turn into percentage
+     * @param digits the amount of digits
+     * @return formatted text
+     */
+    public static @NotNull String percentage(double value, int digits) {
+        return round(value * 100.0, digits) + "%";
+    }
 }

@@ -159,6 +159,9 @@ public class WorldData extends MinecraftUtil.AbstractWorldData {
     public static HashSet<WorldTier> getTiers() {
         return instance.tiers;
     }
+    public static int totalWeight() {
+        return instance.tiers.stream().filter(WorldTier::isEnabled).mapToInt(WorldTier::getWeight).sum();
+    }
 
     public static boolean isInactive() {
         return instance.status.state == WorldState.INACTIVE;

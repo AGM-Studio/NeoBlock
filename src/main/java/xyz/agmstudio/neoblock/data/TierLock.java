@@ -47,6 +47,15 @@ public class TierLock {
     public int getTime() {
         return time;
     }
+    public int getBlocks() {
+        return blocks;
+    }
+    public int getGameplay() {
+        return game;
+    }
+    public boolean isCommanded() {
+        return command;
+    }
 
     public boolean isUnlocked(WorldData data) {
         if (blocks > 0 && data.getStatus().getBlockCount() < blocks) return false;
