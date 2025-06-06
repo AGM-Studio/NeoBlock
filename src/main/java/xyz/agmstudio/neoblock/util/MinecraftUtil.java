@@ -55,6 +55,10 @@ public final class MinecraftUtil {
     public static @Nullable ResourceLocation getResourceLocation(String name) {
         return ResourceLocation.tryParse(name);
     }
+    public static ResourceLocation createResourceLocation(String namespace, String path) {
+        return ResourceLocation.fromNamespaceAndPath(namespace, path);
+    }
+
     public static @Nullable Item getItem(String name) {
         return getItem(getResourceLocation(name));
     }
