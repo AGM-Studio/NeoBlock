@@ -14,10 +14,10 @@ import xyz.agmstudio.neoblock.util.MinecraftUtil;
 import xyz.agmstudio.neoblock.util.StringUtil;
 
 public class NeoItem {
-    private static final ResourceLocation air = MinecraftUtil.getResourceLocation("minecraft:air");
+    private static final ResourceLocation air = MinecraftUtil.parseResourceLocation("minecraft:air");
     private static boolean isValid(Item item) {
-        @Nullable ResourceLocation resource = MinecraftUtil.getItemResource(item);
-        return resource != null && resource != air;
+        ResourceLocation resource = MinecraftUtil.getItemResource(item).orElse(air);
+        return resource != air;
     }
 
     public static NeoItem parse(String value) {
@@ -71,7 +71,7 @@ public class NeoItem {
         public ItemStack modify(ItemStack stack) {
             CompoundTag tag = MinecraftUtil.Items.getItemTag(stack);
 
-            @Nullable ResourceLocation location = MinecraftUtil.getEntityTypeResource(mob);
+            @Nullable ResourceLocation location = MinecraftUtil.getEntityTypeResource(mob).orElse(null);
             tag.putBoolean("isNeoMob", true);
             tag.putString("neoMobType", location != null ? location.toString() : "minecraft:pig");
 

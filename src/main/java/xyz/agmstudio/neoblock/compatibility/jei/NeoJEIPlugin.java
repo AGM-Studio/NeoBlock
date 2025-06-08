@@ -28,7 +28,7 @@ import java.util.*;
 
 @JeiPlugin
 public class NeoJEIPlugin implements IModPlugin {
-    private static final ResourceLocation ID = MinecraftUtil.getResourceLocation("neoblock:jei_plugin");
+    private static final ResourceLocation ID = MinecraftUtil.parseResourceLocation("neoblock:jei_plugin");
 
     public static final int WHITE_COLOR = 0xFFFFFF;
     public static final int RED_COLOR = 0xFF5555;

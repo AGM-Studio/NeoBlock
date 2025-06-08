@@ -67,7 +67,7 @@ public final class NeoOffer {
         if (!tag.getBoolean("isNeoMob")) return null;
 
         String type = tag.getString("neoMobType");
-        return MinecraftUtil.getEntityType(type);
+        return MinecraftUtil.getEntityType(type).orElse(null);
     }
 
     public static boolean handlePossibleMobTrade(ItemStack item, ServerLevel level) {

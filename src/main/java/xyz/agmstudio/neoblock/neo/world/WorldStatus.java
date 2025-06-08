@@ -19,7 +19,7 @@ public class WorldStatus extends NBTSaveable {
 
     @Override public void onLoad(CompoundTag tag) {
         final CompoundTag mobs = tag.getCompound("TradedMobs");
-        mobs.getAllKeys().forEach(key -> tradedMobs.merge(MinecraftUtil.getEntityType(key), mobs.getInt(key), Integer::sum));
+        mobs.getAllKeys().forEach(key -> tradedMobs.merge(MinecraftUtil.getEntityType(key).orElse(null), mobs.getInt(key), Integer::sum));
     }
     @Override public CompoundTag onSave(CompoundTag tag) {
         final CompoundTag mobs = new CompoundTag();

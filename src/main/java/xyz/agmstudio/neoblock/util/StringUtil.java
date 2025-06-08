@@ -89,7 +89,7 @@ public class StringUtil {
      */
     public static Pair<Block, Range> parseBlock(String value) {
         Pair<String, Range> parsed = parseCount(value, new Range(1, 1));
-        Block block = MinecraftUtil.getBlock(parsed.getLeft());
+        Block block = MinecraftUtil.getBlock(parsed.getLeft()).orElse(null);
         return Pair.of(block, parsed.getRight());
     }
 
@@ -102,7 +102,7 @@ public class StringUtil {
      */
     public static Pair<Item, Range> parseItem(String value) {
         Pair<String, Range> parsed = parseCount(value, new Range(1, 1));
-        Item item = MinecraftUtil.getItem(parsed.getLeft());
+        Item item = MinecraftUtil.getItem(parsed.getLeft()).orElse(null);
         return Pair.of(item, parsed.getRight());
     }
 
@@ -115,7 +115,7 @@ public class StringUtil {
      */
     public static Pair<EntityType<?>, Range> parseEntityType(String value) {
         Pair<String, Range> parsed = parseCount(value, new Range(1, 1));
-        EntityType<?> type = MinecraftUtil.getEntityType(parsed.getLeft());
+        EntityType<?> type = MinecraftUtil.getEntityType(parsed.getLeft()).orElse(null);
         return Pair.of(type, parsed.getRight());
     }
 

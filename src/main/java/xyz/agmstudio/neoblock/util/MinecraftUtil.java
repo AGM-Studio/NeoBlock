@@ -28,7 +28,6 @@ import net.neoforged.fml.ModList;
 import net.neoforged.fml.loading.FMLPaths;
 import net.neoforged.neoforge.common.NeoForge;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.data.Range;
 import xyz.agmstudio.neoblock.neo.merchants.NeoItem;
@@ -52,64 +51,66 @@ public final class MinecraftUtil {
         return ModList.get().isLoaded(mod);
     }
 
-    public static @Nullable ResourceLocation getResourceLocation(String name) {
-        return ResourceLocation.tryParse(name);
+    public static @NotNull ResourceLocation parseResourceLocation(String name) {
+        return ResourceLocation.parse(name);
+    }
+    public static Optional<ResourceLocation> getResourceLocation(String name) {
+        return Optional.ofNullable(ResourceLocation.tryParse(name));
     }
     public static ResourceLocation createResourceLocation(String namespace, String path) {
         return ResourceLocation.fromNamespaceAndPath(namespace, path);
     }
 
-    public static @Nullable Item getItem(String name) {
-        return getItem(getResourceLocation(name));
+    public static Optional<Item> getItem(String name) {
+        return getItem(getResourceLocation(name).get());
     }
-    public static @Nullable Item getItem(ResourceLocation location) {
-        if (location == null) return null;
-        return BuiltInRegistries.ITEM.get(location);
+    public static Optional<Item> getItem(ResourceLocation location) {
+        if (location == null) return Optional.empty();
+        return Optional.of(BuiltInRegistries.ITEM.get(location));
     }
-    public static @Nullable ResourceLocation getItemResource(Item item) {
-        if (item == null) return null;
-        return BuiltInRegistries.ITEM.getKey(item);
+    public static Optional<ResourceLocation> getItemResource(Item item) {
+        if (item == null) return Optional.empty();
+        return Optional.of(BuiltInRegistries.ITEM.getKey(item));
     }
     public static boolean isValidItem(Item item, ResourceLocation location) {
-        return item != null && getItemResource(item) == location;
+        return getItemResource(item).get() == location;
     }
-    public static @Nullable Block getBlock(String name) {
-        return getBlock(getResourceLocation(name));
+    public static Optional<Block> getBlock(String name) {
+        return getBlock(getResourceLocation(name).get());
     }
-    public static @Nullable Block getBlock(ResourceLocation location) {
-        if (location == null) return null;
-        return BuiltInRegistries.BLOCK.get(location);
+    public static Optional<Block> getBlock(ResourceLocation location) {
+        if (location == null) return Optional.empty();
+        return Optional.of(BuiltInRegistries.BLOCK.get(location));
     }
-    public static @Nullable ResourceLocation getBlockResource(Block block) {
-        if (block == null) return null;
-        return BuiltInRegistries.BLOCK.getKey(block);
+    public static Optional<ResourceLocation> getBlockResource(Block block) {
+        if (block == null) return Optional.empty();
+        return Optional.of(BuiltInRegistries.BLOCK.getKey(block));
     }
     public static boolean isValidBlock(Block block, ResourceLocation location) {
-        return block != null && getBlockResource(block) == location;
+        return getBlockResource(block).get() == location;
     }
-    public static @Nullable BlockState getBlockState(String name) {
-        return getBlockState(getResourceLocation(name));
+    public static Optional<BlockState> getBlockState(String name) {
+        return getBlockState(getResourceLocation(name).get());
     }
-    public static @Nullable BlockState getBlockState(ResourceLocation location) {
-        if (location == null) return null;
-        return getBlock(location).defaultBlockState();
+    public static Optional<BlockState> getBlockState(ResourceLocation location) {
+        return getBlock(location).map(Block::defaultBlockState);
     }
     public static boolean isValidBlockState(BlockState state, ResourceLocation location) {
-        return state != null && getBlockResource(state.getBlock()).equals(location);
+        return getBlockResource(state.getBlock()).get() == location;
     }
-    public static @Nullable EntityType<?> getEntityType(String name) {
-        return getEntityType(getResourceLocation(name));
+    public static Optional<EntityType<?>> getEntityType(String name) {
+        return getEntityType(getResourceLocation(name).get());
     }
-    public static @Nullable EntityType<?> getEntityType(ResourceLocation location) {
-        if (location == null) return null;
-        return BuiltInRegistries.ENTITY_TYPE.get(location);
+    public static Optional<EntityType<?>> getEntityType(ResourceLocation location) {
+        if (location == null) return Optional.empty();
+        return Optional.of(BuiltInRegistries.ENTITY_TYPE.get(location));
     }
-    public static @Nullable ResourceLocation getEntityTypeResource(EntityType<?> type) {
-        if (type == null) return null;
-        return BuiltInRegistries.ENTITY_TYPE.getKey(type);
+    public static Optional<ResourceLocation> getEntityTypeResource(EntityType<?> type) {
+        if (type == null) return Optional.empty();
+        return Optional.of(BuiltInRegistries.ENTITY_TYPE.getKey(type));
     }
     public static boolean isValidEntityType(EntityType<?> entityType, ResourceLocation location) {
-        return entityType != null && getEntityTypeResource(entityType) == location;
+        return getEntityTypeResource(entityType).get() == location;
     }
 
     public static final class Items {
