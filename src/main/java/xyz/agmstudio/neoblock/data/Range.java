@@ -2,6 +2,7 @@ package xyz.agmstudio.neoblock.data;
 
 import xyz.agmstudio.neoblock.neo.world.WorldData;
 
+@Deprecated(since = "0.5", forRemoval = true)
 public final class Range {
     final int min, max;
 
