@@ -28,7 +28,7 @@ trader-trades = [
     "1xminecraft:small_amethyst_bud; 4-6xminecraft:amethyst_shard; 8-12",
     "1xminecraft:medium_amethyst_bud; 8-12xminecraft:amethyst_shard; 8-12",
     "1xminecraft:large_amethyst_bud; 16-24xminecraft:amethyst_shard; 8-12",
-    "1xminecraft:amethyst_cluster; 32-48xminecraft:amethyst_shard; 8-12",
+    "1xminecraft:amethyst_cluster; 32-48xminecraft:amethyst_shard; 8-12"
 ]
 # Amount of trades they will choose from this tier
 trader-count = 2

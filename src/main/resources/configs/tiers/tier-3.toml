@@ -4,7 +4,7 @@ name = "Deep Cave phase"
 blocks = [
     "20xminecraft:deepslate",
     "14xminecraft:tuff",
-    "5xminecraft:amethyste_block",
+    "5xminecraft:amethyst_block",
     "4xminecraft:deepslate_coal_ore",
     "4xminecraft:deepslate_iron_ore",
     "2xminecraft:deepslate_gold_ore",
