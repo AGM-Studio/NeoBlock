@@ -6,6 +6,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
 import xyz.agmstudio.neoblock.util.MinecraftUtil;
+import xyz.agmstudio.neoblock.util.StringUtil;
 
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -14,7 +15,6 @@ import java.util.regex.Pattern;
 public class NeoItemStack {
     private static final Pattern PATTERN = Pattern.compile("(?<count>\\d+(-\\d+)?)?x(?<id>[\\w:]+)(?:\\s+(?<chance>\\d+\\.?\\d*)%?)?");
     private static final ResourceLocation DEFAULT = MinecraftUtil.parseResourceLocation("minecraft:stone");
-    protected static final UniformInt ONE = UniformInt.of(1, 1);
 
     protected final Item item;
     protected final UniformInt range;
@@ -57,7 +57,7 @@ public class NeoItemStack {
     }
 
     @Override public String toString() {
-        return NeoParser.stringUniformInt(range) + getId() + NeoParser.stringChance(chance);
+        return StringUtil.stringUniformInt(range) + getId() + StringUtil.stringChance(chance);
     }
 
     public static Optional<? extends NeoItemStack> parseItem(String input) {
@@ -72,8 +72,8 @@ public class NeoItemStack {
         Item item = MinecraftUtil.getItem(matcher.group("id")).orElse(null);
         if (item == null) return Optional.empty();
 
-        UniformInt range = NeoParser.parseRange(matcher.group("count"));
-        double chance = NeoParser.parseChance(matcher.group("chance"));
+        UniformInt range = StringUtil.parseRange(matcher.group("count"));
+        double chance = StringUtil.parseChance(matcher.group("chance"));
 
         return Optional.of(new NeoItemStack(item, range, chance));
     }

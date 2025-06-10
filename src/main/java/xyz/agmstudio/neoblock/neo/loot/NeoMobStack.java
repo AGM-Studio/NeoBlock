@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
 import xyz.agmstudio.neoblock.util.MinecraftUtil;
+import xyz.agmstudio.neoblock.util.StringUtil;
 
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -63,8 +64,8 @@ public class NeoMobStack extends NeoItemStack {
         if (entityType == null) return Optional.empty();
 
         Item spawnEgg = MinecraftUtil.getItem(id + "_spawn_egg").orElse(DEFAULT_EGG);
-        UniformInt range = NeoParser.parseRange(matcher.group("count"));
-        double chance = NeoParser.parseChance(matcher.group("chance"));
+        UniformInt range = StringUtil.parseRange(matcher.group("count"));
+        double chance = StringUtil.parseChance(matcher.group("chance"));
 
         return Optional.of(new NeoMobStack(entityType, range, chance, spawnEgg));
     }

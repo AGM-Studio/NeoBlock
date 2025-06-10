@@ -1,18 +1,21 @@
 package xyz.agmstudio.neoblock.util;
 
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.item.Item;
+import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.level.block.Block;
-import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import xyz.agmstudio.neoblock.data.Range;
+import xyz.agmstudio.neoblock.NeoBlockMod;
 
+import java.util.AbstractMap;
 import java.util.Base64;
+import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class StringUtil {
+    private static final Pattern BLOCK_PATTERN = Pattern.compile("^(?:(?<count>\\d+)x)?(?<id>[a-z0-9_]+:[a-z0-9_/]+)$");
+    private static final UniformInt ONE = UniformInt.of(1, 1);
+
     /**
      * Converts string to snake-case
      *
@@ -29,94 +32,6 @@ public class StringUtil {
             } else result.append(c);
         }
         return result.toString();
-    }
-
-
-    private static final Pattern RX = Pattern.compile("^(\\d+)(?:-(\\d+))?x");
-    private static final Pattern RP = Pattern.compile("^(\\d+)(?:-(\\d+))?");
-
-    /**
-     * Parses a count prefix from the string and returns a Pair of the remaining identifier string
-     * and the parsed Range. If no count prefix is found, the defaultRange is used.
-     * <p>
-     * For example, given "2-3xminecraft:stone", this method returns a pair of:
-     *   - "minecraft:stone"
-     *   - Range with min=2 and max=3.
-     *
-     * @param value the input string (e.g. "2-3xminecraft:stone")
-     * @param defaultRange the range to use if no count prefix is found
-     * @return a Pair of the identifier (String) and the Range
-     */
-    public static Pair<String, Range> parseCount(String value, Range defaultRange) {
-        value = value.strip();
-        Matcher matcher = RX.matcher(value);
-        Range parsedRange = defaultRange;
-        if (matcher.find()) {
-            String countPart = matcher.group(0);
-            Range temp = parseRange(countPart.substring(0, countPart.length() - 1));
-            if (temp != null) parsedRange = temp;
-            value = value.substring(matcher.end());
-        }
-        return Pair.of(value, parsedRange);
-    }
-
-    /**
-     * Parses a numeric range from the given string.
-     * For example:
-     *   - "1" returns Range(1, 1)
-     *   - "1-5" returns Range(1, 5)
-     *
-     * @param value the input string representing the range
-     * @return a Range object, or null if the string does not match
-     */
-    public static @Nullable Range parseRange(String value) {
-        value = value.strip();
-        Matcher matcher = RP.matcher(value);
-        if (matcher.find()) {
-            int min = Integer.parseInt(matcher.group(1));
-            int max = matcher.group(2) != null ? Integer.parseInt(matcher.group(2)) : min;
-            return new Range(min, max);
-        }
-        return null;
-    }
-
-    /**
-     * Parses a Block from the given string.
-     * The string should be in the format "[count]x[block_id]", for example "2xminecraft:stone" or "3-5xminecraft:stone".
-     *
-     * @param value the input string
-     * @return a Pair of the Block and the Range extracted
-     */
-    public static Pair<Block, Range> parseBlock(String value) {
-        Pair<String, Range> parsed = parseCount(value, new Range(1, 1));
-        Block block = MinecraftUtil.getBlock(parsed.getLeft()).orElse(null);
-        return Pair.of(block, parsed.getRight());
-    }
-
-    /**
-     * Parses an Item from the given string.
-     * The string should be in the format "[count]x[item_id]", for example "1xminecraft:diamond" or "2-3xminecraft:diamond".
-     *
-     * @param value the input string
-     * @return a Pair of the Item and the Range extracted
-     */
-    public static Pair<Item, Range> parseItem(String value) {
-        Pair<String, Range> parsed = parseCount(value, new Range(1, 1));
-        Item item = MinecraftUtil.getItem(parsed.getLeft()).orElse(null);
-        return Pair.of(item, parsed.getRight());
-    }
-
-    /**
-     * Parses an EntityType from the given string.
-     * The string should be in the format "[count]x[entity_type]", for example "1xminecraft:pig" or "2-4xminecraft:pig".
-     *
-     * @param value the input string
-     * @return a Pair of the EntityType and the Range extracted
-     */
-    public static Pair<EntityType<?>, Range> parseEntityType(String value) {
-        Pair<String, Range> parsed = parseCount(value, new Range(1, 1));
-        EntityType<?> type = MinecraftUtil.getEntityType(parsed.getLeft()).orElse(null);
-        return Pair.of(type, parsed.getRight());
     }
 
     /**
@@ -176,5 +91,52 @@ public class StringUtil {
      */
     public static @NotNull String percentage(double value, int digits) {
         return round(value * 100.0, digits) + "%";
+    }
+
+    public static double parseChance(String string) {
+        if (string != null) try {
+            return Double.parseDouble(string) / 100.0;
+        } catch (NumberFormatException ignored) {}
+        return 1.0;
+    }
+
+    public static String stringChance(double chance) {
+        return (chance < 1.0) ? " " + (chance * 100) + "%" : "";
+    }
+
+    public static UniformInt parseRange(String string) {
+        if (string == null) return ONE;
+        if (string.endsWith("x")) string = string.substring(0, string.length() - 1);
+        if (string.contains("-")) {
+            String[] parts = string.split("-");
+            return UniformInt.of(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]));
+        }
+        int c = Integer.parseInt(string);
+        return UniformInt.of(c, c);
+    }
+
+    public static String stringUniformInt(UniformInt range) {
+        int min = range.getMinValue();
+        int max = range.getMaxValue();
+        return (min == max) ? min <= 1 ? "" : min + "x" : min + "-" + max + "x";
+    }
+
+    public static Optional<Map.Entry<Block, Integer>> parseBlock(String input) {
+        Matcher matcher = BLOCK_PATTERN.matcher(input.trim());
+
+        if (!matcher.matches()) {
+            NeoBlockMod.LOGGER.warn("Invalid block: '{}'", input);
+            return Optional.empty();
+        }
+
+        Optional<Block> block = MinecraftUtil.getBlock(matcher.group("id"));
+        if (block.isEmpty()) {
+            NeoBlockMod.LOGGER.warn("Unknown block ID: '{}'", matcher.group("id"));
+            return Optional.empty();
+        }
+
+        String countString = matcher.group("count");
+        int count = (countString != null) ? Integer.parseInt(countString) : 1;
+        return Optional.of(new AbstractMap.SimpleEntry<>(block.get(), count));
     }
 }

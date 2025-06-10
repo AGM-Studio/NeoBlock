@@ -4,9 +4,9 @@ import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.item.trading.MerchantOffer;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.neo.loot.NeoItemStack;
-import xyz.agmstudio.neoblock.neo.loot.NeoParser;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
 import xyz.agmstudio.neoblock.util.MinecraftUtil;
+import xyz.agmstudio.neoblock.util.StringUtil;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
@@ -56,8 +56,8 @@ public class NeoTradeSingle extends NeoTrade {
         }
 
         NeoItemStack costB = NeoItemStack.parseItem(matcher.group("costB")).orElse(null);
-        double chance = NeoParser.parseChance(matcher.group("chance"));
-        UniformInt uses = NeoParser.parseRange(matcher.group("uses"));
+        double chance = StringUtil.parseChance(matcher.group("chance"));
+        UniformInt uses = StringUtil.parseRange(matcher.group("uses"));
 
         return Optional.of(new NeoTradeSingle(result, costA, costB, chance, uses));
     }
@@ -66,8 +66,8 @@ public class NeoTradeSingle extends NeoTrade {
         StringBuilder sb = new StringBuilder(result.toString()).append("; ")
                 .append(costA.toString()).append("; ");
         if (costB != null) sb.append(costB).append(";");
-        sb.append(NeoParser.stringChance(chance));
-        sb.append(" ").append(NeoParser.stringUniformInt(uses));
+        sb.append(StringUtil.stringChance(chance));
+        sb.append(" ").append(StringUtil.stringUniformInt(uses));
         return sb.toString();
     }
 }

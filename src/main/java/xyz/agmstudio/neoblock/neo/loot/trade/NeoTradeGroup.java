@@ -1,8 +1,8 @@
 package xyz.agmstudio.neoblock.neo.loot.trade;
 
 import net.minecraft.world.item.trading.MerchantOffer;
-import xyz.agmstudio.neoblock.neo.loot.NeoParser;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
+import xyz.agmstudio.neoblock.util.StringUtil;
 
 import java.util.List;
 import java.util.Optional;
@@ -38,14 +38,14 @@ public class NeoTradeGroup extends NeoTrade {
         if (!matcher.matches()) return Optional.empty();
 
         String name = matcher.group("name");
-        double chance = NeoParser.parseChance(matcher.group("chance"));
+        double chance = StringUtil.parseChance(matcher.group("chance"));
 
         return Optional.of(new NeoTradeGroup(name, chance));
     }
 
     @Override
     public String toString() {
-        return "trade:" + name + NeoParser.stringChance(chance);
+        return "trade:" + name + StringUtil.stringChance(chance);
     }
 }
 

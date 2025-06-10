@@ -77,7 +77,8 @@ public class TierData {
         lock = id > 0 ? lockConfig != null ? new TierLock(this.id, lockConfig) : TierLock.CommandOnly(this.id) : TierLock.Unlocked();
 
         List<String> blocks = config.getOrElse("blocks", List.of("minecraft:grass_block"));
-        blocks.stream().map(StringUtil::parseBlock).forEach(parsed -> this.blocks.merge(parsed.getKey().defaultBlockState(), parsed.getValue().get(), Integer::sum));
+        blocks.forEach(value -> StringUtil.parseBlock(value).ifPresent(b -> this.blocks.merge(b.getKey().defaultBlockState(), b.getValue(), Integer::sum)));
+
         if (this.blocks.isEmpty()) weight = 0;
         else weight = Math.max(0, config.getIntOrElse("weight", 1));
 

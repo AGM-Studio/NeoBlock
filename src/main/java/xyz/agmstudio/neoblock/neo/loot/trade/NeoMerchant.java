@@ -62,9 +62,7 @@ public class NeoMerchant {
     public static WanderingTrader forceSpawnTrader(ServerLevel level) {
         WorldData.resetTraderFailedAttempts();
         List<NeoTrade> trades = new ArrayList<>();
-        WorldData.getTiers().stream().filter(WorldTier::isEnabled).forEach(tier -> {
-            trades.addAll(tier.getTrades());
-        });
+        WorldData.getTiers().stream().filter(WorldTier::isEnabled).forEach(tier -> trades.addAll(tier.getTrades()));
 
         WanderingTrader trader = spawnTraderWith(trades, level, "NeoMerchant");
         if (trader == null) return null;
