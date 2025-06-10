@@ -1,13 +1,14 @@
 {
   "homepage": "https://github.com/AGM-Studio/NeoBlock",
   "promos": {
-    "1.21.1-latest": "1.21.1-0.4.0-Beta",
+    "1.21.1-latest": "1.21.1-0.5.0-Beta",
     "1.20.1-latest": "1.20.1-0.4.0-Beta"
   },
   "1.21.1": {
-    "1.21.1-0.4.0-Beta": "✨ Added schematic system (save/load, auto-load on world gen)\n🛠 Default world type set by mod (no external mod needed)\n🚫 Removed experimental warning\n🧹 Internal improvements with TierManager & utilities"
+    "1.21.1-0.4.0-Beta": "✨ Added schematic system (save/load, auto-load on world gen)\n🛠 Default world type set by mod (no external mod needed)\n🚫 Removed experimental warning\n🧹 Internal improvements with TierManager & utilities",
+    "1.21.1-0.5.0-Beta": "✨ Instanced Tiers System for safer data loading (⚠️ backup your world!)\n✨ JEI Integration for NeoBlock blocks\n🛠 Improved trade parsing (back up config for regeneration)\n🛠 Commands: 'force reset', enable/disable tiers, permission levels\n🧹 Renamed 'trader-trades' → 'trades' in config (old configs still work)\n🪓 Dropped support for Minecraft 1.20.1"
   },
   "1.20.1": {
-    "1.20.1-0.4.0-Beta": "✨ Added schematic system (save/load, auto-load on world gen)\n🛠 Default world type set by mod (no external mod needed)\n🚫 Removed experimental warning\n🧹 Internal improvements with TierManager & utilities"
+    "1.20.1-0.4.0-Beta": "✨ Added schematic system (save/load, auto-load on world gen)\n🛠 Default world type set by mod (no external mod needed)\n🚫 Removed experimental warning\n🧹 Internal improvements with TierManager & utilities\n⚠️ This is the last supported version for 1.20.1"
   }
 }
