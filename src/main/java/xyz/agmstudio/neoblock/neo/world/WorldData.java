@@ -24,7 +24,7 @@ import xyz.agmstudio.neoblock.animations.Animation;
 import xyz.agmstudio.neoblock.data.NBTSaveable;
 import xyz.agmstudio.neoblock.data.Schematic;
 import xyz.agmstudio.neoblock.data.TierData;
-import xyz.agmstudio.neoblock.neo.merchants.NeoMerchant;
+import xyz.agmstudio.neoblock.neo.loot.trade.NeoMerchant;
 import xyz.agmstudio.neoblock.util.MinecraftUtil;
 
 import java.io.FileNotFoundException;

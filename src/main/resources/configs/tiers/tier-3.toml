@@ -16,9 +16,9 @@ blocks = [
     "2xminecraft:lapis_ore",
     "1xminecraft:emerald_ore"
 ]
-# The wight of tier when choosing between unlocked tiers.
+# The wight of tier when choosing between enabled tiers.
 weight = 1
-# The trades the trader will spawn with when this tier is unlocked. This trader will despawn (if not dead) upon unlocking next tier.
+# The trades the trader will spawn with when this tier is enabled. This trader will despawn (if not dead) upon unlocking next tier.
 # Syntax for item is `COUNT`x`ID`, the count can be a range like `8-12` or a number.
 # Uses also use same syntax as the count, but not providing it will use 1 instead.
 # For a trade use one of the following:
@@ -35,20 +35,11 @@ unlock-trades = [
 ]
 # Wandering NeoTraders will spawn when they have some offers
 # List of offers they might have when spawned. using same syntax.
-trader-trades = [
-    "1xminecraft:lava_bucket; 16-32xminecraft:iron_ingot; 1xminecraft:bucket; 3",
-    "2xminecraft:glow_berries; 16-24xminecraft:moss_block; 8-12",
-    "2xminecraft:sweet_berries; 8-12xminecraft:moss_block; 8-12",
-    "1xminecraft:pointed_dripstone; 24-64xminecraft:cobblestone; 6-12",
-    "1xminecraft:bamboo; 36-64xminecraft:oak_sapling; 1-3",
-    "1xminecraft:brown_mushroom; 12-32xminecraft:iron_ingot; 1-3",
-    "1xminecraft:red_mushroom; 12-32xminecraft:iron_ingot; 1-3",
-    "mob:1xminecraft:goat; 16-32xminecraft:gold_ingot; 10-30xminecraft:golden_carrot; 2",
-    "mob:1xminecraft:panda; 16-32xminecraft:gold_ingot; 64xminecraft:bamboo; 2",
-    "mob:1xminecraft:frog; 16-32xminecraft:gold_ingot; 16-32xminecraft:slime_ball; 2"
+trades = [
+    "1xminecraft:lava_bucket; 16-32xminecraft:iron_ingot; 1xminecraft:bucket; 3 25%",
+    "trade:farm-3",
+    "trade:mobs-3"
 ]
-# Amount of trades they will choose from this tier
-trader-count = 2
 
 # Conditions to unlock the mod, all conditions must be met to unlock.
 [unlock]

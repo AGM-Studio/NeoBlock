@@ -9,6 +9,8 @@ import net.minecraft.nbt.*;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
+import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
@@ -29,8 +31,7 @@ import net.neoforged.fml.loading.FMLPaths;
 import net.neoforged.neoforge.common.NeoForge;
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlockMod;
-import xyz.agmstudio.neoblock.data.Range;
-import xyz.agmstudio.neoblock.neo.merchants.NeoItem;
+import xyz.agmstudio.neoblock.neo.loot.NeoItemStack;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
 
 import java.io.IOException;
@@ -113,6 +114,13 @@ public final class MinecraftUtil {
         return getEntityTypeResource(entityType).get() == location;
     }
 
+    public static final class Collection {
+        public static <T> void shuffle(List<T> list) {
+            @NotNull RandomSource rand = WorldData.getRandom();
+            for (int i = list.size(); i > 1; i--) Collections.swap(list, i - 1, rand.nextInt(i));
+        }
+    }
+
     public static final class Items {
         public static @NotNull CompoundTag getItemTag(ItemStack item) {
             CustomData data = item.getComponents().getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY);
@@ -131,14 +139,24 @@ public final class MinecraftUtil {
     }
 
     public static final class Merchant {
-        public static MerchantOffer getOfferOf(NeoItem costA, NeoItem costB, NeoItem result, Range uses) {
-            ItemStack r = new ItemStack(result.getItem(), result.getCount().get());
-            ItemCost a = new ItemCost(costA.getItem(), costA.getCount().get());
-            Optional<ItemCost> b = costB != null ?
-                    Optional.of(new ItemCost(costB.getItem(), costB.getCount().get())) :
-                    Optional.empty();
+        private static ItemStack toItemStack(NeoItemStack item, RandomSource random) {
+            ItemStack stack = new ItemStack(item.getItem(), item.getRange().sample(random));
+            return item.modify(stack);
+        }
+        private static ItemCost toItemCost(NeoItemStack item, RandomSource random) {
+            return new ItemCost(item.getItem(), item.getRange().sample(random));
+        }
 
-            return new MerchantOffer(a, b, r, uses.get(), 0, 0);
+        public static Optional<MerchantOffer> getOfferOf(NeoItemStack result, NeoItemStack costA, NeoItemStack costB, UniformInt uses) {
+            @NotNull final RandomSource RNG = WorldData.getRandom();
+            @NotNull final Item AIR = net.minecraft.world.item.Items.AIR;
+
+            ItemStack r = toItemStack(result, RNG);
+            ItemCost a = toItemCost(costA, RNG);
+            Optional<ItemCost> b = costB != null ? Optional.of(toItemCost(costB, RNG)) : Optional.empty();
+
+            if (r.getItem() == AIR || a.itemStack().getItem() == AIR) return Optional.empty();
+            return Optional.of(new MerchantOffer(a, b, r, uses.sample(RNG), 0, 0));
         }
     }
 

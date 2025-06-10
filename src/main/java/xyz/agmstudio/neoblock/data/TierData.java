@@ -4,8 +4,7 @@ import com.electronwill.nightconfig.core.UnmodifiableConfig;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import net.minecraft.world.level.block.state.BlockState;
 import xyz.agmstudio.neoblock.NeoBlockMod;
-import xyz.agmstudio.neoblock.neo.merchants.NeoMerchant;
-import xyz.agmstudio.neoblock.neo.merchants.NeoOffer;
+import xyz.agmstudio.neoblock.neo.loot.trade.NeoTradePool;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
 import xyz.agmstudio.neoblock.neo.world.WorldTier;
 import xyz.agmstudio.neoblock.util.MinecraftUtil;
@@ -17,7 +16,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Stream;
 
 public class TierData {
@@ -64,9 +62,8 @@ public class TierData {
     public final TierLock lock;
 
     public final HashMap<BlockState, Integer> blocks = new HashMap<>();
-    public final NeoMerchant tradeOffer;
-    public final List<NeoOffer> trades;
-    public final int tradeCount;
+    public final NeoTradePool tradePoolUnlock;
+    public final NeoTradePool trades;
 
     protected TierData(int id) {
         this.id = id;
@@ -85,11 +82,10 @@ public class TierData {
         else weight = Math.max(0, config.getIntOrElse("weight", 1));
 
         List<String> unlockTrades = config.getOrElse("unlock-trades", List.of());
-        tradeOffer = NeoMerchant.parse(unlockTrades);
+        tradePoolUnlock = NeoTradePool.parse(unlockTrades);
 
-        List<String> trades = config.getOrElse("trader-trades", List.of());
-        this.trades = trades.stream().map(NeoOffer::parse).filter(Objects::nonNull).toList();
-        tradeCount = MinecraftUtil.MathUtil.clamp(config.getIntOrElse("trader-count", 0), 0, this.trades.size());
+        List<String> list = config.getOrElse("trader-trades", config.getOrElse("trades", List.of()));
+        trades = NeoTradePool.parse(list);
 
         NeoBlockMod.LOGGER.debug("Tier {} loaded. Hash key: {}", id, getHashCode());
     }

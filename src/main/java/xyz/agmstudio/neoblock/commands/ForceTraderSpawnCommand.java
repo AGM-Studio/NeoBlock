@@ -5,7 +5,7 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.npc.WanderingTrader;
 import xyz.agmstudio.neoblock.commands.util.NeoCommand;
-import xyz.agmstudio.neoblock.neo.merchants.NeoMerchant;
+import xyz.agmstudio.neoblock.neo.loot.trade.NeoMerchant;
 
 public class ForceTraderSpawnCommand extends NeoCommand {
     public ForceTraderSpawnCommand() {

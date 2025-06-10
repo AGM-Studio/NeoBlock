@@ -4,9 +4,9 @@ name = "End phase"
 blocks = [
     "1xminecraft:end_stone"
 ]
-# The wight of tier when choosing between unlocked tiers.
+# The wight of tier when choosing between enabled tiers.
 weight = 1
-# The trades the trader will spawn with when this tier is unlocked. This trader will despawn (if not dead) upon unlocking next tier.
+# The trades the trader will spawn with when this tier is enabled. This trader will despawn (if not dead) upon unlocking next tier.
 # Syntax for item is `COUNT`x`ID`, the count can be a range like `8-12` or a number.
 # Uses also use same syntax as the count, but not providing it will use 1 instead.
 # For a trade use one of the following:
@@ -21,17 +21,9 @@ unlock-trades = [
 ]
 # Wandering NeoTraders will spawn when they have some offers
 # List of offers they might have when spawned. using same syntax.
-trader-trades = [
-    "1xminecraft:deepslate_emerald_ore; 64xminecraft:emerald_block; 1",
-    "1xminecraft:diamond_ore; 4-8xminecraft:diamond; 1",
-    "1xminecraft:budding_amethyst; 16-64xminecraft:diamond; 1",
-    "1xminecraft:small_amethyst_bud; 4-6xminecraft:amethyst_shard; 8-12",
-    "1xminecraft:medium_amethyst_bud; 8-12xminecraft:amethyst_shard; 8-12",
-    "1xminecraft:large_amethyst_bud; 16-24xminecraft:amethyst_shard; 8-12",
-    "1xminecraft:amethyst_cluster; 32-48xminecraft:amethyst_shard; 8-12"
+trades = [
+    "trade:blocks-3"
 ]
-# Amount of trades they will choose from this tier
-trader-count = 2
 
 # Conditions to unlock the mod, all conditions must be met to unlock.
 [unlock]

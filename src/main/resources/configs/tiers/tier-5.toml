@@ -14,9 +14,9 @@ blocks = [
     "4xminecraft:ice",
     "4xminecraft:snow_block",
 ]
-# The wight of tier when choosing between unlocked tiers.
+# The wight of tier when choosing between enabled tiers.
 weight = 1
-# The trades the trader will spawn with when this tier is unlocked. This trader will despawn (if not dead) upon unlocking next tier.
+# The trades the trader will spawn with when this tier is enabled. This trader will despawn (if not dead) upon unlocking next tier.
 # Syntax for item is `COUNT`x`ID`, the count can be a range like `8-12` or a number.
 # Uses also use same syntax as the count, but not providing it will use 1 instead.
 # For a trade use one of the following:
@@ -31,30 +31,12 @@ unlock-trades = [
 ]
 # Wandering NeoTraders will spawn when they have some offers
 # List of offers they might have when spawned. using same syntax.
-trader-trades = [
-    "16xminecraft:wind_charge; 3-4xminecraft:iron_ingot; 32-64",
-    "1xminecraft:tube_coral; 4-8xminecraft:gold_ingot; 8-12",
-    "1xminecraft:fire_coral; 4-8xminecraft:gold_ingot; 8-12",
-    "1xminecraft:horn_coral; 4-8xminecraft:gold_ingot; 8-12",
-    "1xminecraft:brain_coral; 4-8xminecraft:gold_ingot; 8-12",
-    "1xminecraft:bubble_coral; 4-8xminecraft:gold_ingot; 8-12",
-    "1xminecraft:tube_coral_fan; 4-8xminecraft:gold_ingot; 8-12",
-    "1xminecraft:fire_coral_fan; 4-8xminecraft:gold_ingot; 8-12",
-    "1xminecraft:horn_coral_fan; 4-8xminecraft:gold_ingot; 8-12",
-    "1xminecraft:brain_coral_fan; 4-8xminecraft:gold_ingot; 8-12",
-    "1xminecraft:bubble_coral_fan; 4-8xminecraft:gold_ingot; 8-12",
-    "1xminecraft:glow_lichen; 4-8xminecraft:gold_ingot; 8-12",
-    "1xminecraft:bee_nest; 20-32xminecraft:gold_ingot; 8-12",
-    "1xminecraft:sculk_catalyst; 20-32xminecraft:diamond; 8-12",
-    "1xminecraft:azalea; 8-16xminecraft:gold_ingot; 8-12",
-    "1xminecraft:flowering_azalea; 8-16xminecraft:gold_ingot; 8-12",
-    "mob:1xminecraft:armadillo; 16-32xminecraft:gold_ingot; 16-32xminecraft:spider_eye; 2",
-    "mob:1xminecraft:axolotl; 16-32xminecraft:gold_ingot; 32-64xminecraft:tropical_fish; 2",
-    "mob:1xminecraft:alley; 16-32xminecraft:gold_ingot; 32-64xminecraft:amethyst_shard; 2",
-    "mob:1xminecraft:bee; 16-32xminecraft:gold_ingot; 32-64xminecraft:poppy; 2",
+trades = [
+    "16xminecraft:wind_charge; 3-4xminecraft:iron_ingot; 32-64 50%",
+    "trade:blocks-4 50%",
+    "trade:saplings-2",
+    "trade:mobs-5",
 ]
-# Amount of trades they will choose from this tier
-trader-count = 5
 
 # Conditions to unlock the mod, all conditions must be met to unlock.
 [unlock]

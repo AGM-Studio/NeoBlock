@@ -1,4 +1,4 @@
-name = "Green phase" # This tier is unlocked by default!
+name = "Green phase" # This tier is enabled by default!
 # List of all blocks in this tier. All of them have equal chance to be chosen in this tier.
 blocks = [
     "16xminecraft:grass_block",
@@ -6,5 +6,5 @@ blocks = [
     "1xminecraft:podzol",
     "1xminecraft:mycelium"
 ]
-# The wight of tier when choosing between unlocked tiers.
+# The wight of tier when choosing between enabled tiers.
 weight = 4

@@ -6,9 +6,9 @@ blocks = [
     "minecraft:coal_ore",
     "minecraft:iron_ore"
 ]
-# The wight of tier when choosing between unlocked tiers.
+# The wight of tier when choosing between enabled tiers.
 weight = 1
-# The trades the trader will spawn with when this tier is unlocked.
+# The trades the trader will spawn with when this tier is enabled.
 # Syntax for item is `COUNT`x`ID`, the count can be a range like `8-12` or a number.
 # Uses also use same syntax as the count, but not providing it will use 1 instead.
 # For a trade use one of the following:
@@ -23,11 +23,7 @@ unlock-trades = [
 ]
 # NeoMerchants will spawn randomly only when they have some offers.
 # List of offers they might have when spawned. using same syntax.
-wandering-trades = [
-
-]
-# Amount of trades they will choose from this tier
-wandering-count = 0
+trades = []
 
 # Conditions to unlock the mod, all conditions must be met to unlock.
 [unlock]

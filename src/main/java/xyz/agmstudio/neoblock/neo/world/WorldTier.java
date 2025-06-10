@@ -9,11 +9,10 @@ import xyz.agmstudio.neoblock.data.NBTData;
 import xyz.agmstudio.neoblock.data.NBTSaveable;
 import xyz.agmstudio.neoblock.data.TierData;
 import xyz.agmstudio.neoblock.data.TierLock;
-import xyz.agmstudio.neoblock.neo.merchants.NeoOffer;
+import xyz.agmstudio.neoblock.neo.loot.trade.NeoMerchant;
+import xyz.agmstudio.neoblock.neo.loot.trade.NeoTrade;
 import xyz.agmstudio.neoblock.util.MinecraftUtil;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -49,10 +48,8 @@ public class WorldTier extends NBTSaveable {
         lock.tier = this;
     }
 
-    public List<NeoOffer> getRandomTrades() {
-        List<NeoOffer> trades = new ArrayList<>(data.trades);
-        Collections.shuffle(trades);
-        return trades.subList(0, data.tradeCount);
+    public List<NeoTrade> getTrades() {
+        return data.trades.getPool();
     }
     public BlockState getRandomBlock() {
         if (data.blocks.isEmpty()) return WorldData.DEFAULT_STATE;
@@ -84,10 +81,8 @@ public class WorldTier extends NBTSaveable {
     }
     public void onStartUpgrade(ServerLevel level) {
         MinecraftUtil.Messenger.sendInstantMessage("message.neoblock.unlocking_tier", level, false, id);
-        if (data.tradeOffer != null) {
-            data.tradeOffer.spawnTrader(level, "UnlockTrader");
-            MinecraftUtil.Messenger.sendInstantMessage("message.neoblock.unlocking_trader", level, false, id);
-        }
+        NeoMerchant.spawnTraderWith(data.tradePoolUnlock.getPool(), level, "UnlockTrader");
+        MinecraftUtil.Messenger.sendInstantMessage("message.neoblock.unlocking_trader", level, false, id);
     }
 
     public boolean isUnlocked() {
