@@ -2,6 +2,7 @@ package xyz.agmstudio.neoblock.data;
 
 import com.electronwill.nightconfig.core.UnmodifiableConfig;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
+import xyz.agmstudio.neoblock.neo.world.WorldTier;
 
 public class TierLock {
     private final int id;
@@ -58,8 +59,13 @@ public class TierLock {
     }
 
     public boolean isUnlocked(WorldData data) {
+        return isUnlocked(data, data.getTier(id));
+    }
+    public boolean isUnlocked(WorldData data, WorldTier tier) {
+        assert tier == null || tier.getID() == id;
+        if (id == 0) return true;
         if (blocks > 0 && data.getStatus().getBlockCount() < blocks) return false;
         if (game > 0 && data.getLevel().getGameTime() < game) return false;
-        return !command || data.getTier(id).isCommanded();
+        return !command || tier == null || tier.isCommanded();
     }
 }

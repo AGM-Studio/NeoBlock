@@ -18,10 +18,13 @@ import java.util.Map;
 
 public class WorldTier extends NBTSaveable {
     public static WorldTier of(@NotNull TierData tier, WorldData data) {
+        NeoBlockMod.LOGGER.debug("[WorldTier] Creating tier " + tier.id);
+
+        // TODO: Patch the QUICK FIX of the lock
         WorldTier instance = new WorldTier();
         instance.id = tier.id;
         instance.lock = new Lock();
-        instance.lock.unlocked = tier.lock.isUnlocked(data);
+        instance.lock.unlocked = tier.lock.isUnlocked(data, instance);
         instance.lock.tier = instance;
         instance.enabled = instance.lock.unlocked;
 
