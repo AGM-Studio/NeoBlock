@@ -7,7 +7,7 @@ import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoTradePool;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
 import xyz.agmstudio.neoblock.neo.world.WorldTier;
-import xyz.agmstudio.neoblock.util.MinecraftUtil;
+import xyz.agmstudio.neoblock.minecraft.MinecraftAPI;
 import xyz.agmstudio.neoblock.util.ResourceUtil;
 import xyz.agmstudio.neoblock.util.StringUtil;
 
@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 public class TierData {
-    public static final Path FOLDER = MinecraftUtil.CONFIG_DIR.resolve(NeoBlockMod.MOD_ID + "/tiers");
+    public static final Path FOLDER = MinecraftAPI.CONFIG_DIR.resolve(NeoBlockMod.MOD_ID + "/tiers");
     public static final List<TierData> DATA = new ArrayList<>();
     private static String HASH = "";
 

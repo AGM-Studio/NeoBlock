@@ -9,8 +9,9 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 import xyz.agmstudio.neoblock.NeoBlockMod;
+import xyz.agmstudio.neoblock.minecraft.NBTAPI;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
-import xyz.agmstudio.neoblock.util.MinecraftUtil;
+import xyz.agmstudio.neoblock.minecraft.MinecraftAPI;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Schematic {
-    public static final Path folder = MinecraftUtil.CONFIG_DIR.resolve(NeoBlockMod.MOD_ID + File.separator + "schematics");
+    public static final Path folder = MinecraftAPI.CONFIG_DIR.resolve(NeoBlockMod.MOD_ID + File.separator + "schematics");
     static {
         if (folder.toFile().mkdirs()) NeoBlockMod.LOGGER.debug("Created {}", folder);
     }
@@ -35,7 +36,7 @@ public class Schematic {
             } else if (!name.endsWith(".nbt")) name = name + ".nbt";
 
             Path file = folder.resolve(name);
-            MinecraftUtil.NBT.IO.write(file, nbt);
+            NBTAPI.IO.write(file, nbt);
             return file;
         } catch (IOException e) {
             NeoBlockMod.LOGGER.error("Failed to save schematic", e);
@@ -54,7 +55,7 @@ public class Schematic {
             Path file = name != null ? folder.resolve(name) : null;
             if (file == null || !Files.exists(file)) return 0;
 
-            CompoundTag tag = MinecraftUtil.NBT.IO.read(file);
+            CompoundTag tag = NBTAPI.IO.read(file);
             Schematic.fromNBT(tag, level).place(level, origin);
             return 1;
         } catch (Exception e) {
@@ -64,14 +65,14 @@ public class Schematic {
     }
 
     public static Schematic fromNBT(CompoundTag tag, ServerLevel level) {
-        BlockPos origin = MinecraftUtil.NBT.readBlockPos(tag, "origin", WorldData.POS);
+        BlockPos origin = NBTAPI.readBlockPos(tag, "origin", WorldData.POS);
         List<Schematic.BlockInfo> blocks = new ArrayList<>();
         ListTag blockList = tag.getList("blocks", Tag.TAG_COMPOUND);
 
         for (Tag t : blockList) {
             CompoundTag blockTag = (CompoundTag) t;
-            BlockPos offset = MinecraftUtil.NBT.readBlockPos(blockTag, "pos", BlockPos.ZERO);
-            BlockState state = MinecraftUtil.NBT.readBlockState(blockTag, "state", level);
+            BlockPos offset = NBTAPI.readBlockPos(blockTag, "pos", BlockPos.ZERO);
+            BlockState state = NBTAPI.readBlockState(blockTag, "state", level);
             CompoundTag nbt = blockTag.contains("be") ? blockTag.getCompound("be") : null;
             blocks.add(new Schematic.BlockInfo(offset, state, nbt));
         }
@@ -99,7 +100,7 @@ public class Schematic {
         for (BlockPos pos : BlockPos.betweenClosed(min, max)) {
             BlockState state = level.getBlockState(pos);
             BlockEntity block = level.getBlockEntity(pos);
-            CompoundTag nbt = MinecraftUtil.NBT.getBlockEntity(block, level);
+            CompoundTag nbt = NBTAPI.getBlockEntity(block, level);
 
             blocks.add(new BlockInfo(pos.subtract(origin), state, nbt));
         }
@@ -107,13 +108,13 @@ public class Schematic {
 
     public CompoundTag toNBT() {
         CompoundTag tag = new CompoundTag();
-        tag.put("origin", MinecraftUtil.NBT.writeBlockPos(origin));
+        tag.put("origin", NBTAPI.writeBlockPos(origin));
 
         ListTag blockList = new ListTag();
         for (BlockInfo info : blocks) {
             CompoundTag blockTag = new CompoundTag();
-            blockTag.put("pos", MinecraftUtil.NBT.writeBlockPos(info.offset()));
-            blockTag.put("state", MinecraftUtil.NBT.writeBlockState(info.state()));
+            blockTag.put("pos", NBTAPI.writeBlockPos(info.offset()));
+            blockTag.put("state", NBTAPI.writeBlockState(info.state()));
             if (info.nbt() != null) blockTag.put("be", info.nbt());
             blockList.add(blockTag);
         }
@@ -127,7 +128,7 @@ public class Schematic {
             BlockPos pos = target.offset(info.offset());
             level.setBlock(pos, info.state(), 3);
             BlockEntity be = level.getBlockEntity(pos);
-            MinecraftUtil.NBT.loadBlockEntity(be, info.nbt, level);
+            NBTAPI.loadBlockEntity(be, info.nbt, level);
         }
     }
 }

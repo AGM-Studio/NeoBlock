@@ -5,7 +5,7 @@ import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
-import xyz.agmstudio.neoblock.util.MinecraftUtil;
+import xyz.agmstudio.neoblock.minecraft.MinecraftAPI;
 import xyz.agmstudio.neoblock.util.StringUtil;
 
 import java.util.Optional;
@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 
 public class NeoItemStack {
     private static final Pattern PATTERN = Pattern.compile("(?<count>\\d+(-\\d+)?)?x(?<id>[\\w:]+)(?:\\s+(?<chance>\\d+\\.?\\d*)%?)?");
-    private static final ResourceLocation DEFAULT = MinecraftUtil.parseResourceLocation("minecraft:stone");
+    private static final ResourceLocation DEFAULT = MinecraftAPI.parseResourceLocation("minecraft:stone");
 
     protected final Item item;
     protected final UniformInt range;
@@ -37,7 +37,7 @@ public class NeoItemStack {
     }
 
     public ResourceLocation getResource() {
-        return MinecraftUtil.getItemResource(item).orElse(DEFAULT);
+        return MinecraftAPI.getItemResource(item).orElse(DEFAULT);
     }
     public String getId() {
         return getResource().toString();
@@ -69,7 +69,7 @@ public class NeoItemStack {
         Matcher matcher = PATTERN.matcher(input.trim().toLowerCase());
         if (!matcher.matches()) return Optional.empty();
 
-        Item item = MinecraftUtil.getItem(matcher.group("id")).orElse(null);
+        Item item = MinecraftAPI.getItem(matcher.group("id")).orElse(null);
         if (item == null) return Optional.empty();
 
         UniformInt range = StringUtil.parseRange(matcher.group("count"));

@@ -11,9 +11,10 @@ import net.minecraft.world.item.trading.MerchantOffers;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.agmstudio.neoblock.NeoBlockMod;
+import xyz.agmstudio.neoblock.minecraft.EntityAPI;
+import xyz.agmstudio.neoblock.minecraft.MessengerAPI;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
 import xyz.agmstudio.neoblock.neo.world.WorldTier;
-import xyz.agmstudio.neoblock.util.MinecraftUtil;
 
 import java.util.*;
 
@@ -67,13 +68,13 @@ public class NeoMerchant {
         WanderingTrader trader = spawnTraderWith(trades, level, "NeoMerchant");
         if (trader == null) return null;
 
-        MinecraftUtil.Messenger.sendInstantMessage("message.neoblock.trader_spawned", level, true);
+        MessengerAPI.sendInstantMessage("message.neoblock.trader_spawned", level, true);
 
         HashMap<EntityType<?>, Integer> tradedMobs = WorldData.getTradedMobs();
         tradedMobs.forEach((type, count) -> {
             for (int i = 0; i < count; i++) {
                 Entity mob = type.spawn(level, trader.getOnPos(), MobSpawnType.SPAWN_EGG);
-                MinecraftUtil.Entities.leash(mob, trader);
+                EntityAPI.leash(mob, trader);
             }
         });
         WorldData.clearTradedMobs();

@@ -9,9 +9,9 @@ import xyz.agmstudio.neoblock.data.NBTData;
 import xyz.agmstudio.neoblock.data.NBTSaveable;
 import xyz.agmstudio.neoblock.data.TierData;
 import xyz.agmstudio.neoblock.data.TierLock;
+import xyz.agmstudio.neoblock.minecraft.MessengerAPI;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoMerchant;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoTrade;
-import xyz.agmstudio.neoblock.util.MinecraftUtil;
 
 import java.util.List;
 import java.util.Map;
@@ -80,12 +80,12 @@ public class WorldTier extends NBTSaveable {
 
     public void onFinishUpgrade(ServerLevel level) {
         this.enable();
-        MinecraftUtil.Messenger.sendInstantMessage("message.neoblock.unlocked_tier", level, false, id);
+        MessengerAPI.sendInstantMessage("message.neoblock.unlocked_tier", level, false, id);
     }
     public void onStartUpgrade(ServerLevel level) {
-        MinecraftUtil.Messenger.sendInstantMessage("message.neoblock.unlocking_tier", level, false, id);
+        MessengerAPI.sendInstantMessage("message.neoblock.unlocking_tier", level, false, id);
         NeoMerchant.spawnTraderWith(data.tradePoolUnlock.getPool(), level, "UnlockTrader");
-        MinecraftUtil.Messenger.sendInstantMessage("message.neoblock.unlocking_trader", level, false, id);
+        MessengerAPI.sendInstantMessage("message.neoblock.unlocking_trader", level, false, id);
     }
 
     public boolean isUnlocked() {

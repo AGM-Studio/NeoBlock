@@ -3,9 +3,9 @@ package xyz.agmstudio.neoblock.neo.loot.trade;
 import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.item.trading.MerchantOffer;
 import xyz.agmstudio.neoblock.NeoBlockMod;
+import xyz.agmstudio.neoblock.minecraft.MerchantAPI;
 import xyz.agmstudio.neoblock.neo.loot.NeoItemStack;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
-import xyz.agmstudio.neoblock.util.MinecraftUtil;
 import xyz.agmstudio.neoblock.util.StringUtil;
 
 import javax.annotation.Nullable;
@@ -38,7 +38,7 @@ public class NeoTradeSingle extends NeoTrade {
 
     @Override public Optional<MerchantOffer> getOffer() {
         if (WorldData.getRandom().nextDouble() > chance) return Optional.empty();
-        return MinecraftUtil.Merchant.getOfferOf(result, costA, costB, uses);
+        return MerchantAPI.getOfferOf(result, costA, costB, uses);
     }
 
     public static Optional<NeoTrade> parse(String input) {

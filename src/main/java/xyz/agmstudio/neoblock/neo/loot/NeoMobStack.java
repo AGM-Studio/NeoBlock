@@ -9,8 +9,10 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import xyz.agmstudio.neoblock.minecraft.ItemAPI;
+import xyz.agmstudio.neoblock.minecraft.MessengerAPI;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
-import xyz.agmstudio.neoblock.util.MinecraftUtil;
+import xyz.agmstudio.neoblock.minecraft.MinecraftAPI;
 import xyz.agmstudio.neoblock.util.StringUtil;
 
 import java.util.Optional;
@@ -19,9 +21,9 @@ import java.util.regex.Pattern;
 
 public class NeoMobStack extends NeoItemStack {
     private static final Pattern MOB_PATTERN = Pattern.compile("mob:(?<count>\\d+(-\\d+)?)?x?(?<id>[\\w:]+)(?:\\s+(?<chance>\\d+\\.?\\d*)%?)?");
-    @NotNull private static final ResourceLocation DEFAULT = MinecraftUtil.parseResourceLocation("minecraft:pig");
-    @NotNull private static final EntityType<?> DEFAULT_MOB = MinecraftUtil.getEntityType(DEFAULT).get();
-    @NotNull private static final Item DEFAULT_EGG = MinecraftUtil.getItem("minecraft:egg").get();
+    @NotNull private static final ResourceLocation DEFAULT = MinecraftAPI.parseResourceLocation("minecraft:pig");
+    @NotNull private static final EntityType<?> DEFAULT_MOB = MinecraftAPI.getEntityType(DEFAULT).get();
+    @NotNull private static final Item DEFAULT_EGG = MinecraftAPI.getItem("minecraft:egg").get();
 
     private final EntityType<?> mob;
 
@@ -35,18 +37,18 @@ public class NeoMobStack extends NeoItemStack {
     }
 
     @Override public ItemStack modify(ItemStack item) {
-        CompoundTag tag = MinecraftUtil.Items.getItemTag(item);
+        CompoundTag tag = ItemAPI.getItemTag(item);
 
-        @Nullable ResourceLocation location = MinecraftUtil.getEntityTypeResource(mob).orElse(null);
+        @Nullable ResourceLocation location = MinecraftAPI.getEntityTypeResource(mob).orElse(null);
         tag.putBoolean("isNeoMob", true);
         tag.putString("neoMobType", location != null ? location.toString() : DEFAULT.toString());
 
-        MinecraftUtil.Items.setItemTag(item, tag);
+        ItemAPI.setItemTag(item, tag);
         return item;
     }
 
     @Override public ResourceLocation getResource() {
-        return MinecraftUtil.getEntityTypeResource(mob).orElse(DEFAULT);
+        return MinecraftAPI.getEntityTypeResource(mob).orElse(DEFAULT);
     }
     @Override
     public String getId() {
@@ -63,7 +65,7 @@ public class NeoMobStack extends NeoItemStack {
         EntityType<?> entityType = EntityType.byString(id).orElse(null);
         if (entityType == null) return Optional.empty();
 
-        Item spawnEgg = MinecraftUtil.getItem(id + "_spawn_egg").orElse(DEFAULT_EGG);
+        Item spawnEgg = MinecraftAPI.getItem(id + "_spawn_egg").orElse(DEFAULT_EGG);
         UniformInt range = StringUtil.parseRange(matcher.group("count"));
         double chance = StringUtil.parseChance(matcher.group("chance"));
 
@@ -73,16 +75,16 @@ public class NeoMobStack extends NeoItemStack {
     public static Optional<EntityType<?>> getMobTradeEntity(ItemStack item) {
         if (item == null) return Optional.empty();
 
-        CompoundTag tag = MinecraftUtil.Items.getItemTag(item);
+        CompoundTag tag = ItemAPI.getItemTag(item);
         if (!tag.getBoolean("isNeoMob")) return Optional.empty();
-        return MinecraftUtil.getEntityType(tag.getString("neoMobType"));
+        return MinecraftAPI.getEntityType(tag.getString("neoMobType"));
     }
 
     public static boolean handlePossibleMobTrade(ItemStack item, ServerLevel level) {
         Optional<EntityType<?>> mob = getMobTradeEntity(item);
         if (mob.isEmpty()) return false;
 
-        MinecraftUtil.Messenger.sendInstantMessage("message.neoblock.trades.mob", level, true, item.getCount(), mob.get().getDescription());
+        MessengerAPI.sendInstantMessage("message.neoblock.trades.mob", level, true, item.getCount(), mob.get().getDescription());
         WorldData.addTradedMob(mob.get(), item.getCount());
         item.setCount(0);
 

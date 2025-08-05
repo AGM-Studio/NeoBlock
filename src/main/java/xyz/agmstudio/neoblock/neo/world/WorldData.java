@@ -24,14 +24,15 @@ import xyz.agmstudio.neoblock.animations.Animation;
 import xyz.agmstudio.neoblock.data.NBTSaveable;
 import xyz.agmstudio.neoblock.data.Schematic;
 import xyz.agmstudio.neoblock.data.TierData;
+import xyz.agmstudio.neoblock.minecraft.MessengerAPI;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoMerchant;
-import xyz.agmstudio.neoblock.util.MinecraftUtil;
+import xyz.agmstudio.neoblock.minecraft.MinecraftAPI;
 
 import java.io.FileNotFoundException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class WorldData extends MinecraftUtil.AbstractWorldData {
+public class WorldData extends MinecraftAPI.AbstractWorldData {
     private static WorldData instance;
     public static WorldData getInstance() {
         return instance;
@@ -80,8 +81,8 @@ public class WorldData extends MinecraftUtil.AbstractWorldData {
                 setActive();
             } else {
                 NeoBlockMod.LOGGER.info("NeoBlock has been disabled.");
-                MinecraftUtil.Messenger.sendMessage("message.neoblock.disabled_world_1", level, false);
-                MinecraftUtil.Messenger.sendMessage("message.neoblock.disabled_world_2", level, false);
+                MessengerAPI.sendMessage("message.neoblock.disabled_world_1", level, false);
+                MessengerAPI.sendMessage("message.neoblock.disabled_world_2", level, false);
                 setActive();
             }
         } else if (isUpdated()) {
@@ -89,7 +90,7 @@ public class WorldData extends MinecraftUtil.AbstractWorldData {
             Component command = Component.literal("/neoblock force update").withStyle(
                     Style.EMPTY.withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/neoblock force update"))
             );
-            MinecraftUtil.Messenger.sendMessage("message.neoblock.updated_world", level, false, command);
+            MessengerAPI.sendMessage("message.neoblock.updated_world", level, false, command);
             setActive();
         }
     }

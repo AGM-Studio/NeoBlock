@@ -21,11 +21,11 @@ import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.commands.*;
 import xyz.agmstudio.neoblock.commands.util.NeoCommand;
+import xyz.agmstudio.neoblock.minecraft.MessengerAPI;
 import xyz.agmstudio.neoblock.neo.loot.NeoMobStack;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoMerchant;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
 import xyz.agmstudio.neoblock.neo.world.WorldUpgrade;
-import xyz.agmstudio.neoblock.util.MinecraftUtil;
 
 import java.util.HashSet;
 import java.util.Optional;
@@ -75,7 +75,7 @@ public final class NeoListener {
         if (event.getEntity() instanceof WanderingTrader trader) NeoMerchant.handleTrader(trader);
         if (event.getEntity() instanceof ServerPlayer player) {
             if (WorldData.isOnUpgrade()) WorldUpgrade.addPlayer(player);
-            MinecraftUtil.Messenger.onPlayerJoin(level, player);
+            MessengerAPI.onPlayerJoin(level, player);
         }
     }
 

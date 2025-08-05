@@ -4,6 +4,7 @@ import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlockMod;
+import xyz.agmstudio.neoblock.minecraft.MinecraftAPI;
 
 import java.util.AbstractMap;
 import java.util.Base64;
@@ -129,7 +130,7 @@ public class StringUtil {
             return Optional.empty();
         }
 
-        Optional<Block> block = MinecraftUtil.getBlock(matcher.group("id"));
+        Optional<Block> block = MinecraftAPI.getBlock(matcher.group("id"));
         if (block.isEmpty()) {
             NeoBlockMod.LOGGER.warn("Unknown block ID: '{}'", matcher.group("id"));
             return Optional.empty();
