@@ -1,10 +1,11 @@
 package xyz.agmstudio.neoblock.compatibility.jei;
 
 import net.minecraft.world.item.Item;
-import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.data.TierData;
 import xyz.agmstudio.neoblock.data.TierLock;
+import xyz.agmstudio.neoblock.neo.loot.NeoBlockSpec;
+import xyz.agmstudio.neoblock.neo.loot.chest.NeoChestSpec;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
 import xyz.agmstudio.neoblock.neo.world.WorldTier;
 import xyz.agmstudio.neoblock.util.StringUtil;
@@ -23,9 +24,10 @@ public class TierDisplay {
         int sum = 0;
         this.data = data;
         LinkedHashMap<Item, Integer> blocks = new LinkedHashMap<>();
-        for (Map.Entry<BlockState, Integer> entry: data.blocks.entrySet()) {
-            blocks.merge(entry.getKey().getBlock().asItem(), entry.getValue(), Integer::sum);
-            sum += entry.getValue();
+        for (NeoBlockSpec entry: data.blocks) {
+            sum += entry.getWeight();
+            if (entry instanceof NeoChestSpec) continue;  // Todo: Support for chest loots and trades
+            blocks.merge(entry.getBlock().asItem(), entry.getWeight(), Integer::sum);
         }
         blocks.entrySet().stream().sorted(Comparator.comparingInt(Map.Entry<Item, Integer>::getValue).reversed())
                 .forEachOrdered(e -> this.blocks.put(e.getKey(), e.getValue()));

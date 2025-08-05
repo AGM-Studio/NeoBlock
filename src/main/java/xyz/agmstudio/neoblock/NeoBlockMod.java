@@ -24,6 +24,7 @@ import xyz.agmstudio.neoblock.animations.progress.SparkleAnimation;
 import xyz.agmstudio.neoblock.animations.progress.SpiralAnimation;
 import xyz.agmstudio.neoblock.animations.progress.UpgradeProgressAnimation;
 import xyz.agmstudio.neoblock.data.TierData;
+import xyz.agmstudio.neoblock.neo.loot.chest.NeoChestSpec;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoMerchant;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoTrade;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
@@ -81,10 +82,11 @@ public final class NeoBlockMod {
     }
 
     public static void reload() {
-        TierData.reload();
-
+        NeoChestSpec.reloadChests();
         NeoMerchant.loadConfig();
         NeoTrade.reloadTrades();
+
+        TierData.reload();
 
         Animation.clearAnimations();
 

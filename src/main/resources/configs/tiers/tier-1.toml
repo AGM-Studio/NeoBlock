@@ -8,7 +8,8 @@ blocks = [
     "minecraft:andesite",
     "minecraft:granite",
     "minecraft:diorite",
-    "minecraft:clay"
+    "minecraft:clay",
+    "neoblock:casual-chest"     # The chest in chests.toml
 ]
 # The wight of tier when choosing between enabled tiers.
 weight = 3
