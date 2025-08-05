@@ -1,16 +1,9 @@
 package xyz.agmstudio.neoblock.util;
 
 import net.minecraft.util.valueproviders.UniformInt;
-import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.NotNull;
-import xyz.agmstudio.neoblock.NeoBlockMod;
-import xyz.agmstudio.neoblock.minecraft.MinecraftAPI;
 
-import java.util.AbstractMap;
 import java.util.Base64;
-import java.util.Map;
-import java.util.Optional;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class StringUtil {
@@ -120,24 +113,5 @@ public class StringUtil {
         int min = range.getMinValue();
         int max = range.getMaxValue();
         return (min == max) ? min <= 1 ? "" : min + "x" : min + "-" + max + "x";
-    }
-
-    public static Optional<Map.Entry<Block, Integer>> parseBlock(String input) {
-        Matcher matcher = BLOCK_PATTERN.matcher(input.trim());
-
-        if (!matcher.matches()) {
-            NeoBlockMod.LOGGER.warn("Invalid block: '{}'", input);
-            return Optional.empty();
-        }
-
-        Optional<Block> block = MinecraftAPI.getBlock(matcher.group("id"));
-        if (block.isEmpty()) {
-            NeoBlockMod.LOGGER.warn("Unknown block ID: '{}'", matcher.group("id"));
-            return Optional.empty();
-        }
-
-        String countString = matcher.group("count");
-        int count = (countString != null) ? Integer.parseInt(countString) : 1;
-        return Optional.of(new AbstractMap.SimpleEntry<>(block.get(), count));
     }
 }

@@ -25,6 +25,7 @@ import xyz.agmstudio.neoblock.data.NBTSaveable;
 import xyz.agmstudio.neoblock.data.Schematic;
 import xyz.agmstudio.neoblock.data.TierData;
 import xyz.agmstudio.neoblock.minecraft.MessengerAPI;
+import xyz.agmstudio.neoblock.neo.loot.NeoBlockSpec;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoMerchant;
 import xyz.agmstudio.neoblock.minecraft.MinecraftAPI;
 
@@ -41,7 +42,7 @@ public class WorldData extends MinecraftAPI.AbstractWorldData {
     public static final double AABB_RANGE = 1.05;
     public static final BlockPos POS = new BlockPos(0, 64, 0);
     public static final Vec3 POS_CORNER = new Vec3(POS.getX(), POS.getY(), POS.getZ());
-    public static final BlockState DEFAULT_STATE = Blocks.GRASS_BLOCK.defaultBlockState();
+    public static final NeoBlockSpec DEFAULT_SPEC = new NeoBlockSpec(Blocks.GRASS_BLOCK);
 
     private static void resetTiers(WorldData data) {
         data.tiers.clear();
@@ -59,7 +60,7 @@ public class WorldData extends MinecraftAPI.AbstractWorldData {
                 if (!level.getBlockState(new BlockPos(0, y, 0)).isAir()) isNeoBlock = false;
 
             if (isNeoBlock) {
-                level.setBlock(POS, DEFAULT_STATE, 3);
+                DEFAULT_SPEC.placeAt(level, POS);
                 UnmodifiableConfig rules = NeoBlockMod.getConfig().get("rules");
                 if (rules != null) WorldRules.applyGameRules(level, rules);
 
@@ -250,7 +251,7 @@ public class WorldData extends MinecraftAPI.AbstractWorldData {
         if (instance != null) instance.upgrade.tick(level, access);
     }
 
-    public static BlockState getRandomBlock() {
+    public static NeoBlockSpec getRandomBlock() {
         AtomicInteger totalChance = new AtomicInteger();
         List<WorldTier> tiers = new ArrayList<>();
 
@@ -259,7 +260,7 @@ public class WorldData extends MinecraftAPI.AbstractWorldData {
             totalChance.addAndGet(tier.getWeight());
         });
 
-        if (totalChance.get() == 0) return DEFAULT_STATE;
+        if (totalChance.get() == 0) return DEFAULT_SPEC;
         int randomValue = getRandom().nextInt(totalChance.get());
         for (WorldTier tier : tiers) {
             randomValue -= tier.getWeight();
@@ -267,11 +268,18 @@ public class WorldData extends MinecraftAPI.AbstractWorldData {
         }
 
         NeoBlockMod.LOGGER.error("Unable to find a block for {} blocks", getBlockCount());
-        return DEFAULT_STATE;
+        return DEFAULT_SPEC;
     }
 
     public static void setNeoBlock(@NotNull LevelAccessor access, BlockState block) {
         access.setBlock(POS, block, 3);
+
+        Vec3 center = POS.getCenter();
+        for(Entity entity: access.getEntities(null, AABB.ofSize(center, AABB_RANGE, AABB_RANGE, AABB_RANGE)))
+            entity.teleportTo(entity.getX(), center.y + AABB_RANGE / 2.0, entity.getZ());
+    }
+    public static void setNeoBlock(@NotNull LevelAccessor access, NeoBlockSpec block) {
+        block.placeAt(access, POS);
 
         Vec3 center = POS.getCenter();
         for(Entity entity: access.getEntities(null, AABB.ofSize(center, AABB_RANGE, AABB_RANGE, AABB_RANGE)))

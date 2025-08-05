@@ -2,19 +2,18 @@ package xyz.agmstudio.neoblock.data;
 
 import com.electronwill.nightconfig.core.UnmodifiableConfig;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
-import net.minecraft.world.level.block.state.BlockState;
 import xyz.agmstudio.neoblock.NeoBlockMod;
+import xyz.agmstudio.neoblock.minecraft.MinecraftAPI;
+import xyz.agmstudio.neoblock.neo.loot.NeoBlockSpec;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoTradePool;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
 import xyz.agmstudio.neoblock.neo.world.WorldTier;
-import xyz.agmstudio.neoblock.minecraft.MinecraftAPI;
 import xyz.agmstudio.neoblock.util.ResourceUtil;
 import xyz.agmstudio.neoblock.util.StringUtil;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -61,7 +60,7 @@ public class TierData {
     public final String name;
     public final TierLock lock;
 
-    public final HashMap<BlockState, Integer> blocks = new HashMap<>();
+    public final List<NeoBlockSpec> blocks = new ArrayList<>();
     public final NeoTradePool tradePoolUnlock;
     public final NeoTradePool trades;
 
@@ -77,7 +76,7 @@ public class TierData {
         lock = id > 0 ? lockConfig != null ? new TierLock(this.id, lockConfig) : TierLock.CommandOnly(this.id) : TierLock.Unlocked();
 
         List<String> blocks = config.getOrElse("blocks", List.of("minecraft:grass_block"));
-        blocks.forEach(value -> StringUtil.parseBlock(value).ifPresent(b -> this.blocks.merge(b.getKey().defaultBlockState(), b.getValue(), Integer::sum)));
+        blocks.forEach(value -> NeoBlockSpec.parse(value).ifPresent(this.blocks::add));
 
         if (this.blocks.isEmpty()) weight = 0;
         else weight = Math.max(0, config.getIntOrElse("weight", 1));

@@ -2,7 +2,6 @@ package xyz.agmstudio.neoblock.neo.world;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.data.NBTData;
@@ -10,11 +9,11 @@ import xyz.agmstudio.neoblock.data.NBTSaveable;
 import xyz.agmstudio.neoblock.data.TierData;
 import xyz.agmstudio.neoblock.data.TierLock;
 import xyz.agmstudio.neoblock.minecraft.MessengerAPI;
+import xyz.agmstudio.neoblock.neo.loot.NeoBlockSpec;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoMerchant;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoTrade;
 
 import java.util.List;
-import java.util.Map;
 
 public class WorldTier extends NBTSaveable {
     public static WorldTier of(@NotNull TierData tier, WorldData data) {
@@ -54,18 +53,18 @@ public class WorldTier extends NBTSaveable {
     public List<NeoTrade> getTrades() {
         return data.trades.getPool();
     }
-    public BlockState getRandomBlock() {
-        if (data.blocks.isEmpty()) return WorldData.DEFAULT_STATE;
+    public NeoBlockSpec getRandomBlock() {
+        if (data.blocks.isEmpty()) return WorldData.DEFAULT_SPEC;
 
-        int totalWeight = data.blocks.values().stream().mapToInt(Integer::intValue).sum();
+        int totalWeight = data.blocks.stream().mapToInt(NeoBlockSpec::getWeight).sum();
         int randomValue = WorldData.getRandom().nextInt(totalWeight);
-        for (Map.Entry<BlockState, Integer> entry: data.blocks.entrySet()) {
-            randomValue -= entry.getValue();
-            if (randomValue < 0) return entry.getKey();
+        for (NeoBlockSpec entry: data.blocks) {
+            randomValue -= entry.getWeight();
+            if (randomValue < 0) return entry;
         }
 
         NeoBlockMod.LOGGER.error("Unable to get a random block from tier {}", id);
-        return data.blocks.keySet().stream().findFirst().orElse(WorldData.DEFAULT_STATE);
+        return data.blocks.stream().findFirst().orElse(WorldData.DEFAULT_SPEC);
     }
 
     public @NotNull String getName() {
