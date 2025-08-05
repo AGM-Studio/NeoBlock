@@ -19,7 +19,7 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class NeoMobStack extends NeoItemStack {
+public class NeoMobSpec extends NeoItemSpec {
     private static final Pattern MOB_PATTERN = Pattern.compile("mob:(?<count>\\d+(-\\d+)?)?x?(?<id>[\\w:]+)(?:\\s+(?<chance>\\d+\\.?\\d*)%?)?");
     @NotNull private static final ResourceLocation DEFAULT = MinecraftAPI.parseResourceLocation("minecraft:pig");
     @NotNull private static final EntityType<?> DEFAULT_MOB = MinecraftAPI.getEntityType(DEFAULT).get();
@@ -27,7 +27,7 @@ public class NeoMobStack extends NeoItemStack {
 
     private final EntityType<?> mob;
 
-    public NeoMobStack(EntityType<?> mob, UniformInt range, double chance, Item egg) {
+    public NeoMobSpec(EntityType<?> mob, UniformInt range, double chance, Item egg) {
         super(egg, range, chance);
         this.mob = mob;
     }
@@ -55,7 +55,7 @@ public class NeoMobStack extends NeoItemStack {
         return "mob:" + getResource();
     }
 
-    public static Optional<NeoMobStack> parseMob(String input) {
+    public static Optional<NeoMobSpec> parseMob(String input) {
         if (input == null) return Optional.empty();
 
         Matcher matcher = MOB_PATTERN.matcher(input.trim().toLowerCase());
@@ -69,7 +69,7 @@ public class NeoMobStack extends NeoItemStack {
         UniformInt range = StringUtil.parseRange(matcher.group("count"));
         double chance = StringUtil.parseChance(matcher.group("chance"));
 
-        return Optional.of(new NeoMobStack(entityType, range, chance, spawnEgg));
+        return Optional.of(new NeoMobSpec(entityType, range, chance, spawnEgg));
     }
 
     public static Optional<EntityType<?>> getMobTradeEntity(ItemStack item) {

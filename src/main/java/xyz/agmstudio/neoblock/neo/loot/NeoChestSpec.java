@@ -1,4 +1,4 @@
-package xyz.agmstudio.neoblock.neo.loot.chest;
+package xyz.agmstudio.neoblock.neo.loot;
 
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import net.minecraft.core.BlockPos;
@@ -9,8 +9,6 @@ import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.minecraft.MinecraftAPI;
-import xyz.agmstudio.neoblock.neo.loot.NeoBlockSpec;
-import xyz.agmstudio.neoblock.neo.loot.NeoItemStack;
 import xyz.agmstudio.neoblock.util.ResourceUtil;
 
 import java.nio.file.Path;
@@ -24,9 +22,9 @@ public class NeoChestSpec extends NeoBlockSpec {
     private static final Pattern CHEST_PATTERN = Pattern.compile("^(?:(?<count>\\d+)x)?neoblock:(?<id>[^ ]+)$");
 
     private static final Path FOLDER = MinecraftAPI.CONFIG_DIR.resolve(NeoBlockMod.MOD_ID);
-    private static final HashMap<String, List<NeoItemStack>> CHESTS = new HashMap<>();
+    private static final HashMap<String, List<NeoItemSpec>> CHESTS = new HashMap<>();
 
-    public static List<NeoItemStack> getChestItems(String name) {
+    public static List<NeoItemSpec> getChestItems(String name) {
         return CHESTS.getOrDefault(name, List.of());
     }
 
@@ -48,8 +46,8 @@ public class NeoChestSpec extends NeoBlockSpec {
                 break;
             }
 
-            List<NeoItemStack> list = new ArrayList<>();
-            entries.forEach(entry -> NeoItemStack.parseItem(entry).ifPresent(list::add));
+            List<NeoItemSpec> list = new ArrayList<>();
+            entries.forEach(entry -> NeoItemSpec.parseItem(entry).ifPresent(list::add));
 
             CHESTS.put(key, list);
             NeoBlockMod.LOGGER.info("Loaded {} stacks for {}", list.size(), key);
@@ -62,7 +60,7 @@ public class NeoChestSpec extends NeoBlockSpec {
         Matcher matcher = CHEST_PATTERN.matcher(input.trim());
         if (!matcher.matches()) return Optional.empty();
 
-        List<NeoItemStack> items = CHESTS.getOrDefault(matcher.group("id"), List.of());
+        List<NeoItemSpec> items = CHESTS.getOrDefault(matcher.group("id"), List.of());
         if (items.isEmpty()) NeoBlockMod.LOGGER.warn("Unknown chest ID: '{}'", matcher.group("id"));
 
         String countString = matcher.group("count");
@@ -70,9 +68,9 @@ public class NeoChestSpec extends NeoBlockSpec {
         return Optional.of(new NeoChestSpec(items, count));
     }
 
-    private final List<NeoItemStack> items;
+    private final List<NeoItemSpec> items;
 
-    public NeoChestSpec(List<NeoItemStack> items, int weight) {
+    public NeoChestSpec(List<NeoItemSpec> items, int weight) {
         super(Blocks.CHEST, weight);
 
         this.items = items;
@@ -84,7 +82,7 @@ public class NeoChestSpec extends NeoBlockSpec {
             List<Integer> slots = IntStream.range(0, chest.getContainerSize()).boxed().collect(Collectors.toList());
             Collections.shuffle(slots);
 
-            for (NeoItemStack item: items) {
+            for (NeoItemSpec item: items) {
                 ItemStack result = item.getStackWithChance();
                 if (result == null) continue;
 

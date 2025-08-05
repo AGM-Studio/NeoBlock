@@ -7,22 +7,22 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.trading.ItemCost;
 import net.minecraft.world.item.trading.MerchantOffer;
 import org.jetbrains.annotations.NotNull;
-import xyz.agmstudio.neoblock.neo.loot.NeoItemStack;
+import xyz.agmstudio.neoblock.neo.loot.NeoItemSpec;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
 
 import java.util.Optional;
 
 public final class MerchantAPI {
-    private static ItemStack toItemStack(NeoItemStack item, RandomSource random) {
+    private static ItemStack toItemStack(NeoItemSpec item, RandomSource random) {
         ItemStack stack = new ItemStack(item.getItem(), item.getRange().sample(random));
         return item.modify(stack);
     }
 
-    private static ItemCost toItemCost(NeoItemStack item, RandomSource random) {
+    private static ItemCost toItemCost(NeoItemSpec item, RandomSource random) {
         return new ItemCost(item.getItem(), item.getRange().sample(random));
     }
 
-    public static Optional<MerchantOffer> getOfferOf(NeoItemStack result, NeoItemStack costA, NeoItemStack costB, UniformInt uses) {
+    public static Optional<MerchantOffer> getOfferOf(NeoItemSpec result, NeoItemSpec costA, NeoItemSpec costB, UniformInt uses) {
         @NotNull final RandomSource RNG = WorldData.getRandom();
         @NotNull final Item AIR = net.minecraft.world.item.Items.AIR;
 

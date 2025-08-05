@@ -4,7 +4,7 @@ import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.item.trading.MerchantOffer;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.minecraft.MerchantAPI;
-import xyz.agmstudio.neoblock.neo.loot.NeoItemStack;
+import xyz.agmstudio.neoblock.neo.loot.NeoItemSpec;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
 import xyz.agmstudio.neoblock.util.StringUtil;
 
@@ -22,13 +22,13 @@ public class NeoTradeSingle extends NeoTrade {
                     "(?:\\s*(?<chance>\\d+(?:\\.\\d+)?)%\\s*)?"
     );
 
-    private final NeoItemStack result;
-    private final NeoItemStack costA;
-    private final @Nullable NeoItemStack costB;
+    private final NeoItemSpec result;
+    private final NeoItemSpec costA;
+    private final @Nullable NeoItemSpec costB;
     private final double chance;
     private final UniformInt uses;
 
-    public NeoTradeSingle(NeoItemStack result, NeoItemStack costA, @Nullable NeoItemStack costB, double chance, UniformInt uses) {
+    public NeoTradeSingle(NeoItemSpec result, NeoItemSpec costA, @Nullable NeoItemSpec costB, double chance, UniformInt uses) {
         this.result = result;
         this.costA = costA;
         this.costB = costB;
@@ -47,15 +47,15 @@ public class NeoTradeSingle extends NeoTrade {
         Matcher matcher = PATTERN.matcher(input.trim().toLowerCase());
         if (!matcher.matches()) return Optional.empty();
 
-        NeoItemStack result = NeoItemStack.parseItem(matcher.group("result")).orElse(null);
-        NeoItemStack costA = NeoItemStack.parseItem(matcher.group("costA")).orElse(null);
+        NeoItemSpec result = NeoItemSpec.parseItem(matcher.group("result")).orElse(null);
+        NeoItemSpec costA = NeoItemSpec.parseItem(matcher.group("costA")).orElse(null);
         if (result == null || costA == null) {
             String key = result == null ? "result" : "costA";
             NeoBlockMod.LOGGER.error("Invalid trade {} '{}' for: {}", key, matcher.group(key), input);
             return Optional.empty();
         }
 
-        NeoItemStack costB = NeoItemStack.parseItem(matcher.group("costB")).orElse(null);
+        NeoItemSpec costB = NeoItemSpec.parseItem(matcher.group("costB")).orElse(null);
         double chance = StringUtil.parseChance(matcher.group("chance"));
         UniformInt uses = StringUtil.parseRange(matcher.group("uses"));
 

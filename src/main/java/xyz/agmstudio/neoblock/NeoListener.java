@@ -22,7 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.commands.*;
 import xyz.agmstudio.neoblock.commands.util.NeoCommand;
 import xyz.agmstudio.neoblock.minecraft.MessengerAPI;
-import xyz.agmstudio.neoblock.neo.loot.NeoMobStack;
+import xyz.agmstudio.neoblock.neo.loot.NeoMobSpec;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoMerchant;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
 import xyz.agmstudio.neoblock.neo.world.WorldUpgrade;
@@ -98,7 +98,7 @@ public final class NeoListener {
 
     @SubscribeEvent
     public static void onItemTooltip(ItemTooltipEvent event) {
-        Optional<EntityType<?>> mob = NeoMobStack.getMobTradeEntity(event.getItemStack());
+        Optional<EntityType<?>> mob = NeoMobSpec.getMobTradeEntity(event.getItemStack());
         if (mob.isEmpty()) return;
         event.getToolTip().add(
                 Component.translatable("tooltip.neoblock.spawn_lore", mob.get().getDescription())
@@ -109,16 +109,16 @@ public final class NeoListener {
     @SubscribeEvent
     public static void onItemUse_RCI(PlayerInteractEvent.RightClickItem event) {
         if (!(event.getLevel() instanceof ServerLevel level) || WorldData.isDisabled()) return;
-        if (NeoMobStack.handlePossibleMobTrade(event.getItemStack(), level)) event.setCanceled(true);
+        if (NeoMobSpec.handlePossibleMobTrade(event.getItemStack(), level)) event.setCanceled(true);
     }
     @SubscribeEvent
     public static void onItemUse_RCB(PlayerInteractEvent.RightClickBlock event) {
         if (!(event.getLevel() instanceof ServerLevel level) || WorldData.isDisabled()) return;
-        if (NeoMobStack.handlePossibleMobTrade(event.getItemStack(), level)) event.setCanceled(true);
+        if (NeoMobSpec.handlePossibleMobTrade(event.getItemStack(), level)) event.setCanceled(true);
     }
     @SubscribeEvent
     public static void onItemUse_EI(PlayerInteractEvent.EntityInteract event) {
         if (!(event.getLevel() instanceof ServerLevel level) || WorldData.isDisabled()) return;
-        if (NeoMobStack.handlePossibleMobTrade(event.getItemStack(), level)) event.setCanceled(true);
+        if (NeoMobSpec.handlePossibleMobTrade(event.getItemStack(), level)) event.setCanceled(true);
     }
 }

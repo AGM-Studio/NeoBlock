@@ -7,7 +7,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.minecraft.MinecraftAPI;
-import xyz.agmstudio.neoblock.neo.loot.chest.NeoChestSpec;
 
 import java.util.Optional;
 import java.util.regex.Matcher;

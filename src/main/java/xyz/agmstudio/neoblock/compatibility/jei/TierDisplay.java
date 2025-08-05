@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.data.TierData;
 import xyz.agmstudio.neoblock.data.TierLock;
 import xyz.agmstudio.neoblock.neo.loot.NeoBlockSpec;
-import xyz.agmstudio.neoblock.neo.loot.chest.NeoChestSpec;
+import xyz.agmstudio.neoblock.neo.loot.NeoChestSpec;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
 import xyz.agmstudio.neoblock.neo.world.WorldTier;
 import xyz.agmstudio.neoblock.util.StringUtil;
