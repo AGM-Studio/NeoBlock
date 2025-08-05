@@ -1,4 +1,4 @@
-package xyz.agmstudio.neoblock.neo.loot;
+package xyz.agmstudio.neoblock.neo.block;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.LevelAccessor;
@@ -57,6 +57,7 @@ public class NeoBlockSpec {
 
     public void placeAt(@NotNull LevelAccessor level, BlockPos pos) {
         level.setBlock(pos, getState(), 3);
+        BlockManager.ensureNoFall(level);
     }
 
     public Block getBlock() {

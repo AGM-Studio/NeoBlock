@@ -6,7 +6,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.phys.Vec3;
-import xyz.agmstudio.neoblock.neo.world.WorldData;
+import xyz.agmstudio.neoblock.neo.block.BlockManager;
 import xyz.agmstudio.neoblock.util.ConfigUtil;
 
 import java.util.ArrayList;
@@ -48,10 +48,10 @@ public class FuseAnimation extends UpgradePhaseAnimation {
 
         while (iterator.hasNext()) {
             int tick = iterator.next();
-            if (tick == 0) level.playSound(null, WorldData.POS, SoundEvents.CREEPER_PRIMED, SoundSource.BLOCKS, volume, 1.0f);
+            if (tick == 0) level.playSound(null, BlockManager.POS, SoundEvents.CREEPER_PRIMED, SoundSource.BLOCKS, volume, 1.0f);
 
             for (int i = 0; i < 8; i++) {
-                Vec3 particlePos = Vec3.atCenterOf(WorldData.POS).add(
+                Vec3 particlePos = Vec3.atCenterOf(BlockManager.POS).add(
                         (level.getRandom().nextDouble() - 0.5) * 1.5,
                         0.55,
                         (level.getRandom().nextDouble() - 0.5) * 1.5
@@ -59,7 +59,7 @@ public class FuseAnimation extends UpgradePhaseAnimation {
                 level.sendParticles(ParticleTypes.SMOKE, particlePos.x, particlePos.y, particlePos.z, 1, 0, 0, 0, 0.02);
             }
             if (tick % 5 == 0) {
-                Vec3 sparkPos = Vec3.atCenterOf(WorldData.POS).add(
+                Vec3 sparkPos = Vec3.atCenterOf(BlockManager.POS).add(
                         (level.getRandom().nextDouble() - 0.5) * 0.7,
                         level.getRandom().nextDouble() * 1.1,
                         (level.getRandom().nextDouble() - 0.5) * 0.7

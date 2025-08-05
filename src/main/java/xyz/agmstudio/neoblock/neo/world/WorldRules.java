@@ -31,7 +31,7 @@ public class WorldRules {
         return null;
     }
 
-    private static  <T extends GameRules.Value<T>> void setGameRule(ServerLevel level, GameRules.Key<T> key, String value) {
+    private static <T extends GameRules.Value<T>> void setGameRule(ServerLevel level, GameRules.Key<T> key, String value) {
         GameRules gameRules = level.getGameRules();
         T rule = gameRules.getRule(key);
 

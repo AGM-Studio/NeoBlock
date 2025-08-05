@@ -17,7 +17,7 @@ import java.util.function.Predicate;
 public class NeoArgumentTier extends NeoArgument<WorldTier> {
     public static SuggestionProvider<CommandSourceStack> createSuggester(final Predicate<WorldTier> filter) {
         return (CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) -> {
-            WorldData.getTiers().stream().filter(filter).mapToInt(WorldTier::getID).forEach(builder::suggest);
+            WorldData.getWorldTiers().stream().filter(filter).mapToInt(WorldTier::getID).forEach(builder::suggest);
             return builder.buildFuture();
         };
     }
@@ -33,8 +33,8 @@ public class NeoArgumentTier extends NeoArgument<WorldTier> {
     @Override public WorldTier capture(CommandContext<CommandSourceStack> context, String key) throws NeoCommand.CommandExtermination {
         try {
             int index = IntegerArgumentType.getInteger(context, key);
-            if (index < 0 || index > WorldData.getTiers().size()) {
-                context.getSource().sendFailure(Component.translatable("command.neoblock.invalid_tier", WorldData.getTiers().size() - 1));
+            if (index < 0 || index > WorldData.getWorldTiers().size()) {
+                context.getSource().sendFailure(Component.translatable("command.neoblock.invalid_tier", WorldData.getWorldTiers().size() - 1));
                 throw new NeoCommand.CommandExtermination();
             }
             return WorldData.getInstance().getTier(index);

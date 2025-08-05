@@ -1,6 +1,7 @@
 package xyz.agmstudio.neoblock.neo.world;
 
 import com.electronwill.nightconfig.core.UnmodifiableConfig;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -10,28 +11,20 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlockMod;
-import xyz.agmstudio.neoblock.NeoListener;
-import xyz.agmstudio.neoblock.animations.Animation;
 import xyz.agmstudio.neoblock.data.NBTSaveable;
 import xyz.agmstudio.neoblock.data.Schematic;
 import xyz.agmstudio.neoblock.data.TierData;
 import xyz.agmstudio.neoblock.minecraft.MessengerAPI;
-import xyz.agmstudio.neoblock.neo.loot.NeoBlockSpec;
-import xyz.agmstudio.neoblock.neo.loot.trade.NeoMerchant;
 import xyz.agmstudio.neoblock.minecraft.MinecraftAPI;
+import xyz.agmstudio.neoblock.neo.block.BlockManager;
 
 import java.io.FileNotFoundException;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
 
 public class WorldData extends MinecraftAPI.AbstractWorldData {
     private static WorldData instance;
@@ -39,12 +32,10 @@ public class WorldData extends MinecraftAPI.AbstractWorldData {
         return instance;
     }
 
-    public static final double AABB_RANGE = 1.05;
-    public static final BlockPos POS = new BlockPos(0, 64, 0);
-    public static final Vec3 POS_CORNER = new Vec3(POS.getX(), POS.getY(), POS.getZ());
-    public static final NeoBlockSpec DEFAULT_SPEC = new NeoBlockSpec(Blocks.GRASS_BLOCK);
-
-    private static void resetTiers(WorldData data) {
+    public static void resetTiers() {
+        resetTiers(instance);
+    }
+    public static void resetTiers(WorldData data) {
         data.tiers.clear();
         TierData.stream().map(tier -> WorldTier.of(tier, data)).forEach(data.tiers::add);
 
@@ -54,18 +45,19 @@ public class WorldData extends MinecraftAPI.AbstractWorldData {
     public static void setup(@NotNull ServerLevel level) {
         load(level);
 
-        if (isInactive()) {
+        if (instance == null) return;
+        if (instance.status.state == WorldStatus.State.INACTIVE) {
             boolean isNeoBlock = true;
             for (int y : List.of(-64, -61, 0, 64))
                 if (!level.getBlockState(new BlockPos(0, y, 0)).isAir()) isNeoBlock = false;
 
             if (isNeoBlock) {
-                DEFAULT_SPEC.placeAt(level, POS);
+                BlockManager.DEFAULT_SPEC.placeAt(level, BlockManager.POS);
                 UnmodifiableConfig rules = NeoBlockMod.getConfig().get("rules");
                 if (rules != null) WorldRules.applyGameRules(level, rules);
 
                 // Load schematics from config!
-                Schematic.loadSchematic(level, POS, "main.nbt");
+                Schematic.loadSchematic(level, BlockManager.POS, "main.nbt");
                 int iterator = 0;
                 while (NeoBlockMod.getConfig().contains("schematics.custom_" + iterator)) {
                     try {
@@ -79,27 +71,33 @@ public class WorldData extends MinecraftAPI.AbstractWorldData {
                     }
                     iterator++;
                 }
-                setActive();
+
+                instance.status.state = WorldStatus.State.ACTIVE;
+                instance.setDirty();
             } else {
                 NeoBlockMod.LOGGER.info("NeoBlock has been disabled.");
                 MessengerAPI.sendMessage("message.neoblock.disabled_world_1", level, false);
                 MessengerAPI.sendMessage("message.neoblock.disabled_world_2", level, false);
-                setActive();
+
+                instance.status.state = WorldStatus.State.DISABLED;
+                instance.setDirty();
             }
-        } else if (isUpdated()) {
+        } else if (instance.status.state == WorldStatus.State.UPDATED) {
             NeoBlockMod.LOGGER.info("NeoBlock tiers has been updated.");
-            Component command = Component.literal("/neoblock force update").withStyle(
-                    Style.EMPTY.withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/neoblock force update"))
+            Component command = Component.literal("/neoblock force reset").withStyle(
+                    Style.EMPTY.withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/neoblock force reset")).withColor(ChatFormatting.AQUA)
             );
             MessengerAPI.sendMessage("message.neoblock.updated_world", level, false, command);
-            setActive();
+
+            instance.status.state = WorldStatus.State.UPDATED;
+            instance.setDirty();
         }
     }
 
     public static @NotNull WorldData create(@NotNull ServerLevel level) {
         WorldData data = new WorldData(level);
 
-        data.status = new WorldStatus();
+        data.status = new WorldStatus(data);
         resetTiers(data);
 
         NeoBlockMod.LOGGER.debug("Creating new world data");
@@ -109,9 +107,9 @@ public class WorldData extends MinecraftAPI.AbstractWorldData {
         WorldData data = new WorldData(level);
 
         NeoBlockMod.LOGGER.debug("Loading WorldData from {}", tag);
-        data.status = NBTSaveable.load(WorldStatus.class, tag);
-        if (!isValid()) {
-            data.status.state = WorldState.UPDATED;
+        data.status = NBTSaveable.load(WorldStatus.class, tag, data);
+        if (!Objects.equals(instance.status.hash, TierData.getHash())) {
+            data.status.setUpdated();
             return data;
         }
 
@@ -127,7 +125,7 @@ public class WorldData extends MinecraftAPI.AbstractWorldData {
 
     @Override public @NotNull CompoundTag save(@NotNull CompoundTag tag) {
         tag.merge(status.save());
-        if (status.state == WorldState.ACTIVE) {
+        if (status.isActive()) {
             ListTag list = new ListTag();
             for (WorldTier tier: tiers) list.add(tier.save());
             tag.put("Tiers", list);
@@ -147,98 +145,45 @@ public class WorldData extends MinecraftAPI.AbstractWorldData {
         instance = this;
         this.level = level;
     }
+
+    public static @NotNull RandomSource getRandom() {
+        return instance.level.getRandom();
+    }
     public WorldStatus getStatus() {
         return status;
     }
+    public static WorldStatus getWorldStatus() {
+        return instance.status;
+    }
     public ServerLevel getLevel() {
         return level;
+    }
+    public static ServerLevel getWorldLevel() {
+        return instance.level;
     }
     public WorldTier getTier(int id) {
         for (WorldTier tier: tiers) if (tier.getID() == id) return tier;
         return null;
     }
+    public static WorldTier getWorldTier(int id) {
+        return instance.getTier(id);
+    }
 
-    public static HashSet<WorldTier> getTiers() {
+    public HashSet<WorldTier> getTiers() {
+        return tiers;
+    }
+    public static HashSet<WorldTier> getWorldTiers() {
         return instance.tiers;
     }
     public static int totalWeight() {
         return instance.tiers.stream().filter(WorldTier::isEnabled).mapToInt(WorldTier::getWeight).sum();
     }
 
-    public static boolean isInactive() {
-        return instance.status.state == WorldState.INACTIVE;
+    public WorldUpgrade getUpgrade() {
+        return upgrade;
     }
-    public static void setActive() {
-        instance.status.state = WorldState.ACTIVE;
-        instance.setDirty();
-    }
-    public static boolean isActive() {
-        return instance.status.state == WorldState.ACTIVE;
-    }
-    public void setDisabled() {
-        instance.status.state = WorldState.DISABLED;
-        instance.setDirty();
-    }
-    public static boolean isDisabled() {
-        return instance.status.state == WorldState.DISABLED;
-    }
-    public static void setUpdated() {
-        instance.status.state = WorldState.UPDATED;
-        instance.setDirty();
-    }
-    public static boolean isUpdated() {
-        return instance.status.state == WorldState.UPDATED;
-    }
-
-    public static int getBlockCount() {
-        return instance.status.blockCount;
-    }
-    public static void setBlockCount(int count) {
-        instance.status.blockCount = count;
-        instance.setDirty();
-    }
-    public static void addBlockCount(int count) {
-        instance.status.blockCount += count;
-        instance.setDirty();
-    }
-
-    public static long getGameTime() {
-        return instance.level.getGameTime();
-    }
-
-    public static int getTraderFailedAttempts() {
-        return instance.status.traderFailedAttempts;
-    }
-    public static void resetTraderFailedAttempts() {
-        instance.status.traderFailedAttempts = 0;
-        instance.setDirty();
-    }
-    public static void addTraderFailedAttempts() {
-        instance.status.traderFailedAttempts += 1;
-        instance.setDirty();
-    }
-
-    public static HashMap<EntityType<?>, Integer> getTradedMobs() {
-        return instance.status.tradedMobs;
-    }
-    public static void addTradedMob(EntityType<?> entityType, int count) {
-        instance.status.tradedMobs.merge(entityType, count, Integer::sum);
-        instance.setDirty();
-    }
-    public static void clearTradedMobs() {
-        instance.status.tradedMobs.clear();
-        instance.setDirty();
-    }
-
-    public static boolean isValid() {
-        return Objects.equals(instance.status.hash, TierData.getHash());
-    }
-    public static void updateTiers() {
-        resetTiers(instance);
-    }
-
-    public static @NotNull RandomSource getRandom() {
-        return instance.level.getRandom();
+    public static WorldUpgrade getWorldUpgrade() {
+        return instance.upgrade;
     }
 
     public static void setCommanded(WorldTier tier, boolean force) {
@@ -249,54 +194,5 @@ public class WorldData extends MinecraftAPI.AbstractWorldData {
 
     public static void tick(ServerLevel level, LevelAccessor access) {
         if (instance != null) instance.upgrade.tick(level, access);
-    }
-
-    public static NeoBlockSpec getRandomBlock() {
-        AtomicInteger totalChance = new AtomicInteger();
-        List<WorldTier> tiers = new ArrayList<>();
-
-        instance.tiers.stream().filter(WorldTier::isEnabled).forEach(tier -> {
-            tiers.add(tier);
-            totalChance.addAndGet(tier.getWeight());
-        });
-
-        if (totalChance.get() == 0) return DEFAULT_SPEC;
-        int randomValue = getRandom().nextInt(totalChance.get());
-        for (WorldTier tier : tiers) {
-            randomValue -= tier.getWeight();
-            if (randomValue < 0) return tier.getRandomBlock();
-        }
-
-        NeoBlockMod.LOGGER.error("Unable to find a block for {} blocks", getBlockCount());
-        return DEFAULT_SPEC;
-    }
-
-    public static void setNeoBlock(@NotNull LevelAccessor access, BlockState block) {
-        access.setBlock(POS, block, 3);
-
-        Vec3 center = POS.getCenter();
-        for(Entity entity: access.getEntities(null, AABB.ofSize(center, AABB_RANGE, AABB_RANGE, AABB_RANGE)))
-            entity.teleportTo(entity.getX(), center.y + AABB_RANGE / 2.0, entity.getZ());
-    }
-    public static void setNeoBlock(@NotNull LevelAccessor access, NeoBlockSpec block) {
-        block.placeAt(access, POS);
-
-        Vec3 center = POS.getCenter();
-        for(Entity entity: access.getEntities(null, AABB.ofSize(center, AABB_RANGE, AABB_RANGE, AABB_RANGE)))
-            entity.teleportTo(entity.getX(), center.y + AABB_RANGE / 2.0, entity.getZ());
-    }
-
-    public static void onBlockBroken(ServerLevel level, LevelAccessor access, boolean triggered) {
-        Animation.resetIdleTick();if (triggered) addBlockCount(1);
-
-        for (WorldTier tier: instance.tiers)
-            if (tier.canBeUnlocked()) instance.upgrade.addUpgrade(tier);
-
-        if (instance.upgrade.upgrades.isEmpty()) setNeoBlock(access, getRandomBlock());
-        NeoListener.execute(() -> NeoMerchant.attemptSpawnTrader(level));
-    }
-
-    public static boolean isOnUpgrade() {
-        return !instance.upgrade.upgrades.isEmpty();
     }
 }

@@ -19,9 +19,11 @@ import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import xyz.agmstudio.neoblock.commands.*;
 import xyz.agmstudio.neoblock.commands.util.NeoCommand;
 import xyz.agmstudio.neoblock.minecraft.MessengerAPI;
+import xyz.agmstudio.neoblock.neo.block.BlockManager;
 import xyz.agmstudio.neoblock.neo.loot.NeoMobSpec;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoMerchant;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
@@ -48,33 +50,45 @@ public final class NeoListener {
         tickers.add(ticker);
     }
 
+    private static @Nullable ServerLevel getServerConditioned(LevelAccessor level, boolean isOverWorld, boolean isNotDisabled) {
+        if (!(level instanceof ServerLevel server)) return null;
+        if (isOverWorld && server.dimension() != Level.OVERWORLD) return null;
+        if (isNotDisabled && WorldData.getWorldStatus().isDisabled()) return null;
+
+        return server;
+    }
+
+
     @SubscribeEvent
     public static void onWorldLoad(LevelEvent.@NotNull Load event) {
-        if (!(event.getLevel() instanceof ServerLevel level) || level.dimension() != Level.OVERWORLD) return;
-        WorldData.setup(level);
+        ServerLevel level = getServerConditioned(event.getLevel(), true, false);
+        if (level != null) WorldData.setup(level);
     }
 
     @SubscribeEvent
     public static void onWorldTick(LevelTickEvent.@NotNull Post event) {
-        if (!(event.getLevel() instanceof ServerLevel level) || level.dimension() != Level.OVERWORLD || WorldData.isDisabled())
-            return;
+        ServerLevel level = getServerConditioned(event.getLevel(), true, true);
+        if (level == null) return;
+
         final LevelAccessor access = event.getLevel();
-        final BlockState block = access.getBlockState(WorldData.POS);
+        final BlockState block = access.getBlockState(BlockManager.POS);
 
         tickers.forEach(ticker -> ticker.accept(level, access));
 
-        if (WorldData.isUpdated() || WorldData.isOnUpgrade()) {
-            if (block.getBlock() != Blocks.BEDROCK) WorldData.setNeoBlock(access, Blocks.BEDROCK.defaultBlockState());
+        if (WorldData.getWorldStatus().isUpdated() || !WorldData.getWorldUpgrade().isEmpty()) {
+            if (block.getBlock() != Blocks.BEDROCK) BlockManager.BEDROCK_SPEC.placeAt(access, BlockManager.POS);
         } else if (block.isAir() || block.canBeReplaced())          // NeoBlock has been broken logic
-            WorldData.onBlockBroken(level, access, true);
+            BlockManager.onBlockBroken(level, access);
     }
 
     @SubscribeEvent
     public static void onEntitySpawn(EntityJoinLevelEvent event) {
-        if (!(event.getLevel() instanceof ServerLevel level) || WorldData.isDisabled()) return;
+        ServerLevel level = getServerConditioned(event.getLevel(), false, false);
+        if (level == null) return;
+
         if (event.getEntity() instanceof WanderingTrader trader) NeoMerchant.handleTrader(trader);
         if (event.getEntity() instanceof ServerPlayer player) {
-            if (WorldData.isOnUpgrade()) WorldUpgrade.addPlayer(player);
+            if (!WorldData.getWorldUpgrade().isEmpty()) WorldUpgrade.addPlayer(player);
             MessengerAPI.onPlayerJoin(level, player);
         }
     }
@@ -108,17 +122,23 @@ public final class NeoListener {
 
     @SubscribeEvent
     public static void onItemUse_RCI(PlayerInteractEvent.RightClickItem event) {
-        if (!(event.getLevel() instanceof ServerLevel level) || WorldData.isDisabled()) return;
+        ServerLevel level = getServerConditioned(event.getLevel(), false, false);
+        if (level == null) return;
+
         if (NeoMobSpec.handlePossibleMobTrade(event.getItemStack(), level)) event.setCanceled(true);
     }
     @SubscribeEvent
     public static void onItemUse_RCB(PlayerInteractEvent.RightClickBlock event) {
-        if (!(event.getLevel() instanceof ServerLevel level) || WorldData.isDisabled()) return;
+        ServerLevel level = getServerConditioned(event.getLevel(), false, false);
+        if (level == null) return;
+
         if (NeoMobSpec.handlePossibleMobTrade(event.getItemStack(), level)) event.setCanceled(true);
     }
     @SubscribeEvent
     public static void onItemUse_EI(PlayerInteractEvent.EntityInteract event) {
-        if (!(event.getLevel() instanceof ServerLevel level) || WorldData.isDisabled()) return;
+        ServerLevel level = getServerConditioned(event.getLevel(), false, false);
+        if (level == null) return;
+
         if (NeoMobSpec.handlePossibleMobTrade(event.getItemStack(), level)) event.setCanceled(true);
     }
 }

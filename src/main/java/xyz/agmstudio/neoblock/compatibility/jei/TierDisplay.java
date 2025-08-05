@@ -4,8 +4,8 @@ import net.minecraft.world.item.Item;
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.data.TierData;
 import xyz.agmstudio.neoblock.data.TierLock;
-import xyz.agmstudio.neoblock.neo.loot.NeoBlockSpec;
-import xyz.agmstudio.neoblock.neo.loot.NeoChestSpec;
+import xyz.agmstudio.neoblock.neo.block.NeoBlockSpec;
+import xyz.agmstudio.neoblock.neo.block.NeoChestSpec;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
 import xyz.agmstudio.neoblock.neo.world.WorldTier;
 import xyz.agmstudio.neoblock.util.StringUtil;
@@ -82,16 +82,17 @@ public class TierDisplay {
             );
 
             @NotNull TierLock lock = tier.getLock();
-            if (lock.getBlocks() > 0)
+            if (lock.getBlocks() > 0) {
+                int count = WorldData.getWorldStatus().getBlockCount();
+                NeoJEIPlugin.addBox(boxes, "jei.neoblock.requirement.blocks_broken", 7, y.getAndAdd(12), lock.getBlocks() <= count, lock.getBlocks(), count);
+            }
+            if (lock.getGameplay() > 0) {
+                long time = WorldData.getWorldLevel().getGameTime();
                 NeoJEIPlugin.addBox(boxes,
-                        "jei.neoblock.requirement.blocks_broken", 7, y.getAndAdd(12), lock.getBlocks() <= WorldData.getBlockCount(),
-                        lock.getBlocks(), WorldData.getBlockCount()
+                        "jei.neoblock.requirement.play_time", 7, y.getAndAdd(12), lock.getGameplay() <= time,
+                        StringUtil.formatTicks(lock.getGameplay()), StringUtil.formatTicks(time)
                 );
-            if (lock.getGameplay() > 0)
-                NeoJEIPlugin.addBox(boxes,
-                        "jei.neoblock.requirement.play_time", 7, y.getAndAdd(12), lock.getGameplay() <= WorldData.getGameTime(),
-                        StringUtil.formatTicks(lock.getGameplay()), StringUtil.formatTicks(WorldData.getGameTime())
-                );
+            }
             if (lock.isCommanded())
                 NeoJEIPlugin.addBox(boxes,
                         tier.isCommanded() ? "jei.neoblock.status.requirement.command.met" : "jei.neoblock.status.requirement.command",

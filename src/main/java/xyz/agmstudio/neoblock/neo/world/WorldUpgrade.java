@@ -3,12 +3,12 @@ package xyz.agmstudio.neoblock.neo.world;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.block.Blocks;
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.animations.Animation;
 import xyz.agmstudio.neoblock.animations.ProgressbarAnimation;
 import xyz.agmstudio.neoblock.animations.phase.UpgradePhaseAnimation;
 import xyz.agmstudio.neoblock.animations.progress.UpgradeProgressAnimation;
+import xyz.agmstudio.neoblock.neo.block.BlockManager;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -22,7 +22,7 @@ public class WorldUpgrade {
         if (lock.tick++ == 0) {
             lock.tier.onStartUpgrade(level);
 
-            WorldData.setNeoBlock(access, Blocks.BEDROCK.defaultBlockState());
+            BlockManager.BEDROCK_SPEC.placeAt(level, BlockManager.POS);
 
             if (progressbar != null) level.players().forEach(progressbar::addPlayer);
             for (UpgradePhaseAnimation animation : phaseAnimations)
@@ -39,7 +39,7 @@ public class WorldUpgrade {
                 for (UpgradePhaseAnimation animation : phaseAnimations)
                     if (animation.isActiveOnUpgradeFinish()) animation.animate(level, access);
 
-                WorldData.setNeoBlock(access, WorldData.getRandomBlock());
+                BlockManager.getRandomBlock().placeAt(access, BlockManager.POS);
             }
         } else {
             if (progressbar != null) progressbar.update(lock.tick, lock.getGoal());
@@ -52,6 +52,9 @@ public class WorldUpgrade {
 
     public void addUpgrade(WorldTier tier) {
         upgrades.add(tier.lock);
+    }
+    public boolean isEmpty() {
+        return upgrades.isEmpty();
     }
 
     // Animations

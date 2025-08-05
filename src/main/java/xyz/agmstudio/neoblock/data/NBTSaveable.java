@@ -5,6 +5,7 @@ import xyz.agmstudio.neoblock.NeoBlockMod;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 
 @SuppressWarnings("IfCanBeSwitch")
 public abstract class NBTSaveable {
@@ -79,9 +80,10 @@ public abstract class NBTSaveable {
     }
 
 
-    public static <T extends NBTSaveable> T load(Class<T> clazz, CompoundTag tag) {
+    public static <T extends NBTSaveable> T load(Class<T> clazz, CompoundTag tag, Object... args) {
         try {
-            T instance = clazz.getDeclaredConstructor().newInstance();
+            Class<?>[] types = Arrays.stream(args).map(Object::getClass).toArray(Class[]::new);
+            T instance = clazz.getDeclaredConstructor(types).newInstance(args);
             for (Field field : clazz.getDeclaredFields()) {
                 if (field.isAnnotationPresent(NBTData.class)) {
                     field.setAccessible(true);
@@ -95,7 +97,7 @@ public abstract class NBTSaveable {
                             Object enumValue = fromId.invoke(null, id);
                             field.set(instance, enumValue);
                         } catch (Exception e) {
-                            NeoBlockMod.LOGGER.error("Failed to load enum field: " + field.getName(), e);
+                            NeoBlockMod.LOGGER.error("Failed to load enum field: {}", field.getName(), e);
                             throw new RuntimeException("Failed to load enum field: " + field.getName(), e);
                         }
                     } else {
@@ -107,7 +109,7 @@ public abstract class NBTSaveable {
             instance.onLoad(tag);
             return instance;
         } catch (Exception e) {
-            NeoBlockMod.LOGGER.error("Failed to load NBT into " + clazz.getSimpleName(), e);
+            NeoBlockMod.LOGGER.error("Failed to load NBT into {}", clazz.getSimpleName(), e);
             throw new RuntimeException("Failed to load NBT into " + clazz.getSimpleName(), e);
         }
     }

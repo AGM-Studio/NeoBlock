@@ -9,7 +9,8 @@ import xyz.agmstudio.neoblock.data.NBTSaveable;
 import xyz.agmstudio.neoblock.data.TierData;
 import xyz.agmstudio.neoblock.data.TierLock;
 import xyz.agmstudio.neoblock.minecraft.MessengerAPI;
-import xyz.agmstudio.neoblock.neo.loot.NeoBlockSpec;
+import xyz.agmstudio.neoblock.neo.block.BlockManager;
+import xyz.agmstudio.neoblock.neo.block.NeoBlockSpec;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoMerchant;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoTrade;
 
@@ -54,7 +55,7 @@ public class WorldTier extends NBTSaveable {
         return data.trades.getPool();
     }
     public NeoBlockSpec getRandomBlock() {
-        if (data.blocks.isEmpty()) return WorldData.DEFAULT_SPEC;
+        if (data.blocks.isEmpty()) return BlockManager.DEFAULT_SPEC;
 
         int totalWeight = data.blocks.stream().mapToInt(NeoBlockSpec::getWeight).sum();
         int randomValue = WorldData.getRandom().nextInt(totalWeight);
@@ -64,7 +65,7 @@ public class WorldTier extends NBTSaveable {
         }
 
         NeoBlockMod.LOGGER.error("Unable to get a random block from tier {}", id);
-        return data.blocks.stream().findFirst().orElse(WorldData.DEFAULT_SPEC);
+        return data.blocks.stream().findFirst().orElse(BlockManager.DEFAULT_SPEC);
     }
 
     public @NotNull String getName() {

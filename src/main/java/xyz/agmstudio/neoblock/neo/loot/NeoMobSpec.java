@@ -85,7 +85,7 @@ public class NeoMobSpec extends NeoItemSpec {
         if (mob.isEmpty()) return false;
 
         MessengerAPI.sendInstantMessage("message.neoblock.trades.mob", level, true, item.getCount(), mob.get().getDescription());
-        WorldData.addTradedMob(mob.get(), item.getCount());
+        WorldData.getWorldStatus().addTradedMob(mob.get(), item.getCount());
         item.setCount(0);
 
         return true;

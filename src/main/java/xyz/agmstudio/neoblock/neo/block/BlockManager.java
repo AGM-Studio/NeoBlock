@@ -1,0 +1,65 @@
+package xyz.agmstudio.neoblock.neo.block;
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
+import xyz.agmstudio.neoblock.NeoBlockMod;
+import xyz.agmstudio.neoblock.NeoListener;
+import xyz.agmstudio.neoblock.animations.Animation;
+import xyz.agmstudio.neoblock.neo.loot.trade.NeoMerchant;
+import xyz.agmstudio.neoblock.neo.world.WorldData;
+import xyz.agmstudio.neoblock.neo.world.WorldTier;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+
+public class BlockManager {
+    public static final double AABB_RANGE = 1.05;
+    public static final BlockPos POS = new BlockPos(0, 64, 0);
+    public static final Vec3 POS_CORNER = new Vec3(POS.getX(), POS.getY(), POS.getZ());
+    public static final NeoBlockSpec DEFAULT_SPEC = new NeoBlockSpec(Blocks.GRASS_BLOCK);
+    public static final NeoBlockSpec BEDROCK_SPEC = new NeoBlockSpec(Blocks.BEDROCK);
+
+    public static NeoBlockSpec getRandomBlock() {
+        AtomicInteger totalChance = new AtomicInteger();
+        List<WorldTier> tiers = new ArrayList<>();
+
+        WorldData.getWorldTiers().stream().filter(WorldTier::isEnabled).forEach(tier -> {
+            tiers.add(tier);
+            totalChance.addAndGet(tier.getWeight());
+        });
+
+        if (totalChance.get() == 0) return DEFAULT_SPEC;
+        int randomValue = WorldData.getRandom().nextInt(totalChance.get());
+        for (WorldTier tier : tiers) {
+            randomValue -= tier.getWeight();
+            if (randomValue < 0) return tier.getRandomBlock();
+        }
+
+        NeoBlockMod.LOGGER.error("Unable to find a block for {} blocks", WorldData.getWorldStatus().getBlockCount());
+        return DEFAULT_SPEC;
+    }
+
+    public static void onBlockBroken(ServerLevel level, LevelAccessor access) {
+        Animation.resetIdleTick();
+        WorldData.getWorldStatus().addBlockCount(1);
+
+        for (WorldTier tier: WorldData.getWorldTiers())
+            if (tier.canBeUnlocked()) WorldData.getWorldUpgrade().addUpgrade(tier);
+
+        if (WorldData.getWorldUpgrade().isEmpty()) getRandomBlock().placeAt(access, POS);
+        NeoListener.execute(() -> NeoMerchant.attemptSpawnTrader(level));
+    }
+
+    public static void ensureNoFall(@NotNull LevelAccessor access) {
+        Vec3 center = POS.getCenter();
+        for(Entity entity: access.getEntities(null, AABB.ofSize(center, AABB_RANGE, AABB_RANGE, AABB_RANGE)))
+            entity.teleportTo(entity.getX(), center.y + AABB_RANGE / 2.0, entity.getZ());
+    }
+}

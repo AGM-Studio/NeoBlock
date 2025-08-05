@@ -16,7 +16,7 @@ public class MainCommand extends NeoCommand {
     }
 
     @Override public int execute(CommandContext<CommandSourceStack> context) throws CommandExtermination {
-        MutableComponent message = Component.translatable("command.neoblock.info", WorldData.getBlockCount(), WorldData.getTiers().stream().filter(WorldTier::isUnlocked).map(WorldTier::getName).collect(Collectors.joining("\n\t")));
+        MutableComponent message = Component.translatable("command.neoblock.info", WorldData.getWorldStatus().getBlockCount(), WorldData.getWorldTiers().stream().filter(WorldTier::isUnlocked).map(WorldTier::getName).collect(Collectors.joining("\n\t")));
 
         context.getSource().sendSuccess(() -> message, true);
         return 1;

@@ -1,4 +1,4 @@
-package xyz.agmstudio.neoblock.neo.loot;
+package xyz.agmstudio.neoblock.neo.block;
 
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import net.minecraft.core.BlockPos;
@@ -9,6 +9,7 @@ import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.minecraft.MinecraftAPI;
+import xyz.agmstudio.neoblock.neo.loot.NeoItemSpec;
 import xyz.agmstudio.neoblock.util.ResourceUtil;
 
 import java.nio.file.Path;
