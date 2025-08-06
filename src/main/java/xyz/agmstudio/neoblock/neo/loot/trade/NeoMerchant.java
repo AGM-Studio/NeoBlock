@@ -14,11 +14,14 @@ import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.minecraft.EntityAPI;
 import xyz.agmstudio.neoblock.minecraft.MessengerAPI;
 import xyz.agmstudio.neoblock.neo.block.BlockManager;
+import xyz.agmstudio.neoblock.neo.tiers.TierSpec;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
 import xyz.agmstudio.neoblock.neo.world.WorldStatus;
-import xyz.agmstudio.neoblock.neo.world.WorldTier;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
 
 public class NeoMerchant {
     public static double chance;
@@ -67,7 +70,7 @@ public class NeoMerchant {
         WorldStatus status = WorldData.getWorldStatus();
         status.resetTraderFailedAttempts();
         List<NeoTrade> trades = new ArrayList<>();
-        WorldData.getWorldTiers().stream().filter(WorldTier::isEnabled).forEach(tier -> trades.addAll(tier.getTrades()));
+        WorldData.getWorldTiers().stream().filter(TierSpec::isEnabled).forEach(tier -> trades.addAll(tier.getTrades()));
 
         WanderingTrader trader = spawnTraderWith(trades, level, "NeoMerchant");
         if (trader == null) return null;

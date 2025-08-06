@@ -26,8 +26,8 @@ import xyz.agmstudio.neoblock.minecraft.MessengerAPI;
 import xyz.agmstudio.neoblock.neo.block.BlockManager;
 import xyz.agmstudio.neoblock.neo.loot.NeoMobSpec;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoMerchant;
+import xyz.agmstudio.neoblock.neo.tiers.TierManager;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
-import xyz.agmstudio.neoblock.neo.world.WorldUpgrade;
 
 import java.util.HashSet;
 import java.util.Optional;
@@ -75,7 +75,7 @@ public final class NeoListener {
 
         tickers.forEach(ticker -> ticker.accept(level, access));
 
-        if (WorldData.getWorldStatus().isUpdated() || !WorldData.getWorldUpgrade().isEmpty()) {
+        if (WorldData.getWorldStatus().isUpdated() || TierManager.hasResearch()) {
             if (block.getBlock() != Blocks.BEDROCK) BlockManager.BEDROCK_SPEC.placeAt(access, BlockManager.POS);
         } else if (block.isAir() || block.canBeReplaced())          // NeoBlock has been broken logic
             BlockManager.onBlockBroken(level, access);
@@ -88,7 +88,7 @@ public final class NeoListener {
 
         if (event.getEntity() instanceof WanderingTrader trader) NeoMerchant.handleTrader(trader);
         if (event.getEntity() instanceof ServerPlayer player) {
-            if (!WorldData.getWorldUpgrade().isEmpty()) WorldUpgrade.addPlayer(player);
+            if (TierManager.hasResearch()) TierManager.addPlayer(player);
             MessengerAPI.onPlayerJoin(level, player);
         }
     }

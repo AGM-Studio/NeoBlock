@@ -12,6 +12,7 @@ import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.NeoListener;
 import xyz.agmstudio.neoblock.animations.Animation;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoMerchant;
+import xyz.agmstudio.neoblock.neo.tiers.TierManager;
 import xyz.agmstudio.neoblock.neo.tiers.TierSpec;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
 
@@ -53,7 +54,9 @@ public class BlockManager {
         for (TierSpec tier: WorldData.getWorldTiers())
             if (tier.canBeResearched()) tier.startResearch();
 
-        if (WorldData.getWorldUpgrade().isEmpty()) getRandomBlock().placeAt(access, POS);
+        if (!TierManager.hasResearch()) getRandomBlock().placeAt(access, POS);
+        else BEDROCK_SPEC.placeAt(access, POS);  // Creative cheaters (Just in case)
+
         NeoListener.execute(() -> NeoMerchant.attemptSpawnTrader(level));
     }
 

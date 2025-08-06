@@ -7,24 +7,31 @@ import xyz.agmstudio.neoblock.minecraft.MessengerAPI;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoMerchant;
 
 public class TierResearch implements NBTSaveable {
-    private final TierSpec root;
+    protected final TierSpec tier;
 
-    @NBTData public boolean done = false;
-    @NBTData public long tick = 0;
+    @NBTData protected boolean done = false;
+    @NBTData protected long tick = 0;
 
-    public long time = 72000;
+    protected long time = 72000;
 
     public TierResearch(TierSpec root) {
-        this.root = root;
+        this.tier = root;
     }
 
     public void onFinish(ServerLevel level) {
-        root.enable();
-        MessengerAPI.sendInstantMessage("message.neoblock.unlocked_tier", level, false, root.id);
+        tier.enable();
+        MessengerAPI.sendInstantMessage("message.neoblock.unlocked_tier", level, false, tier.id);
     }
-    public void onStartUpgrade(ServerLevel level) {
-        MessengerAPI.sendInstantMessage("message.neoblock.unlocking_tier", level, false, root.id);
-        NeoMerchant.spawnTraderWith(root.tradePoolUnlock.getPool(), level, "UnlockTrader");
-        MessengerAPI.sendInstantMessage("message.neoblock.unlocking_trader", level, false, root.id);
+    public void onStart(ServerLevel level) {
+        MessengerAPI.sendInstantMessage("message.neoblock.unlocking_tier", level, false, tier.id);
+        NeoMerchant.spawnTraderWith(tier.tradePoolUnlock.getPool(), level, "UnlockTrader");
+        MessengerAPI.sendInstantMessage("message.neoblock.unlocking_trader", level, false, tier.id);
+    }
+
+    public long getTime() {
+        return time;
+    }
+    public boolean isTimeDone() {
+        return tick >= time;
     }
 }

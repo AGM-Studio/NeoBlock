@@ -19,6 +19,7 @@ import xyz.agmstudio.neoblock.data.Schematic;
 import xyz.agmstudio.neoblock.minecraft.MessengerAPI;
 import xyz.agmstudio.neoblock.minecraft.MinecraftAPI;
 import xyz.agmstudio.neoblock.neo.block.BlockManager;
+import xyz.agmstudio.neoblock.neo.tiers.TierManager;
 import xyz.agmstudio.neoblock.neo.tiers.TierSpec;
 
 import java.io.FileNotFoundException;
@@ -147,7 +148,6 @@ public class WorldData extends MinecraftAPI.AbstractWorldData {
 
     private WorldStatus status;
     private final HashSet<TierSpec> tiers = new HashSet<>();
-    private final WorldUpgrade upgrade = new WorldUpgrade();
 
     private WorldData(ServerLevel level) {
         instance = this;
@@ -187,13 +187,6 @@ public class WorldData extends MinecraftAPI.AbstractWorldData {
         return instance.tiers.stream().filter(TierSpec::isEnabled).mapToInt(TierSpec::getWeight).sum();
     }
 
-    public WorldUpgrade getUpgrade() {
-        return upgrade;
-    }
-    public static WorldUpgrade getWorldUpgrade() {
-        return instance.upgrade;
-    }
-
     public static void setCommanded(TierSpec tier, boolean force) {
         tier.setSpecialRequirement(true);
 
@@ -201,6 +194,6 @@ public class WorldData extends MinecraftAPI.AbstractWorldData {
     }
 
     public static void tick(ServerLevel level, LevelAccessor access) {
-        if (instance != null) instance.upgrade.tick(level, access);
+        if (instance != null) TierManager.tick(level, access);
     }
 }

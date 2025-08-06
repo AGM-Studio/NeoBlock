@@ -20,7 +20,7 @@ public class ProgressbarAnimation extends Animation {
         bar = new ServerBossEvent(Component.literal(""), BossEvent.BossBarColor.RED, BossEvent.BossBarOverlay.PROGRESS);
     }
 
-    public void update(int ticks, int goal) {
+    public void update(long ticks, long goal) {
         bar.setProgress((float) ticks / goal);
         bar.setName(Component.translatable("bossbar.neoblock.upgrade_bar", StringUtil.formatTicks(goal - ticks)));
     }

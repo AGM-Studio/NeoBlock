@@ -1,8 +1,14 @@
 package xyz.agmstudio.neoblock.neo.tiers;
 
+import xyz.agmstudio.neoblock.compatibility.jei.NeoJEIPlugin;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
+import xyz.agmstudio.neoblock.util.StringUtil;
+
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public interface TierRequirement {
+    void addJEIBox(List<NeoJEIPlugin.TextBox> boxes, AtomicInteger y, TierSpec spec);
     boolean isMet(WorldData data, TierSpec spec);
     String hash();
 
@@ -20,6 +26,11 @@ public interface TierRequirement {
         @Override public String hash() {
             return String.valueOf(count);
         }
+
+        @Override public void addJEIBox(List<NeoJEIPlugin.TextBox> boxes, AtomicInteger y, TierSpec spec) {
+            int count = WorldData.getWorldStatus().getBlockCount();
+            NeoJEIPlugin.addBox(boxes, "jei.neoblock.requirement.blocks_broken", 7, y.getAndAdd(12), this.count <= count, this.count, count);
+        }
     }
 
     class GameTime implements TierRequirement {
@@ -36,6 +47,14 @@ public interface TierRequirement {
         @Override public String hash() {
             return String.valueOf(time);
         }
+
+        @Override public void addJEIBox(List<NeoJEIPlugin.TextBox> boxes, AtomicInteger y, TierSpec spec) {
+            long time = WorldData.getWorldLevel().getGameTime();
+            NeoJEIPlugin.addBox(boxes,
+                    "jei.neoblock.requirement.play_time", 7, y.getAndAdd(12), this.time <= time,
+                    StringUtil.formatTicks(this.time), StringUtil.formatTicks(time)
+            );
+        }
     }
 
     class Special implements TierRequirement {
@@ -45,6 +64,13 @@ public interface TierRequirement {
 
         @Override public String hash() {
             return "V6Special";
+        }
+
+        @Override public void addJEIBox(List<NeoJEIPlugin.TextBox> boxes, AtomicInteger y, TierSpec spec) {
+            NeoJEIPlugin.addBox(boxes,
+                    spec.commanded ? "jei.neoblock.status.requirement.command.met" : "jei.neoblock.status.requirement.command",
+                    7, y.addAndGet(12), spec.commanded
+            );
         }
     }
 }

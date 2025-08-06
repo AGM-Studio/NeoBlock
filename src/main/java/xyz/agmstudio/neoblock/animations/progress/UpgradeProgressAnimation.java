@@ -5,7 +5,7 @@ import net.minecraft.world.level.LevelAccessor;
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.animations.Animation;
-import xyz.agmstudio.neoblock.neo.world.WorldUpgrade;
+import xyz.agmstudio.neoblock.neo.tiers.TierManager;
 import xyz.agmstudio.neoblock.util.ConfigUtil;
 
 import java.util.HashSet;
@@ -22,7 +22,7 @@ public abstract class UpgradeProgressAnimation extends Animation {
     }
 
     @Override protected void onRegister() {
-        WorldUpgrade.addProgressAnimation(this);
+        TierManager.addProgressAnimation(this);
     }
 
     /**
@@ -32,7 +32,7 @@ public abstract class UpgradeProgressAnimation extends Animation {
      * @param access the world access if needed
      * @param tick   the tick upgrade is in
      */
-    public void upgradeTick(ServerLevel level, LevelAccessor access, int tick) {
+    public void upgradeTick(ServerLevel level, LevelAccessor access, long tick) {
         if (tick % interval == 0) animate(level, access);
     }
 

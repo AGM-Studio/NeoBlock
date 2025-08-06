@@ -23,12 +23,11 @@ import xyz.agmstudio.neoblock.animations.progress.BreakingAnimation;
 import xyz.agmstudio.neoblock.animations.progress.SparkleAnimation;
 import xyz.agmstudio.neoblock.animations.progress.SpiralAnimation;
 import xyz.agmstudio.neoblock.animations.progress.UpgradeProgressAnimation;
-import xyz.agmstudio.neoblock.data.TierData;
 import xyz.agmstudio.neoblock.neo.block.NeoChestSpec;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoMerchant;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoTrade;
+import xyz.agmstudio.neoblock.neo.tiers.TierManager;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
-import xyz.agmstudio.neoblock.neo.world.WorldUpgrade;
 import xyz.agmstudio.neoblock.util.ResourceUtil;
 
 import java.nio.file.Path;
@@ -86,14 +85,12 @@ public final class NeoBlockMod {
         NeoMerchant.loadConfig();
         NeoTrade.reloadTrades();
 
-        TierData.reload();
-
         Animation.clearAnimations();
 
-        WorldUpgrade.reloadProgressbarAnimations();
-        WorldUpgrade.clearPhaseAnimations();
+        TierManager.reloadProgressbarAnimations();
+        TierManager.clearPhaseAnimations();
         UpgradePhaseAnimation.getAnimations().forEach(Animation::register);
-        WorldUpgrade.clearProgressAnimations();
+        TierManager.clearProgressAnimations();
         UpgradeProgressAnimation.getAnimations().forEach(Animation::register);
 
         IdleAnimation.getAnimations().forEach(Animation::register);
