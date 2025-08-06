@@ -1,5 +1,6 @@
 package xyz.agmstudio.neoblock.data;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 
@@ -35,7 +36,9 @@ public interface NBTSaveable {
     private static void putToTag(CompoundTag tag, String key, Object value) {
         if (value == null) return;
         if (value instanceof NBTSaveable saveable) tag.put(key, saveable.save());
+        else if (value instanceof BlockPos p) tag.putLong(key, p.asLong());
         else if (value instanceof Integer i) tag.putInt(key, i);
+        else if (value instanceof Long l) tag.putLong(key, l);
         else if (value instanceof Double d) tag.putDouble(key, d);
         else if (value instanceof Boolean b) tag.putBoolean(key, b);
         else if (value instanceof String s) tag.putString(key, s);
@@ -62,7 +65,9 @@ public interface NBTSaveable {
                 return (R) NBTSaveable.load((Class<? extends NBTSaveable>) type, compound);
             }
         }
+        else if (type == BlockPos.class) return (R) BlockPos.of(tag.getLong(key));
         else if (type == Integer.class || type == int.class) return (R) (Integer) tag.getInt(key);
+        else if (type == Long.class || type == long.class) return (R) (Long) tag.getLong(key);
         else if (type == Double.class || type == double.class) return (R) (Double) tag.getDouble(key);
         else if (type == Boolean.class || type == boolean.class) return (R) (Boolean) tag.getBoolean(key);
         else if (type == String.class) return (R) tag.getString(key);
