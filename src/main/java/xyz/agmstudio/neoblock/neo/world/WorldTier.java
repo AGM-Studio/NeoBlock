@@ -16,7 +16,8 @@ import xyz.agmstudio.neoblock.neo.loot.trade.NeoTrade;
 
 import java.util.List;
 
-public class WorldTier extends NBTSaveable {
+@Deprecated(forRemoval = true)
+public class WorldTier implements NBTSaveable {
     public static WorldTier of(@NotNull TierData tier, WorldData data) {
         NeoBlockMod.LOGGER.debug("[WorldTier] Creating tier " + tier.id);
 
@@ -116,7 +117,7 @@ public class WorldTier extends NBTSaveable {
         return data;
     }
 
-    public static class Lock extends NBTSaveable {
+    public static class Lock implements NBTSaveable {
         public WorldTier tier;
 
         @NBTData protected boolean unlocked = false;

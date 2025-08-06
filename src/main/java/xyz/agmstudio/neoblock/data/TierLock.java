@@ -4,6 +4,7 @@ import com.electronwill.nightconfig.core.UnmodifiableConfig;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
 import xyz.agmstudio.neoblock.neo.world.WorldTier;
 
+@Deprecated(forRemoval = true)
 public class TierLock {
     private final int id;
     private final int time;         // Time to unlock.

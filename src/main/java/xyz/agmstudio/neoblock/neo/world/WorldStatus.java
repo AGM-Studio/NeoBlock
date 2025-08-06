@@ -10,7 +10,7 @@ import xyz.agmstudio.neoblock.minecraft.MinecraftAPI;
 
 import java.util.HashMap;
 
-public class WorldStatus extends NBTSaveable {
+public class WorldStatus implements NBTSaveable {
     private final WorldData data;
 
     @NBTData("Hash") protected String hash = TierData.getHash();

@@ -8,14 +8,14 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 
 @SuppressWarnings("IfCanBeSwitch")
-public abstract class NBTSaveable {
-    public CompoundTag onSave(CompoundTag tag) {
+public interface NBTSaveable {
+    default CompoundTag onSave(CompoundTag tag) {
         return tag;
     }
 
-    public void onLoad(CompoundTag tag) {}
+    default void onLoad(CompoundTag tag) {}
 
-    public CompoundTag save() {
+    default CompoundTag save() {
         CompoundTag tag = new CompoundTag();
         for (Field field : this.getClass().getDeclaredFields()) {
             if (field.isAnnotationPresent(NBTData.class)) {
@@ -53,9 +53,15 @@ public abstract class NBTSaveable {
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public static <R> R getFromTag(CompoundTag tag, String key, Class<R> type) {
-        if (NBTSaveable.class.isAssignableFrom(type))
-            return (R) NBTSaveable.load((Class<? extends NBTSaveable>) type, tag.getCompound(key));
+    static <R> R getFromTag(CompoundTag tag, String key, Class<R> type, Object root) {
+        if (NBTSaveable.class.isAssignableFrom(type)) {
+            CompoundTag compound = tag.getCompound(key);
+            try {
+                return (R) NBTSaveable.load((Class<? extends NBTSaveable>) type, compound, root);
+            } catch (RuntimeException ignored) {
+                return (R) NBTSaveable.load((Class<? extends NBTSaveable>) type, compound);
+            }
+        }
         else if (type == Integer.class || type == int.class) return (R) (Integer) tag.getInt(key);
         else if (type == Double.class || type == double.class) return (R) (Double) tag.getDouble(key);
         else if (type == Boolean.class || type == boolean.class) return (R) (Boolean) tag.getBoolean(key);
@@ -80,7 +86,7 @@ public abstract class NBTSaveable {
     }
 
 
-    public static <T extends NBTSaveable> T load(Class<T> clazz, CompoundTag tag, Object... args) {
+    static <T extends NBTSaveable> T load(Class<T> clazz, CompoundTag tag, Object... args) {
         try {
             Class<?>[] types = Arrays.stream(args).map(Object::getClass).toArray(Class[]::new);
             T instance = clazz.getDeclaredConstructor(types).newInstance(args);
@@ -101,7 +107,7 @@ public abstract class NBTSaveable {
                             throw new RuntimeException("Failed to load enum field: " + field.getName(), e);
                         }
                     } else {
-                        Object value = getFromTag(tag, key, type);
+                        Object value = getFromTag(tag, key, type, instance);
                         field.set(instance, value);
                     }
                 }
