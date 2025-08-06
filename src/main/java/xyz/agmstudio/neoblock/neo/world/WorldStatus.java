@@ -5,7 +5,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.EntityType;
 import xyz.agmstudio.neoblock.data.NBTData;
 import xyz.agmstudio.neoblock.data.NBTSaveable;
-import xyz.agmstudio.neoblock.data.TierData;
 import xyz.agmstudio.neoblock.minecraft.MinecraftAPI;
 
 import java.util.HashMap;
@@ -13,7 +12,6 @@ import java.util.HashMap;
 public class WorldStatus implements NBTSaveable {
     private final WorldData data;
 
-    @NBTData("Hash") protected String hash = TierData.getHash();
     @NBTData("WorldState") protected State state = State.INACTIVE;
     @NBTData("BlockCount") protected int blockCount = 0;
     @NBTData("TraderFailedAttempts") protected int traderFailedAttempts = 0;

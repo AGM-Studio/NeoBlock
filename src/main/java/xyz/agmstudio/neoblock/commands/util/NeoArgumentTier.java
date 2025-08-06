@@ -8,16 +8,15 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
-import xyz.agmstudio.neoblock.data.TierData;
+import xyz.agmstudio.neoblock.neo.tiers.TierSpec;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
-import xyz.agmstudio.neoblock.neo.world.WorldTier;
 
 import java.util.function.Predicate;
 
-public class NeoArgumentTier extends NeoArgument<WorldTier> {
-    public static SuggestionProvider<CommandSourceStack> createSuggester(final Predicate<WorldTier> filter) {
+public class NeoArgumentTier extends NeoArgument<TierSpec> {
+    public static SuggestionProvider<CommandSourceStack> createSuggester(final Predicate<TierSpec> filter) {
         return (CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) -> {
-            WorldData.getWorldTiers().stream().filter(filter).mapToInt(WorldTier::getID).forEach(builder::suggest);
+            WorldData.getWorldTiers().stream().filter(filter).mapToInt(TierSpec::getID).forEach(builder::suggest);
             return builder.buildFuture();
         };
     }
@@ -27,10 +26,10 @@ public class NeoArgumentTier extends NeoArgument<WorldTier> {
     }
 
     @Override public ArgumentBuilder<CommandSourceStack, ?> build() {
-        return Commands.argument(key, IntegerArgumentType.integer(0, TierData.size() - 1)).suggests(provider);
+        return Commands.argument(key, IntegerArgumentType.integer(0, WorldData.getWorldTiers().size() - 1)).suggests(provider);
     }
 
-    @Override public WorldTier capture(CommandContext<CommandSourceStack> context, String key) throws NeoCommand.CommandExtermination {
+    @Override public TierSpec capture(CommandContext<CommandSourceStack> context, String key) throws NeoCommand.CommandExtermination {
         try {
             int index = IntegerArgumentType.getInteger(context, key);
             if (index < 0 || index > WorldData.getWorldTiers().size()) {
@@ -48,7 +47,7 @@ public class NeoArgumentTier extends NeoArgument<WorldTier> {
         private final NeoCommand base;
         private final String key;
         private boolean optional = false;
-        private WorldTier defaultValue = null;
+        private TierSpec defaultValue = null;
         private SuggestionProvider<CommandSourceStack> provider = createSuggester(s -> true);
 
         public Builder(NeoCommand base, String key) {
@@ -56,7 +55,7 @@ public class NeoArgumentTier extends NeoArgument<WorldTier> {
             this.key = key;
         }
 
-        public Builder defaultValue(WorldTier defaultValue) {
+        public Builder defaultValue(TierSpec defaultValue) {
             this.defaultValue = defaultValue;
             this.optional = true;
             return this;

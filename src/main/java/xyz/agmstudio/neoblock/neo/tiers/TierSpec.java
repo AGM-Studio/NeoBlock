@@ -139,8 +139,15 @@ public class TierSpec implements NBTSaveable {
     public void startResearch() {
         if (canBeResearched()) return; // Todo: Redo the research system
     }
+
     public void setSpecialRequirement(boolean special) {
         this.commanded = special;
+    }
+    public boolean hasSpecialRequirement() {
+        for (TierRequirement requirement: requirements)
+            if (requirement instanceof TierRequirement.Special) return true;
+
+        return false;
     }
 
     public boolean isEnabled() {

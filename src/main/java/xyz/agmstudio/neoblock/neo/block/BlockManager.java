@@ -12,15 +12,15 @@ import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.NeoListener;
 import xyz.agmstudio.neoblock.animations.Animation;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoMerchant;
+import xyz.agmstudio.neoblock.neo.tiers.TierSpec;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
-import xyz.agmstudio.neoblock.neo.world.WorldTier;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class BlockManager {
-    public static final double AABB_RANGE = 1.05;
+    public static final double AABB_RANGE = 1.02;
     public static final BlockPos POS = new BlockPos(0, 64, 0);
     public static final Vec3 POS_CORNER = new Vec3(POS.getX(), POS.getY(), POS.getZ());
     public static final NeoBlockSpec DEFAULT_SPEC = new NeoBlockSpec(Blocks.GRASS_BLOCK);
@@ -28,16 +28,16 @@ public class BlockManager {
 
     public static NeoBlockSpec getRandomBlock() {
         AtomicInteger totalChance = new AtomicInteger();
-        List<WorldTier> tiers = new ArrayList<>();
+        List<TierSpec> tiers = new ArrayList<>();
 
-        WorldData.getWorldTiers().stream().filter(WorldTier::isEnabled).forEach(tier -> {
+        WorldData.getWorldTiers().stream().filter(TierSpec::isEnabled).forEach(tier -> {
             tiers.add(tier);
             totalChance.addAndGet(tier.getWeight());
         });
 
         if (totalChance.get() == 0) return DEFAULT_SPEC;
         int randomValue = WorldData.getRandom().nextInt(totalChance.get());
-        for (WorldTier tier : tiers) {
+        for (TierSpec tier : tiers) {
             randomValue -= tier.getWeight();
             if (randomValue < 0) return tier.getRandomBlock();
         }
@@ -50,8 +50,8 @@ public class BlockManager {
         Animation.resetIdleTick();
         WorldData.getWorldStatus().addBlockCount(1);
 
-        for (WorldTier tier: WorldData.getWorldTiers())
-            if (tier.canBeUnlocked()) WorldData.getWorldUpgrade().addUpgrade(tier);
+        for (TierSpec tier: WorldData.getWorldTiers())
+            if (tier.canBeResearched()) tier.startResearch();
 
         if (WorldData.getWorldUpgrade().isEmpty()) getRandomBlock().placeAt(access, POS);
         NeoListener.execute(() -> NeoMerchant.attemptSpawnTrader(level));
