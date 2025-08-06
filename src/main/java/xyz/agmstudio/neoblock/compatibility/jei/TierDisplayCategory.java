@@ -16,10 +16,12 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import org.jetbrains.annotations.NotNull;
-import xyz.agmstudio.neoblock.data.TierData;
+import xyz.agmstudio.neoblock.neo.world.WorldData;
 import xyz.agmstudio.neoblock.util.StringUtil;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 @SuppressWarnings("FieldCanBeLocal")
 public class TierDisplayCategory implements IRecipeCategory<TierDisplay> {
@@ -38,7 +40,7 @@ public class TierDisplayCategory implements IRecipeCategory<TierDisplay> {
     }
 
     public TierDisplayCategory(IGuiHelper helper) {
-        int max = TierData.stream().mapToInt(tier -> tier.blocks.size()).max().orElse(0);
+        int max = WorldData.getWorldTiers().stream().mapToInt(tier -> tier.getBlocks().size()).max().orElse(0);
         rows = max % 9 == 0 ? max / 9 : max / 9 + 1;
         height = 78 + 18 * rows;
         background = helper.createBlankDrawable(166, height);

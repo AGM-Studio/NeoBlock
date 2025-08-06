@@ -19,10 +19,9 @@ import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredItem;
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlockMod;
-import xyz.agmstudio.neoblock.data.TierData;
-import xyz.agmstudio.neoblock.neo.world.WorldData;
-import xyz.agmstudio.neoblock.neo.world.WorldTier;
 import xyz.agmstudio.neoblock.minecraft.MinecraftAPI;
+import xyz.agmstudio.neoblock.neo.tiers.TierSpec;
+import xyz.agmstudio.neoblock.neo.world.WorldData;
 
 import java.util.*;
 
@@ -51,13 +50,13 @@ public class NeoJEIPlugin implements IModPlugin {
         return runtime.getJeiHelpers().getFocusFactory();
     }
 
-    private static final List<TierDisplay> displays = new ArrayList<>(TierData.stream().map(TierDisplay::new).toList());
+    private static final List<TierDisplay> displays = new ArrayList<>(WorldData.getWorldTiers().stream().map(TierDisplay::new).toList());
     private static final LinkedHashMap<Item, Double> chances = new LinkedHashMap<>();
     public static void recalculate() {
         chances.clear();
         int weights = WorldData.totalWeight();
         for (TierDisplay display: displays) {
-            WorldTier tier = display.getData().getWorldTier();
+            TierSpec tier = display.getTierSpec();
             if (tier != null && tier.isEnabled()) for (Map.Entry<Item, Double> entry : display.getChances())
                 chances.merge(entry.getKey(), entry.getValue() * tier.getWeight() / weights, Double::sum);
         }
@@ -81,7 +80,7 @@ public class NeoJEIPlugin implements IModPlugin {
 
     @Override public void registerRecipes(IRecipeRegistration registration) {
         displays.clear();
-        displays.addAll(TierData.stream().map(TierDisplay::new).toList());
+        displays.addAll(WorldData.getWorldTiers().stream().map(TierDisplay::new).toList());
 
         registration.addRecipes(TierDisplayCategory.TYPE, displays);
     }
