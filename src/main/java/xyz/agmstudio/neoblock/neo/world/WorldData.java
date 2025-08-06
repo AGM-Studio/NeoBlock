@@ -16,15 +16,15 @@ import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.data.NBTSaveable;
 import xyz.agmstudio.neoblock.data.Schematic;
-import xyz.agmstudio.neoblock.data.TierData;
 import xyz.agmstudio.neoblock.minecraft.MessengerAPI;
 import xyz.agmstudio.neoblock.minecraft.MinecraftAPI;
 import xyz.agmstudio.neoblock.neo.block.BlockManager;
+import xyz.agmstudio.neoblock.neo.tiers.TierSpec;
 
 import java.io.FileNotFoundException;
+import java.nio.file.Files;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 
 public class WorldData extends MinecraftAPI.AbstractWorldData {
     private static WorldData instance;
@@ -32,14 +32,18 @@ public class WorldData extends MinecraftAPI.AbstractWorldData {
         return instance;
     }
 
-    public static void resetTiers() {
-        resetTiers(instance);
+    public static void reloadTiers() {
+        reloadTiers(instance);
     }
-    public static void resetTiers(WorldData data) {
+    public static void reloadTiers(WorldData data) {
+        int i = 0;
         data.tiers.clear();
-        TierData.stream().map(tier -> WorldTier.of(tier, data)).forEach(data.tiers::add);
+        while (Files.exists(TierSpec.FOLDER.resolve("tier-" + i + ".toml"))) {
+            TierSpec spec = new TierSpec(i++);
+            data.tiers.add(spec);
+        }
 
-        instance.status.hash = TierData.getHash();
+        NeoBlockMod.LOGGER.info("Loaded {} tiers from the tiers folder.", data.tiers.size());
     }
 
     public static void setup(@NotNull ServerLevel level) {
@@ -98,7 +102,7 @@ public class WorldData extends MinecraftAPI.AbstractWorldData {
         WorldData data = new WorldData(level);
 
         data.status = new WorldStatus(data);
-        resetTiers(data);
+        reloadTiers(data);
 
         NeoBlockMod.LOGGER.debug("Creating new world data");
         return data;
@@ -108,17 +112,21 @@ public class WorldData extends MinecraftAPI.AbstractWorldData {
 
         NeoBlockMod.LOGGER.debug("Loading WorldData from {}", tag);
         data.status = NBTSaveable.load(WorldStatus.class, tag, data);
-        if (!Objects.equals(instance.status.hash, TierData.getHash())) {
-            data.status.setUpdated();
-            return data;
-        }
-
         final ListTag tiers = tag.getList("Tiers", StringTag.TAG_COMPOUND);
         for (int i = 0; i < tiers.size(); i++) {
-            WorldTier tier = NBTSaveable.load(WorldTier.class, tiers.getCompound(i));
-            if (tier.canBeUnlocked()) data.upgrade.addUpgrade(tier);
+            TierSpec tier = NBTSaveable.load(TierSpec.class, tiers.getCompound(i));
+            if (tier == null || !tier.isStable()) {
+                int id = tiers.getCompound(i).getInt("id");
+                MessengerAPI.sendMessage("message.neoblock.tier_updated", level, false, id);
+                data.status.setUpdated();
+            }
+
             data.tiers.add(tier);
         }
+
+        if (data.status.isActive()) data.tiers.forEach(tier -> {
+            if (tier.canBeResearched()) tier.startResearch();
+        });
 
         return data;
     }
@@ -127,7 +135,7 @@ public class WorldData extends MinecraftAPI.AbstractWorldData {
         tag.merge(status.save());
         if (status.isActive()) {
             ListTag list = new ListTag();
-            for (WorldTier tier: tiers) list.add(tier.save());
+            for (TierSpec tier: tiers) list.add(tier.save());
             tag.put("Tiers", list);
         }
 
@@ -138,7 +146,7 @@ public class WorldData extends MinecraftAPI.AbstractWorldData {
     private final ServerLevel level;
 
     private WorldStatus status;
-    private final HashSet<WorldTier> tiers = new HashSet<>();
+    private final HashSet<TierSpec> tiers = new HashSet<>();
     private final WorldUpgrade upgrade = new WorldUpgrade();
 
     private WorldData(ServerLevel level) {
@@ -161,22 +169,22 @@ public class WorldData extends MinecraftAPI.AbstractWorldData {
     public static ServerLevel getWorldLevel() {
         return instance.level;
     }
-    public WorldTier getTier(int id) {
-        for (WorldTier tier: tiers) if (tier.getID() == id) return tier;
+    public TierSpec getTier(int id) {
+        for (TierSpec tier: tiers) if (tier.getID() == id) return tier;
         return null;
     }
-    public static WorldTier getWorldTier(int id) {
+    public static TierSpec getWorldTier(int id) {
         return instance.getTier(id);
     }
 
-    public HashSet<WorldTier> getTiers() {
+    public HashSet<TierSpec> getTiers() {
         return tiers;
     }
-    public static HashSet<WorldTier> getWorldTiers() {
+    public static HashSet<TierSpec> getWorldTiers() {
         return instance.tiers;
     }
     public static int totalWeight() {
-        return instance.tiers.stream().filter(WorldTier::isEnabled).mapToInt(WorldTier::getWeight).sum();
+        return instance.tiers.stream().filter(TierSpec::isEnabled).mapToInt(TierSpec::getWeight).sum();
     }
 
     public WorldUpgrade getUpgrade() {
@@ -186,10 +194,10 @@ public class WorldData extends MinecraftAPI.AbstractWorldData {
         return instance.upgrade;
     }
 
-    public static void setCommanded(WorldTier tier, boolean force) {
-        tier.lock.commanded = true;
+    public static void setCommanded(TierSpec tier, boolean force) {
+        tier.setSpecialRequirement(true);
 
-        if (force && tier.canBeUnlocked()) instance.upgrade.addUpgrade(tier);
+        if (force && tier.canBeResearched()) tier.startResearch();
     }
 
     public static void tick(ServerLevel level, LevelAccessor access) {

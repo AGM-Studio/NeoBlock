@@ -32,6 +32,18 @@ public class TierSpec implements NBTSaveable {
     @NBTData protected TierResearch research;
     @NBTData protected String hash = "";
 
+    public TierSpec() {
+        // Normal version for WorldData to load with
+    }
+    public TierSpec(final int id) {
+        // Extended version for the WorldData to reset with
+        this.id = id;
+        this.research = new TierResearch(this);
+
+        this.onLoad(new CompoundTag());
+        this.hash = getHashCode();
+    }
+
     // Data loaded from config
     protected String name;
     protected int weight;
@@ -123,6 +135,12 @@ public class TierSpec implements NBTSaveable {
             if (!requirement.isMet(WorldData.getInstance(), this)) return false;
 
         return true;
+    }
+    public void startResearch() {
+        if (canBeResearched()) return; // Todo: Redo the research system
+    }
+    public void setSpecialRequirement(boolean special) {
+        this.commanded = special;
     }
 
     public boolean isEnabled() {

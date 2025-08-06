@@ -114,9 +114,18 @@ public interface NBTSaveable {
             }
             instance.onLoad(tag);
             return instance;
+        } catch (AbortException e) {
+            NeoBlockMod.LOGGER.error("NBT loading into {} has been aborted by {}", clazz.getSimpleName(), e);
+            return null;
         } catch (Exception e) {
             NeoBlockMod.LOGGER.error("Failed to load NBT into {}", clazz.getSimpleName(), e);
             throw new RuntimeException("Failed to load NBT into " + clazz.getSimpleName(), e);
+        }
+    }
+
+    class AbortException extends RuntimeException {
+        public AbortException(String message) {
+            super(message);
         }
     }
 }
