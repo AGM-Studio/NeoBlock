@@ -22,7 +22,7 @@ public class MainCommand extends NeoCommand {
             MutableComponent name = Component.literal(tier.getName());
             if (tier.isEnabled()) name.setStyle(Style.EMPTY.withColor(ChatFormatting.GREEN));
             else name.setStyle(Style.EMPTY.withColor(ChatFormatting.RED));
-            tiers.append("\n\t - ").append(name);
+            tiers.append("\n    - ").append(name);
         }
 
         MutableComponent message = Component.translatable("command.neoblock.info", WorldData.getWorldStatus().getBlockCount(), tiers);

@@ -181,6 +181,7 @@ public class WorldData extends MinecraftAPI.AbstractWorldData {
         return tiers;
     }
     public static HashSet<TierSpec> getWorldTiers() {
+        if (instance == null)  return new HashSet<>();
         return instance.tiers;
     }
     public static int totalWeight() {

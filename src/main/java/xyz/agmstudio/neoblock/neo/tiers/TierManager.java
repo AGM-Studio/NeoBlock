@@ -1,6 +1,5 @@
 package xyz.agmstudio.neoblock.neo.tiers;
 
-import com.electronwill.nightconfig.core.UnmodifiableConfig;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -37,15 +36,16 @@ public class TierManager {
         spec.name = config.getOrElse("name", "Tier-" + spec.id);
 
         spec.requirements.clear();
-        final UnmodifiableConfig lockConfig = config.get("unlock");
-        spec.research.time = config.getIntOrElse("unlock-time", 0);
+        spec.research.time = config.getIntOrElse("unlock.unlock-time", 0);
         if (spec.id > 0) {
-            long time = config.getIntOrElse("game-time", -1);
+            long time = config.getIntOrElse("unlock.game-time", -1);
             if (time > 0) spec.requirements.add(new TierRequirement.GameTime(time));
-            long blocks = config.getIntOrElse("blocks", -1);
+            long blocks = config.getIntOrElse("unlock.blocks", -1);
             if (blocks > 0) spec.requirements.add(new TierRequirement.BlockBroken(blocks));
-            if (config.getOrElse("command", spec.requirements.isEmpty()))
+            if (config.getOrElse("unlock.command", spec.requirements.isEmpty()))
                 spec.requirements.add(new TierRequirement.Special());
+        } else {
+            spec.research.done = true;
         }
 
         spec.blocks.clear();
