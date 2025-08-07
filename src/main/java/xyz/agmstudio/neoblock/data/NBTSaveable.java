@@ -1,12 +1,15 @@
 package xyz.agmstudio.neoblock.data;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.*;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 @SuppressWarnings("IfCanBeSwitch")
 public interface NBTSaveable {
@@ -50,6 +53,19 @@ public interface NBTSaveable {
             } catch (Exception e) {
                 tag.putString(key, ((Enum<?>) value).name());
             }
+        } else if (value instanceof List<?> list) {
+            ListTag listTag = new ListTag();
+            for (Object item : list) {
+                if (item instanceof NBTSaveable saveable) listTag.add(saveable.save());
+                else if (item instanceof BlockPos p) listTag.add(LongTag.valueOf(p.asLong()));
+                else if (item instanceof Integer i) listTag.add(IntTag.valueOf(i));
+                else if (item instanceof Long l) listTag.add(LongTag.valueOf(l));
+                else if (item instanceof Double d) listTag.add(DoubleTag.valueOf(d));
+                else if (item instanceof Boolean b) listTag.add(ByteTag.valueOf((byte) (b ? 1 : 0)));
+                else if (item instanceof String s) listTag.add(StringTag.valueOf(s));
+                else throw new RuntimeException("Unsupported list element type: " + item.getClass());
+            }
+            tag.put(key, listTag);
         } else {
             throw new RuntimeException("Unsupported value type: " + value.getClass());
         }
@@ -84,6 +100,27 @@ public interface NBTSaveable {
                     throw new RuntimeException("Failed to load enum from tag using both id and name", ex);
                 }
             }
+        } else if (List.class.isAssignableFrom(type)) {
+            Field field = Arrays.stream(root.getClass().getDeclaredFields()).filter(f -> f.getName().equals(key)).findFirst().orElse(null);
+            if (field == null) return null;
+
+            ParameterizedType listType = (ParameterizedType) field.getGenericType();
+            Class<?> elementType = (Class<?>) listType.getActualTypeArguments()[0];
+
+            List<Object> list = new ArrayList<>();
+            ListTag listTag = tag.getList(key, Tag.TAG_COMPOUND);
+            for (Tag t : listTag) {
+                if (NBTSaveable.class.isAssignableFrom(elementType))
+                    list.add(NBTSaveable.load((Class<? extends NBTSaveable>) elementType, (CompoundTag) t, root));
+                else if (elementType == BlockPos.class) list.add(BlockPos.of(((LongTag) t).getAsLong()));
+                else if (elementType == String.class) list.add(t.getAsString());
+                else if (elementType == Integer.class) list.add(((IntTag) t).getAsInt());
+                else if (elementType == Long.class) list.add(((LongTag) t).getAsLong());
+                else if (elementType == Double.class) list.add(((DoubleTag) t).getAsDouble());
+                else if (elementType == Boolean.class) list.add(((ByteTag) t).getAsByte() != 0);
+                else throw new RuntimeException("Unsupported list element type: " + elementType);
+            }
+            return (R) list;
         } else {
             NeoBlockMod.LOGGER.error("Unsupported tag type: {}", type);
             return null;
