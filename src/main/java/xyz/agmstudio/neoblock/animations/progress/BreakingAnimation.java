@@ -18,7 +18,7 @@ public class BreakingAnimation extends UpgradeProgressAnimation {
     }
 
     @Override public void animate(ServerLevel level, LevelAccessor access) {
-        level.levelEvent(2001, BlockManager.POS, Block.getId(Blocks.BEDROCK.defaultBlockState()));
-        level.playSound(null, BlockManager.POS, SoundEvents.STONE_BREAK, SoundSource.BLOCKS, volume, 1.0f);
+        level.levelEvent(2001, BlockManager.getBlockPos(), Block.getId(Blocks.BEDROCK.defaultBlockState()));
+        level.playSound(null, BlockManager.getBlockPos(), SoundEvents.STONE_BREAK, SoundSource.BLOCKS, volume, 1.0f);
     }
 }

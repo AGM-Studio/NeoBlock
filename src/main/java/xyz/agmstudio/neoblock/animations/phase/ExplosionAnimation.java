@@ -33,11 +33,11 @@ public class ExplosionAnimation extends UpgradePhaseAnimation {
 
     @Override public void animate(ServerLevel level, LevelAccessor access) {
         level.sendParticles(ParticleTypes.EXPLOSION_EMITTER,
-                BlockManager.POS.getX() + 0.5,
-                BlockManager.POS.getY() + 0.5,
-                BlockManager.POS.getZ() + 0.5,
+                BlockManager.getBlockPos().getX() + 0.5,
+                BlockManager.getBlockPos().getY() + 0.5,
+                BlockManager.getBlockPos().getZ() + 0.5,
                 1, 0, 0, 0, 1);
 
-        level.playSound(null, BlockManager.POS, SoundEvents.ANVIL_LAND, SoundSource.BLOCKS, volume, 0.4f);
+        level.playSound(null, BlockManager.getBlockPos(), SoundEvents.ANVIL_LAND, SoundSource.BLOCKS, volume, 0.4f);
     }
 }

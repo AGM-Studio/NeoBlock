@@ -35,6 +35,10 @@ public class WorldStatus implements NBTSaveable {
         this.data = data;
     }
 
+    public BlockPos getBlockPos() {
+        return pos;
+    }
+
     public boolean isInactive() {
         return state == State.INACTIVE;
     }

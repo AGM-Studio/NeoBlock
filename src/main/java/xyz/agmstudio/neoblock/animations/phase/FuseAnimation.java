@@ -48,10 +48,10 @@ public class FuseAnimation extends UpgradePhaseAnimation {
 
         while (iterator.hasNext()) {
             int tick = iterator.next();
-            if (tick == 0) level.playSound(null, BlockManager.POS, SoundEvents.CREEPER_PRIMED, SoundSource.BLOCKS, volume, 1.0f);
+            if (tick == 0) level.playSound(null, BlockManager.getBlockPos(), SoundEvents.CREEPER_PRIMED, SoundSource.BLOCKS, volume, 1.0f);
 
             for (int i = 0; i < 8; i++) {
-                Vec3 particlePos = Vec3.atCenterOf(BlockManager.POS).add(
+                Vec3 particlePos = Vec3.atCenterOf(BlockManager.getBlockPos()).add(
                         (level.getRandom().nextDouble() - 0.5) * 1.5,
                         0.55,
                         (level.getRandom().nextDouble() - 0.5) * 1.5
@@ -59,7 +59,7 @@ public class FuseAnimation extends UpgradePhaseAnimation {
                 level.sendParticles(ParticleTypes.SMOKE, particlePos.x, particlePos.y, particlePos.z, 1, 0, 0, 0, 0.02);
             }
             if (tick % 5 == 0) {
-                Vec3 sparkPos = Vec3.atCenterOf(BlockManager.POS).add(
+                Vec3 sparkPos = Vec3.atCenterOf(BlockManager.getBlockPos()).add(
                         (level.getRandom().nextDouble() - 0.5) * 0.7,
                         level.getRandom().nextDouble() * 1.1,
                         (level.getRandom().nextDouble() - 0.5) * 0.7

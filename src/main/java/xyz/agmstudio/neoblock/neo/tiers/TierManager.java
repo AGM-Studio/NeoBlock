@@ -70,7 +70,7 @@ public class TierManager {
         if (research.tick++ == 0) {
             research.onStart(level);
 
-            BlockManager.BEDROCK_SPEC.placeAt(level, BlockManager.POS);
+            BlockManager.BEDROCK_SPEC.placeAt(level, BlockManager.getBlockPos());
 
             if (TierManager.progressbar != null) level.players().forEach(TierManager.progressbar::addPlayer);
             for (UpgradePhaseAnimation animation : TierManager.phaseAnimations)
@@ -86,7 +86,7 @@ public class TierManager {
                 for (UpgradePhaseAnimation animation : TierManager.phaseAnimations)
                     if (animation.isActiveOnUpgradeFinish()) animation.animate(level, access);
 
-                BlockManager.getRandomBlock().placeAt(access, BlockManager.POS);
+                BlockManager.getRandomBlock().placeAt(access, BlockManager.getBlockPos());
             }
         } else {
             if (TierManager.progressbar != null) TierManager.progressbar.update(research.tick, research.time);

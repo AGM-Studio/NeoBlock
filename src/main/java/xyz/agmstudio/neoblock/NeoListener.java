@@ -71,12 +71,12 @@ public final class NeoListener {
         if (level == null) return;
 
         final LevelAccessor access = event.getLevel();
-        final BlockState block = access.getBlockState(BlockManager.POS);
+        final BlockState block = access.getBlockState(BlockManager.getBlockPos());
 
         tickers.forEach(ticker -> ticker.accept(level, access));
 
         if (WorldData.getWorldStatus().isUpdated() || TierManager.hasResearch()) {
-            if (block.getBlock() != Blocks.BEDROCK) BlockManager.BEDROCK_SPEC.placeAt(access, BlockManager.POS);
+            if (block.getBlock() != Blocks.BEDROCK) BlockManager.BEDROCK_SPEC.placeAt(access, BlockManager.getBlockPos());
         } else if (block.isAir() || block.canBeReplaced())          // NeoBlock has been broken logic
             BlockManager.onBlockBroken(level, access);
     }

@@ -57,12 +57,12 @@ public class WorldData extends MinecraftAPI.AbstractWorldData {
                 if (!level.getBlockState(new BlockPos(0, y, 0)).isAir()) isNeoBlock = false;
 
             if (isNeoBlock) {
-                BlockManager.DEFAULT_SPEC.placeAt(level, BlockManager.POS);
+                BlockManager.DEFAULT_SPEC.placeAt(level, BlockManager.getBlockPos());
                 UnmodifiableConfig rules = NeoBlockMod.getConfig().get("rules");
                 if (rules != null) WorldRules.applyGameRules(level, rules);
 
                 // Load schematics from config!
-                Schematic.loadSchematic(level, BlockManager.POS, "main.nbt");
+                Schematic.loadSchematic(level, BlockManager.getBlockPos(), "main.nbt");
                 int iterator = 0;
                 while (NeoBlockMod.getConfig().contains("schematics.custom_" + iterator)) {
                     try {

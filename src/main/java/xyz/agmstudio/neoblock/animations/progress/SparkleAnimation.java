@@ -43,7 +43,7 @@ public class SparkleAnimation extends UpgradeProgressAnimation {
             int tick = iterator.next();
             if (tick % factor == 0) {
                 for (int i = 0; i < 1 + (length / 2) - Math.abs(tick - (length / 2)); i++) {
-                    Vec3 glowPos = Vec3.atCenterOf(BlockManager.POS).add(
+                    Vec3 glowPos = Vec3.atCenterOf(BlockManager.getBlockPos()).add(
                             (level.getRandom().nextDouble() - 0.5) * 1.2,
                             level.getRandom().nextDouble() * 1.5,
                             (level.getRandom().nextDouble() - 0.5) * 1.2

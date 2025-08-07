@@ -102,7 +102,7 @@ public class NeoMerchant {
     private final List<NeoTrade> trades = new ArrayList<>();
     public WanderingTrader spawnTrader(ServerLevel level, String... tags) {
         WanderingTrader trader = new WanderingTrader(EntityType.WANDERING_TRADER, level);
-        trader.setPos(BlockManager.POS.getCenter().add(0, 2, 0));
+        trader.setPos(BlockManager.getBlockPos().getCenter().add(0, 2, 0));
         trader.setDespawnDelay(lifespan.sample(WorldData.getRandom()));
         for (String tag: tags) trader.addTag(tag);
 

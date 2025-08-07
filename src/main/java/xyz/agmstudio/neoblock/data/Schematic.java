@@ -65,7 +65,7 @@ public class Schematic {
     }
 
     public static Schematic fromNBT(CompoundTag tag, ServerLevel level) {
-        BlockPos origin = NBTAPI.readBlockPos(tag, "origin", BlockManager.POS);
+        BlockPos origin = NBTAPI.readBlockPos(tag, "origin", BlockManager.getBlockPos());
         List<Schematic.BlockInfo> blocks = new ArrayList<>();
         ListTag blockList = tag.getList("blocks", Tag.TAG_COMPOUND);
 

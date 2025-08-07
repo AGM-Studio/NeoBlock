@@ -42,7 +42,7 @@ public class SpiralAnimation extends UpgradeProgressAnimation {
                 double zOffset = Math.sin(angle) * radius;
                 double yOffset = progress * 1.2;
 
-                Vec3 particlePos = Vec3.atCenterOf(BlockManager.POS).add(xOffset, yOffset, zOffset);
+                Vec3 particlePos = Vec3.atCenterOf(BlockManager.getBlockPos()).add(xOffset, yOffset, zOffset);
                 level.sendParticles(ParticleTypes.ENCHANT,
                         particlePos.x, particlePos.y, particlePos.z,
                         1, 0, 0, 0, 0.02);

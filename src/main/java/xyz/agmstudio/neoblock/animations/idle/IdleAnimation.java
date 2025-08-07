@@ -15,7 +15,7 @@ public abstract class IdleAnimation extends Animation {
     protected static final Vec3[] CORNERS = Stream.of(
             new Vec3(0, 0, 0), new Vec3(1, 0, 0), new Vec3(1, 0, 1), new Vec3(0, 0, 1),
             new Vec3(0, 1, 0), new Vec3(1, 1, 0), new Vec3(1, 1, 1), new Vec3(0, 1, 1)
-    ).map(vec3 -> vec3.add(BlockManager.POS_CORNER)).toArray(Vec3[]::new);
+    ).map(vec3 -> vec3.add(BlockManager.getBlockCorner())).toArray(Vec3[]::new);
     protected static final HashSet<HashSet<Vec3>> EDGES = new HashSet<>();
     static {
         for (Vec3 corner: CORNERS) {

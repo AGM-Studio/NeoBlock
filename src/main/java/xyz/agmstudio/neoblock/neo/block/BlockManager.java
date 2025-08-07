@@ -18,14 +18,21 @@ import xyz.agmstudio.neoblock.neo.world.WorldData;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class BlockManager {
-    public static final double AABB_RANGE = 1.02;
-    public static final BlockPos POS = new BlockPos(0, 64, 0);
-    public static final Vec3 POS_CORNER = new Vec3(POS.getX(), POS.getY(), POS.getZ());
     public static final NeoBlockSpec DEFAULT_SPEC = new NeoBlockSpec(Blocks.GRASS_BLOCK);
     public static final NeoBlockSpec BEDROCK_SPEC = new NeoBlockSpec(Blocks.BEDROCK);
+    public static final double AABB_RANGE = 1.02;
+
+    public static BlockPos getBlockPos() {
+        return WorldData.getWorldStatus().getBlockPos();
+    }
+    public static Vec3 getBlockCorner() {
+        BlockPos pos = getBlockPos();
+        return new Vec3(pos.getX(), pos.getY(), pos.getZ());
+    }
 
     public static NeoBlockSpec getRandomBlock() {
         AtomicInteger totalChance = new AtomicInteger();
@@ -54,14 +61,14 @@ public class BlockManager {
         for (TierSpec tier: WorldData.getWorldTiers())
             if (tier.canBeResearched()) tier.startResearch();
 
-        if (!TierManager.hasResearch()) getRandomBlock().placeAt(access, POS);
-        else BEDROCK_SPEC.placeAt(access, POS);  // Creative cheaters (Just in case)
+        if (!TierManager.hasResearch()) getRandomBlock().placeAt(access, getBlockPos());
+        else BEDROCK_SPEC.placeAt(access, getBlockPos());  // Creative cheaters (Just in case)
 
         NeoListener.execute(() -> NeoMerchant.attemptSpawnTrader(level));
     }
 
     public static void ensureNoFall(@NotNull LevelAccessor access) {
-        Vec3 center = POS.getCenter();
+        Vec3 center = getBlockPos().getCenter();
         for(Entity entity: access.getEntities(null, AABB.ofSize(center, AABB_RANGE, AABB_RANGE, AABB_RANGE)))
             entity.teleportTo(entity.getX(), center.y + AABB_RANGE / 2.0, entity.getZ());
     }
