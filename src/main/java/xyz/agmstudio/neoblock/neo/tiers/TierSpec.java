@@ -3,9 +3,9 @@ package xyz.agmstudio.neoblock.neo.tiers;
 import net.minecraft.nbt.CompoundTag;
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlockMod;
+import xyz.agmstudio.neoblock.compatibility.minecraft.MinecraftAPI;
 import xyz.agmstudio.neoblock.data.NBTData;
 import xyz.agmstudio.neoblock.data.NBTSaveable;
-import xyz.agmstudio.neoblock.compatibility.minecraft.MinecraftAPI;
 import xyz.agmstudio.neoblock.neo.block.BlockManager;
 import xyz.agmstudio.neoblock.neo.block.NeoBlockSpec;
 import xyz.agmstudio.neoblock.neo.block.NeoSeqBlockSpec;
@@ -34,6 +34,7 @@ public class TierSpec implements NBTSaveable {
         // Extended version for the WorldData to reset with
         this.id = id;
         this.research = new TierResearch(this);
+        this.enabled = id == 0;
 
         this.onLoad(new CompoundTag());
         this.hash = getHashCode();

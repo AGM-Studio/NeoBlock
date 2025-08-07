@@ -62,7 +62,7 @@ public class NeoBlockSpec {
     }
     public String getID() {
         String range = weight > 1 ? weight + "x " : "";
-        return range + MinecraftAPI.getBlockResource(getBlock());
+        return range + MinecraftAPI.getBlockResource(getBlock()).orElse(null);
     }
 
     public void placeAt(@NotNull LevelAccessor level, BlockPos pos) {
@@ -75,5 +75,9 @@ public class NeoBlockSpec {
     }
     public NeoBlockSpec copy(int weight) {
         return new NeoBlockSpec(block, weight);
+    }
+
+    @Override public String toString() {
+        return getID();
     }
 }

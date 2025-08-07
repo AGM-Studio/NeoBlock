@@ -95,4 +95,15 @@ public class NeoChestSpec extends NeoBlockSpec {
             }
         }
     }
+
+    @Override public NeoBlockSpec copy() {
+        return copy(weight);
+    }
+    @Override public NeoBlockSpec copy(int weight) {
+        return new NeoChestSpec(items, weight, id);
+    }
+
+    @Override public String toString() {
+        return getID() + "{" + items.stream().map(Object::toString).collect(Collectors.joining(";")) + "}";
+    }
 }

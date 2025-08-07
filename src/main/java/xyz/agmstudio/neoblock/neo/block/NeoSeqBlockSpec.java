@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class NeoSeqBlockSpec extends NeoBlockSpec {
     private static final Pattern PATTERN = Pattern.compile("^(?:(?<count>\\d+)x *)?neoblock:(?:seq|sequence):(?<id>[^ ]+)$");
@@ -108,5 +109,16 @@ public class NeoSeqBlockSpec extends NeoBlockSpec {
         super.placeAt(level, pos);  // Place the first block
 
         addToQueue(true);
+    }
+
+    @Override public NeoBlockSpec copy() {
+        return copy(weight);
+    }
+    @Override public NeoBlockSpec copy(int weight) {
+        return new NeoSeqBlockSpec(blocks, weight, id);
+    }
+
+    @Override public String toString() {
+        return getID() + "{" + blocks.stream().map(Object::toString).collect(Collectors.joining(";")) + "}";
     }
 }
