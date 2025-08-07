@@ -20,7 +20,7 @@ tier2-chest = [
 	"2-4xminecraft:oak_log"
 ]
 
-tier3-chest = [
+tier4-chest = [
 	"1xminecraft:iron_chestplate 25%",
 	"4-8xminecraft:coal 60%",
 	"1xminecraft:gold_ingot 40%",

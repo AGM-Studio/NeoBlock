@@ -1,4 +1,10 @@
 name = "Nether phase"
+# Blocks you want to gurantee to be spawned when this tier is unlocked!
+# The format is the same as blocks, also used in sequences.toml.
+# If empty or missing, a random block will be chosen like normal.
+starting-blocks = [
+    "neoblock:chest:tier4-chest"
+]
 # List of all blocks in this tier. All of them have equal chance to be chosen in this tier.
 # Note that, blocks from tier 0 are available
 blocks = [

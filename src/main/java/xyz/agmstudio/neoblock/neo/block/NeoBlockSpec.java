@@ -13,25 +13,19 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class NeoBlockSpec {
-    private static final Pattern BLOCK_PATTERN = Pattern.compile("^(?:(?<count>\\d+)x)?(?<id>[a-z0-9_]+:[a-z0-9_/]+)$");
+    private static final Pattern PATTERN = Pattern.compile("^(?:(?<count>\\d+)x *)?(?<id>[a-z0-9_]+:[a-z0-9_/]+)$");
 
-    private final Block block;
-    private final int weight;
-
-    public NeoBlockSpec(Block block, int weight) {
-        this.block = block;
-        this.weight = weight;
-    }
-
-    public NeoBlockSpec(Block block) {
-        this(block, 1);
-    }
+    protected final Block block;
+    protected final int weight;
 
     public static Optional<? extends NeoBlockSpec> parse(String input) {
+        Optional<NeoSeqBlockSpec> seq = NeoSeqBlockSpec.parseSequence(input);
+        if (seq.isPresent()) return seq;
+
         Optional<NeoChestSpec> chest = NeoChestSpec.parseChest(input);
         if (chest.isPresent()) return chest;
 
-        Matcher matcher = BLOCK_PATTERN.matcher(input.trim());
+        Matcher matcher = PATTERN.matcher(input.trim());
         if (!matcher.matches()) {
             NeoBlockMod.LOGGER.warn("Invalid block: '{}'", input);
             return Optional.empty();
@@ -48,11 +42,27 @@ public class NeoBlockSpec {
         return Optional.of(new NeoBlockSpec(block.get(), count));
     }
 
+    public NeoBlockSpec(Block block, int weight) {
+        this.block = block;
+        this.weight = weight;
+    }
+
+    public NeoBlockSpec(Block block) {
+        this(block, 1);
+    }
+
+    public Block getBlock() {
+        return block;
+    }
     public BlockState getState() {
-        return block.defaultBlockState();
+        return getBlock().defaultBlockState();
     }
     public int getWeight() {
         return weight;
+    }
+    public String getID() {
+        String range = weight > 1 ? weight + "x " : "";
+        return range + MinecraftAPI.getBlockResource(getBlock());
     }
 
     public void placeAt(@NotNull LevelAccessor level, BlockPos pos) {
@@ -60,7 +70,10 @@ public class NeoBlockSpec {
         BlockManager.ensureNoFall(level);
     }
 
-    public Block getBlock() {
-        return block;
+    public NeoBlockSpec copy() {
+        return new NeoBlockSpec(block, weight);
+    }
+    public NeoBlockSpec copy(int weight) {
+        return new NeoBlockSpec(block, weight);
     }
 }

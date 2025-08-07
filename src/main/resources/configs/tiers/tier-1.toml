@@ -1,4 +1,11 @@
 name = "Growing phase"  # Helps you to check your tier with info command.
+# Blocks you want to gurantee to be spawned when this tier is unlocked!
+# The format is the same as blocks, also used in sequences.toml.
+# If empty or missing, a random block will be chosen like normal.
+starting-blocks = [
+    "neoblock:chest:tier1-chest",
+    "3xminecraft:stone"
+]
 # List of all blocks in this tier. All of them have equal chance to be chosen in this tier.
 # Note that, blocks from tier 0 are available
 blocks = [
@@ -9,7 +16,9 @@ blocks = [
     "minecraft:granite",
     "minecraft:diorite",
     "minecraft:clay",
-    "neoblock:casual-chest"     # The chest in chests.toml
+    "neoblock:chest:casual-chest",      # The chests are in chests.toml
+    "neoblock:sequence:stone-pot",      # The sequences are in sequences.toml
+    "neoblock:sequence:three-stones"
 ]
 # The wight of tier when choosing between enabled tiers.
 weight = 3

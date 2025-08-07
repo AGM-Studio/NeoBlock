@@ -14,6 +14,7 @@ import xyz.agmstudio.neoblock.data.NBTSaveable;
 import xyz.agmstudio.neoblock.minecraft.MinecraftAPI;
 import xyz.agmstudio.neoblock.neo.block.BlockManager;
 import xyz.agmstudio.neoblock.neo.block.NeoBlockSpec;
+import xyz.agmstudio.neoblock.neo.block.NeoSeqBlockSpec;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoTradePool;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
 import xyz.agmstudio.neoblock.util.ResourceUtil;
@@ -60,6 +61,9 @@ public class TierManager {
 
         final List<String> list = config.getOrElse("trader-trades", config.getOrElse("trades", List.of()));
         spec.trades = NeoTradePool.parse(list);
+
+        final List<NeoBlockSpec> start = NeoSeqBlockSpec.extractSequenceList(config.getOrElse("starting-blocks", List.of()));
+        spec.startSequence = new NeoSeqBlockSpec(start, 1, "tier-" + spec.id + "-start");
 
         NeoBlockMod.LOGGER.debug("Tier {} loaded. Hash key: {}", spec.id, spec.getHashCode());
     }

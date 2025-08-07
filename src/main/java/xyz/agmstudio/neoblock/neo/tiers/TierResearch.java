@@ -1,6 +1,7 @@
 package xyz.agmstudio.neoblock.neo.tiers;
 
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.npc.WanderingTrader;
 import xyz.agmstudio.neoblock.data.NBTData;
 import xyz.agmstudio.neoblock.data.NBTSaveable;
 import xyz.agmstudio.neoblock.minecraft.MessengerAPI;
@@ -20,12 +21,13 @@ public class TierResearch implements NBTSaveable {
 
     public void onFinish(ServerLevel level) {
         tier.enable();
+        tier.startSequence.addToQueue(false);
         MessengerAPI.sendInstantMessage("message.neoblock.unlocked_tier", level, false, tier.id);
     }
     public void onStart(ServerLevel level) {
         MessengerAPI.sendInstantMessage("message.neoblock.unlocking_tier", level, false, tier.id);
-        NeoMerchant.spawnTraderWith(tier.tradePoolUnlock.getPool(), level, "UnlockTrader");
-        MessengerAPI.sendInstantMessage("message.neoblock.unlocking_trader", level, false, tier.id);
+        WanderingTrader trader = NeoMerchant.spawnTraderWith(tier.tradePoolUnlock.getPool(), level, "UnlockTrader");
+        if (trader != null) MessengerAPI.sendInstantMessage("message.neoblock.unlocking_trader", level, false, tier.id);
     }
 
     public long getTime() {

@@ -2,12 +2,19 @@ package xyz.agmstudio.neoblock.neo.world;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.world.entity.EntityType;
 import xyz.agmstudio.neoblock.data.NBTData;
 import xyz.agmstudio.neoblock.data.NBTSaveable;
 import xyz.agmstudio.neoblock.minecraft.MinecraftAPI;
+import xyz.agmstudio.neoblock.neo.block.NeoBlockSpec;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
 
 public class WorldStatus implements NBTSaveable {
     private final WorldData data;
@@ -18,15 +25,24 @@ public class WorldStatus implements NBTSaveable {
     @NBTData("NeoBlock") protected BlockPos pos = new BlockPos(0, 64, 0);
 
     protected final HashMap<EntityType<?>, Integer> tradedMobs = new HashMap<>();
+    protected final List<NeoBlockSpec> queue = new ArrayList<>();
 
     @Override public void onLoad(CompoundTag tag) {
         final CompoundTag mobs = tag.getCompound("TradedMobs");
         mobs.getAllKeys().forEach(key -> tradedMobs.merge(MinecraftAPI.getEntityType(key).orElse(null), mobs.getInt(key), Integer::sum));
+
+        queue.clear();
+        final ListTag blocks = tag.getList("Queue", Tag.TAG_STRING);
+        blocks.forEach(block -> NeoBlockSpec.parse(block.getAsString()).ifPresent(queue::add));
     }
     @Override public CompoundTag onSave(CompoundTag tag) {
         final CompoundTag mobs = new CompoundTag();
         tradedMobs.forEach((key, value) -> mobs.putInt(String.valueOf(MinecraftAPI.getEntityTypeResource(key)), value));
         tag.put("TradedMobs", mobs);
+
+        final ListTag blocks = new ListTag();
+        queue.forEach(block -> blocks.add(StringTag.valueOf(block.getID())));
+        tag.put("Queue", blocks);
 
         return tag;
     }
@@ -37,6 +53,13 @@ public class WorldStatus implements NBTSaveable {
 
     public BlockPos getBlockPos() {
         return pos;
+    }
+    public Optional<NeoBlockSpec> getNextInQueue() {
+        if (queue.isEmpty()) return Optional.empty();
+        else return Optional.of(queue.remove(0));
+    }
+    public void addToQueue(NeoBlockSpec spec) {
+        queue.add(spec);
     }
 
     public boolean isInactive() {

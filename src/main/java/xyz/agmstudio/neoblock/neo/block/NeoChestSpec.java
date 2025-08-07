@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class NeoChestSpec extends NeoBlockSpec {
-    private static final Pattern CHEST_PATTERN = Pattern.compile("^(?:(?<count>\\d+)x)?neoblock:(?<id>[^ ]+)$");
+    private static final Pattern PATTERN = Pattern.compile("^(?:(?<count>\\d+)x *)?neoblock:chest:(?<id>[^ ]+)$");
 
     private static final Path FOLDER = MinecraftAPI.CONFIG_DIR.resolve(NeoBlockMod.MOD_ID);
     private static final HashMap<String, List<NeoItemSpec>> CHESTS = new HashMap<>();
@@ -39,26 +39,22 @@ public class NeoChestSpec extends NeoBlockSpec {
         CHESTS.clear();
 
         for (String key : config.valueMap().keySet()) {
-            Set<String> visited = new HashSet<>();
-            List<String> entries = config.get(key);
-            if (entries == null) {
-                CHESTS.put(key, List.of());
-                NeoBlockMod.LOGGER.info("Loaded 0 stacks for {}", key);
-                break;
-            }
+            List<String> entries = config.getOrElse(key, List.of());
 
             List<NeoItemSpec> list = new ArrayList<>();
             entries.forEach(entry -> NeoItemSpec.parseItem(entry).ifPresent(list::add));
-
-            CHESTS.put(key, list);
-            NeoBlockMod.LOGGER.info("Loaded {} stacks for {}", list.size(), key);
+            if (list.isEmpty()) NeoBlockMod.LOGGER.info("Unable to load chest {} because it's empty.", key);
+            else {
+                NeoBlockMod.LOGGER.info("Loaded {} stacks for {}", list.size(), key);
+                CHESTS.put(key, list);
+            }
         }
 
         NeoBlockMod.LOGGER.info("Loaded {} chests.", CHESTS.size());
     }
 
     public static Optional<NeoChestSpec> parseChest(String input) {
-        Matcher matcher = CHEST_PATTERN.matcher(input.trim());
+        Matcher matcher = PATTERN.matcher(input.trim());
         if (!matcher.matches()) return Optional.empty();
 
         List<NeoItemSpec> items = CHESTS.getOrDefault(matcher.group("id"), List.of());
@@ -66,15 +62,22 @@ public class NeoChestSpec extends NeoBlockSpec {
 
         String countString = matcher.group("count");
         int count = (countString != null) ? Integer.parseInt(countString) : 1;
-        return Optional.of(new NeoChestSpec(items, count));
+        return Optional.of(new NeoChestSpec(items, count, matcher.group("id")));
     }
 
     private final List<NeoItemSpec> items;
+    private final String id;
 
-    public NeoChestSpec(List<NeoItemSpec> items, int weight) {
+    public NeoChestSpec(List<NeoItemSpec> items, int weight, String id) {
         super(Blocks.CHEST, weight);
 
         this.items = items;
+        this.id = id;
+    }
+
+    @Override public String getID() {
+        String range = weight > 1 ? weight + "x " : "";
+        return range + "neoblock:chest:" + id;
     }
 
     @Override public void placeAt(@NotNull LevelAccessor level, BlockPos pos) {

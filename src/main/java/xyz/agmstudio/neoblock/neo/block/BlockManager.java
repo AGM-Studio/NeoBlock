@@ -35,6 +35,9 @@ public class BlockManager {
     }
 
     public static NeoBlockSpec getRandomBlock() {
+        Optional<NeoBlockSpec> queued = WorldData.getWorldStatus().getNextInQueue();
+        if (queued.isPresent()) return queued.get();
+
         AtomicInteger totalChance = new AtomicInteger();
         List<TierSpec> tiers = new ArrayList<>();
 

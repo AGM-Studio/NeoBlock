@@ -8,6 +8,7 @@ import xyz.agmstudio.neoblock.data.NBTSaveable;
 import xyz.agmstudio.neoblock.minecraft.MinecraftAPI;
 import xyz.agmstudio.neoblock.neo.block.BlockManager;
 import xyz.agmstudio.neoblock.neo.block.NeoBlockSpec;
+import xyz.agmstudio.neoblock.neo.block.NeoSeqBlockSpec;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoTrade;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoTradePool;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
@@ -49,6 +50,7 @@ public class TierSpec implements NBTSaveable {
 
     protected NeoTradePool tradePoolUnlock;
     protected NeoTradePool trades;
+    protected NeoSeqBlockSpec startSequence;
 
     @Override public void onLoad(CompoundTag tag) {
         TierManager.loadConfig(this);
