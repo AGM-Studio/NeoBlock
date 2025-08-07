@@ -11,7 +11,7 @@ import xyz.agmstudio.neoblock.animations.ProgressbarAnimation;
 import xyz.agmstudio.neoblock.animations.phase.UpgradePhaseAnimation;
 import xyz.agmstudio.neoblock.animations.progress.UpgradeProgressAnimation;
 import xyz.agmstudio.neoblock.data.NBTSaveable;
-import xyz.agmstudio.neoblock.minecraft.MinecraftAPI;
+import xyz.agmstudio.neoblock.compatibility.minecraft.MinecraftAPI;
 import xyz.agmstudio.neoblock.neo.block.BlockManager;
 import xyz.agmstudio.neoblock.neo.block.NeoBlockSpec;
 import xyz.agmstudio.neoblock.neo.block.NeoSeqBlockSpec;

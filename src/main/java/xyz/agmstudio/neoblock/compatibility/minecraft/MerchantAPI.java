@@ -1,4 +1,4 @@
-package xyz.agmstudio.neoblock.minecraft;
+package xyz.agmstudio.neoblock.compatibility.minecraft;
 
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.valueproviders.UniformInt;

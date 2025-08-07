@@ -3,7 +3,7 @@ package xyz.agmstudio.neoblock.neo.loot.trade;
 import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.item.trading.MerchantOffer;
 import xyz.agmstudio.neoblock.NeoBlockMod;
-import xyz.agmstudio.neoblock.minecraft.MerchantAPI;
+import xyz.agmstudio.neoblock.compatibility.minecraft.MerchantAPI;
 import xyz.agmstudio.neoblock.neo.loot.NeoItemSpec;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
 import xyz.agmstudio.neoblock.util.StringUtil;

@@ -3,7 +3,7 @@ package xyz.agmstudio.neoblock.neo.loot.trade;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import net.minecraft.world.item.trading.MerchantOffer;
 import xyz.agmstudio.neoblock.NeoBlockMod;
-import xyz.agmstudio.neoblock.minecraft.MinecraftAPI;
+import xyz.agmstudio.neoblock.compatibility.minecraft.MinecraftAPI;
 import xyz.agmstudio.neoblock.util.ResourceUtil;
 
 import java.nio.file.Path;

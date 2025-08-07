@@ -4,7 +4,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.npc.WanderingTrader;
 import xyz.agmstudio.neoblock.data.NBTData;
 import xyz.agmstudio.neoblock.data.NBTSaveable;
-import xyz.agmstudio.neoblock.minecraft.MessengerAPI;
+import xyz.agmstudio.neoblock.compatibility.minecraft.MessengerAPI;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoMerchant;
 
 public class TierResearch implements NBTSaveable {

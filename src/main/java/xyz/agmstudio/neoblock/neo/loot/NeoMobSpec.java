@@ -9,10 +9,10 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import xyz.agmstudio.neoblock.minecraft.ItemAPI;
-import xyz.agmstudio.neoblock.minecraft.MessengerAPI;
+import xyz.agmstudio.neoblock.compatibility.minecraft.ItemAPI;
+import xyz.agmstudio.neoblock.compatibility.minecraft.MessengerAPI;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
-import xyz.agmstudio.neoblock.minecraft.MinecraftAPI;
+import xyz.agmstudio.neoblock.compatibility.minecraft.MinecraftAPI;
 import xyz.agmstudio.neoblock.util.StringUtil;
 
 import java.util.Optional;

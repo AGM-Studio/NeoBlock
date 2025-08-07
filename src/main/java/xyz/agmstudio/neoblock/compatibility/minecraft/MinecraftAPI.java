@@ -1,4 +1,4 @@
-package xyz.agmstudio.neoblock.minecraft;
+package xyz.agmstudio.neoblock.compatibility.minecraft;
 
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;

@@ -1,4 +1,4 @@
-package xyz.agmstudio.neoblock.minecraft;
+package xyz.agmstudio.neoblock.compatibility.minecraft;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
