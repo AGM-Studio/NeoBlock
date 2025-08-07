@@ -31,7 +31,7 @@ public class PulseAnimation extends IdleAnimation {
     }
 
     @Override public void animate(ServerLevel level, LevelAccessor access) {
-        for (HashSet<Vec3> edge: EDGES) {
+        for (HashSet<Vec3> edge: getEdges()) {
             Iterator<Vec3> iter = edge.iterator();
             Vec3 from = iter.next();
             Vec3 step = iter.next().subtract(from).scale(0.1);

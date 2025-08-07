@@ -14,11 +14,16 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.LevelAccessor;
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlockMod;
-import xyz.agmstudio.neoblock.data.NBTSaveable;
-import xyz.agmstudio.neoblock.data.Schematic;
+import xyz.agmstudio.neoblock.animations.Animation;
 import xyz.agmstudio.neoblock.compatibility.minecraft.MessengerAPI;
 import xyz.agmstudio.neoblock.compatibility.minecraft.MinecraftAPI;
+import xyz.agmstudio.neoblock.data.NBTSaveable;
+import xyz.agmstudio.neoblock.data.Schematic;
 import xyz.agmstudio.neoblock.neo.block.BlockManager;
+import xyz.agmstudio.neoblock.neo.block.NeoChestSpec;
+import xyz.agmstudio.neoblock.neo.block.NeoSeqBlockSpec;
+import xyz.agmstudio.neoblock.neo.loot.trade.NeoMerchant;
+import xyz.agmstudio.neoblock.neo.loot.trade.NeoTrade;
 import xyz.agmstudio.neoblock.neo.tiers.TierManager;
 import xyz.agmstudio.neoblock.neo.tiers.TierSpec;
 
@@ -47,7 +52,18 @@ public class WorldData extends MinecraftAPI.AbstractWorldData {
         NeoBlockMod.LOGGER.info("Loaded {} tiers from the tiers folder.", data.tiers.size());
     }
 
+    public static void reloadConfig() {
+        NeoTrade.reloadTrades();
+        NeoMerchant.loadConfig();
+
+        NeoChestSpec.reloadChests();
+        NeoSeqBlockSpec.reloadSequences();
+
+        Animation.reloadAnimations();
+    }
+
     public static void setup(@NotNull ServerLevel level) {
+        reloadConfig();
         load(level);
 
         if (instance == null) return;

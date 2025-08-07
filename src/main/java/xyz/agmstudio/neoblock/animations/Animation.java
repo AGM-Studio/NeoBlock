@@ -4,6 +4,14 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.LevelAccessor;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.animations.idle.IdleAnimation;
+import xyz.agmstudio.neoblock.animations.idle.NeoFlowAnimation;
+import xyz.agmstudio.neoblock.animations.idle.PulseAnimation;
+import xyz.agmstudio.neoblock.animations.phase.ExplosionAnimation;
+import xyz.agmstudio.neoblock.animations.phase.FuseAnimation;
+import xyz.agmstudio.neoblock.animations.progress.BreakingAnimation;
+import xyz.agmstudio.neoblock.animations.progress.SparkleAnimation;
+import xyz.agmstudio.neoblock.animations.progress.SpiralAnimation;
+import xyz.agmstudio.neoblock.neo.tiers.TierManager;
 import xyz.agmstudio.neoblock.util.ConfigUtil;
 import xyz.agmstudio.neoblock.util.StringUtil;
 
@@ -12,21 +20,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Animation implements ConfigUtil.CategorizedConfig {
-    private static boolean registeringNewAnimations = true;
     private static final List<Animation> animations = new ArrayList<>();
 
-    public static void addAnimation(Animation animation) {
-        animations.add(animation);
-    }
-    public static void clearAnimations() {
+    public static void reloadAnimations() {
         animations.clear();
-    }
-    public static void disableRegisteringNewAnimations() {
-        registeringNewAnimations = false;
-    }
-    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-    public static boolean canRegisterNewAnimations() {
-        return registeringNewAnimations;
+
+        TierManager.clearPhaseAnimations();
+        TierManager.clearProgressAnimations();
+        TierManager.reloadProgressbarAnimations();
+
+        new ExplosionAnimation().register();
+        new FuseAnimation().register();
+
+        new BreakingAnimation().register();
+        new SparkleAnimation().register();
+        new SpiralAnimation().register();
+
+        new NeoFlowAnimation().register();
+        new PulseAnimation().register();
     }
 
     public static void tickAll(ServerLevel level, LevelAccessor access) {
@@ -68,7 +79,7 @@ public abstract class Animation implements ConfigUtil.CategorizedConfig {
     public final boolean register() {
         this.reload();
         if (!enabled) return false;
-        Animation.addAnimation(this);
+        animations.add(this);
         onRegister();
         return true;
     }

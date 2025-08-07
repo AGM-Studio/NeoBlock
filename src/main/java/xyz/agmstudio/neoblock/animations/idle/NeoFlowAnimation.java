@@ -64,7 +64,8 @@ public class NeoFlowAnimation extends IdleAnimation {
 
     private static class AnimationParticle {
         private static AnimationParticle fromRandom(RandomSource random) {
-            return new AnimationParticle(random, CORNERS[random.nextInt(CORNERS.length)]);
+            Vec3[] corners = getCorners();
+            return new AnimationParticle(random, corners[random.nextInt(corners.length)]);
         }
 
         private final RandomSource random;
@@ -89,7 +90,7 @@ public class NeoFlowAnimation extends IdleAnimation {
         }
 
         private void updateGoal(Vec3 vec3) {
-            List<Vec3> options = Arrays.stream(CORNERS).filter(vec -> vec.distanceToSqr(vec3) == 1 && vec != this.last).toList();
+            List<Vec3> options = Arrays.stream(getCorners()).filter(vec -> vec.distanceToSqr(vec3) == 1 && vec != this.last).toList();
             last = goal;
             goal = options.get(random.nextInt(options.size()));
             direction = goal.subtract(current).normalize();

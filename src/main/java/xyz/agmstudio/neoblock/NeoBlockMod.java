@@ -13,20 +13,6 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import xyz.agmstudio.neoblock.animations.Animation;
-import xyz.agmstudio.neoblock.animations.idle.IdleAnimation;
-import xyz.agmstudio.neoblock.animations.idle.NeoFlowAnimation;
-import xyz.agmstudio.neoblock.animations.idle.PulseAnimation;
-import xyz.agmstudio.neoblock.animations.phase.ExplosionAnimation;
-import xyz.agmstudio.neoblock.animations.phase.FuseAnimation;
-import xyz.agmstudio.neoblock.animations.phase.UpgradePhaseAnimation;
-import xyz.agmstudio.neoblock.animations.progress.BreakingAnimation;
-import xyz.agmstudio.neoblock.animations.progress.SparkleAnimation;
-import xyz.agmstudio.neoblock.animations.progress.SpiralAnimation;
-import xyz.agmstudio.neoblock.animations.progress.UpgradeProgressAnimation;
-import xyz.agmstudio.neoblock.neo.block.NeoChestSpec;
-import xyz.agmstudio.neoblock.neo.loot.trade.NeoMerchant;
-import xyz.agmstudio.neoblock.neo.loot.trade.NeoTrade;
-import xyz.agmstudio.neoblock.neo.tiers.TierManager;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
 import xyz.agmstudio.neoblock.util.ResourceUtil;
 
@@ -80,38 +66,8 @@ public final class NeoBlockMod {
         ITEMS.register(bus);
     }
 
-    public static void reload() {
-        NeoChestSpec.reloadChests();
-        NeoMerchant.loadConfig();
-        NeoTrade.reloadTrades();
-
-        Animation.clearAnimations();
-
-        TierManager.reloadProgressbarAnimations();
-        TierManager.clearPhaseAnimations();
-        UpgradePhaseAnimation.getAnimations().forEach(Animation::register);
-        TierManager.clearProgressAnimations();
-        UpgradeProgressAnimation.getAnimations().forEach(Animation::register);
-
-        IdleAnimation.getAnimations().forEach(Animation::register);
-    }
-
     public void setup(FMLCommonSetupEvent event) {
-        UpgradePhaseAnimation.addAnimation(ExplosionAnimation.class);
-        UpgradePhaseAnimation.addAnimation(FuseAnimation.class);
-
-        UpgradeProgressAnimation.addAnimation(BreakingAnimation.class);
-        UpgradeProgressAnimation.addAnimation(SparkleAnimation.class);
-        UpgradeProgressAnimation.addAnimation(SpiralAnimation.class);
-
-        IdleAnimation.addAnimation(NeoFlowAnimation.class);
-        IdleAnimation.addAnimation(PulseAnimation.class);
-
-        Animation.disableRegisteringNewAnimations();
-
         NeoListener.registerTicker(Animation::tickAll);
         NeoListener.registerTicker(WorldData::tick);
-
-        NeoBlockMod.reload();
     }
 }
