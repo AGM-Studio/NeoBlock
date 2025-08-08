@@ -32,10 +32,13 @@ public abstract class CreateWorldScreenMixin {
     @Inject(method = "<init>", at = @At("TAIL"))
     private void CreateWorldScreen(Minecraft minecraft, Screen lastScreen, WorldCreationContext settings, Optional<ResourceKey<WorldPreset>> preset, OptionalLong seed, CallbackInfo ci) {
         List<WorldCreationUiState.WorldTypeEntry> list = uiState.getNormalPresetList();
-        ResourceLocation location = NeoBlockMod.getConfig().getOrElse("world.no-nether", true) ?
-                MinecraftAPI.parseResourceLocation("neoblock:neoblock_no_nether") :
-                MinecraftAPI.parseResourceLocation("neoblock:neoblock");
+        String name = NeoBlockMod.getConfig().getOrElse(
+                "world.preset",
+                NeoBlockMod.getConfig().getOrElse("world.no-nether", true) ?
+                        "neoblock:neoblock_no_nether" : "neoblock:neoblock"
+        );
 
+        ResourceLocation location = MinecraftAPI.parseResourceLocation(name);
         WorldCreationUiState.WorldTypeEntry type = uiState.getWorldType();
         for (WorldCreationUiState.WorldTypeEntry entry : list) {
             Holder<WorldPreset> world = entry.preset();
@@ -49,6 +52,7 @@ public abstract class CreateWorldScreenMixin {
         uiState.setWorldType(type);
     }
 
+    // No Expremental notice
     @ModifyArg(method = "onCreate", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/worldselection/WorldOpenFlows;confirmWorldCreation(Lnet/minecraft/client/Minecraft;Lnet/minecraft/client/gui/screens/worldselection/CreateWorldScreen;Lcom/mojang/serialization/Lifecycle;Ljava/lang/Runnable;Z)V"), index = 2)
     private Lifecycle modifyLifecycle(Lifecycle original) {
         if (original == Lifecycle.experimental()) return Lifecycle.stable();

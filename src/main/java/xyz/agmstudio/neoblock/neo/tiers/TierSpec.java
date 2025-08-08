@@ -89,6 +89,9 @@ public class TierSpec implements NBTSaveable {
     public List<NeoBlockSpec> getBlocks() {
         return Collections.unmodifiableList(blocks);
     }
+    public NeoSeqBlockSpec getStartSequence() {
+        return startSequence;
+    }
     public double getTotalBlockWeight() {
         return totalBlockWeight;
     }

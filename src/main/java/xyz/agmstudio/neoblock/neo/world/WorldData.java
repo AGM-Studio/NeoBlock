@@ -82,6 +82,8 @@ public class WorldData extends MinecraftAPI.AbstractWorldData {
             if (!allowNeoBlock) allowNeoBlock = config.getOrElse("world.force-block", false);
             if (allowNeoBlock) {
                 getWorldStatus().setBlockPos(new BlockPos(x, config.getOrElse("world.block.y", 64), z), level);
+                TierSpec tier0 = getWorldTier(0);
+                if (tier0 != null) tier0.getStartSequence().addToQueue(false);
 
                 UnmodifiableConfig rules = config.get("rules");
                 if (rules != null) WorldRules.applyGameRules(level, rules);
