@@ -78,7 +78,7 @@ public final class NeoListener {
         if (WorldData.getWorldStatus().isUpdated() || TierManager.hasResearch()) {
             if (block.getBlock() != Blocks.BEDROCK) BlockManager.BEDROCK_SPEC.placeAt(access, BlockManager.getBlockPos());
         } else if (block.isAir() || block.canBeReplaced())          // NeoBlock has been broken logic
-            BlockManager.onBlockBroken(level, access);
+            BlockManager.updateBlock(level, true);
     }
 
     @SubscribeEvent
@@ -101,6 +101,7 @@ public final class NeoListener {
         new EnableTierCommand();
         new CommandTierCommand();
 
+        new ForceBlockCommand();
         new ForceResetTiersCommand();
         new ForceTraderSpawnCommand();
 

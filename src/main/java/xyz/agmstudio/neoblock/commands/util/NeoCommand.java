@@ -7,18 +7,31 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.tree.LiteralCommandNode;
+import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 
 @SuppressWarnings("unchecked")
 public abstract class NeoCommand {
     private static final List<NeoCommand> registry = new ArrayList<>();
+    public static <T extends NeoCommand> Optional<T> getFromRegistry(Class<T> clazz) {
+        for (NeoCommand command : registry)
+            if (command.getClass() == clazz)
+                return Optional.of((T) command);
+
+        return Optional.empty();
+    }
     public static void registerAll(CommandDispatcher<CommandSourceStack> dispatcher) {
         for (NeoCommand command : registry) command.register(dispatcher);
     }
@@ -34,6 +47,12 @@ public abstract class NeoCommand {
         this.permission = context -> context.hasPermission(permission);
         this.pattern = pattern;
         registry.add(this);
+    }
+
+    public MutableComponent getCommand() {
+        return Component.literal("/" + this.pattern).withStyle(
+                Style.EMPTY.withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/" + this.pattern)).withColor(ChatFormatting.AQUA)
+        );
     }
 
     public <T> T getArgument(CommandContext<CommandSourceStack> context, String key, Class<T> type) throws CommandExtermination {

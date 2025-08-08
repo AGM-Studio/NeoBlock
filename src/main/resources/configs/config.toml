@@ -1,5 +1,11 @@
-[world]                     # Added in 0.4.0! Effects only the client single player, for servers you need to change the level type
-no-nether = true            # in servers.properties. "neoblock:neoblock" or "neoblock:neoblock_no_nether"
+[world]                                 # Added in 0.4.0! Effects only the client single player, for servers you need to change the level type
+preset = "neoblock:neoblock_no_nether"  # in servers.properties. "neoblock:neoblock" or "neoblock:neoblock_no_nether"
+force-block = false                     # If you want to use another preset, other than normal ones...
+
+[world.block]               # The position you want the block to be, will change world spawn too and
+x = 0                       #  will only affect when generating the world for the first time.
+y = 64                      # To change it after first generation, use /neoblock force setblock <x> <y> <z>
+z = 0
 
 # [schematics.custom_0]       # You can add as many custom schematics to be loaded when the world is generated. Remove the `#` at the beginning of the lines to start and for more duplicte this.
 # name = "NeoBlockSchematic_0.nbt"

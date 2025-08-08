@@ -1,20 +1,20 @@
 package xyz.agmstudio.neoblock.neo.world;
 
 import com.electronwill.nightconfig.core.UnmodifiableConfig;
-import net.minecraft.ChatFormatting;
+import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
-import net.minecraft.network.chat.ClickEvent;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.Style;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.LevelAccessor;
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.animations.Animation;
+import xyz.agmstudio.neoblock.commands.ForceBlockCommand;
+import xyz.agmstudio.neoblock.commands.ForceResetTiersCommand;
+import xyz.agmstudio.neoblock.commands.util.NeoCommand;
 import xyz.agmstudio.neoblock.compatibility.minecraft.MessengerAPI;
 import xyz.agmstudio.neoblock.compatibility.minecraft.MinecraftAPI;
 import xyz.agmstudio.neoblock.data.NBTSaveable;
@@ -31,6 +31,7 @@ import java.io.FileNotFoundException;
 import java.nio.file.Files;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 
 public class WorldData extends MinecraftAPI.AbstractWorldData {
     private static WorldData instance;
@@ -53,6 +54,8 @@ public class WorldData extends MinecraftAPI.AbstractWorldData {
     }
 
     public static void reloadConfig() {
+        NeoBlockMod.reloadConfig();
+
         NeoTrade.reloadTrades();
         NeoMerchant.loadConfig();
 
@@ -66,23 +69,30 @@ public class WorldData extends MinecraftAPI.AbstractWorldData {
         reloadConfig();
         load(level);
 
+        CommentedFileConfig config = NeoBlockMod.getConfig();
+
         if (instance == null) return;
         if (instance.status.state == WorldStatus.State.INACTIVE) {
-            boolean isNeoBlock = true;
+            boolean allowNeoBlock = true;
+            final int x = config.getOrElse("world.block.x", 0);
+            final int z = config.getOrElse("world.block.z", 0);
             for (int y : List.of(-64, -61, 0, 64))
-                if (!level.getBlockState(new BlockPos(0, y, 0)).isAir()) isNeoBlock = false;
+                if (!level.getBlockState(new BlockPos(x, y, z)).isAir()) allowNeoBlock = false;
+            
+            if (!allowNeoBlock) allowNeoBlock = config.getOrElse("world.force-block", false);
+            if (allowNeoBlock) {
+                getWorldStatus().setBlockPos(new BlockPos(x, config.getOrElse("world.block.y", 64), z), level);
 
-            if (isNeoBlock) {
-                BlockManager.DEFAULT_SPEC.placeAt(level, BlockManager.getBlockPos());
-                UnmodifiableConfig rules = NeoBlockMod.getConfig().get("rules");
+                UnmodifiableConfig rules = config.get("rules");
                 if (rules != null) WorldRules.applyGameRules(level, rules);
 
                 // Load schematics from config!
                 Schematic.loadSchematic(level, BlockManager.getBlockPos(), "main.nbt");
+                BlockManager.updateBlock(level, false);
                 int iterator = 0;
-                while (NeoBlockMod.getConfig().contains("schematics.custom_" + iterator)) {
+                while (config.contains("schematics.custom_" + iterator)) {
                     try {
-                        UnmodifiableConfig scheme = NeoBlockMod.getConfig().get("schematics.custom_" + iterator);
+                        UnmodifiableConfig scheme = config.get("schematics.custom_" + iterator);
                         String name = scheme.getOrElse("name", "NeoBlockSchematic_" + iterator);
                         BlockPos pos = new BlockPos(scheme.getInt("x"), scheme.getInt("y"), scheme.getInt("z"));
                         int result = Schematic.loadSchematic(level, pos, name);
@@ -96,19 +106,20 @@ public class WorldData extends MinecraftAPI.AbstractWorldData {
                 instance.status.state = WorldStatus.State.ACTIVE;
                 instance.setDirty();
             } else {
+                Optional<ForceBlockCommand> command = NeoCommand.getFromRegistry(ForceBlockCommand.class);
+
                 NeoBlockMod.LOGGER.info("NeoBlock has been disabled.");
                 MessengerAPI.sendMessage("message.neoblock.disabled_world_1", level, false);
-                MessengerAPI.sendMessage("message.neoblock.disabled_world_2", level, false);
+                MessengerAPI.sendMessage("message.neoblock.disabled_world_2", level, false, command.map(NeoCommand::getCommand).orElse(null));
 
                 instance.status.state = WorldStatus.State.DISABLED;
                 instance.setDirty();
             }
         } else if (instance.status.state == WorldStatus.State.UPDATED) {
+            Optional<ForceResetTiersCommand> command = NeoCommand.getFromRegistry(ForceResetTiersCommand.class);
+
             NeoBlockMod.LOGGER.info("NeoBlock tiers has been updated.");
-            Component command = Component.literal("/neoblock force reset").withStyle(
-                    Style.EMPTY.withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/neoblock force reset")).withColor(ChatFormatting.AQUA)
-            );
-            MessengerAPI.sendMessage("message.neoblock.updated_world", level, false, command);
+            MessengerAPI.sendMessage("message.neoblock.updated_world", level, false, command.map(NeoCommand::getCommand).orElse(null));
 
             instance.status.state = WorldStatus.State.UPDATED;
             instance.setDirty();

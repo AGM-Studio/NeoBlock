@@ -5,6 +5,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
@@ -57,22 +58,26 @@ public class BlockManager {
         return DEFAULT_SPEC;
     }
 
-    public static void onBlockBroken(ServerLevel level, LevelAccessor access) {
+    public static void updateBlock(ServerLevel level, boolean trigger) {
+        if (!TierManager.hasResearch()) getRandomBlock().placeAt(level, getBlockPos());
+        else BEDROCK_SPEC.placeAt(level, getBlockPos());  // Creative cheaters & Move block in mid-search (Just in case)
+
+        if (!trigger) return;
         Animation.resetIdleTick();
         WorldData.getWorldStatus().addBlockCount(1);
+        NeoListener.execute(() -> NeoMerchant.attemptSpawnTrader(level));
 
         for (TierSpec tier: WorldData.getWorldTiers())
             if (tier.canBeResearched()) tier.startResearch();
-
-        if (!TierManager.hasResearch()) getRandomBlock().placeAt(access, getBlockPos());
-        else BEDROCK_SPEC.placeAt(access, getBlockPos());  // Creative cheaters (Just in case)
-
-        NeoListener.execute(() -> NeoMerchant.attemptSpawnTrader(level));
     }
 
     public static void ensureNoFall(@NotNull LevelAccessor access) {
         Vec3 center = getBlockPos().getCenter();
         for(Entity entity: access.getEntities(null, AABB.ofSize(center, AABB_RANGE, AABB_RANGE, AABB_RANGE)))
             entity.teleportTo(entity.getX(), center.y + AABB_RANGE / 2.0, entity.getZ());
+    }
+
+    public static BlockState getCurrentBlock(ServerLevel level) {
+        return level.getBlockState(getBlockPos());
     }
 }

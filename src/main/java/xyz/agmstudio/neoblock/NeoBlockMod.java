@@ -50,6 +50,9 @@ public final class NeoBlockMod {
     public static CommentedFileConfig getConfig() {
         return config;
     }
+    public static void reloadConfig() {
+        NeoBlockMod.config = ResourceUtil.getConfig(folder, "config.toml");
+    }
 
     public NeoBlockMod(IEventBus bus, ModContainer container) {
         this.install(bus, container);
