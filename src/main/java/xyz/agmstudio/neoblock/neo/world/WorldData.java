@@ -29,7 +29,8 @@ import xyz.agmstudio.neoblock.neo.tiers.TierSpec;
 
 import java.io.FileNotFoundException;
 import java.nio.file.Files;
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -143,7 +144,8 @@ public class WorldData extends MinecraftAPI.AbstractWorldData {
         NeoBlockMod.LOGGER.debug("Loading WorldData from {}", tag);
         data.status = NBTSaveable.load(WorldStatus.class, tag, data);
         final ListTag tiers = tag.getList("Tiers", StringTag.TAG_COMPOUND);
-        for (int i = 0; i < tiers.size(); i++) {
+        if (tiers.isEmpty()) reloadTiers();
+        else for (int i = 0; i < tiers.size(); i++) {
             TierSpec tier = NBTSaveable.load(TierSpec.class, tiers.getCompound(i));
             if (tier == null || !tier.isStable()) {
                 int id = tiers.getCompound(i).getInt("id");
@@ -163,11 +165,9 @@ public class WorldData extends MinecraftAPI.AbstractWorldData {
 
     @Override public @NotNull CompoundTag save(@NotNull CompoundTag tag) {
         tag.merge(status.save());
-        if (status.isActive()) {
-            ListTag list = new ListTag();
-            for (TierSpec tier: tiers) list.add(tier.save());
-            tag.put("Tiers", list);
-        }
+        ListTag list = new ListTag();
+        for (TierSpec tier: tiers) list.add(tier.save());
+        tag.put("Tiers", list);
 
         NeoBlockMod.LOGGER.debug("WorldData saved as {}", tag);
         return tag;
@@ -176,7 +176,7 @@ public class WorldData extends MinecraftAPI.AbstractWorldData {
     private final ServerLevel level;
 
     private WorldStatus status;
-    private final HashSet<TierSpec> tiers = new HashSet<>();
+    private final List<TierSpec> tiers = new ArrayList<>();
 
     private WorldData(ServerLevel level) {
         instance = this;
@@ -206,12 +206,12 @@ public class WorldData extends MinecraftAPI.AbstractWorldData {
         return instance.getTier(id);
     }
 
-    public HashSet<TierSpec> getTiers() {
+    public List<TierSpec> getTiers() {
         return tiers;
     }
-    public static HashSet<TierSpec> getWorldTiers() {
-        if (instance == null)  return new HashSet<>();
-        return instance.tiers;
+    public static List<TierSpec> getWorldTiers() {
+        if (instance == null) return List.of();
+        return Collections.unmodifiableList(instance.tiers);
     }
     public static int totalWeight() {
         return instance.tiers.stream().filter(TierSpec::isEnabled).mapToInt(TierSpec::getWeight).sum();

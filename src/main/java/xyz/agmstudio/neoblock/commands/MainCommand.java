@@ -18,9 +18,9 @@ public class MainCommand extends NeoCommand {
     @Override public int execute(CommandContext<CommandSourceStack> context) throws CommandExtermination {
         MutableComponent tiers = Component.literal("");
         for (TierSpec tier: WorldData.getWorldTiers()) {
-            if (!tier.isResearched()) continue;
             MutableComponent name = Component.literal(tier.getName());
-            if (tier.isEnabled()) name.setStyle(Style.EMPTY.withColor(ChatFormatting.GREEN));
+            if (!tier.isResearched()) name.setStyle(Style.EMPTY.withColor(ChatFormatting.GRAY));
+            else if (tier.isEnabled()) name.setStyle(Style.EMPTY.withColor(ChatFormatting.GREEN));
             else name.setStyle(Style.EMPTY.withColor(ChatFormatting.RED));
             tiers.append("\n    - ").append(name);
         }

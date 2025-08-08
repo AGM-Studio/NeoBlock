@@ -25,7 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class BlockManager {
     public static final NeoBlockSpec DEFAULT_SPEC = new NeoBlockSpec(Blocks.GRASS_BLOCK);
     public static final NeoBlockSpec BEDROCK_SPEC = new NeoBlockSpec(Blocks.BEDROCK);
-    public static final double AABB_RANGE = 1.02;
+    public static final double AABB_RANGE = 1.0;
 
     public static BlockPos getBlockPos() {
         return WorldData.getWorldStatus().getBlockPos();
@@ -79,5 +79,11 @@ public class BlockManager {
 
     public static BlockState getCurrentBlock(ServerLevel level) {
         return level.getBlockState(getBlockPos());
+    }
+
+    public static void cleanBlock(ServerLevel level, BlockPos pos) {
+        BlockState block = BlockManager.getCurrentBlock(level);
+        if (block.getBlock().equals(Blocks.BEDROCK))
+            BlockManager.DEFAULT_SPEC.placeAt(level, pos);
     }
 }

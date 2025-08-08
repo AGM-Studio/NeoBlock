@@ -101,6 +101,7 @@ public final class NeoListener {
         new EnableTierCommand();
         new CommandTierCommand();
 
+        new ForceStopCommand();
         new ForceBlockCommand();
         new ForceResetTiersCommand();
         new ForceTraderSpawnCommand();

@@ -11,6 +11,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static xyz.agmstudio.neoblock.compatibility.jei.NeoJEIPlugin.GRAY_COLOR;
+import static xyz.agmstudio.neoblock.compatibility.jei.NeoJEIPlugin.RED_COLOR;
 
 public class TierDisplay {
     private final TierSpec tier;
@@ -54,10 +55,15 @@ public class TierDisplay {
         final AtomicInteger y = new AtomicInteger(2);
 
         NeoJEIPlugin.addBox(boxes,
-                "jei.neoblock.tier", 2, y.getAndAdd(12), tier.isEnabled(),
+                "jei.neoblock.tier", 2, y.getAndAdd(12),
+                tier.isEnabled() && WorldData.getWorldStatus().isActive(),
                 tier.getID(), getTierName()
         );
-        if (!tier.isResearched()) {
+        if (!WorldData.getWorldStatus().isActive()) {
+            NeoJEIPlugin.addBox(boxes,
+                    "jei.neoblock.dormant", 2, y.getAndAdd(12), RED_COLOR
+            );
+        } else if (!tier.isResearched()) {
             NeoJEIPlugin.addBox(boxes,
                     "jei.neoblock.unlock_time", 2, y.getAndAdd(12), GRAY_COLOR,
                     StringUtil.formatTicks(tier.getResearch().getTime())

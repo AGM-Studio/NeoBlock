@@ -7,8 +7,6 @@ import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.state.BlockState;
 import xyz.agmstudio.neoblock.compatibility.minecraft.MinecraftAPI;
 import xyz.agmstudio.neoblock.data.NBTData;
 import xyz.agmstudio.neoblock.data.NBTSaveable;
@@ -136,9 +134,7 @@ public class WorldStatus implements NBTSaveable {
     }
 
     public void setBlockPos(BlockPos pos, ServerLevel level) {
-        BlockState block = BlockManager.getCurrentBlock(level);
-        if (block.getBlock().equals(Blocks.BEDROCK))
-            BlockManager.DEFAULT_SPEC.placeAt(level, this.pos);
+        BlockManager.cleanBlock(level, this.pos);
 
         this.pos = pos;
         data.setDirty();
