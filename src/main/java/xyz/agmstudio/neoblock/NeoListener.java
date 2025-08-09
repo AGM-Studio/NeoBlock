@@ -1,10 +1,7 @@
 package xyz.agmstudio.neoblock;
 
-import net.minecraft.ChatFormatting;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.npc.WanderingTrader;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -14,8 +11,6 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
-import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import org.jetbrains.annotations.NotNull;
@@ -24,13 +19,11 @@ import xyz.agmstudio.neoblock.commands.*;
 import xyz.agmstudio.neoblock.commands.util.NeoCommand;
 import xyz.agmstudio.neoblock.compatibility.minecraft.MessengerAPI;
 import xyz.agmstudio.neoblock.neo.block.BlockManager;
-import xyz.agmstudio.neoblock.neo.loot.NeoMobSpec;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoMerchant;
 import xyz.agmstudio.neoblock.neo.tiers.TierManager;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
 
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -110,37 +103,5 @@ public final class NeoListener {
         new SchematicLoadCommand();
 
         NeoCommand.registerAll(event.getDispatcher());
-    }
-
-    @SubscribeEvent
-    public static void onItemTooltip(ItemTooltipEvent event) {
-        Optional<EntityType<?>> mob = NeoMobSpec.getMobTradeEntity(event.getItemStack());
-        if (mob.isEmpty()) return;
-        event.getToolTip().add(
-                Component.translatable("tooltip.neoblock.spawn_lore", mob.get().getDescription())
-                        .withStyle(ChatFormatting.ITALIC, ChatFormatting.GRAY)
-        );
-    }
-
-    @SubscribeEvent
-    public static void onItemUse_RCI(PlayerInteractEvent.RightClickItem event) {
-        ServerLevel level = getServerConditioned(event.getLevel(), false, false);
-        if (level == null) return;
-
-        if (NeoMobSpec.handlePossibleMobTrade(event.getItemStack(), level)) event.setCanceled(true);
-    }
-    @SubscribeEvent
-    public static void onItemUse_RCB(PlayerInteractEvent.RightClickBlock event) {
-        ServerLevel level = getServerConditioned(event.getLevel(), false, false);
-        if (level == null) return;
-
-        if (NeoMobSpec.handlePossibleMobTrade(event.getItemStack(), level)) event.setCanceled(true);
-    }
-    @SubscribeEvent
-    public static void onItemUse_EI(PlayerInteractEvent.EntityInteract event) {
-        ServerLevel level = getServerConditioned(event.getLevel(), false, false);
-        if (level == null) return;
-
-        if (NeoMobSpec.handlePossibleMobTrade(event.getItemStack(), level)) event.setCanceled(true);
     }
 }

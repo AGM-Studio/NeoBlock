@@ -6,6 +6,9 @@
 
   "block.neoblock.neoblock": "NeoBlock Generation",
 
+  "item.neoblock.mob_ticket": "Mob trade ticket",
+  "item.neoblock.mob_ticket.of": "%s trade ticket",
+
   "jei.neoblock.title": "NeoBlock Generation",
   "jei.neoblock.tier": "Tier %s: %s",
   "jei.neoblock.dormant": "Mod is not active in this world!",
@@ -17,7 +20,7 @@
   "jei.neoblock.requirement.command": "Has special requirement by modpack.",
   "jei.neoblock.requirement.command.me": "✅ Special requirement met.",
 
-  "tooltip.neoblock.spawn_lore": "Using this will ask the trader to bring a %s next time they visit.\nThis doesn't spawn any mob on use.",
+  "tooltip.neoblock.spawn_lore": "Using this will ask the trader to bring a %s next time they visit.",
   "tooltip.neoblock.tier_chance": "Tier chance: %f%%",
   "tooltip.neoblock.total_chance": "Total chance: %f%%",
 

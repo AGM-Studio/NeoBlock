@@ -13,6 +13,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import xyz.agmstudio.neoblock.animations.Animation;
+import xyz.agmstudio.neoblock.neo.loot.NeoMobSpec;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
 import xyz.agmstudio.neoblock.util.ResourceUtil;
 
@@ -64,6 +65,9 @@ public final class NeoBlockMod {
         NeoBlockMod.config = ResourceUtil.getConfig(folder, "config.toml");
 
         bus.addListener(this::setup);
+
+        // Make sure it's registered!
+        NeoMobSpec.load();
 
         BLOCKS.register(bus);
         ITEMS.register(bus);

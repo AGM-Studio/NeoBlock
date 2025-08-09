@@ -1,20 +1,30 @@
 package xyz.agmstudio.neoblock.neo.loot;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.valueproviders.UniformInt;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.registries.DeferredItem;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.compatibility.minecraft.ItemAPI;
 import xyz.agmstudio.neoblock.compatibility.minecraft.MessengerAPI;
-import xyz.agmstudio.neoblock.neo.world.WorldData;
 import xyz.agmstudio.neoblock.compatibility.minecraft.MinecraftAPI;
+import xyz.agmstudio.neoblock.neo.world.WorldData;
 import xyz.agmstudio.neoblock.util.StringUtil;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -22,8 +32,9 @@ import java.util.regex.Pattern;
 public class NeoMobSpec extends NeoItemSpec {
     private static final Pattern MOB_PATTERN = Pattern.compile("mob:(?<count>\\d+(-\\d+)?)?x?(?<id>[\\w:]+)(?:\\s+(?<chance>\\d+\\.?\\d*)%?)?");
     @NotNull private static final ResourceLocation DEFAULT = MinecraftAPI.parseResourceLocation("minecraft:pig");
-    @NotNull private static final EntityType<?> DEFAULT_MOB = MinecraftAPI.getEntityType(DEFAULT).get();
-    @NotNull private static final Item DEFAULT_EGG = MinecraftAPI.getItem("minecraft:egg").get();
+    public static final DeferredItem<TradeTicket> TICKET = NeoBlockMod.ITEMS.register("mob_ticket", () -> new TradeTicket(new Item.Properties().stacksTo(16)));
+
+    public static void load() {}
 
     private final EntityType<?> mob;
 
@@ -31,6 +42,7 @@ public class NeoMobSpec extends NeoItemSpec {
         super(egg, range, chance);
         this.mob = mob;
     }
+
 
     public EntityType<?> getMob() {
         return mob;
@@ -40,7 +52,6 @@ public class NeoMobSpec extends NeoItemSpec {
         CompoundTag tag = ItemAPI.getItemTag(item);
 
         @Nullable ResourceLocation location = MinecraftAPI.getEntityTypeResource(mob).orElse(null);
-        tag.putBoolean("isNeoMob", true);
         tag.putString("neoMobType", location != null ? location.toString() : DEFAULT.toString());
 
         ItemAPI.setItemTag(item, tag);
@@ -65,18 +76,16 @@ public class NeoMobSpec extends NeoItemSpec {
         EntityType<?> entityType = EntityType.byString(id).orElse(null);
         if (entityType == null) return Optional.empty();
 
-        Item spawnEgg = MinecraftAPI.getItem(id + "_spawn_egg").orElse(DEFAULT_EGG);
         UniformInt range = StringUtil.parseRange(matcher.group("count"));
         double chance = StringUtil.parseChance(matcher.group("chance"));
 
-        return Optional.of(new NeoMobSpec(entityType, range, chance, spawnEgg));
+        return Optional.of(new NeoMobSpec(entityType, range, chance, TICKET.get()));
     }
 
     public static Optional<EntityType<?>> getMobTradeEntity(ItemStack item) {
-        if (item == null) return Optional.empty();
+        if (item == null || !item.getItem().equals(TICKET.get())) return Optional.empty();
 
         CompoundTag tag = ItemAPI.getItemTag(item);
-        if (!tag.getBoolean("isNeoMob")) return Optional.empty();
         return MinecraftAPI.getEntityType(tag.getString("neoMobType"));
     }
 
@@ -89,5 +98,37 @@ public class NeoMobSpec extends NeoItemSpec {
         item.setCount(0);
 
         return true;
+    }
+
+    public static class TradeTicket extends Item {
+
+        public TradeTicket(Properties properties) {
+            super(properties);
+        }
+
+        @Override public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level level, Player player, @NotNull InteractionHand hand) {
+            ItemStack stack = player.getItemInHand(hand);
+            if (level instanceof ServerLevel server)
+                handlePossibleMobTrade(stack, server);
+
+            return InteractionResultHolder.success(stack);
+        }
+
+        @Override public @NotNull Component getName(@NotNull ItemStack stack) {
+            Optional<EntityType<?>> mob = getMobTradeEntity(stack);
+            return mob.map(
+                    t -> Component.translatable("item.neoblock.mob_ticket.of", t.getDescription())).orElseGet(
+                            () -> Component.translatable("item.neoblock.mob_ticket")
+            );
+        }
+
+        @Override public void appendHoverText(@NotNull ItemStack stack, @NotNull TooltipContext context, @NotNull List<Component> components, @NotNull TooltipFlag flag) {
+            Optional<EntityType<?>> mob = getMobTradeEntity(stack);
+            if (mob.isEmpty()) return;
+            components.add(
+                    Component.translatable("tooltip.neoblock.spawn_lore", mob.get().getDescription())
+                            .withStyle(ChatFormatting.ITALIC, ChatFormatting.GRAY)
+            );
+        }
     }
 }
