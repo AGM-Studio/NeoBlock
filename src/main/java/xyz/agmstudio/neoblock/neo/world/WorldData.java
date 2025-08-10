@@ -8,7 +8,6 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.level.LevelAccessor;
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.animations.Animation;
