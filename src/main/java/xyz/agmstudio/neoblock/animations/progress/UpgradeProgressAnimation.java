@@ -1,7 +1,6 @@
 package xyz.agmstudio.neoblock.animations.progress;
 
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.LevelAccessor;
 import xyz.agmstudio.neoblock.animations.Animation;
 import xyz.agmstudio.neoblock.neo.tiers.TierManager;
 import xyz.agmstudio.neoblock.util.ConfigUtil;
@@ -24,11 +23,10 @@ public abstract class UpgradeProgressAnimation extends Animation {
     /**
      * Will tick while upgrading is active. The default will call animate on interval tick.
      *
-     * @param level  the level to play animation
-     * @param access the world access if needed
-     * @param tick   the tick upgrade is in
+     * @param level the level to play animation
+     * @param tick  the tick upgrade is in
      */
-    public void upgradeTick(ServerLevel level, LevelAccessor access, long tick) {
-        if (tick % interval == 0) animate(level, access);
+    public void upgradeTick(ServerLevel level, long tick) {
+        if (tick % interval == 0) animate(level);
     }
 }

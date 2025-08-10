@@ -3,7 +3,6 @@ package xyz.agmstudio.neoblock.neo.tiers;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.LevelAccessor;
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.animations.Animation;
@@ -68,7 +67,7 @@ public class TierManager {
         NeoBlockMod.LOGGER.debug("Tier {} loaded. Hash key: {}", spec.id, spec.getHashCode());
     }
 
-    public static void tick(ServerLevel level, LevelAccessor access) {
+    public static void tick(ServerLevel level) {
         if (researches.isEmpty()) return;
         TierResearch research = researches.get(0);
         if (research.tick++ == 0) {
@@ -78,7 +77,7 @@ public class TierManager {
 
             if (TierManager.progressbar != null) level.players().forEach(TierManager.progressbar::addPlayer);
             for (UpgradePhaseAnimation animation : TierManager.phaseAnimations)
-                if (animation.isActiveOnUpgradeStart()) animation.animate(level, access);
+                if (animation.isActiveOnUpgradeStart()) animation.animate(level);
         }
         if (research.isTimeDone()) {
             research.done = true;
@@ -88,14 +87,14 @@ public class TierManager {
             if (researches.isEmpty()) {
                 if (TierManager.progressbar != null) TierManager.progressbar.removeAllPlayers();
                 for (UpgradePhaseAnimation animation : TierManager.phaseAnimations)
-                    if (animation.isActiveOnUpgradeFinish()) animation.animate(level, access);
+                    if (animation.isActiveOnUpgradeFinish()) animation.animate(level);
 
-                BlockManager.getRandomBlock().placeAt(access, BlockManager.getBlockPos());
+                BlockManager.getRandomBlock().placeAt(level, BlockManager.getBlockPos());
             }
         } else {
             if (TierManager.progressbar != null) TierManager.progressbar.update(research.tick, research.time);
             for (UpgradeProgressAnimation animation : TierManager.progressAnimations)
-                animation.upgradeTick(level, access, research.tick);
+                animation.upgradeTick(level, research.tick);
         }
 
         WorldData.getInstance().setDirty();

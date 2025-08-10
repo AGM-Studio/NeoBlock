@@ -2,7 +2,6 @@ package xyz.agmstudio.neoblock.animations.idle;
 
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.phys.Vec3;
 import xyz.agmstudio.neoblock.util.ConfigUtil;
 
@@ -25,12 +24,12 @@ public class PulseAnimation extends IdleAnimation {
         tick = 0;
     }
 
-    @Override public void tick(ServerLevel level, LevelAccessor access) {
+    @Override public void tick(ServerLevel level) {
         if (tick++ % interval != 0 || tick < delay) return;
-        animate(level, access);
+        animate(level);
     }
 
-    @Override public void animate(ServerLevel level, LevelAccessor access) {
+    @Override public void animate(ServerLevel level) {
         for (HashSet<Vec3> edge: getEdges()) {
             Iterator<Vec3> iter = edge.iterator();
             Vec3 from = iter.next();

@@ -110,6 +110,6 @@ mobs-4 = [
 mobs-5 = [
     "mob:1xminecraft:armadillo; 16-32xminecraft:gold_ingot; 16-32xminecraft:spider_eye; 2",
     "mob:1xminecraft:axolotl; 16-32xminecraft:gold_ingot; 32-64xminecraft:tropical_fish; 2",
-    "mob:1xminecraft:alley; 16-32xminecraft:gold_ingot; 32-64xminecraft:amethyst_shard; 2",
+    "mob:1xminecraft:allay; 16-32xminecraft:gold_ingot; 32-64xminecraft:amethyst_shard; 2",
     "mob:1xminecraft:bee; 16-32xminecraft:gold_ingot; 32-64xminecraft:poppy; 2"
 ]

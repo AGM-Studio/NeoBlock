@@ -223,7 +223,7 @@ public class WorldData extends MinecraftAPI.AbstractWorldData {
         if (force && tier.canBeResearched()) tier.startResearch();
     }
 
-    public static void tick(ServerLevel level, LevelAccessor access) {
-        if (instance != null) TierManager.tick(level, access);
+    public static void tick(ServerLevel level) {
+        if (instance != null) TierManager.tick(level);
     }
 }

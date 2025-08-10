@@ -27,7 +27,7 @@ import java.util.HashSet;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 @EventBusSubscriber(modid = NeoBlockMod.MOD_ID)
 public final class NeoListener {
@@ -37,9 +37,9 @@ public final class NeoListener {
         executor.submit(callable);
     }
 
-    private static final HashSet<BiConsumer<ServerLevel, LevelAccessor>> tickers = new HashSet<>();
+    private static final HashSet<Consumer<ServerLevel>> tickers = new HashSet<>();
 
-    public static void registerTicker(BiConsumer<ServerLevel, LevelAccessor> ticker) {
+    public static void registerTicker(Consumer<ServerLevel> ticker) {
         tickers.add(ticker);
     }
 
@@ -63,13 +63,11 @@ public final class NeoListener {
         ServerLevel level = getServerConditioned(event.getLevel(), true, true);
         if (level == null) return;
 
-        final LevelAccessor access = event.getLevel();
-        final BlockState block = access.getBlockState(BlockManager.getBlockPos());
+        tickers.forEach(ticker -> ticker.accept(level));
 
-        tickers.forEach(ticker -> ticker.accept(level, access));
-
+        final BlockState block = level.getBlockState(BlockManager.getBlockPos());
         if (WorldData.getWorldStatus().isUpdated() || TierManager.hasResearch()) {
-            if (block.getBlock() != Blocks.BEDROCK) BlockManager.BEDROCK_SPEC.placeAt(access, BlockManager.getBlockPos());
+            if (block.getBlock() != Blocks.BEDROCK) BlockManager.BEDROCK_SPEC.placeAt(level, BlockManager.getBlockPos());
         } else if (block.isAir() || block.canBeReplaced())          // NeoBlock has been broken logic
             BlockManager.updateBlock(level, true);
     }

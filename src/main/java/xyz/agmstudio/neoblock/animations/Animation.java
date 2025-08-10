@@ -1,7 +1,6 @@
 package xyz.agmstudio.neoblock.animations;
 
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.LevelAccessor;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.animations.idle.IdleAnimation;
 import xyz.agmstudio.neoblock.animations.idle.NeoFlowAnimation;
@@ -40,8 +39,8 @@ public abstract class Animation implements ConfigUtil.CategorizedConfig {
         new PulseAnimation().register();
     }
 
-    public static void tickAll(ServerLevel level, LevelAccessor access) {
-        animations.forEach(animation -> animation.tick(level, access));
+    public static void tickAll(ServerLevel level) {
+        animations.forEach(animation -> animation.tick(level));
     }
     public static void resetIdleTick() {
         for (Animation animation : animations)
@@ -96,17 +95,15 @@ public abstract class Animation implements ConfigUtil.CategorizedConfig {
      * Will always tick...
      *
      * @param level the level to play animation
-     * @param access the world access if needed
      */
-    public void tick(ServerLevel level, LevelAccessor access) {}
+    public void tick(ServerLevel level) {}
 
     /**
      * Should animate the animation!
      *
      * @param level the level to play animation
-     * @param access the world access if needed
      */
-    public void animate(ServerLevel level, LevelAccessor access) {}
+    public void animate(ServerLevel level) {}
 
     @Override public String toString() {
         StringBuilder sb = new StringBuilder();

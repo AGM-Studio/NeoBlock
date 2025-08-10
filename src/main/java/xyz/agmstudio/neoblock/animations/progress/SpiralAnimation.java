@@ -2,7 +2,6 @@ package xyz.agmstudio.neoblock.animations.progress;
 
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.phys.Vec3;
 import xyz.agmstudio.neoblock.neo.block.BlockManager;
 import xyz.agmstudio.neoblock.util.ConfigUtil;
@@ -23,11 +22,11 @@ public class SpiralAnimation extends UpgradeProgressAnimation {
         super("spiral");
     }
 
-    @Override public void animate(ServerLevel level, LevelAccessor access) {
+    @Override public void animate(ServerLevel level) {
         animations.add(0);
     }
 
-    @Override public void tick(ServerLevel level, LevelAccessor access) {
+    @Override public void tick(ServerLevel level) {
         Iterator<Integer> iterator = new ArrayList<>(animations).iterator();
         animations.clear();
 

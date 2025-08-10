@@ -4,7 +4,6 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.level.LevelAccessor;
 import xyz.agmstudio.neoblock.neo.block.BlockManager;
 import xyz.agmstudio.neoblock.util.ConfigUtil;
 
@@ -31,7 +30,7 @@ public class ExplosionAnimation extends UpgradePhaseAnimation {
         this.enabled = activeOnUpgradeStart || activeOnUpgradeFinish;
     }
 
-    @Override public void animate(ServerLevel level, LevelAccessor access) {
+    @Override public void animate(ServerLevel level) {
         level.sendParticles(ParticleTypes.EXPLOSION_EMITTER,
                 BlockManager.getBlockPos().getX() + 0.5,
                 BlockManager.getBlockPos().getY() + 0.5,

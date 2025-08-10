@@ -3,7 +3,6 @@ package xyz.agmstudio.neoblock.animations.idle;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
 import xyz.agmstudio.neoblock.util.ConfigUtil;
@@ -35,11 +34,11 @@ public class NeoFlowAnimation extends IdleAnimation {
         tick = 0;
     }
 
-    @Override public void tick(ServerLevel level, LevelAccessor access) {
-        if (tick++ > delay) animate(level, access);
+    @Override public void tick(ServerLevel level) {
+        if (tick++ > delay) animate(level);
     }
 
-    @Override public void animate(ServerLevel level, LevelAccessor access) {
+    @Override public void animate(ServerLevel level) {
         if (particles.isEmpty()) for (int i = 0; i < count; i++)
             particles.add(AnimationParticle.fromRandom(level.getRandom()));
 
