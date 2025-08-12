@@ -1,6 +1,6 @@
 package xyz.agmstudio.neoblock.platform;
 
-import xyz.agmstudio.neoblock.platform.services.IPlatformHelper;
+import xyz.agmstudio.neoblock.platform.helpers.IPlatformHelper;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.loading.FMLLoader;
 

@@ -1,7 +1,8 @@
-package xyz.agmstudio.neoblock.platform.services;
+package xyz.agmstudio.neoblock.platform.helpers;
+
+import java.nio.file.Path;
 
 public interface IPlatformHelper {
-
     /**
      * Gets the name of the current platform
      *
@@ -30,7 +31,8 @@ public interface IPlatformHelper {
      * @return The name of the environment type.
      */
     default String getEnvironmentName() {
-
         return isDevelopmentEnvironment() ? "development" : "production";
     }
+
+    Path getConfigFolder();
 }
