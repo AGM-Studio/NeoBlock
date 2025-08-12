@@ -1,0 +1,115 @@
+oak-saplings = [
+    "1xminecraft:oak_sapling; 10-15xminecraft:dirt; 3",
+    "1xminecraft:oak_sapling; 10-15xminecraft:moss_block; 3"
+]
+saplings-1 = [
+    "trade:oak-saplings",       # Will pull one of the 2 recipes!
+    "1xminecraft:spruce_sapling; 10-20xminecraft:oak_log; 48-64xminecraft:dirt; 4-8",
+    "1xminecraft:birch_sapling; 5-10xminecraft:oak_log; 16-48xminecraft:dirt; 4-8",
+    "1xminecraft:jungle_sapling; 10-20xminecraft:oak_log; 48-64xminecraft:dirt; 4-8",
+    "1xminecraft:dark_oak_sapling; 24-48xminecraft:oak_log; 56-64xminecraft:cobblestone; 4-8",
+    "1xminecraft:cherry_sapling; 24-48xminecraft:oak_log; 24-48xminecraft:iron_ingot; 4-8",
+    "1xminecraft:acacia_sapling; 10-20xminecraft:oak_log; 48-64xminecraft:dirt; 4-8",
+    "1xminecraft:mangrove_propagule; 24-48xminecraft:oak_log; 56-64xminecraft:cobblestone; 4-8"
+]
+saplings-2 = [
+    "1xminecraft:azalea; 8-16xminecraft:gold_ingot; 8-12",
+    "1xminecraft:flowering_azalea; 8-16xminecraft:gold_ingot; 8-12"
+]
+
+corals = [
+    "1xminecraft:tube_coral; 4-8xminecraft:gold_ingot; 8-12",
+    "1xminecraft:fire_coral; 4-8xminecraft:gold_ingot; 8-12",
+    "1xminecraft:horn_coral; 4-8xminecraft:gold_ingot; 8-12",
+    "1xminecraft:brain_coral; 4-8xminecraft:gold_ingot; 8-12",
+    "1xminecraft:bubble_coral; 4-8xminecraft:gold_ingot; 8-12",
+    "1xminecraft:tube_coral_fan; 4-8xminecraft:gold_ingot; 8-12",
+    "1xminecraft:fire_coral_fan; 4-8xminecraft:gold_ingot; 8-12",
+    "1xminecraft:horn_coral_fan; 4-8xminecraft:gold_ingot; 8-12",
+    "1xminecraft:brain_coral_fan; 4-8xminecraft:gold_ingot; 8-12",
+    "1xminecraft:bubble_coral_fan; 4-8xminecraft:gold_ingot; 8-12"
+]
+
+
+blocks-1 = [
+    "6xminecraft:gravel; 8xminecraft:cobblestone; 8-12",
+    "5xminecraft:sand; 8xminecraft:cobblestone; 8-12",
+    "4xminecraft:red_sand; 8xminecraft:cobblestone; 8-12"
+]
+blocks-2 = [
+    "3-6xminecraft:warped_nylium; 8-16xminecraft:netherrack; 12-24",
+    "3-6xminecraft:crimson_nylium; 8-16xminecraft:netherrack; 12-24",
+    "8xminecraft:gilded_blackstone; 8xminecraft:gold_block; 16xminecraft:blackstone; 3"
+]
+blocks-3 = [
+    "1xminecraft:deepslate_emerald_ore; 64xminecraft:emerald_block; 1",
+    "1xminecraft:diamond_ore; 4-8xminecraft:diamond; 1",
+    "1xminecraft:budding_amethyst; 16-64xminecraft:diamond; 1",
+    "1xminecraft:small_amethyst_bud; 4-6xminecraft:amethyst_shard; 8-12",
+    "1xminecraft:medium_amethyst_bud; 8-12xminecraft:amethyst_shard; 8-12",
+    "1xminecraft:large_amethyst_bud; 16-24xminecraft:amethyst_shard; 8-12",
+    "1xminecraft:amethyst_cluster; 32-48xminecraft:amethyst_shard; 8-12"
+]
+blocks-4 = [
+    "trade:corals",
+    "1xminecraft:glow_lichen; 4-8xminecraft:gold_ingot; 8-12",
+    "1xminecraft:bee_nest; 20-32xminecraft:gold_ingot; 8-12",
+    "1xminecraft:sculk_catalyst; 20-32xminecraft:diamond; 8-12"
+]
+
+farm-1 = [
+    "1-3xminecraft:carrot; 4-12xminecraft:apple; 3-6",
+    "1-3xminecraft:potato; 4-12xminecraft:apple; 3-6",
+    "1-3xminecraft:beetroot_seeds; 4-12xminecraft:apple; 3-6",
+    "1-3xminecraft:wheat_seeds; 4-12xminecraft:apple; 3-6",
+    "1-3xminecraft:kelp; 4-12xminecraft:grass; 3-6"
+]
+farm-2 = [
+    "1-3xminecraft:pumpkin_seeds; 20-40xminecraft:apple; 3-6",
+    "1-3xminecraft:melon_seeds; 20-40xminecraft:apple; 3-6",
+    "1-3xminecraft:lily_pad; 20-40xminecraft:grass; 3-6"
+]
+farm-3 = [
+    "2xminecraft:glow_berries; 16-24xminecraft:moss_block; 8-12",
+    "2xminecraft:sweet_berries; 8-12xminecraft:moss_block; 8-12",
+    "1xminecraft:pointed_dripstone; 24-64xminecraft:cobblestone; 6-12",
+    "1xminecraft:bamboo; 36-64xminecraft:oak_sapling; 1-3",
+    "1xminecraft:brown_mushroom; 12-32xminecraft:iron_ingot; 1-3",
+    "1xminecraft:red_mushroom; 12-32xminecraft:iron_ingot; 1-3"
+]
+farm-4 = [
+    "1-2xminecraft:warped_fungus; 1-2xminecraft:warped_nylium; 10-20xminecraft:oak_sapling; 4-8",
+    "1-2xminecraft:crimson_fungus; 1-2xminecraft:crimson_nylium; 10-20xminecraft:oak_sapling; 4-8",
+    "1-2xminecraft:nether_wart; 8-12xminecraft:gold_ingot; 4-20xminecraft:soul_sand; 1-3",
+    "1xminecraft:twisting_vines; 8-12xminecraft:gold_ingot; 4-20xminecraft:netherrack; 3",
+    "1xminecraft:weeping_vines; 8-12xminecraft:gold_ingot; 4-20xminecraft:netherrack; 3"
+]
+
+mobs-1 = [
+    "mob:1xminecraft:pig; 16-32xminecraft:iron_ingot; 20-30xminecraft:potato; 1-3",
+    "mob:1xminecraft:chicken; 40-60xminecraft:iron_ingot; 20-30xminecraft:wheat_seeds; 1-3",
+    "mob:1xminecraft:cow; 16-32xminecraft:iron_ingot; 10-15xminecraft:wheat; 1-3",
+    "mob:1xminecraft:sheep; 24-36xminecraft:iron_ingot; 10-15xminecraft:wheat; 1-3"
+]
+mobs-2 = [
+    "mob:1xminecraft:horse; 16-32xminecraft:iron_ingot; 5-15xminecraft:golden_carrot; 2",
+    "mob:1xminecraft:donkey; 16-32xminecraft:iron_ingot; 5-15xminecraft:golden_carrot; 2",
+    "mob:1xminecraft:llama; 16-32xminecraft:iron_ingot; 5-15xminecraft:golden_carrot; 2"
+]
+mobs-3 = [
+    "mob:1xminecraft:goat; 16-32xminecraft:gold_ingot; 10-30xminecraft:golden_carrot; 2",
+    "mob:1xminecraft:panda; 16-32xminecraft:gold_ingot; 64xminecraft:bamboo; 2",
+    "mob:1xminecraft:frog; 16-32xminecraft:gold_ingot; 16-32xminecraft:slime_ball; 2"
+]
+mobs-4 = [
+    "mob:1xminecraft:fox; 16-32xminecraft:gold_ingot; 10-30xminecraft:sweet_berries; 2",
+    "mob:1xminecraft:wolf; 16-32xminecraft:gold_ingot; 10-30xminecraft:bone; 2",
+    "mob:1xminecraft:polar_bear; 16-32xminecraft:gold_ingot; 16-32xminecraft:cod; 2",
+    "mob:1xminecraft:rabbit; 16-32xminecraft:gold_ingot; 16-32xminecraft:carrot; 2"
+]
+mobs-5 = [
+    "mob:1xminecraft:armadillo; 16-32xminecraft:gold_ingot; 16-32xminecraft:spider_eye; 2",
+    "mob:1xminecraft:axolotl; 16-32xminecraft:gold_ingot; 32-64xminecraft:tropical_fish; 2",
+    "mob:1xminecraft:allay; 16-32xminecraft:gold_ingot; 32-64xminecraft:amethyst_shard; 2",
+    "mob:1xminecraft:bee; 16-32xminecraft:gold_ingot; 32-64xminecraft:poppy; 2"
+]
