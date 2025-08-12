@@ -1,17 +1,11 @@
 # eclipse
 bin
 *.launch
-.settings
-.metadata
-.classpath
-.project
+.*
+!.github
 
 # idea
-out
-*.ipr
-*.iws
-*.iml
-.idea
+.idea/*
 
 # gradle
 build
