@@ -97,7 +97,9 @@ processResources {
         'java_version'                 : java_version
     ]
 
-    def mergedExpandProps = baseExpandProps + moduleExpandProps
+    def props = new Properties()
+    file("${project.projectDir}/gradle.properties").withInputStream { props.load(it) }
+    def mergedExpandProps = baseExpandProps + (props.collectEntries { k, v -> [(k): v.toString()] })
 
     def jsonExpandProps = mergedExpandProps.collectEntries { k, v ->
         [(k): v instanceof String ? v.replace("\n", "\\\\n") : v]
