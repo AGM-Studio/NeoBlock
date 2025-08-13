@@ -38,10 +38,7 @@ public class ConfigUtil {
         } catch (Exception ignored) {}
         if (!Files.exists(configPath)) return null;
 
-        IConfig config = IConfigHelper.getIConfig(configPath);
-
-        config.load();
-        return config;
+        return IConfigHelper.getIConfig(configPath);
     }
 
     public interface CategorizedConfig {

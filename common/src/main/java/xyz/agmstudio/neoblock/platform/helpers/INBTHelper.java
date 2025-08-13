@@ -4,8 +4,10 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.platform.Services;
 
 import java.io.File;
@@ -47,6 +49,21 @@ public interface INBTHelper {
             Services.NBT.loadBlockEntity(be, tag, level);
         }
     }
+    final class Item {
+        public static CompoundTag getItemTag(@NotNull ItemStack item) {
+            return Services.NBT.getItemTag(item);
+        }
+        public static void setItemTag(@NotNull ItemStack item, @NotNull CompoundTag tag) {
+            Services.NBT.setItemTag(item, tag);
+        }
+    }
+
+    void writeCompressed(CompoundTag nbt, OutputStream os) throws IOException;
+    CompoundTag readCompressed(File file) throws IOException;
+    CompoundTag readCompressed(InputStream is) throws IOException;
+
+    CompoundTag getItemTag(@NotNull ItemStack item);
+    void setItemTag(@NotNull ItemStack item, @NotNull CompoundTag tag);
 
     Tag writeBlockPos(BlockPos pos);
     BlockPos readBlockPos(CompoundTag tag, String key, BlockPos def);
@@ -56,8 +73,4 @@ public interface INBTHelper {
 
     CompoundTag getBlockEntity(BlockEntity be, ServerLevel level);
     void loadBlockEntity(BlockEntity be, CompoundTag tag, ServerLevel level);
-
-    void writeCompressed(CompoundTag nbt, OutputStream os) throws IOException;
-    CompoundTag readCompressed(File file) throws IOException;
-    CompoundTag readCompressed(InputStream is) throws IOException;
 }

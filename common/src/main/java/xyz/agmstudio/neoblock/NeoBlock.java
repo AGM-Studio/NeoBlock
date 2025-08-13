@@ -7,6 +7,8 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
+import xyz.agmstudio.neoblock.platform.Services;
+import xyz.agmstudio.neoblock.platform.helpers.IRegistryHelper;
 import xyz.agmstudio.neoblock.platform.implants.IConfig;
 import xyz.agmstudio.neoblock.util.ConfigUtil;
 import xyz.agmstudio.neoblock.util.ResourceUtil;
@@ -24,6 +26,8 @@ public abstract class NeoBlock {
     public static final String MOD_NAME = "NeoBlock";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_NAME);
     public static final Path CONFIG_FOLDER = ResourceUtil.getConfigFolder(NeoBlock.MOD_ID);
+
+    public static final IRegistryHelper REGISTRY = Services.load(IRegistryHelper.class);
 
     private static NeoBlock instance;
     private static IConfig config;

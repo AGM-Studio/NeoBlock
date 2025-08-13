@@ -7,6 +7,8 @@ import net.minecraft.world.level.saveddata.SavedData;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.loading.FMLLoader;
 import net.neoforged.fml.loading.FMLPaths;
+import org.jetbrains.annotations.NotNull;
+import xyz.agmstudio.neoblock.neo.world.WorldData;
 import xyz.agmstudio.neoblock.platform.helpers.IPlatformHelper;
 
 import java.nio.file.Path;
@@ -34,5 +36,14 @@ public class NeoForgePlatformHelper implements IPlatformHelper {
     @Override public <T extends SavedData> T captureSavedData(ServerLevel level, String name, Function<CompoundTag, T> loader, Supplier<T> creator) {
         BiFunction<CompoundTag, HolderLookup.Provider, T> neoLoader = ((tag, provider) -> loader.apply(tag));
         return level.getDataStorage().computeIfAbsent(new SavedData.Factory<>(creator, neoLoader), name);
+    }
+
+    @Override
+    public WorldData instanceWorldData(ServerLevel level) {
+        return new WorldData(level) {
+            @Override public @NotNull CompoundTag save(@NotNull CompoundTag tag, HolderLookup.@NotNull Provider provider) {
+                return saveDataOnTag(tag);
+            }
+        };
     }
 }

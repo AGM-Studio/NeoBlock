@@ -1,11 +1,17 @@
 package xyz.agmstudio.neoblock.util;
 
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.valueproviders.UniformInt;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.trading.MerchantOffer;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
+import xyz.agmstudio.neoblock.neo.loot.NeoItemSpec;
 import xyz.agmstudio.neoblock.platform.Services;
 import xyz.agmstudio.neoblock.platform.helpers.IMinecraftHelper;
 
@@ -77,5 +83,17 @@ public final class MinecraftUtil {
     }
     public static boolean isValidEntityType(EntityType<?> entityType, ResourceLocation location) {
         return getEntityTypeResource(entityType).orElse(null) == location;
+    }
+
+    public static Iterable<Entity> allEntities(ServerLevel level) {
+        return HELPER.iterateEntities(level);
+    }
+
+    public static void leash(Entity mob, Mob to) {
+        HELPER.leash(mob, to);
+    }
+
+    public static Optional<MerchantOffer> getOfferOf(NeoItemSpec result, NeoItemSpec costA, NeoItemSpec costB, UniformInt uses) {
+        return HELPER.getOfferOf(result, costA, costB, uses);
     }
 }

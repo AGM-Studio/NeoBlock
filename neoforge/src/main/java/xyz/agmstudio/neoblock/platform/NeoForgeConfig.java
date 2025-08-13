@@ -1,45 +1,41 @@
 package xyz.agmstudio.neoblock.platform;
 
-import com.electronwill.nightconfig.core.file.CommentedFileConfig;
-import xyz.agmstudio.neoblock.platform.helpers.IConfigHelper;
+import com.electronwill.nightconfig.core.UnmodifiableConfig;
+import com.electronwill.nightconfig.core.file.FileConfig;
 import xyz.agmstudio.neoblock.platform.implants.IConfig;
 
+import java.util.Map;
+
 public class NeoForgeConfig implements IConfig {
-    private final CommentedFileConfig config;
+    private final UnmodifiableConfig config;
 
-    protected NeoForgeConfig(CommentedFileConfig config) {
+    protected NeoForgeConfig(UnmodifiableConfig config) {
         this.config = config;
+
+        if (config instanceof FileConfig c) c.load();
     }
 
-
-    @Override public <T> T get(Path path) {
-        for (String p: path.getPaths()) {
-            T result = get(p);
-            if (IConfigHelper.isINull(result)) continue;
-            return result;
-        }
-
-        return null;
+    @Override public IConfig getSection(String path) {
+        UnmodifiableConfig config = this.config.get(path);
+        return new NeoForgeConfig(config);
     }
 
-    @Override
-    public <T> T get(Path path, T defaultValue) {
-        T result = get(path);
-        return IConfigHelper.isINull(result) ? defaultValue : result;
+    @Override public boolean contains(String path) {
+        return config.contains(path);
     }
 
-    @Override
-    public <T> T get(String path) {
+    @Override public <T> T get(String path) {
         return config.get(path);
     }
-
-    @Override
-    public <T> T get(String path, T defaultValue) {
+    @Override public <T> T get(String path, T defaultValue) {
         return config.getOrElse(path, defaultValue);
     }
 
-    @Override
-    public void load() {
-        config.load();
+    @Override public void load() {
+        if (config instanceof FileConfig c) c.load();
+    }
+
+    @Override public Map<String, Object> valueMap() {
+        return config.valueMap();
     }
 }
