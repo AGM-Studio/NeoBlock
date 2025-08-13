@@ -37,6 +37,14 @@ pluginManagement {
                 includeGroupAndSubgroups('net.minecraftforge')
             }
         }
+        maven {
+            name = "Jared's maven"
+            url = "https://maven.blamejared.com/"
+        }
+        maven {
+            name = "ModMaven"
+            url = "https://modmaven.dev"
+        }
     }
 }
 

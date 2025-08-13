@@ -3,15 +3,10 @@ plugins {
     id 'net.neoforged.moddev'
 }
 
-moduleExpandProps = [
-    'version'                       : version,
-    'minecraft_version'             : minecraft_version,
-    'minecraft_version_range'       : minecraft_version_range,
-    'parchment_minecraft'           : parchment_minecraft,
-    'parchment_version'             : parchment_version,
-    'neoforge_version'              : neoforge_version,
-    'neoforge_loader_version_range' : neoforge_loader_version_range
-]
+dependencies {
+    compileOnly "mezz.jei:jei-${minecraft_version}-neoforge-api:${jei_version}"
+    runtimeOnly "mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}"
+}
 
 neoForge {
     version = neoforge_version

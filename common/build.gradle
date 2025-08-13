@@ -3,17 +3,6 @@ plugins {
     id 'net.neoforged.moddev'
 }
 
-
-// https://parchmentmc.org/docs/getting-started#choose-a-version
-// https://projects.neoforged.net/neoforged/neoform
-moduleExpandProps = [
-    'minecraft_version'         : minecraft_version,
-    'minecraft_version_range'   : minecraft_version_range,
-    'parchment_minecraft'       : parchment_minecraft,
-    'parchment_version'         : parchment_version,
-    'neo_form_version'          : neo_form_version,
-]
-
 neoForge {
     neoFormVersion = neo_form_version
     // Automatically enable AccessTransformers if the file exists
@@ -32,6 +21,8 @@ dependencies {
     // fabric and neoforge both bundle mixinextras, so it is safe to use it in common
     compileOnly group: 'io.github.llamalad7', name: 'mixinextras-common', version: '0.3.5'
     annotationProcessor group: 'io.github.llamalad7', name: 'mixinextras-common', version: '0.3.5'
+    // API of JEI
+    compileOnly "mezz.jei:jei-${minecraft_version}-common-api:${jei_version}"
 }
 
 configurations {
