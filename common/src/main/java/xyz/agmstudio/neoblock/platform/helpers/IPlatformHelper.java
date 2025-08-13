@@ -1,6 +1,12 @@
 package xyz.agmstudio.neoblock.platform.helpers;
 
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.saveddata.SavedData;
+
 import java.nio.file.Path;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 public interface IPlatformHelper {
     /**
@@ -34,5 +40,12 @@ public interface IPlatformHelper {
         return isDevelopmentEnvironment() ? "development" : "production";
     }
 
+    /**
+     * Returns the config folder of the loader
+     *
+     * @return path of the config folder of the loader
+     */
     Path getConfigFolder();
+
+    <T extends SavedData> T captureSavedData(ServerLevel level, String name, Function<CompoundTag, T> loader, Supplier<T> creator);
 }

@@ -1,13 +1,14 @@
 {
   "required": true,
-  "minVersion": "0.8",
-  "package": "xyz.agmstudio.neoblock.mixin",
   "compatibilityLevel": "JAVA_21",
-  "mixins": [],
+  "refmap": "neoblock.refmap.json",
+  "package": "xyz.agmstudio.neoblock.mixin",
+  "minVersion": "0.8",
   "client": [
-    "MixinTitleScreen"
+    "CreateWorldScreenMixin"
   ],
   "server": [],
+  "mixins": [],
   "injectors": {
     "defaultRequire": 1
   }
