@@ -3,6 +3,17 @@ plugins {
     id 'net.neoforged.moddev'
 }
 
+
+// https://parchmentmc.org/docs/getting-started#choose-a-version
+// https://projects.neoforged.net/neoforged/neoform
+moduleExpandProps = [
+    'minecraft_version'         : minecraft_version,
+    'minecraft_version_range'   : minecraft_version_range,
+    'parchment_minecraft'       : parchment_minecraft,
+    'parchment_version'         : parchment_version,
+    'neo_form_version'          : neo_form_version,
+]
+
 neoForge {
     neoFormVersion = neo_form_version
     // Automatically enable AccessTransformers if the file exists
