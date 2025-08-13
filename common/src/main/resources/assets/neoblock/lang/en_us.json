@@ -3,6 +3,7 @@
   "generator.neoblock.neoblock_no_nether": "NeoBlock (No Nether)",
 
   "bossbar.neoblock.upgrade_bar": "Upgrading... (%s)",
+  "bossbar.neoblock.upgrade_bar_no_time": "Upgrading...",
 
   "block.neoblock.neoblock": "NeoBlock Generation",
 
