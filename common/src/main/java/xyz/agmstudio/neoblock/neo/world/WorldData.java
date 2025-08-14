@@ -67,9 +67,8 @@ public abstract class WorldData extends SavedData {
         reloadConfig();
         instance = load(level);
 
-        IConfig config = NeoBlock.getConfig();
-
         if (instance == null) return;
+        IConfig config = NeoBlock.getConfig();
         if (instance.status.state == WorldStatus.State.INACTIVE) {
             boolean allowNeoBlock = true;
             final int x = config.get("world.block.x", 0);
@@ -124,7 +123,7 @@ public abstract class WorldData extends SavedData {
 
             instance.status.state = WorldStatus.State.UPDATED;
             instance.setDirty();
-        }
+        } else if (instance.status.state == WorldStatus.State.ACTIVE) TierManager.reloadResearches();
     }
 
     public static @NotNull WorldData create(@NotNull ServerLevel level) {
@@ -154,7 +153,7 @@ public abstract class WorldData extends SavedData {
                 continue;
             }
             TierSpec tier = data.tiers.get(id);
-            tier.load(tag);
+            tier.load(tt);
 
             if (!tier.isStable()) {
                 MessengerUtil.sendMessage("message.neoblock.tier_updated", level, false, id);
@@ -163,10 +162,6 @@ public abstract class WorldData extends SavedData {
         }
 
         if (isUpdated || tiers.size() < data.tiers.size()) data.status.setUpdated();
-        else if (data.status.isActive()) data.tiers.forEach(tier -> {
-            if (tier.canBeResearched()) tier.startResearch();
-        });
-
         return data;
     }
 
@@ -227,9 +222,5 @@ public abstract class WorldData extends SavedData {
         tier.setSpecialRequirement(true);
 
         if (force && tier.canBeResearched()) tier.startResearch();
-    }
-
-    public static void tick(ServerLevel level) {
-        if (instance != null) TierManager.tick(level);
     }
 }

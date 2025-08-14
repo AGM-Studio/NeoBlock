@@ -22,22 +22,27 @@ public class TierSpec implements NBTSaveable {
 
     // Stored data in world info
     @NBTData protected int id;
-    @NBTData protected boolean enabled = false;
+    @NBTData protected boolean enabled;
     @NBTData protected boolean commanded = false;
     @NBTData protected TierResearch research;
     @NBTData protected String hash = "";
 
-    public TierSpec() {
-        // Normal version for WorldData to load with
-    }
     public TierSpec(final int id) {
-        // Extended version for the WorldData to reset with
         this.id = id;
         this.research = new TierResearch(this);
         this.enabled = id == 0;
 
-        this.onLoad(new CompoundTag());
+        TierManager.loadTierConfig(this);
+
         this.hash = getHashCode();
+        this.totalBlockWeight = blocks.stream().mapToInt(NeoBlockSpec::getWeight).sum();
+    }
+
+    @Override
+    public void onLoad(CompoundTag tag) {
+        TierManager.loadTierConfig(this);
+
+        this.totalBlockWeight = blocks.stream().mapToInt(NeoBlockSpec::getWeight).sum();
     }
 
     // Data loaded from config
@@ -52,12 +57,6 @@ public class TierSpec implements NBTSaveable {
     protected NeoTradePool tradePoolUnlock;
     protected NeoTradePool trades;
     protected NeoSeqBlockSpec startSequence;
-
-    @Override public void onLoad(CompoundTag tag) {
-        TierManager.loadTierConfig(this);
-
-        totalBlockWeight = blocks.stream().mapToInt(NeoBlockSpec::getWeight).sum();
-    }
 
     public boolean isStable() {
         return Objects.equals(hash, getHashCode());
@@ -107,14 +106,17 @@ public class TierSpec implements NBTSaveable {
         return research.done;
     }
     public boolean canBeResearched() {
+        return canBeResearched(WorldData.getInstance());
+    }
+    public boolean canBeResearched(WorldData data) {
         if (research.done) return false;
         for (TierRequirement requirement: requirements)
-            if (!requirement.isMet(WorldData.getInstance(), this)) return false;
+            if (!requirement.isMet(data, this)) return false;
 
         return true;
     }
     public void startResearch() {
-        if (canBeResearched()) TierManager.addResearch(this.research);
+        TierManager.addResearch(this.research);
     }
     public TierResearch getResearch() {
         if (research == null) research = new TierResearch(this);

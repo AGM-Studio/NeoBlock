@@ -1,5 +1,6 @@
 package xyz.agmstudio.neoblock.neo.tiers;
 
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.npc.WanderingTrader;
 import xyz.agmstudio.neoblock.data.NBTData;
@@ -14,6 +15,11 @@ public class TierResearch implements NBTSaveable {
     @NBTData protected long tick = 0;
 
     protected long time = 72000;
+
+    @Override public CompoundTag onSave(CompoundTag tag) {
+        tag.putInt("tier", tier.id);
+        return tag;
+    }
 
     public TierResearch(TierSpec root) {
         this.tier = root;
@@ -35,5 +41,9 @@ public class TierResearch implements NBTSaveable {
     }
     public boolean isTimeDone() {
         return tick >= time;
+    }
+
+    @Override public String toString() {
+        return "TierResearch[tier=%d, tick=%d, time=%d, done=%s]".formatted(tier.id, tick, time, done);
     }
 }

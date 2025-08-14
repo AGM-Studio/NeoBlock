@@ -117,6 +117,12 @@ public final class TierManager {
     public static boolean hasResearch() {
         return !researches.isEmpty();
     }
+    public static void reloadResearches() {
+        researches.clear();
+        WorldData.getWorldTiers().forEach(tier -> {
+            if (tier.canBeResearched()) tier.startResearch();
+        });
+    }
 
     // Animations
     public static final HashSet<UpgradeProgressAnimation> progressAnimations = new HashSet<>();
