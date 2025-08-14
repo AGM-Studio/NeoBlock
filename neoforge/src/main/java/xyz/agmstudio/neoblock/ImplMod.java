@@ -7,9 +7,6 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.registries.DeferredBlock;
-import xyz.agmstudio.neoblock.animations.Animation;
-import xyz.agmstudio.neoblock.neo.loot.NeoMobSpec;
-import xyz.agmstudio.neoblock.neo.world.WorldData;
 import xyz.agmstudio.neoblock.platform.NeoForgeRegistry;
 
 import java.util.function.Supplier;
@@ -24,11 +21,6 @@ public final class ImplMod extends NeoBlock {
 
     public ImplMod(IEventBus bus, ModContainer container) {
         super(NeoBlock.MOD_NAME);
-
-        NeoBlock.registerTicker(Animation::tickAll);
-        NeoBlock.registerTicker(WorldData::tick);
-
-        NeoMobSpec.load();
 
         NeoForgeRegistry.BLOCKS.register(bus);
         NeoForgeRegistry.ITEMS.register(bus);

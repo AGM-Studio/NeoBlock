@@ -85,4 +85,11 @@ public class BlockManager {
         if (block.getBlock().equals(Blocks.BEDROCK))
             BlockManager.DEFAULT_SPEC.placeAt(level, pos);
     }
+
+    public static void tick(ServerLevel level) {
+        final BlockState block = level.getBlockState(getBlockPos());
+        if (WorldData.getWorldStatus().isUpdated() || TierManager.hasResearch()) {
+            if (block.getBlock() != Blocks.BEDROCK) BEDROCK_SPEC.placeAt(level, getBlockPos());
+        } else if (block.isAir() || block.canBeReplaced()) updateBlock(level, true);
+    }
 }
