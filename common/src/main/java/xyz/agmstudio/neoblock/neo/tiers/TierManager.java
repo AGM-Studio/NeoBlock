@@ -27,12 +27,12 @@ import java.util.List;
 public final class TierManager {
     private static final List<TierResearch> researches = new ArrayList<>();
 
-    public static List<TierSpec> fetchTiers() {
+    public static List<TierSpec> fetchTiers(boolean loadConfig) {
         ResourceUtil.loadAllTierConfigs();
 
         List<TierSpec> tiers = new ArrayList<>();
         for (int i = 0; Files.exists(TierSpec.FOLDER.resolve("tier-" + i + ".toml")); i++)
-            tiers.add(new TierSpec(i));
+            tiers.add(new TierSpec(i, loadConfig));
 
         NeoBlock.LOGGER.info("Loaded {} tiers from the tiers folder.", tiers.size());
         return tiers;

@@ -12,7 +12,7 @@ public class ForceResetTiersCommand extends NeoCommand {
     }
 
     @Override public int execute(CommandContext<CommandSourceStack> context) throws CommandExtermination {
-        WorldData.reloadTiers();
+        WorldData.resetTiers();
         context.getSource().sendSuccess(() -> Component.translatable("command.neoblock.update.success"), true);
         return 1;
     }

@@ -42,12 +42,12 @@ public abstract class WorldData extends SavedData {
         return instance;
     }
 
-    public static List<TierSpec> reloadTiers() {
-        return reloadTiers(instance);
+    public static List<TierSpec> resetTiers() {
+        return resetTiers(instance);
     }
-    public static List<TierSpec> reloadTiers(WorldData data) {
+    public static List<TierSpec> resetTiers(WorldData data) {
         data.tiers.clear();
-        data.tiers.addAll(TierManager.fetchTiers());
+        data.tiers.addAll(TierManager.fetchTiers(true));
         return data.tiers;
     }
 
@@ -130,7 +130,7 @@ public abstract class WorldData extends SavedData {
         WorldData data = Services.PLATFORM.instanceWorldData(level);
 
         data.status = new WorldStatus(data);
-        reloadTiers(data);
+        data.tiers.addAll(TierManager.fetchTiers(true));
 
         NeoBlock.LOGGER.debug("Creating new world data");
         return data;
@@ -140,7 +140,7 @@ public abstract class WorldData extends SavedData {
 
         NeoBlock.LOGGER.debug("Loading WorldData from {}", tag);
         data.status = NBTSaveable.instance(WorldStatus.class, tag, data);
-        data.tiers.addAll(TierManager.fetchTiers());
+        data.tiers.addAll(TierManager.fetchTiers(false));
 
         boolean isUpdated = false;
         final ListTag tiers = tag.getList("Tiers", StringTag.TAG_COMPOUND);

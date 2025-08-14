@@ -27,15 +27,17 @@ public class TierSpec implements NBTSaveable {
     @NBTData protected TierResearch research;
     @NBTData protected String hash = "";
 
-    public TierSpec(final int id) {
+    public TierSpec(final int id, boolean loadConfig) {
         this.id = id;
         this.research = new TierResearch(this);
         this.enabled = id == 0;
 
-        TierManager.loadTierConfig(this);
+        if (loadConfig) {
+            TierManager.loadTierConfig(this);
+            this.totalBlockWeight = blocks.stream().mapToInt(NeoBlockSpec::getWeight).sum();
+        }
 
         this.hash = getHashCode();
-        this.totalBlockWeight = blocks.stream().mapToInt(NeoBlockSpec::getWeight).sum();
     }
 
     @Override
