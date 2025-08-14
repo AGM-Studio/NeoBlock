@@ -56,3 +56,4 @@ plugins {
 rootProject.name = 'NeoBlock'
 include('common')
 include('neoforge')
+include('forge20')
