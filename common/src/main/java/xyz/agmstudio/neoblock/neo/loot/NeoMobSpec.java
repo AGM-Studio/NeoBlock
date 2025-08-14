@@ -12,7 +12,6 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -36,13 +35,17 @@ public class NeoMobSpec extends NeoItemSpec {
 
     private final EntityType<?> mob;
 
-    public NeoMobSpec(EntityType<?> mob, UniformInt range, double chance, Item egg) {
-        super(egg, range, chance);
+    public NeoMobSpec(EntityType<?> mob, UniformInt range, double chance) {
+        super(null, range, chance);
         this.mob = mob;
     }
 
     public EntityType<?> getMob() {
         return mob;
+    }
+
+    @Override public Item getItem() {
+        return NeoBlock.REGISTRY.getMobTicket();
     }
 
     @Override public ItemStack modify(ItemStack item) {
@@ -76,7 +79,7 @@ public class NeoMobSpec extends NeoItemSpec {
         UniformInt range = StringUtil.parseRange(matcher.group("count"));
         double chance = StringUtil.parseChance(matcher.group("chance"));
 
-        return Optional.of(new NeoMobSpec(entityType, range, chance, NeoBlock.REGISTRY.getMobTicket()));
+        return Optional.of(new NeoMobSpec(entityType, range, chance));
     }
 
     public static Optional<EntityType<?>> getMobTradeEntity(ItemStack item) {
@@ -97,8 +100,7 @@ public class NeoMobSpec extends NeoItemSpec {
         return true;
     }
 
-    public static class TradeTicket extends Item {
-
+    public static abstract class TradeTicket extends Item {
         public TradeTicket(Properties properties) {
             super(properties);
         }
@@ -119,13 +121,12 @@ public class NeoMobSpec extends NeoItemSpec {
             );
         }
 
-        @Override public void appendHoverText(@NotNull ItemStack stack, @NotNull TooltipContext context, @NotNull List<Component> components, @NotNull TooltipFlag flag) {
+        public @NotNull List<Component> getLore(@NotNull ItemStack stack) {
             Optional<EntityType<?>> mob = getMobTradeEntity(stack);
-            if (mob.isEmpty()) return;
-            components.add(
-                    Component.translatable("tooltip.neoblock.spawn_lore", mob.get().getDescription())
+            return mob.<List<Component>>map(entityType -> List.of(
+                    Component.translatable("tooltip.neoblock.spawn_lore", entityType.getDescription())
                             .withStyle(ChatFormatting.ITALIC, ChatFormatting.GRAY)
-            );
+            )).orElseGet(List::of);
         }
     }
 }

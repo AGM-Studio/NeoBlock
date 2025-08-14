@@ -1,8 +1,10 @@
 package xyz.agmstudio.neoblock.platform.helpers;
 
+import mezz.jei.api.gui.builder.IRecipeSlotBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -16,6 +18,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 public interface INBTHelper {
     final class IO {
@@ -57,6 +60,11 @@ public interface INBTHelper {
             Services.NBT.setItemTag(item, tag);
         }
     }
+    final class JEI {
+        public static IRecipeSlotBuilder addTooltip(IRecipeSlotBuilder builder, List<Component> components) {
+            return Services.NBT.addTooltip(builder, components);
+        }
+    }
 
     void writeCompressed(CompoundTag nbt, OutputStream os) throws IOException;
     CompoundTag readCompressed(File file) throws IOException;
@@ -73,4 +81,6 @@ public interface INBTHelper {
 
     CompoundTag getBlockEntity(BlockEntity be, ServerLevel level);
     void loadBlockEntity(BlockEntity be, CompoundTag tag, ServerLevel level);
+
+    IRecipeSlotBuilder addTooltip(IRecipeSlotBuilder builder, List<Component> components);
 }

@@ -18,6 +18,7 @@ import net.minecraft.world.item.Items;
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlock;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
+import xyz.agmstudio.neoblock.platform.helpers.INBTHelper;
 import xyz.agmstudio.neoblock.util.StringUtil;
 
 import java.util.ArrayList;
@@ -84,9 +85,9 @@ public class TierDisplayCategory implements IRecipeCategory<TierDisplay> {
     private void addBlockGeneration(@NotNull IRecipeLayoutBuilder builder, @NotNull TierDisplay display, Item item, int x, int y, int count) {
         IRecipeSlotBuilder build = builder.addSlot(RecipeIngredientRole.OUTPUT, x, y).setBackground(slot, -1, -1);
         if (item == null || item == Items.AIR) return;
-        build.addItemStack(new ItemStack(item, count)).addRichTooltipCallback((view, tooltip) -> {
-            tooltip.add(Component.translatable("tooltip.neoblock.tier_chance", StringUtil.percentage(display.getChance(item), 2)));
-            tooltip.add(Component.translatable("tooltip.neoblock.total_chance", StringUtil.percentage(NeoJEIPlugin.getTotalChance(item), 2)));
-        });
+        INBTHelper.JEI.addTooltip(build.addItemStack(new ItemStack(item, count)), List.of(
+            Component.translatable("tooltip.neoblock.tier_chance", StringUtil.percentage(display.getChance(item), 2)),
+            Component.translatable("tooltip.neoblock.total_chance", StringUtil.percentage(NeoJEIPlugin.getTotalChance(item), 2))
+        ));
     }
 }

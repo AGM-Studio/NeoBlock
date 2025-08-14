@@ -28,7 +28,7 @@ public class NeoItemSpec {
 
     public ItemStack getStack() {
         int count = range.sample(WorldData.getRandom());
-        return new ItemStack(item, count);
+        return new ItemStack(getItem(), count);
     }
 
     public ItemStack getStackWithChance() {
@@ -37,7 +37,7 @@ public class NeoItemSpec {
     }
 
     public ResourceLocation getResource() {
-        return MinecraftUtil.getItemResource(item).orElse(DEFAULT);
+        return MinecraftUtil.getItemResource(getItem()).orElse(DEFAULT);
     }
     public String getId() {
         return getResource().toString();

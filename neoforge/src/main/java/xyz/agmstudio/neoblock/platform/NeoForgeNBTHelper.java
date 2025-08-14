@@ -1,9 +1,11 @@
 package xyz.agmstudio.neoblock.platform;
 
+import mezz.jei.api.gui.builder.IRecipeSlotBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.*;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.CustomData;
@@ -16,6 +18,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.List;
 
 public class NeoForgeNBTHelper implements INBTHelper {
     @Override public void writeCompressed(CompoundTag nbt, OutputStream os) throws IOException {
@@ -64,5 +67,9 @@ public class NeoForgeNBTHelper implements INBTHelper {
         if (be == null || tag == null) return;
         be.loadWithComponents(tag, level.registryAccess());
         be.setChanged();
+    }
+
+    @Override public IRecipeSlotBuilder addTooltip(IRecipeSlotBuilder builder, List<Component> components) {
+        return builder.addRichTooltipCallback((view, tooltip) -> tooltip.addAll(components));
     }
 }
