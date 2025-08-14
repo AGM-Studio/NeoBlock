@@ -91,6 +91,17 @@ public class ResourceUtil {
      * Loads all available tier configuration files from resources if they do not exist.
      */
     public static void loadAllTierConfigs() {
+        // Prioritize template config
+        Path templateLocation = TierSpec.FOLDER.resolve("tier-template.toml");
+        if (!Files.exists(templateLocation)) {
+            try {
+                processResourceFile("/configs/tiers/tier-template.toml", templateLocation, Map.of("[TIER]", "10"));
+                NeoBlock.LOGGER.debug("Loaded tier template config.");
+            } catch (IOException e) {
+                NeoBlock.LOGGER.error("Unable to process tier template resource", e);
+            }
+        }
+
         // If tier-0.toml is present, no need to proceed
         if (Files.exists(TierSpec.FOLDER.resolve("tier-0.toml"))) return;
         if (TierSpec.FOLDER.toFile().mkdirs())
@@ -111,16 +122,6 @@ public class ResourceUtil {
             } catch (IOException e) {
                 NeoBlock.LOGGER.error("Unable to process resource {}", resource, e);
                 break;
-            }
-        }
-
-        Path templateLocation = TierSpec.FOLDER.resolve("tier-template.toml");
-        if (!Files.exists(templateLocation)) {
-            try {
-                processResourceFile("/configs/tiers/tier-template.toml", templateLocation, Map.of("[TIER]", "10"));
-                NeoBlock.LOGGER.debug("Loaded tier template config.");
-            } catch (IOException e) {
-                NeoBlock.LOGGER.error("Unable to process tier template resource", e);
             }
         }
     }

@@ -4,6 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.*;
 import xyz.agmstudio.neoblock.NeoBlock;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -34,6 +35,40 @@ public interface NBTSaveable {
             }
         }
         return onSave(tag);
+    }
+
+    default void load(CompoundTag tag) {
+        Class<? extends NBTSaveable> clazz = this.getClass();
+        try {
+            for (Field field : clazz.getDeclaredFields()) {
+                if (field.isAnnotationPresent(NBTData.class)) {
+                    field.setAccessible(true);
+                    NBTData annotation = field.getAnnotation(NBTData.class);
+                    String key = annotation.value().isEmpty() ? field.getName() : annotation.value();
+                    Class<?> type = field.getType();
+                    if (type.isEnum()) {
+                        try {
+                            int id = tag.getInt(key);
+                            Method fromId = type.getMethod("fromId", int.class);
+                            Object enumValue = fromId.invoke(null, id);
+                            field.set(this, enumValue);
+                        } catch (Exception e) {
+                            NeoBlock.LOGGER.error("Failed to load enum field: {}", field.getName(), e);
+                            throw new RuntimeException("Failed to load enum field: " + field.getName(), e);
+                        }
+                    } else {
+                        Object value = getFromTag(tag, key, type, this);
+                        field.set(this, value);
+                    }
+                }
+            }
+            this.onLoad(tag);
+        } catch (AbortException e) {
+            NeoBlock.LOGGER.error("NBT loading into {} has been aborted by {}", clazz.getSimpleName(), e);
+        } catch (Exception e) {
+            NeoBlock.LOGGER.error("Failed to load NBT into {}", clazz.getSimpleName(), e);
+            throw new RuntimeException("Failed to load NBT into " + clazz.getSimpleName(), e);
+        }
     }
 
     private static void putToTag(CompoundTag tag, String key, Object value) {
@@ -76,9 +111,9 @@ public interface NBTSaveable {
         if (NBTSaveable.class.isAssignableFrom(type)) {
             CompoundTag compound = tag.getCompound(key);
             try {
-                return (R) NBTSaveable.load((Class<? extends NBTSaveable>) type, compound, root);
+                return (R) NBTSaveable.instance((Class<? extends NBTSaveable>) type, compound, root);
             } catch (RuntimeException ignored) {
-                return (R) NBTSaveable.load((Class<? extends NBTSaveable>) type, compound);
+                return (R) NBTSaveable.instance((Class<? extends NBTSaveable>) type, compound);
             }
         }
         else if (type == BlockPos.class) return (R) BlockPos.of(tag.getLong(key));
@@ -111,7 +146,7 @@ public interface NBTSaveable {
             ListTag listTag = tag.getList(key, Tag.TAG_COMPOUND);
             for (Tag t : listTag) {
                 if (NBTSaveable.class.isAssignableFrom(elementType))
-                    list.add(NBTSaveable.load((Class<? extends NBTSaveable>) elementType, (CompoundTag) t, root));
+                    list.add(NBTSaveable.instance((Class<? extends NBTSaveable>) elementType, (CompoundTag) t, root));
                 else if (elementType == BlockPos.class) list.add(BlockPos.of(((LongTag) t).getAsLong()));
                 else if (elementType == String.class) list.add(t.getAsString());
                 else if (elementType == Integer.class) list.add(((IntTag) t).getAsInt());
@@ -127,42 +162,29 @@ public interface NBTSaveable {
         }
     }
 
-
-    static <T extends NBTSaveable> T load(Class<T> clazz, CompoundTag tag, Object... args) {
+    static <T extends NBTSaveable> T instance(Class<T> clazz, CompoundTag tag, Object... args) {
+        T instance = null;
         try {
             Class<?>[] types = Arrays.stream(args).map(Object::getClass).toArray(Class[]::new);
-            T instance = clazz.getDeclaredConstructor(types).newInstance(args);
-            for (Field field : clazz.getDeclaredFields()) {
-                if (field.isAnnotationPresent(NBTData.class)) {
-                    field.setAccessible(true);
-                    NBTData annotation = field.getAnnotation(NBTData.class);
-                    String key = annotation.value().isEmpty() ? field.getName() : annotation.value();
-                    Class<?> type = field.getType();
-                    if (type.isEnum()) {
-                        try {
-                            int id = tag.getInt(key);
-                            Method fromId = type.getMethod("fromId", int.class);
-                            Object enumValue = fromId.invoke(null, id);
-                            field.set(instance, enumValue);
-                        } catch (Exception e) {
-                            NeoBlock.LOGGER.error("Failed to load enum field: {}", field.getName(), e);
-                            throw new RuntimeException("Failed to load enum field: " + field.getName(), e);
-                        }
-                    } else {
-                        Object value = getFromTag(tag, key, type, instance);
-                        field.set(instance, value);
-                    }
-                }
-            }
-            instance.onLoad(tag);
-            return instance;
-        } catch (AbortException e) {
-            NeoBlock.LOGGER.error("NBT loading into {} has been aborted by {}", clazz.getSimpleName(), e);
-            return null;
+            @SuppressWarnings("unchecked")
+            Constructor<T> constructor = (Constructor<T>) Arrays.stream(clazz.getDeclaredConstructors())
+                    .filter(c -> {
+                        Class<?>[] paramTypes = c.getParameterTypes();
+                        if (paramTypes.length != args.length) return false;
+                        for (int i = 0; i < paramTypes.length; i++)
+                            if (!paramTypes[i].isAssignableFrom(args[i].getClass())) return false;
+                        return true;
+                    })
+                    .findFirst()
+                    .orElseThrow(() -> new NoSuchMethodException("No matching constructor found"));
+            instance = constructor.newInstance(args);
         } catch (Exception e) {
-            NeoBlock.LOGGER.error("Failed to load NBT into {}", clazz.getSimpleName(), e);
             throw new RuntimeException("Failed to load NBT into " + clazz.getSimpleName(), e);
+        } finally {
+            if (instance != null) instance.load(tag);
         }
+
+        return instance;
     }
 
     class AbortException extends RuntimeException {

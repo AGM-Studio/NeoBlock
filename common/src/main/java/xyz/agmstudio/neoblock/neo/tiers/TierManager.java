@@ -18,15 +18,27 @@ import xyz.agmstudio.neoblock.platform.implants.IConfig;
 import xyz.agmstudio.neoblock.util.ConfigUtil;
 import xyz.agmstudio.neoblock.util.ResourceUtil;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-public class TierManager {
+public final class TierManager {
     private static final List<TierResearch> researches = new ArrayList<>();
 
-    protected static void loadConfig(final TierSpec spec) {
+    public static List<TierSpec> fetchTiers() {
+        ResourceUtil.loadAllTierConfigs();
+
+        List<TierSpec> tiers = new ArrayList<>();
+        for (int i = 0; Files.exists(TierSpec.FOLDER.resolve("tier-" + i + ".toml")); i++)
+            tiers.add(new TierSpec(i));
+
+        NeoBlock.LOGGER.info("Loaded {} tiers from the tiers folder.", tiers.size());
+        return tiers;
+    }
+
+    public static void loadTierConfig(final TierSpec spec) {
         Path FOLDER = ResourceUtil.getConfigFolder(NeoBlock.MOD_ID, "tiers");
         IConfig config = ConfigUtil.getConfig(FOLDER, "tier-" + spec.id);
         if (config == null) throw new NBTSaveable.AbortException("Unable to find config for tier " + spec.id);
@@ -98,6 +110,7 @@ public class TierManager {
 
         WorldData.getInstance().setDirty();
     }
+
     public static void addResearch(TierResearch research) {
         researches.add(research);
     }

@@ -27,7 +27,6 @@ import xyz.agmstudio.neoblock.platform.implants.IConfig;
 import xyz.agmstudio.neoblock.util.MessengerUtil;
 
 import java.io.FileNotFoundException;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -43,18 +42,13 @@ public abstract class WorldData extends SavedData {
         return instance;
     }
 
-    public static void reloadTiers() {
-        reloadTiers(instance);
+    public static List<TierSpec> reloadTiers() {
+        return reloadTiers(instance);
     }
-    public static void reloadTiers(WorldData data) {
-        int i = 0;
+    public static List<TierSpec> reloadTiers(WorldData data) {
         data.tiers.clear();
-        while (Files.exists(TierSpec.FOLDER.resolve("tier-" + i + ".toml"))) {
-            TierSpec spec = new TierSpec(i++);
-            data.tiers.add(spec);
-        }
-
-        NeoBlock.LOGGER.info("Loaded {} tiers from the tiers folder.", data.tiers.size());
+        data.tiers.addAll(TierManager.fetchTiers());
+        return data.tiers;
     }
 
     public static void reloadConfig() {
@@ -79,13 +73,14 @@ public abstract class WorldData extends SavedData {
         if (instance.status.state == WorldStatus.State.INACTIVE) {
             boolean allowNeoBlock = true;
             final int x = config.get("world.block.x", 0);
+            final int y = config.get("world.block.y", 64);
             final int z = config.get("world.block.z", 0);
-            for (int y : List.of(-64, -61, 0, 64))
-                if (!level.getBlockState(new BlockPos(x, y, z)).isAir()) allowNeoBlock = false;
+            for (int t : List.of(-64, -61, 0, 64, y))
+                if (!level.getBlockState(new BlockPos(x, t, z)).isAir()) allowNeoBlock = false;
             
             if (!allowNeoBlock) allowNeoBlock = config.get("world.force-block", false);
             if (allowNeoBlock) {
-                getWorldStatus().setBlockPos(new BlockPos(x, config.get("world.block.y", 64), z), level);
+                getWorldStatus().setBlockPos(new BlockPos(x, y, z), level);
                 TierSpec tier0 = getWorldTier(0);
                 if (tier0 != null) tier0.getStartSequence().addToQueue(false);
 
@@ -145,21 +140,30 @@ public abstract class WorldData extends SavedData {
         WorldData data = Services.PLATFORM.instanceWorldData(level);
 
         NeoBlock.LOGGER.debug("Loading WorldData from {}", tag);
-        data.status = NBTSaveable.load(WorldStatus.class, tag, data);
-        final ListTag tiers = tag.getList("Tiers", StringTag.TAG_COMPOUND);
-        if (tiers.isEmpty()) reloadTiers();
-        else for (int i = 0; i < tiers.size(); i++) {
-            TierSpec tier = NBTSaveable.load(TierSpec.class, tiers.getCompound(i));
-            if (tier == null || !tier.isStable()) {
-                int id = tiers.getCompound(i).getInt("id");
-                MessengerUtil.sendMessage("message.neoblock.tier_updated", level, false, id);
-                data.status.setUpdated();
-            }
+        data.status = NBTSaveable.instance(WorldStatus.class, tag, data);
+        data.tiers.addAll(TierManager.fetchTiers());
 
-            data.tiers.add(tier);
+        boolean isUpdated = false;
+        final ListTag tiers = tag.getList("Tiers", StringTag.TAG_COMPOUND);
+        for (int i = 0; i < tiers.size(); i++) {
+            CompoundTag tt = tiers.getCompound(i);
+            int id = tt.getInt("id");
+
+            if (id >= data.tiers.size()) {
+                isUpdated = true;
+                continue;
+            }
+            TierSpec tier = data.tiers.get(id);
+            tier.load(tag);
+
+            if (!tier.isStable()) {
+                MessengerUtil.sendMessage("message.neoblock.tier_updated", level, false, id);
+                isUpdated = true;
+            }
         }
 
-        if (data.status.isActive()) data.tiers.forEach(tier -> {
+        if (isUpdated || tiers.size() < data.tiers.size()) data.status.setUpdated();
+        else if (data.status.isActive()) data.tiers.forEach(tier -> {
             if (tier.canBeResearched()) tier.startResearch();
         });
 

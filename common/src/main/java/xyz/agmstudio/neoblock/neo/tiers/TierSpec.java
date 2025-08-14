@@ -54,7 +54,7 @@ public class TierSpec implements NBTSaveable {
     protected NeoSeqBlockSpec startSequence;
 
     @Override public void onLoad(CompoundTag tag) {
-        TierManager.loadConfig(this);
+        TierManager.loadTierConfig(this);
 
         totalBlockWeight = blocks.stream().mapToInt(NeoBlockSpec::getWeight).sum();
     }
