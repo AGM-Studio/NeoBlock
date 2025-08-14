@@ -28,6 +28,7 @@
   "message.neoblock.disabled_world_1": "This world is not using the §bNeoBlock§r world preset. §bNeoBlock§r has set to dormant.",
   "message.neoblock.disabled_world_2": "You can enable the mod with \"%s\" or setting the force block in config as modpack developer.",
   "message.neoblock.updated_world": "This world has been using an old tier config. You need to force update the world with %s.",
+  "message.neoblock.tier_updated": "Tier %d has been updated and is incompatible.",
   "message.neoblock.unlocked_tier": "Tier %d has been unlocked!",
   "message.neoblock.disable_tier": "Tier %d has been disabled!",
   "message.neoblock.enable_tier": "Tier %d has been enabled!",
