@@ -69,9 +69,8 @@ public final class ForgeNBTHelper implements INBTHelper {
         be.setChanged();
     }
 
+    @SuppressWarnings("removal")
     @Override public IRecipeSlotBuilder addTooltip(IRecipeSlotBuilder builder, List<Component> components) {
-        return builder.addTooltipCallback((view, tooltip) -> {
-            tooltip.addAll(components);
-        });
+        return builder.addTooltipCallback((view, tooltip) -> tooltip.addAll(components));
     }
 }
