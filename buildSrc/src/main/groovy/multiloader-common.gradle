@@ -84,36 +84,23 @@ jar {
 ext.moduleExpandProps = [:]
 
 processResources {
-    def baseExpandProps = [
-        'group'                        : project.group,
-        'mod_name'                     : mod_name,
-        'mod_authors'                  : mod_authors,
-        'mod_id'                       : mod_id,
-        'mod_license'                  : mod_license,
-        'mod_description'              : mod_description,
-        'mod_credits'                  : mod_credits,
-        'fabric_version'               : fabric_version,
-        'fabric_loader_version'        : fabric_loader_version,
-        'java_version'                 : java_version
-    ]
+    def props = [:]
+    rootProject.properties.each { k, v -> props[k] = v.toString() }
+    project.properties.each     { k, v -> props[k] = v.toString() }
 
-    def props = new Properties()
-    file("${project.projectDir}/gradle.properties").withInputStream { props.load(it) }
-    def mergedExpandProps = baseExpandProps + (props.collectEntries { k, v -> [(k): v.toString()] })
-
-    def jsonExpandProps = mergedExpandProps.collectEntries { k, v ->
+    def jsonProps = props.collectEntries { k, v ->
         [(k): v instanceof String ? v.replace("\n", "\\\\n") : v]
     }
 
     filesMatching(['META-INF/mods.toml', 'META-INF/neoforge.mods.toml']) {
-        expand mergedExpandProps
+        expand props
     }
 
     filesMatching(['pack.mcmeta', 'fabric.mod.json', '*.mixins.json']) {
-        expand jsonExpandProps
+        expand jsonProps
     }
 
-    inputs.properties(mergedExpandProps)
+    inputs.properties(props)
 }
 
 publishing {
