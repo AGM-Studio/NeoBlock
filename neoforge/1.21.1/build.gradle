@@ -46,4 +46,3 @@ neoForge {
 }
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
-layout.buildDirectory = file("${rootProject.projectDir}/build/${project.name}")

@@ -89,10 +89,5 @@ publishing {
     }
 }
 
-sourceSets.each {
-    def dir = layout.buildDirectory.dir("sourcesSets/$it.name")
-    it.output.resourcesDir = dir
-    it.java.destinationDirectory = dir
-}
 
-layout.buildDirectory = file("${rootProject.projectDir}/build/${project.name}")
+sourceSets.main.resources { srcDir 'src/generated/resources' }

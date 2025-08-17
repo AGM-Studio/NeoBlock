@@ -42,3 +42,14 @@ tasks.named('sourcesJar', Jar) {
     dependsOn(configurations.commonResources)
     from(configurations.commonResources)
 }
+
+tasks.named("jar") {
+    doLast {
+        copy {
+            from archiveFile
+            into "${rootProject.projectDir}/build"
+        }
+    }
+}
+
+layout.buildDirectory = file("${rootProject.projectDir}/build/${platform}/${project.name}")
