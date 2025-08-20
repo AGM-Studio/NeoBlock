@@ -1,0 +1,72 @@
+[world]                                 # Added in 0.4.0! Effects only the client single player, for servers you need to change the level type
+preset = "neoblock:neoblock_no_nether"  # in servers.properties. "neoblock:neoblock" or "neoblock:neoblock_no_nether"
+force-block = false                     # If you want to use another preset, other than normal ones...
+
+[world.block]               # The position you want the block to be, will change world spawn too and
+x = 0                       #  will only affect when generating the world for the first time.
+y = 64                      # To change it after first generation, use /neoblock force setblock <x> <y> <z>
+z = 0
+
+# [schematics.custom_0]       # You can add as many custom schematics to be loaded when the world is generated. Remove the `#` at the beginning of the lines to start and for more duplicte this.
+# name = "NeoBlockSchematic_0.nbt"
+# x = 20                      # The title must increase in order (schematics.custom_0, schematics.custom_1, schematics.custom_2, ...)
+# y = 67                      # The name of file in the schematics folder and the position you want the structure be placed.
+# z = 12                      # Note: "main.nbt" is always loaded over the NeoBlock and is centered around 0, 64, 0
+
+[neo-trader]
+chance = 0.3                # Chance of spawning a NeoMerchant per interval. If no trades are available or another trader lives, no NeoMerchant will be spawned.
+chance-increment = 0.075    # On a failed attempt, will increase the chance of NeoMerchant per interval by this amount.
+attempt-interval = 10       # How many blocks should be broken to attempt to spawn a NeoMerchant.
+life-span-min = 24000       # The minimum ticks the trader should exist before despawning.
+life-span-max = 48000       # The maximum ticks the trader should exist before despawning.
+
+[rules]                     # Gamerules that should be applied when the world is generated.
+doFireTick = false
+doPatrolSpawning = false
+doInsomnia = false
+doMobSpawning = false
+
+[animations.progressbar]
+enabled = true              # If the progressbar should be shown to players
+show-time = true            # If the remaining time should be shown to players
+color = "red"               # Supported colors are `red`, `green`, `blue`, `pink`, `yellow`, `purple`, `white`
+
+[animations.idle.neo-flow]
+enabled = false
+wait-for = 100
+color-speed = 1.0
+speed = 0.05
+count = 5
+
+[animations.idle.pulse]
+enabled = true
+wait-for = 100
+interval = 100
+
+[animations.phase.fuse]
+at-start = true
+at-finish = false
+volume = 0.7
+
+[animations.phase.explosion]
+at-start = true
+at-finish = false
+volume = 0.7
+
+[animations.upgrade.breaking]
+enabled = true
+interval = 20       # In ticks
+volume = 0.7
+
+[animations.upgrade.sparkle]
+enabled = false
+interval = 200      # In ticks
+length = 20         # In ticks
+factor = 3
+count = 1
+
+[animations.upgrade.spiral]
+enabled = true
+interval = 50       # In ticks
+length = 20         # In ticks
+count = 5

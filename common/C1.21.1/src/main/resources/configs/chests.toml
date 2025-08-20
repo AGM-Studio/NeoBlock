@@ -1,0 +1,38 @@
+tier1-chest = [
+	"1xminecraft:wooden_pickaxe 75%",
+	"1xminecraft:stone_pickaxe 50%",
+	"4-8xminecraft:oak_log",
+	"4-8xminecraft:oak_planks 80%",
+	"6-12xminecraft:carrot 80%",
+	"8-16xminecraft:bread 60%",
+	"1xminecraft:apple 50%",
+	"1xminecraft:torch 70%"
+]
+
+tier2-chest = [
+	"1xminecraft:stone_pickaxe 70%",
+	"1xminecraft:iron_pickaxe 40%",
+	"8-12xminecraft:carrot",
+	"4-8xminecraft:potato",
+	"1xminecraft:wheat_seeds 80%",
+	"1xminecraft:iron_ingot 50%",
+	"1xminecraft:bucket 30%",
+	"2-4xminecraft:oak_log"
+]
+
+tier4-chest = [
+	"1xminecraft:iron_chestplate 25%",
+	"4-8xminecraft:coal 60%",
+	"1xminecraft:gold_ingot 40%",
+	"1xminecraft:blaze_rod 20%",
+	"1xminecraft:nether_quartz 30%",
+	"1xminecraft:ender_pearl 10%",
+	"1xminecraft:experience_bottle 15%"
+]
+
+casual-chest = [ # Use example in tier 1, line 12
+	"3-6xminecraft:oak_log 80%",
+	"4-8xminecraft:bread 40%",
+	"1xminecraft:torch 50%",
+	"1xminecraft:apple 30%"
+]

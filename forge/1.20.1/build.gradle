@@ -5,10 +5,10 @@ plugins {
 }
 
 dependencies {
+    compileOnly 'org.jetbrains:annotations:26.0.2'
+
     compileOnly "mezz.jei:jei-${minecraft_version}-forge-api:${jei_version}"
     // runtimeOnly "mezz.jei:jei-${minecraft_version}-forge:${jei_version}" // is not working...
-
-    compileOnly 'org.jetbrains:annotations:26.0.2'
 }
 
 
@@ -24,7 +24,7 @@ neoForge {
 
     validateAccessTransformers = true
 
-    def at = project(':common').file('src/main/resources/META-INF/accesstransformer.cfg')
+    def at = project(":common:C${minecraft_version}").file('src/main/resources/META-INF/accesstransformer.cfg')
     if (at.exists()) {
         accessTransformers = ["src/main/resources/META-INF/accesstransformer.cfg"]
     }
@@ -64,7 +64,7 @@ neoForge {
 sourceSets.main.resources.srcDir 'src/generated/resources'
 
 dependencies {
-    compileOnly project(":common")
+    compileOnly project(":common:C${minecraft_version}")
     annotationProcessor("org.spongepowered:mixin:0.8.5-SNAPSHOT:processor")
 }
 
