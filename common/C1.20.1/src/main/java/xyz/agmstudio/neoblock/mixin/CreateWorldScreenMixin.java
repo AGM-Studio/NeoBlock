@@ -10,9 +10,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.presets.WorldPreset;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
@@ -20,17 +18,39 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xyz.agmstudio.neoblock.NeoBlock;
 import xyz.agmstudio.neoblock.util.MinecraftUtil;
 
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Optional;
 import java.util.OptionalLong;
 
 @Mixin(CreateWorldScreen.class)
 public abstract class CreateWorldScreenMixin {
-    @Shadow @Final WorldCreationUiState uiState;
+    public WorldCreationUiState getUiState() {
+        for (Field field : getClass().getDeclaredFields()) {
+            if (field.getType().equals(WorldCreationUiState.class)) {
+                try {
+                    field.setAccessible(true); // important!
+                    return (WorldCreationUiState) field.get(this);
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException("Cannot access uiState field", e);
+                }
+            }
+        }
+        throw new RuntimeException("Could not find WorldCreationUiState");
+    }
+
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     @Inject(method = "<init>", at = @At("TAIL"))
     private void CreateWorldScreen(Minecraft minecraft, Screen lastScreen, WorldCreationContext settings, Optional<ResourceKey<WorldPreset>> preset, OptionalLong seed, CallbackInfo ci) {
+        WorldCreationUiState uiState;
+        try {
+            uiState = getUiState();
+        } catch (RuntimeException e) {
+            NeoBlock.LOGGER.error("Could not access the \"uiState\". Aborting the mixin!", e);
+            return;
+        }
+
         List<WorldCreationUiState.WorldTypeEntry> list = uiState.getNormalPresetList();
         String name = NeoBlock.getConfig().get(
                 "world.preset",
