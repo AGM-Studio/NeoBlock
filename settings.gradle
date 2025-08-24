@@ -54,10 +54,7 @@ plugins {
 
 // This should match the folder name of the project, or else IDEA may complain (see https://youtrack.jetbrains.com/issue/IDEA-317606)
 rootProject.name = 'NeoBlock'
-include(
-        'common:C1.20.1',
-        'common:C1.21.1',
-)
+include('common')
 include(
         'forge:1.20.1',
         'forge:1.21.1',

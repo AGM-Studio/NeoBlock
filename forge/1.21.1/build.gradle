@@ -32,38 +32,28 @@ minecraft {
     }
 
     runs {
+        configureEach {
+            workingDirectory file("${rootProject.projectDir}/.runs/${platform}/${project.name}/${it.name}")
+            property 'forge.logging.markers', 'REGISTRIES'
+
+            property 'forge.logging.console.level', 'debug'
+        }
+
         client {
-            workingDirectory file("${rootProject.projectDir}/.runs/${project.name}/${it.name}")
-            ideaModule "${rootProject.name}.${project.name}.main"
-            taskName 'Client'
-            mods {
-                modClientRun {
-                    source sourceSets.main
-                }
-            }
+            property 'forge.enabledGameTestNamespaces', mod_id
         }
 
         server {
-            workingDirectory file("${rootProject.projectDir}/.runs/${project.name}/${it.name}")
-            ideaModule "${rootProject.name}.${project.name}.main"
-            taskName 'Server'
-            mods {
-                modServerRun {
-                    source sourceSets.main
-                }
-            }
+            property 'forge.enabledGameTestNamespaces', mod_id
+            args '--nogui'
+        }
+
+        gameTestServer {
+            property 'forge.enabledGameTestNamespaces', mod_id
         }
 
         data {
-            workingDirectory file("${rootProject.projectDir}/.runs/${project.name}/${it.name}")
-            ideaModule "${rootProject.name}.${project.name}.main"
             args '--mod', mod_id, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
-            taskName 'Data'
-            mods {
-                modDataRun {
-                    source sourceSets.main
-                }
-            }
         }
     }
 }

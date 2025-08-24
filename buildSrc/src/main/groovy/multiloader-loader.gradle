@@ -3,22 +3,24 @@ plugins {
 }
 
 configurations {
-    commonJava{
+    commonJava {
         canBeResolved = true
+        canBeConsumed = false
     }
-    commonResources{
+    commonResources {
         canBeResolved = true
+        canBeConsumed = false
     }
 }
 
 dependencies {
-    compileOnly(project(":common:C${minecraft_version}")) {
+    compileOnly(project(":common")) {
         capabilities {
             requireCapability "$group:$mod_id"
         }
     }
-    commonJava project(path: ":common:C${minecraft_version}", configuration: 'commonJava')
-    commonResources project(path: ":common:C${minecraft_version}", configuration: 'commonResources')
+    commonJava project(path: ":common", configuration: 'commonJava')
+    commonResources project(path: ":common", configuration: 'commonResources')
 }
 
 tasks.named('compileJava', JavaCompile) {
@@ -43,11 +45,11 @@ tasks.named('sourcesJar', Jar) {
     from(configurations.commonResources)
 }
 
-tasks.named("jar") {
+tasks.named("jar", Jar) {
     doLast {
-        copy {
-            from archiveFile
-            into "${rootProject.projectDir}/build"
+        project.copy { spec ->
+            spec.from(archiveFile.get().asFile)
+            spec.into(rootProject.layout.projectDirectory.dir("build").asFile)
         }
     }
 }

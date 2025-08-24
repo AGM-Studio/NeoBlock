@@ -1,9 +1,0 @@
-three-stones = [
-    "3xminecraft:stone"
-]
-
-stone-pot = [
-    "minecraft:andesite",
-    "minecraft:granite",
-    "minecraft:diorite"
-]

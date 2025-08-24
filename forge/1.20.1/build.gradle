@@ -24,7 +24,7 @@ neoForge {
 
     validateAccessTransformers = true
 
-    def at = project(":common:C${minecraft_version}").file('src/main/resources/META-INF/accesstransformer.cfg')
+    def at = project(":common").file('src/main/resources/META-INF/accesstransformer.cfg')
     if (at.exists()) {
         accessTransformers = ["src/main/resources/META-INF/accesstransformer.cfg"]
     }
@@ -64,15 +64,15 @@ neoForge {
 sourceSets.main.resources.srcDir 'src/generated/resources'
 
 dependencies {
-    compileOnly project(":common:C${minecraft_version}")
+    compileOnly project(":common")
     annotationProcessor("org.spongepowered:mixin:0.8.5-SNAPSHOT:processor")
 }
 
-jar {
-    finalizedBy('reobfJar')
-    manifest.attributes([
-            "MixinConfigs": "${mod_id}.mixins.json,${mod_id}.forge.mixins.json"
-    ])
+tasks.jar {
+    finalizedBy(tasks.named('reobfJar'))
+    manifest {
+        attributes("MixinConfigs": "${mod_id}.mixins.json,${mod_id}.forge.mixins.json")
+    }
 }
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }

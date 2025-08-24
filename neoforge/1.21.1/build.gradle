@@ -11,7 +11,7 @@ dependencies {
 neoForge {
     version = neoforge_version
 
-    def at = project(":common:C${minecraft_version}").file('src/main/resources/META-INF/accesstransformer.cfg')
+    def at = project(":common").file('src/main/resources/META-INF/accesstransformer.cfg')
     if (at.exists()) {
         accessTransformers.from(at.absolutePath)
     }
