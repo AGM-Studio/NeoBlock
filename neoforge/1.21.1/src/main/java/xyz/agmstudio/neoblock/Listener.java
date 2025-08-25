@@ -1,17 +1,20 @@
 package xyz.agmstudio.neoblock;
 
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.agmstudio.neoblock.commands.util.NeoCommand;
+import xyz.agmstudio.neoblock.compatibility.ForgivingVoid;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
 
 @EventBusSubscriber(modid = NeoBlock.MOD_ID)
@@ -47,5 +50,14 @@ public final class Listener {
     public static void onRegisterCommands(RegisterCommandsEvent event) {
         NeoBlock.registerCommands();
         NeoCommand.registerAll(event.getDispatcher());
+    }
+
+    @SubscribeEvent
+    public static void onLivingDamage(LivingDamageEvent.Pre event) {
+        ServerLevel level = getServerConditioned(event.getEntity().level(), false, false);
+        if (level == null) return;
+
+        if (event.getSource().is(DamageTypes.FELL_OUT_OF_WORLD))
+            if (ForgivingVoid.handleVoid(level, event.getEntity())) event.setNewDamage(0);
     }
 }

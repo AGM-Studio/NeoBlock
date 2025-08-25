@@ -8,7 +8,9 @@
     "CreateWorldScreenMixin"
   ],
   "server": [],
-  "mixins": [],
+  "mixins": [
+    "EntityVoidRescueMixin"
+  ],
   "injectors": {
     "defaultRequire": 1
   }
