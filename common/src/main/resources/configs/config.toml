@@ -7,6 +7,38 @@ x = 0                       #  will only affect when generating the world for th
 y = 64                      # To change it after first generation, use /neoblock force setblock <x> <y> <z>
 z = 0
 
+[forgiving-void]
+players = true              # Save the players if they fall into void
+hostile = true              # Save hostile entities that fall into void
+villger = true              # Save wandering traders and villagers that fall into void
+livings = true              # Save other living entities that fall into void
+items = true                # Save items if they fall into void
+misc = false                # Save any other entity falling into the void like arrow or XP orbs
+exceptions = [              # Will save these even if the category is turned off
+    "minecraft:minecart",
+    "minecraft:minecart_chest",
+    "minecraft:minecart_hopper",
+    "minecraft:armor_stand"
+]
+# When saving, will teleport to X & Z of neoblock, the toppest block.
+# It will be added to that position for additional drop... might deal extra damage!
+y-offset = 1.0
+
+animate-players = true      # A lightning animation for players if they fell
+animate-hostile = true      # For falling hostile
+animate-livings = true      # For other livings
+
+# How much void damage should be given as the punishment?
+damage-players = "MAX"      # MAX: Max health - 1                     HALF: Half of the max health
+damage-hostile = 4.0        # ONE_HEART: All remaining health - 1
+damage-livings = 0.0        # Positive value: like 2.5 for the exact amount...
+
+# Potion effects on fall for players only. use `-` instead of `:`.
+[forgiving-void.potions]
+minecraft-blindness = 8     # 8 seconds of blindness
+minecraft-nausea = 12       # 12 seconds of nausea
+
+
 # [schematics.custom_0]       # You can add as many custom schematics to be loaded when the world is generated. Remove the `#` at the beginning of the lines to start and for more duplicte this.
 # name = "NeoBlockSchematic_0.nbt"
 # x = 20                      # The title must increase in order (schematics.custom_0, schematics.custom_1, schematics.custom_2, ...)

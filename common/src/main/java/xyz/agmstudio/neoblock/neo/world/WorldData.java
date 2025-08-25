@@ -13,6 +13,7 @@ import xyz.agmstudio.neoblock.animations.Animation;
 import xyz.agmstudio.neoblock.commands.ForceBlockCommand;
 import xyz.agmstudio.neoblock.commands.ForceResetTiersCommand;
 import xyz.agmstudio.neoblock.commands.util.NeoCommand;
+import xyz.agmstudio.neoblock.compatibility.ForgivingVoid;
 import xyz.agmstudio.neoblock.data.NBTSaveable;
 import xyz.agmstudio.neoblock.data.Schematic;
 import xyz.agmstudio.neoblock.neo.block.BlockManager;
@@ -59,6 +60,8 @@ public abstract class WorldData extends SavedData {
 
         NeoChestSpec.reloadChests();
         NeoSeqBlockSpec.reloadSequences();
+
+        ForgivingVoid.loadConfig();
 
         Animation.reloadAnimations();
     }
