@@ -40,7 +40,7 @@ neoForge {
             systemProperty('neoforge.enabledGameTestNamespaces', mod_id)
             ideName = "NeoForge ${it.name.capitalize()} (${project.path})" // Unify the run config names with fabric
 
-            gameDirectory.set(file("${rootProject.projectDir}/.runs/${project.name}/${it.name}"))
+            gameDirectory.set(file("${rootProject.projectDir}/.runs/${platform}/${project.name}/${it.name}"))
         }
         client {
             client()
