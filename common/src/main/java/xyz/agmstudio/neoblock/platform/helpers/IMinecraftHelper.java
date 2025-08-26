@@ -3,6 +3,8 @@ package xyz.agmstudio.neoblock.platform.helpers;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.valueproviders.UniformInt;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
@@ -13,6 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.neo.loot.NeoItemSpec;
 
 import java.util.Optional;
+import java.util.function.BiFunction;
 
 public interface IMinecraftHelper {
     @NotNull ResourceLocation parseResourceLocation(String name);
@@ -27,6 +30,11 @@ public interface IMinecraftHelper {
 
     Optional<EntityType<?>> getEntityType(ResourceLocation location);
     Optional<ResourceLocation> getEntityTypeResource(EntityType<?> type);
+
+    Optional<MobEffect> getMobEffect(ResourceLocation location);
+    Optional<ResourceLocation> getMobEffectResource(MobEffect effect);
+
+    BiFunction<MobEffect, Integer, MobEffectInstance> effectFactory();
 
     Iterable<Entity> iterateEntities(ServerLevel level);
 

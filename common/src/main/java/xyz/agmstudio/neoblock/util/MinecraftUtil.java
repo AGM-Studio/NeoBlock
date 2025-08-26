@@ -3,6 +3,8 @@ package xyz.agmstudio.neoblock.util;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.valueproviders.UniformInt;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
@@ -83,6 +85,23 @@ public final class MinecraftUtil {
     }
     public static boolean isValidEntityType(EntityType<?> entityType, ResourceLocation location) {
         return getEntityTypeResource(entityType).orElse(null) == location;
+    }
+
+    public static Optional<MobEffect> getMobEffect(String name) {
+        return getMobEffect(getResourceLocation(name).orElse(null));
+    }
+    private static Optional<MobEffect> getMobEffect(ResourceLocation location) {
+        return HELPER.getMobEffect(location);
+    }
+    private static Optional<ResourceLocation> getMobEffectResource(MobEffect effect) {
+        return HELPER.getMobEffectResource(effect);
+    }
+    public static boolean isValidMobEffect(MobEffect effect, ResourceLocation location) {
+        return getMobEffectResource(effect).orElse(null) == location;
+    }
+
+    public static MobEffectInstance getMobEffectInstance(MobEffect effect, int time) {
+        return HELPER.effectFactory().apply(effect, time);
     }
 
     public static Iterable<Entity> allEntities(ServerLevel level) {

@@ -3,7 +3,11 @@ package xyz.agmstudio.neoblock.compatibility;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LightningBolt;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Monster;
@@ -17,10 +21,7 @@ import xyz.agmstudio.neoblock.neo.block.BlockManager;
 import xyz.agmstudio.neoblock.platform.implants.IConfig;
 import xyz.agmstudio.neoblock.util.MinecraftUtil;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 
 public class ForgivingVoid {
@@ -31,9 +32,16 @@ public class ForgivingVoid {
     private static boolean items;
     private static boolean misc;
 
+    private static boolean animatePlayers;
+    private static boolean animateHostile;
+    private static boolean animateVillager;
+    private static boolean animateLivings;
+
     private static double offset;
 
+    private static final HashMap<MobEffect, Integer> effects = new HashMap<>();
     private static final List<String> exceptions = new ArrayList<>();
+
     private static Function<LivingEntity, Float> playersDamager;
     private static Function<LivingEntity, Float> hostileDamager;
     private static Function<LivingEntity, Float> livingsDamager;
@@ -62,7 +70,12 @@ public class ForgivingVoid {
         ForgivingVoid.items     = config.get("forgiving-void.items", true);
         ForgivingVoid.misc      = config.get("forgiving-void.misc", false);
 
-        ForgivingVoid.offset    = config.get("forgiving-void.y-offset", 1.0);
+        ForgivingVoid.animatePlayers  = config.get("forgiving-void.animate-players", true);
+        ForgivingVoid.animateHostile  = config.get("forgiving-void.animate-hostile", false);
+        ForgivingVoid.animateVillager = config.get("forgiving-void.animate-villager", false);
+        ForgivingVoid.animateLivings  = config.get("forgiving-void.animate-livings", false);
+
+        ForgivingVoid.offset = config.get("forgiving-void.y-offset", 1.0);
 
         ForgivingVoid.exceptions.clear();
         List<String> exceptions = config.get("forgiving-void.exceptions", List.of());
@@ -71,6 +84,13 @@ public class ForgivingVoid {
         ForgivingVoid.playersDamager = castDamager(config.get("forgiving-void.damage-players", "MAX"));
         ForgivingVoid.hostileDamager = castDamager(config.get("forgiving-void.damage-hostile", 4.0));
         ForgivingVoid.livingsDamager = castDamager(config.get("forgiving-void.damage-livings", 0.0));
+
+        IConfig potions = config.getSection("forgiving-void.potions");
+        if (potions != null) for (String key: potions.valueMap().keySet()) {
+            double time = potions.getInt(key);
+            Optional<MobEffect> effect = MinecraftUtil.getMobEffect(key.replace('-', ':'));
+            if (time > 0 && effect.isPresent()) effects.put(effect.get(), (int) (time * 20));
+        }
 
         NeoBlock.LOGGER.debug("ForgivingVoid: Config loaded.");
     }
@@ -96,6 +116,27 @@ public class ForgivingVoid {
 
         return livingsDamager.apply(entity);
     }
+    private static boolean animate(ServerLevel level, LivingEntity entity) {
+        if (entity instanceof Player) return animatePlayers && animate(level, entity.position());
+        if (entity instanceof Monster) return animateHostile && animate(level, entity.position());
+        if (entity instanceof Villager || entity instanceof WanderingTrader)
+            return animateVillager && animate(level, entity.position());
+
+        return animateLivings && animate(level, entity.position());
+    }
+    private static boolean animate(ServerLevel level, Vec3 pos) {
+        LightningBolt lightning = new LightningBolt(EntityType.LIGHTNING_BOLT, level);
+        lightning.setVisualOnly(true);
+        lightning.setPos(pos);
+
+        return level.addFreshEntity(lightning);
+    }
+    private static void addEffects(Player player) {
+        for (Map.Entry<MobEffect, Integer> entry : effects.entrySet()) {
+            MobEffectInstance effect = MinecraftUtil.getMobEffectInstance(entry.getKey(), entry.getValue());
+            player.addEffect(effect);
+        }
+    }
 
     public static boolean handleVoid(ServerLevel level, Entity entity) {
         if (!shallBeRescued(entity)) return false;
@@ -106,8 +147,11 @@ public class ForgivingVoid {
         entity.setDeltaMovement(Vec3.ZERO);
         entity.fallDistance = 0;
 
-        if (entity instanceof LivingEntity living)
+        if (entity instanceof LivingEntity living) {
             living.hurt(living.damageSources().fall(), getDamage(living));
+            ForgivingVoid.animate(level, living);
+            if (living instanceof Player player) addEffects(player);
+        }
 
         return true;
     }

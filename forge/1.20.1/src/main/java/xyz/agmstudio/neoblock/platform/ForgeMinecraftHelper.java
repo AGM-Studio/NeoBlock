@@ -4,6 +4,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.valueproviders.UniformInt;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
@@ -18,6 +20,7 @@ import xyz.agmstudio.neoblock.neo.world.WorldData;
 import xyz.agmstudio.neoblock.platform.helpers.IMinecraftHelper;
 
 import java.util.Optional;
+import java.util.function.BiFunction;
 
 public final class ForgeMinecraftHelper implements IMinecraftHelper {
     @Override public @NotNull ResourceLocation parseResourceLocation(String name) {
@@ -55,6 +58,17 @@ public final class ForgeMinecraftHelper implements IMinecraftHelper {
     @Override public Optional<ResourceLocation> getEntityTypeResource(EntityType<?> type) {
         if (type == null) return Optional.empty();
         return Optional.ofNullable(ForgeRegistries.ENTITY_TYPES.getKey(type));
+    }
+
+    @Override public Optional<MobEffect> getMobEffect(ResourceLocation location) {
+        return Optional.ofNullable(ForgeRegistries.MOB_EFFECTS.getValue(location));
+    }
+    @Override public Optional<ResourceLocation> getMobEffectResource(MobEffect effect) {
+        return Optional.ofNullable(ForgeRegistries.MOB_EFFECTS.getKey(effect));
+    }
+
+    @Override public BiFunction<MobEffect, Integer, MobEffectInstance> effectFactory() {
+        return MobEffectInstance::new;
     }
 
     @Override public Iterable<Entity> iterateEntities(ServerLevel level) {

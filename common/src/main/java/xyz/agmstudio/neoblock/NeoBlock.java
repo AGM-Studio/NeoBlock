@@ -57,11 +57,10 @@ public abstract class NeoBlock {
         NeoBlock.instance = this;
         NeoBlock.config = ConfigUtil.getConfig(CONFIG_FOLDER, "config.toml");
 
-        NeoBlock.LOGGER.warn("Enabling the neoblock...");
         if (Services.PLATFORM.isDevelopmentEnvironment()) {
             Configurator.setRootLevel(Level.ERROR);
             Configurator.setLevel(LOGGER.getName(), Level.DEBUG);
-            LOGGER.debug("Disabling other mods logging and enabling debug mode for neoblock (development environment)");
+            LOGGER.debug("Enabling debug mode for neoblock (development environment)");
         }
 
         NeoBlock.registerTicker(Animation::tickAll);

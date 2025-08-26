@@ -10,7 +10,7 @@ z = 0
 [forgiving-void]
 players = true              # Save the players if they fall into void
 hostile = true              # Save hostile entities that fall into void
-villger = true              # Save wandering traders and villagers that fall into void
+villager = true             # Save wandering traders and villagers that fall into void
 livings = true              # Save other living entities that fall into void
 items = true                # Save items if they fall into void
 misc = false                # Save any other entity falling into the void like arrow or XP orbs
@@ -25,8 +25,9 @@ exceptions = [              # Will save these even if the category is turned off
 y-offset = 1.0
 
 animate-players = true      # A lightning animation for players if they fell
-animate-hostile = true      # For falling hostile
-animate-livings = true      # For other livings
+animate-hostile = false     # For falling hostile
+animate-villager = false    # For falling villagers and wandering traders
+animate-livings = false     # For other livings
 
 # How much void damage should be given as the punishment?
 damage-players = "MAX"      # MAX: Max health - 1                     HALF: Half of the max health
