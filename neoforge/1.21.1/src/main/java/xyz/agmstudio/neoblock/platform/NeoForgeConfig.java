@@ -17,7 +17,7 @@ public class NeoForgeConfig implements IConfig {
 
     @Override public IConfig getSection(String path) {
         UnmodifiableConfig config = this.config.get(path);
-        return new NeoForgeConfig(config);
+        return config != null ? new NeoForgeConfig(config) : null;
     }
 
     @Override public boolean contains(String path) {
