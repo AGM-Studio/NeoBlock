@@ -56,9 +56,12 @@ public class TierSpec implements NBTSaveable {
     protected final List<NeoBlockSpec> blocks = new ArrayList<>();
     protected int totalBlockWeight = 0;
 
-    protected NeoTradePool tradePoolUnlock;
     protected NeoTradePool trades;
     protected NeoSeqBlockSpec startSequence;
+
+    protected TierSpecActions unlockActions;
+    protected TierSpecActions enableActions;
+    protected TierSpecActions disableActions;
 
     public boolean isStable() {
         return Objects.equals(hash, getHashCode());
@@ -143,9 +146,11 @@ public class TierSpec implements NBTSaveable {
     }
     public void enable() {
         enabled = true;
+        enableActions.apply(WorldData.getWorldLevel());
     }
     public void disable() {
         enabled = false;
+        disableActions.apply(WorldData.getWorldLevel());
     }
 
     public int getID() {

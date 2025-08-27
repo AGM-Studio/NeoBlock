@@ -2,10 +2,8 @@ package xyz.agmstudio.neoblock.neo.tiers;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.entity.npc.WanderingTrader;
 import xyz.agmstudio.neoblock.data.NBTData;
 import xyz.agmstudio.neoblock.data.NBTSaveable;
-import xyz.agmstudio.neoblock.neo.loot.trade.NeoMerchant;
 import xyz.agmstudio.neoblock.util.MessengerUtil;
 
 public class TierResearch implements NBTSaveable {
@@ -32,8 +30,7 @@ public class TierResearch implements NBTSaveable {
     }
     public void onStart(ServerLevel level) {
         MessengerUtil.sendInstantMessage("message.neoblock.unlocking_tier", level, false, tier.id);
-        WanderingTrader trader = NeoMerchant.spawnTraderWith(tier.tradePoolUnlock.getPool(), level, "UnlockTrader");
-        if (trader != null) MessengerUtil.sendInstantMessage("message.neoblock.unlocking_trader", level, false, tier.id);
+        tier.unlockActions.apply(level);
     }
 
     public long getTime() {

@@ -66,14 +66,15 @@ public final class TierManager {
         if (spec.blocks.isEmpty()) spec.weight = 0;
         else spec.weight = Math.max(0, config.getInt("weight", 1));
 
-        final List<String> unlockTrades = config.get("unlock-trades", List.of());
-        spec.tradePoolUnlock = NeoTradePool.parse(unlockTrades);
-
         final List<String> list = config.get("trader-trades", config.get("trades", List.of()));
         spec.trades = NeoTradePool.parse(list);
 
         final List<NeoBlockSpec> start = NeoSeqBlockSpec.extractSequenceList(config.get("starting-blocks", List.of()));
         spec.startSequence = new NeoSeqBlockSpec(start, 1, "tier-" + spec.id + "-start");
+
+        spec.unlockActions = new TierSpecActions(config, "on-unlock").withMessage("message.neoblock.unlocking_trader", spec.id);
+        spec.enableActions = new TierSpecActions(config, "on-enable").withMessage("message.neoblock.enabling_trader", spec.id);
+        spec.disableActions = new TierSpecActions(config, "on-disable").withMessage("message.neoblock.disabling_trader", spec.id);
 
         NeoBlock.LOGGER.debug("Tier {} loaded. Hash key: {}", spec.id, spec.getHashCode());
     }
