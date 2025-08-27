@@ -2,6 +2,7 @@ package xyz.agmstudio.neoblock.util;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -12,6 +13,9 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.trading.MerchantOffer;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.scores.Objective;
+import net.minecraft.world.scores.Scoreboard;
+import net.minecraft.world.scores.criteria.ObjectiveCriteria;
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.neo.loot.NeoItemSpec;
 import xyz.agmstudio.neoblock.platform.Services;
@@ -114,5 +118,51 @@ public final class MinecraftUtil {
 
     public static Optional<MerchantOffer> getOfferOf(NeoItemSpec result, NeoItemSpec costA, NeoItemSpec costB, UniformInt uses) {
         return HELPER.getOfferOf(result, costA, costB, uses);
+    }
+
+    public enum ScoreboardSlots {
+        LIST(0, "list"),
+        SIDEBAR(1, "sidebar"),
+        BELOW_NAME(2, "below_name"),
+        TEAM_BLACK(3, "sidebar.team.black"),
+        TEAM_DARK_BLUE(4, "sidebar.team.dark_blue"),
+        TEAM_DARK_GREEN(5, "sidebar.team.dark_green"),
+        TEAM_DARK_AQUA(6, "sidebar.team.dark_aqua"),
+        TEAM_DARK_RED(7, "sidebar.team.dark_red"),
+        TEAM_DARK_PURPLE(8, "sidebar.team.dark_purple"),
+        TEAM_GOLD(9, "sidebar.team.gold"),
+        TEAM_GRAY(10, "sidebar.team.gray"),
+        TEAM_DARK_GRAY(11, "sidebar.team.dark_gray"),
+        TEAM_BLUE(12, "sidebar.team.blue"),
+        TEAM_GREEN(13, "sidebar.team.green"),
+        TEAM_AQUA(14, "sidebar.team.aqua"),
+        TEAM_RED(15, "sidebar.team.red"),
+        TEAM_LIGHT_PURPLE(16, "sidebar.team.light_purple"),
+        TEAM_YELLOW(17, "sidebar.team.yellow"),
+        TEAM_WHITE(18, "sidebar.team.white");
+
+        public final String value;
+        public final int id;
+
+        ScoreboardSlots(int id, String value) {
+            this.id = id;
+            this.value = value;
+        }
+    }
+
+    public static Objective createScoreboardObjective(Scoreboard scoreboard, String name, ObjectiveCriteria criteria, String title, ObjectiveCriteria.RenderType renderType) {
+        return HELPER.createScoreboardObjective(scoreboard, name, criteria, title, renderType);
+    }
+    public static void setScoreboardDisplay(Scoreboard scoreboard, ScoreboardSlots slot, Objective objective) {
+        HELPER.setScoreboardDisplay(scoreboard, slot, objective);
+    }
+    public static void setPlayerScore(Scoreboard scoreboard, ServerPlayer player, Objective objective, int amount) {
+        HELPER.setPlayerScore(scoreboard, player, objective, amount);
+    }
+    public static void addPlayerScore(Scoreboard scoreboard, ServerPlayer player, Objective objective, int amount) {
+        HELPER.addPlayerScore(scoreboard, player, objective, amount);
+    }
+    public static int getPlayerScore(Scoreboard scoreboard, ServerPlayer player, Objective objective) {
+        return HELPER.getPlayerScore(scoreboard, player, objective);
     }
 }

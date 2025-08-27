@@ -2,6 +2,7 @@ package xyz.agmstudio.neoblock.platform.helpers;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -11,8 +12,12 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.trading.MerchantOffer;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.scores.Objective;
+import net.minecraft.world.scores.Scoreboard;
+import net.minecraft.world.scores.criteria.ObjectiveCriteria;
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.neo.loot.NeoItemSpec;
+import xyz.agmstudio.neoblock.util.MinecraftUtil;
 
 import java.util.Optional;
 import java.util.function.BiFunction;
@@ -41,4 +46,10 @@ public interface IMinecraftHelper {
     void leash(Entity mob, Mob to);
 
     Optional<MerchantOffer> getOfferOf(NeoItemSpec result, NeoItemSpec costA, NeoItemSpec costB, UniformInt uses);
+
+    Objective createScoreboardObjective(Scoreboard scoreboard, String name, ObjectiveCriteria criteria, String title, ObjectiveCriteria.RenderType renderType);
+    void setScoreboardDisplay(Scoreboard scoreboard, MinecraftUtil.ScoreboardSlots slot, Objective objective);
+    void setPlayerScore(Scoreboard scoreboard, ServerPlayer player, Objective objective, int amount);
+    void addPlayerScore(Scoreboard scoreboard, ServerPlayer player, Objective objective, int amount);
+    int getPlayerScore(Scoreboard scoreboard, ServerPlayer player, Objective objective);
 }

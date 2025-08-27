@@ -1,6 +1,7 @@
 package xyz.agmstudio.neoblock;
 
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -8,6 +9,7 @@ import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
+import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -15,6 +17,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.agmstudio.neoblock.commands.util.NeoCommand;
 import xyz.agmstudio.neoblock.compatibility.ForgivingVoid;
+import xyz.agmstudio.neoblock.neo.block.BlockManager;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
 
 @Mod.EventBusSubscriber(modid = NeoBlock.MOD_ID)
@@ -37,6 +40,14 @@ public final class Listener {
     public static void onWorldTick(TickEvent.LevelTickEvent event) {
         ServerLevel level = getServerConditioned(event.level, true, true);
         if (level != null) NeoBlock.onTick(level);
+    }
+
+    @SubscribeEvent
+    public static void onBlockBroken(BlockEvent.BreakEvent event) {
+        if (event.isCanceled()) return;
+        if (event.getPlayer() == null || event.getPlayer().isCreative()) return;
+        if (event.getPlayer() instanceof ServerPlayer player && BlockManager.isNeoBlock(event.getPos()))
+            WorldData.addBlocksBroken(player, 1);
     }
 
     @SubscribeEvent

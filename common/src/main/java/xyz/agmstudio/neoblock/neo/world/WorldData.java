@@ -5,8 +5,12 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.saveddata.SavedData;
+import net.minecraft.world.scores.Objective;
+import net.minecraft.world.scores.Scoreboard;
+import net.minecraft.world.scores.criteria.ObjectiveCriteria;
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlock;
 import xyz.agmstudio.neoblock.animations.Animation;
@@ -26,6 +30,7 @@ import xyz.agmstudio.neoblock.neo.tiers.TierSpec;
 import xyz.agmstudio.neoblock.platform.Services;
 import xyz.agmstudio.neoblock.platform.implants.IConfig;
 import xyz.agmstudio.neoblock.util.MessengerUtil;
+import xyz.agmstudio.neoblock.util.MinecraftUtil;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -34,6 +39,8 @@ import java.util.List;
 import java.util.Optional;
 
 public abstract class WorldData extends SavedData {
+    private static final String BLOCK_BREAK_OBJECTIVE = "neoblocks_broken";
+
     private static WorldData load(ServerLevel level) {
         return Services.PLATFORM.captureSavedData(level, "neo_block_data", t -> WorldData.load(t, level), () -> WorldData.create(level));
     }
@@ -225,5 +232,34 @@ public abstract class WorldData extends SavedData {
         tier.setSpecialRequirement(true);
 
         if (force && tier.canBeResearched()) tier.startResearch();
+    }
+
+    private static Objective getObjective(Scoreboard scoreboard) {
+        Objective objective = scoreboard.getObjective(BLOCK_BREAK_OBJECTIVE);
+        if (objective != null) return objective;
+
+        objective = MinecraftUtil.createScoreboardObjective(scoreboard, BLOCK_BREAK_OBJECTIVE, ObjectiveCriteria.DUMMY, "scoreboard.neoblock.title", ObjectiveCriteria.RenderType.INTEGER);
+        MinecraftUtil.setScoreboardDisplay(scoreboard, MinecraftUtil.ScoreboardSlots.LIST, objective);
+        MinecraftUtil.setScoreboardDisplay(scoreboard, MinecraftUtil.ScoreboardSlots.BELOW_NAME, objective);
+
+        return objective;
+    }
+    public static void addBlocksBroken(ServerPlayer player, int amount) {
+        Scoreboard scoreboard = player.getScoreboard();
+        Objective objective = getObjective(scoreboard);
+
+        MinecraftUtil.addPlayerScore(scoreboard, player, objective, amount);
+    }
+    public static void setBlocksBroken(ServerPlayer player, int amount) {
+        Scoreboard scoreboard = player.getScoreboard();
+        Objective objective = getObjective(scoreboard);
+
+        MinecraftUtil.setPlayerScore(scoreboard, player, objective, amount);
+    }
+    public static int getBlocksBroken(ServerPlayer player) {
+        Scoreboard scoreboard = player.getScoreboard();
+        Objective objective = getObjective(scoreboard);
+
+        return MinecraftUtil.getPlayerScore(scoreboard, player, objective);
     }
 }

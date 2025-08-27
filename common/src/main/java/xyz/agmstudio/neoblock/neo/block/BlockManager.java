@@ -92,4 +92,8 @@ public class BlockManager {
             if (block.getBlock() != Blocks.BEDROCK) BEDROCK_SPEC.placeAt(level, getBlockPos());
         } else if (block.isAir() || block.canBeReplaced()) updateBlock(level, true);
     }
+
+    public static boolean isNeoBlock(BlockPos pos) {
+        return getBlockPos().equals(pos);
+    }
 }

@@ -1,8 +1,10 @@
 package xyz.agmstudio.neoblock.platform;
 
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.effect.MobEffect;
@@ -12,14 +14,18 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.trading.ItemCost;
 import net.minecraft.world.item.trading.MerchantOffer;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.scores.*;
+import net.minecraft.world.scores.criteria.ObjectiveCriteria;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.neo.loot.NeoItemSpec;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
 import xyz.agmstudio.neoblock.platform.helpers.IMinecraftHelper;
+import xyz.agmstudio.neoblock.util.MinecraftUtil;
 
 import java.util.Optional;
 import java.util.function.BiFunction;
@@ -92,7 +98,7 @@ public final class ForgeMinecraftHelper implements IMinecraftHelper {
 
     @Override public Optional<MerchantOffer> getOfferOf(NeoItemSpec result, NeoItemSpec costA, NeoItemSpec costB, UniformInt uses) {
         @NotNull final RandomSource RNG = WorldData.getRandom();
-        @NotNull final Item AIR = net.minecraft.world.item.Items.AIR;
+        @NotNull final Item AIR = Items.AIR;
 
         ItemStack r = toItemStack(result, RNG);
         ItemCost a = toItemCost(costA, RNG);
@@ -100,5 +106,48 @@ public final class ForgeMinecraftHelper implements IMinecraftHelper {
 
         if (r.getItem() == AIR || a.itemStack().getItem() == AIR) return Optional.empty();
         return Optional.of(new MerchantOffer(a, b, r, uses.sample(RNG), 0, 0));
+    }
+
+    @Override
+    public Objective createScoreboardObjective(Scoreboard scoreboard, String name, ObjectiveCriteria criteria, String title, ObjectiveCriteria.RenderType renderType) {
+        return scoreboard.addObjective(name, criteria, Component.translatable(title), renderType, true, null);
+    }
+    @Override public void setScoreboardDisplay(Scoreboard scoreboard, MinecraftUtil.ScoreboardSlots slot, Objective objective) {
+        DisplaySlot convert = switch (slot) {
+            case LIST -> DisplaySlot.LIST;
+            case SIDEBAR ->  DisplaySlot.SIDEBAR;
+            case BELOW_NAME ->  DisplaySlot.BELOW_NAME;
+            case TEAM_BLACK -> DisplaySlot.TEAM_BLACK;
+            case TEAM_DARK_BLUE -> DisplaySlot.TEAM_DARK_BLUE;
+            case TEAM_DARK_GREEN -> DisplaySlot.TEAM_DARK_GREEN;
+            case TEAM_DARK_AQUA -> DisplaySlot.TEAM_DARK_AQUA;
+            case TEAM_DARK_RED -> DisplaySlot.TEAM_DARK_RED;
+            case TEAM_DARK_PURPLE -> DisplaySlot.TEAM_DARK_PURPLE;
+            case TEAM_GOLD -> DisplaySlot.TEAM_GOLD;
+            case TEAM_GRAY -> DisplaySlot.TEAM_GRAY;
+            case TEAM_DARK_GRAY -> DisplaySlot.TEAM_DARK_GRAY;
+            case TEAM_BLUE -> DisplaySlot.TEAM_BLUE;
+            case TEAM_GREEN -> DisplaySlot.TEAM_GREEN;
+            case TEAM_AQUA -> DisplaySlot.TEAM_AQUA;
+            case TEAM_RED -> DisplaySlot.TEAM_RED;
+            case TEAM_LIGHT_PURPLE -> DisplaySlot.TEAM_LIGHT_PURPLE;
+            case TEAM_YELLOW -> DisplaySlot.TEAM_YELLOW;
+            case TEAM_WHITE -> DisplaySlot.TEAM_WHITE;
+        };
+
+        scoreboard.setDisplayObjective(convert, objective);
+    }
+
+    private ScoreAccess capturePlayerScore(Scoreboard scoreboard, ServerPlayer player, Objective objective) {
+        return scoreboard.getOrCreatePlayerScore(ScoreHolder.fromGameProfile(player.getGameProfile()), objective);
+    }
+    @Override public void setPlayerScore(Scoreboard scoreboard, ServerPlayer player, Objective objective, int amount) {
+        capturePlayerScore(scoreboard, player, objective).set(amount);
+    }
+    @Override public void addPlayerScore(Scoreboard scoreboard, ServerPlayer player, Objective objective, int amount) {
+        capturePlayerScore(scoreboard, player, objective).add(amount);
+    }
+    @Override public int getPlayerScore(Scoreboard scoreboard, ServerPlayer player, Objective objective) {
+        return capturePlayerScore(scoreboard, player, objective).get();
     }
 }

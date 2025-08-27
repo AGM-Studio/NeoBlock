@@ -5,6 +5,8 @@
   "bossbar.neoblock.upgrade_bar": "Upgrading... (%s)",
   "bossbar.neoblock.upgrade_bar_no_time": "Upgrading...",
 
+  "scoreboard.neoblock.title": "NeoBlocks broken",
+
   "block.neoblock.neoblock": "NeoBlock Generation",
 
   "item.neoblock.mob_ticket": "Mob trade ticket",
