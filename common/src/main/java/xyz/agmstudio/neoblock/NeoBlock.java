@@ -14,6 +14,7 @@ import xyz.agmstudio.neoblock.neo.block.BlockManager;
 import xyz.agmstudio.neoblock.neo.loot.NeoMobSpec;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoMerchant;
 import xyz.agmstudio.neoblock.neo.tiers.TierManager;
+import xyz.agmstudio.neoblock.neo.world.WorldData;
 import xyz.agmstudio.neoblock.platform.Services;
 import xyz.agmstudio.neoblock.platform.helpers.IRegistryHelper;
 import xyz.agmstudio.neoblock.platform.implants.IConfig;
@@ -56,6 +57,10 @@ public abstract class NeoBlock {
 
         NeoBlock.instance = this;
         NeoBlock.config = ConfigUtil.getConfig(CONFIG_FOLDER, "config.toml");
+
+        // To make sure files are created.
+        WorldData.reloadConfig();
+        ResourceUtil.loadAllTierConfigs();
 
         if (Services.PLATFORM.isDevelopmentEnvironment()) {
             Configurator.setRootLevel(Level.ERROR);
