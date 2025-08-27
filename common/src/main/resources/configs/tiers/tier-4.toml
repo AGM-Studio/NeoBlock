@@ -1,12 +1,10 @@
 name = "Nether phase"
-# Blocks you want to gurantee to be spawned when this tier is unlocked!
-# The format is the same as blocks, also used in sequences.toml.
-# If empty or missing, a random block will be chosen like normal.
+weight = 1
+
 starting-blocks = [
     "neoblock:chest:tier4-chest"
 ]
-# List of all blocks in this tier. All of them have equal chance to be chosen in this tier.
-# Note that, blocks from tier 0 are available
+
 blocks = [
     "20xminecraft:netherrack",
     "16xminecraft:basalt",
@@ -20,33 +18,23 @@ blocks = [
     "1xminecraft:ancient_debris",
     "1xminecraft:obsidian"
 ]
-# The wight of tier when choosing between enabled tiers.
-weight = 1
-# The trades the trader will spawn with when this tier is enabled. This trader will despawn (if not dead) upon unlocking next tier.
-# Syntax for item is `COUNT`x`ID`, the count can be a range like `8-12` or a number.
-# Uses also use same syntax as the count, but not providing it will use 1 instead.
-# For a trade use one of the following:
-#    `RESULT`; `COST A`; `COST B`; `USES`
-#    `RESULT`; `COST A`; `COST B`;
-#    `RESULT`; `COST A`; `USES`
-#    `RESULT`; `COST A`;
-unlock-trades = [
-    "3-6xminecraft:warped_nylium; 8-16xminecraft:netherrack; 12-24",
-    "3-6xminecraft:crimson_nylium; 8-16xminecraft:netherrack; 12-24",
-    "3-6xminecraft:warped_fungus; 1-2xminecraft:warped_nylium; 10-20xminecraft:oak_sapling; 4-12",
-    "3-6xminecraft:crimson_fungus; 1-2xminecraft:crimson_nylium; 10-20xminecraft:oak_sapling; 4-12"
-]
-# Wandering NeoTraders will spawn when they have some offers
-# List of offers they might have when spawned. using same syntax.
+
 trades = [
     "trade:farm-4",
     "trade:mobs-4",
     "trade:blocks-2 80%"
 ]
 
-# Conditions to unlock the mod, all conditions must be met to unlock.
 [unlock]
-blocks = 600        # Amount of blocks needed to be broken, set to -1 to deactivate
-command = false     # If server has to execute a command to unlock this.  /neoblock unlock <tier-number>
-game-time = -1      # Amount of ticks world has been loaded, set to -1 to deactivate
-unlock-time = 18000 # Upgrade time in ticks. During upgrade the NeoBlock will turn into Bedrock.
+blocks = 600
+command = false
+game-time = -1
+unlock-time = 18000
+
+[on-unlock]
+trades = [
+    "3-6xminecraft:warped_nylium; 8-16xminecraft:netherrack; 12-24",
+    "3-6xminecraft:crimson_nylium; 8-16xminecraft:netherrack; 12-24",
+    "3-6xminecraft:warped_fungus; 1-2xminecraft:warped_nylium; 10-20xminecraft:oak_sapling; 4-12",
+    "3-6xminecraft:crimson_fungus; 1-2xminecraft:crimson_nylium; 10-20xminecraft:oak_sapling; 4-12"
+]

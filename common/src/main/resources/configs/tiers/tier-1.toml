@@ -1,4 +1,6 @@
 name = "Growing phase"  # Helps you to check your tier with info command.
+# The wight of tier when choosing between enabled tiers.
+weight = 3
 # Blocks you want to gurantee to be spawned when this tier is unlocked!
 # The format is the same as blocks, also used in sequences.toml.
 # If empty or missing, a random block will be chosen like normal.
@@ -20,8 +22,6 @@ blocks = [
     "neoblock:sequence:stone-pot",      # The sequences are in sequences.toml
     "neoblock:sequence:three-stones"
 ]
-# The wight of tier when choosing between enabled tiers.
-weight = 3
 # The trades the trader will spawn with when this tier is enabled. This trader will despawn (if not dead) upon unlocking next tier.
 # Syntax for item is `COUNT`x`ID`, the count can be a range like `8-12` or a number.
 # Uses also use same syntax as the count, but not providing it will use 1 instead.
@@ -30,11 +30,7 @@ weight = 3
 #    `RESULT`; `COST A`; `COST B`;
 #    `RESULT`; `COST A`; `USES`
 #    `RESULT`; `COST A`;
-unlock-trades = [
-    "trade:farm-1",
-    "trade:oak-saplings",
-    "1xminecraft:ice; 2-4xminecraft:oak_log; 8-16xminecraft:dirt; 8-12"
-]
+# ----------------------------------------------------------------------------------------------------------------------
 # Wandering NeoTraders will spawn when they have some offers
 # List of offers they might have when spawned. using same syntax.
 trades = [
@@ -49,3 +45,25 @@ blocks = 50         # Amount of blocks needed to be broken, set to -1 to deactiv
 command = false     # If server has to execute a command to unlock this.  /neoblock unlock <tier-number>
 game-time = -1      # Amount of ticks world has been loaded, set to -1 to deactivate
 unlock-time = 1200  # Upgrade time in ticks. During upgrade the NeoBlock will turn into Bedrock.
+
+# The event system (Could be called reward system) has 3 types:
+# on-unlock: Which is when the research/unlocking is done.
+# on-enable: When the tier is enabled. When unlocked it will be enabled immediatly.
+# on-disable: When tier is disabled.
+# All three use the same format as on-unlock given here.
+# For now there are following actions possible, all examples can be found here:
+# rules: Changes the game rules, like enabling the mob spawn.
+# commands: Which executes the commands given exactly.
+# trades: A trader is forced to be spawned with these trades.
+[on-unlock]
+commands = [
+    "give @a apple 8"
+]
+trades = [
+    "trade:farm-1",
+    "trade:oak-saplings",
+    "1xminecraft:ice; 2-4xminecraft:oak_log; 8-16xminecraft:dirt; 8-12"
+]
+
+[on-unlock.rules]
+doMobSpawning = true

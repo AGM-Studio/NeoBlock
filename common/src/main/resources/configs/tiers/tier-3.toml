@@ -1,6 +1,6 @@
 name = "Deep Cave phase"
-# List of all blocks in this tier. All of them have equal chance to be chosen in this tier.
-# Note that, blocks from tier 0 are available
+weight = 1
+
 blocks = [
     "20xminecraft:deepslate",
     "14xminecraft:tuff",
@@ -16,34 +16,24 @@ blocks = [
     "2xminecraft:lapis_ore",
     "1xminecraft:emerald_ore"
 ]
-# The wight of tier when choosing between enabled tiers.
-weight = 1
-# The trades the trader will spawn with when this tier is enabled. This trader will despawn (if not dead) upon unlocking next tier.
-# Syntax for item is `COUNT`x`ID`, the count can be a range like `8-12` or a number.
-# Uses also use same syntax as the count, but not providing it will use 1 instead.
-# For a trade use one of the following:
-#    `RESULT`; `COST A`; `COST B`; `USES`
-#    `RESULT`; `COST A`; `COST B`;
-#    `RESULT`; `COST A`; `USES`
-#    `RESULT`; `COST A`;
-unlock-trades = [
-    "1xminecraft:bamboo; 36-64xminecraft:oak_sapling; 1-3",
-    "1xminecraft:lava_bucket; 16-32xminecraft:cobblestone; 1xminecraft:bucket; 3",
-    "4xminecraft:glow_berries; 16-24xminecraft:moss_block; 8-12",
-    "4xminecraft:sweet_berries; 8-12xminecraft:moss_block; 8-12",
-    "1xminecraft:pointed_dripstone; 8-24xminecraft:cobblestone; 6-12"
-]
-# Wandering NeoTraders will spawn when they have some offers
-# List of offers they might have when spawned. using same syntax.
+
 trades = [
     "1xminecraft:lava_bucket; 16-32xminecraft:iron_ingot; 1xminecraft:bucket; 3 25%",
     "trade:farm-3",
     "trade:mobs-3"
 ]
 
-# Conditions to unlock the mod, all conditions must be met to unlock.
 [unlock]
-blocks = 300        # Amount of blocks needed to be broken, set to -1 to deactivate
-command = false     # If server has to execute a command to unlock this.  /neoblock unlock <tier-number>
-game-time = -1      # Amount of ticks world has been loaded, set to -1 to deactivate
-unlock-time = 9600  # Upgrade time in ticks. During upgrade the NeoBlock will turn into Bedrock.
+blocks = 300
+command = false
+game-time = -1
+unlock-time = 9600
+
+[on-unlock]
+trades = [
+    "1xminecraft:bamboo; 36-64xminecraft:oak_sapling; 1-3",
+    "1xminecraft:lava_bucket; 16-32xminecraft:cobblestone; 1xminecraft:bucket; 3",
+    "4xminecraft:glow_berries; 16-24xminecraft:moss_block; 8-12",
+    "4xminecraft:sweet_berries; 8-12xminecraft:moss_block; 8-12",
+    "1xminecraft:pointed_dripstone; 8-24xminecraft:cobblestone; 6-12"
+]
