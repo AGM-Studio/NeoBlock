@@ -40,14 +40,24 @@ public final class TierSpecActions {
     }
 
     public void apply(ServerLevel level) {
+        applyRulesAndCommands(level);
+        applyTrader(level);
+    }
+    public void applyRulesAndCommands(ServerLevel level) {
+        applyRules(level);
+        applyCommands(level);
+    }
+    public void applyRules(ServerLevel level) {
+        for (Map.Entry<String, Object> rule : this.rules.entrySet())
+            WorldRules.applyGameRule(level, rule.getKey(), rule.getValue());
+    }
+    public void applyCommands(ServerLevel level) {
         MinecraftServer server = level.getServer();
         CommandSourceStack source = server.createCommandSourceStack().withSuppressedOutput();
         for (String command : this.commands)
             server.getCommands().performPrefixedCommand(source, command);
-
-        for (Map.Entry<String, Object> rule : this.rules.entrySet())
-            WorldRules.applyGameRule(level, rule.getKey(), rule.getValue());
-
+    }
+    public void applyTrader(ServerLevel level) {
         WanderingTrader trader = NeoMerchant.spawnTraderWith(trades.getPool(), level, "UnlockTrader");
         if (trader != null) MessengerUtil.sendInstantMessage(traderMessage, level, false, traderMessageArgs);
     }

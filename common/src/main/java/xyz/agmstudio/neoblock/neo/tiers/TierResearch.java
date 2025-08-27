@@ -26,11 +26,12 @@ public class TierResearch implements NBTSaveable {
     public void onFinish(ServerLevel level) {
         tier.enable();
         tier.startSequence.addToQueue(false);
+        tier.unlockActions.applyRulesAndCommands(level);
         MessengerUtil.sendInstantMessage("message.neoblock.unlocked_tier", level, false, tier.id);
     }
     public void onStart(ServerLevel level) {
         MessengerUtil.sendInstantMessage("message.neoblock.unlocking_tier", level, false, tier.id);
-        tier.unlockActions.apply(level);
+        tier.unlockActions.applyTrader(level);
     }
 
     public long getTime() {
