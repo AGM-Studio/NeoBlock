@@ -2,7 +2,8 @@ name = "End phase"
 weight = 1
 
 blocks = [
-    "1xminecraft:end_stone"
+    "99xminecraft:end_stone",
+    "1xminecraft:end_portal_frame"
 ]
 
 trades = [
