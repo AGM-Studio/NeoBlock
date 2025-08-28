@@ -9,7 +9,8 @@
   ],
   "server": [],
   "mixins": [
-    "EntityVoidRescueMixin"
+    "EntityVoidRescueMixin",
+    "EndPortalFrameBlockMixin"
   ],
   "injectors": {
     "defaultRequire": 1

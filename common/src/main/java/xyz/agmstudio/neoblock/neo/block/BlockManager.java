@@ -3,7 +3,11 @@ package xyz.agmstudio.neoblock.neo.block;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
@@ -15,6 +19,7 @@ import xyz.agmstudio.neoblock.neo.loot.trade.NeoMerchant;
 import xyz.agmstudio.neoblock.neo.tiers.TierManager;
 import xyz.agmstudio.neoblock.neo.tiers.TierSpec;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
+import xyz.agmstudio.neoblock.util.MinecraftUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -95,5 +100,18 @@ public class BlockManager {
 
     public static boolean isNeoBlock(BlockPos pos) {
         return getBlockPos().equals(pos);
+    }
+
+    public static void handleEndPortalFrameBreak(ServerLevel level, BlockState state, BlockPos pos, Player player) {
+        ItemStack drop;
+        ItemStack tool = player.getMainHandItem();
+
+        if (tool.getItem() == Items.NETHERITE_PICKAXE && MinecraftUtil.isSilkTouched(tool))
+            drop = new ItemStack(Blocks.END_PORTAL_FRAME);
+        else if (tool.getItem() == Items.DIAMOND_PICKAXE || tool.getItem() == Items.NETHERITE_PICKAXE)
+            drop = new ItemStack(Blocks.END_STONE);
+        else return;
+
+        Block.popResource(level, pos, drop);
     }
 }

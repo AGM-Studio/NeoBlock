@@ -5,6 +5,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
@@ -44,10 +45,12 @@ public final class Listener {
 
     @SubscribeEvent
     public static void onBlockBroken(BlockEvent.BreakEvent event) {
-        if (event.isCanceled()) return;
+        if (event.isCanceled() || !(event.getLevel() instanceof ServerLevel level)) return;
         if (event.getPlayer() == null || event.getPlayer().isCreative()) return;
         if (event.getPlayer() instanceof ServerPlayer player && BlockManager.isNeoBlock(event.getPos()))
             WorldData.addBlocksBroken(player, 1);
+        if (event.getState().getBlock() == Blocks.END_PORTAL_FRAME)
+            BlockManager.handleEndPortalFrameBreak(level, event.getState(), event.getPos(), event.getPlayer());
     }
 
     @SubscribeEvent
