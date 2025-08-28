@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import xyz.agmstudio.neoblock.animations.Animation;
 import xyz.agmstudio.neoblock.commands.*;
+import xyz.agmstudio.neoblock.data.Schematic;
 import xyz.agmstudio.neoblock.neo.block.BlockManager;
 import xyz.agmstudio.neoblock.neo.loot.NeoMobSpec;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoMerchant;
@@ -58,9 +59,11 @@ public abstract class NeoBlock {
         NeoBlock.instance = this;
         NeoBlock.config = ConfigUtil.getConfig(CONFIG_FOLDER, "config.toml");
 
-        // To make sure files are created.
+        // To make sure files & folders are created.
         WorldData.reloadConfig();
         ResourceUtil.loadAllTierConfigs();
+        // Schematic class will take care of it.
+        boolean ignored = Schematic.folder.toFile().exists();
 
         if (Services.PLATFORM.isDevelopmentEnvironment()) {
             Configurator.setRootLevel(Level.ERROR);
