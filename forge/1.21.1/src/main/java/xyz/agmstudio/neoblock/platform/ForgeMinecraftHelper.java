@@ -1,7 +1,11 @@
 package xyz.agmstudio.neoblock.platform;
 
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import net.minecraft.core.Holder;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -15,6 +19,10 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.minecraft.world.item.trading.ItemCost;
 import net.minecraft.world.item.trading.MerchantOffer;
 import net.minecraft.world.level.block.Block;
@@ -48,6 +56,24 @@ public final class ForgeMinecraftHelper implements IMinecraftHelper {
     @Override public Optional<ResourceLocation> getItemResource(Item item) {
         if (item == null) return Optional.empty();
         return Optional.ofNullable(ForgeRegistries.ITEMS.getKey(item));
+    }
+
+    @Override public int getEnchantmentLevel(ItemStack stack, Enchantment enchantment) {
+        return EnchantmentHelper.getItemEnchantmentLevel(Holder.direct(enchantment), stack);
+    }
+    @Override public int getEnchantmentLevel(ItemStack stack, ResourceKey<Enchantment> enchantment) {
+        if (stack.has(DataComponents.ENCHANTMENTS)) {
+            ItemEnchantments enchants = stack.get(DataComponents.ENCHANTMENTS);
+            if (enchants != null) {
+                for (Object2IntMap.Entry<Holder<Enchantment>> entry : enchants.entrySet())
+                    if (entry.getKey().is(enchantment)) return entry.getIntValue();
+            }
+        }
+
+        return 0;
+    }
+    @Override public boolean isSilkTouched(ItemStack stack) {
+        return getEnchantmentLevel(stack, Enchantments.SILK_TOUCH) > 0;
     }
 
     @Override public Optional<Block> getBlock(ResourceLocation location) {

@@ -1,6 +1,7 @@
 package xyz.agmstudio.neoblock.platform;
 
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -13,6 +14,8 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.item.trading.MerchantOffer;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.scores.Objective;
@@ -21,6 +24,7 @@ import net.minecraft.world.scores.Scoreboard;
 import net.minecraft.world.scores.criteria.ObjectiveCriteria;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
+import xyz.agmstudio.neoblock.NeoBlock;
 import xyz.agmstudio.neoblock.neo.loot.NeoItemSpec;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
 import xyz.agmstudio.neoblock.platform.helpers.IMinecraftHelper;
@@ -47,6 +51,17 @@ public final class ForgeMinecraftHelper implements IMinecraftHelper {
     @Override public Optional<ResourceLocation> getItemResource(Item item) {
         if (item == null) return Optional.empty();
         return Optional.ofNullable(ForgeRegistries.ITEMS.getKey(item));
+    }
+
+    @Override public int getEnchantmentLevel(ItemStack stack, Enchantment enchantment) {
+        return stack.getEnchantmentLevel(enchantment);
+    }
+    @Override public int getEnchantmentLevel(ItemStack stack, ResourceKey<Enchantment> enchantment) {
+        NeoBlock.LOGGER.warn("getEnchantmentLevel(ItemStack, ResourceKey<Enchantment>) not implemented");
+        return 0;
+    }
+    @Override public boolean isSilkTouched(ItemStack stack) {
+        return getEnchantmentLevel(stack, Enchantments.SILK_TOUCH) > 0;
     }
 
     @Override public Optional<Block> getBlock(ResourceLocation location) {
