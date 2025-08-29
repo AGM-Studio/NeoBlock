@@ -31,12 +31,16 @@ public class BlockManager {
     public static final NeoBlockSpec BEDROCK_SPEC = new NeoBlockSpec(Blocks.BEDROCK);
     public static final double AABB_RANGE = 1.0;
 
-    public static BlockPos getBlockPos() {
-        return WorldData.getWorldStatus().getBlockPos();
+    @Deprecated(since = "0.7.0-Beta")
+    public static NeoBlockPos getBlockPos() {
+        return new NeoBlockPos();
     }
     public static Vec3 getBlockCorner() {
         BlockPos pos = getBlockPos();
         return new Vec3(pos.getX(), pos.getY(), pos.getZ());
+    }
+    public static NeoBlockPos getSafeBlock() {
+        return NeoBlockPos.safeBlock();
     }
 
     public static NeoBlockSpec getRandomBlock() {

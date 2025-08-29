@@ -1,12 +1,18 @@
 package xyz.agmstudio.neoblock.neo.world;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.data.NBTData;
 import xyz.agmstudio.neoblock.data.NBTSaveable;
 import xyz.agmstudio.neoblock.neo.block.BlockManager;
@@ -25,6 +31,7 @@ public class WorldStatus implements NBTSaveable {
     @NBTData("BlockCount") protected int blockCount = 0;
     @NBTData("TraderFailedAttempts") protected int traderFailedAttempts = 0;
     @NBTData("NeoBlock") protected BlockPos pos = new BlockPos(0, 64, 0);
+    @NBTData("Dimension") protected String dimension = "minecraft:overworld";
 
     protected final HashMap<EntityType<?>, Integer> tradedMobs = new HashMap<>();
     protected final List<NeoBlockSpec> queue = new ArrayList<>();
@@ -53,6 +60,20 @@ public class WorldStatus implements NBTSaveable {
         this.data = data;
     }
 
+    public boolean isCorrectDimension(@NotNull ServerLevel level) {
+        return isCorrectDimension(level.dimension());
+    }
+    public boolean isCorrectDimension(@NotNull ResourceKey<Level> dimension) {
+        return dimension.location().toString().equals(this.dimension);
+    }
+    public ServerLevel getDimension() {
+        return getDimension(data.getLevel().getServer());
+    }
+    public ServerLevel getDimension(MinecraftServer server) {
+        @NotNull ResourceLocation location = MinecraftUtil.parseResourceLocation(this.dimension);
+        ResourceKey<Level> dimension = ResourceKey.create(Registries.DIMENSION, location);
+        return server.getLevel(dimension);
+    }
     public BlockPos getBlockPos() {
         return pos;
     }
@@ -133,6 +154,13 @@ public class WorldStatus implements NBTSaveable {
         data.setDirty();
     }
 
+    public void setDimension(@NotNull ServerLevel level) {
+        setDimension(level.dimension());
+    }
+    public void setDimension(@NotNull ResourceKey<Level> dimension) {
+        this.dimension = dimension.location().toString();
+        data.setDirty();
+    }
     public void setBlockPos(BlockPos pos, ServerLevel level) {
         BlockManager.cleanBlock(level, this.pos);
 
