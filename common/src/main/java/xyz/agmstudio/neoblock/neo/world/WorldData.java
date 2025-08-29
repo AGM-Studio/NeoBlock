@@ -7,6 +7,8 @@ import net.minecraft.nbt.StringTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.chunk.ChunkGenerator;
+import net.minecraft.world.level.levelgen.FlatLevelSource;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.scores.Objective;
 import net.minecraft.world.scores.Scoreboard;
@@ -84,11 +86,9 @@ public abstract class WorldData extends SavedData {
             final int x = config.get("world.block.x", 0);
             final int y = config.get("world.block.y", 64);
             final int z = config.get("world.block.z", 0);
-            for (int t : List.of(-64, -61, 0, 64, y))
-                if (!level.getBlockState(new BlockPos(x, t, z)).isAir()) allowNeoBlock = false;
-            
-            if (!allowNeoBlock) allowNeoBlock = config.get("world.force-block", false);
-            if (allowNeoBlock) {
+
+            ChunkGenerator gen = level.getChunkSource().getGenerator();
+            if (gen instanceof FlatLevelSource || config.get("world.force-block", false)) {
                 getWorldStatus().setBlockPos(new BlockPos(x, y, z), level);
                 TierSpec tier0 = getWorldTier(0);
                 if (tier0 != null) tier0.getStartSequence().addToQueue(false);
