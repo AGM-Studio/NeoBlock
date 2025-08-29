@@ -5,7 +5,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
+import net.minecraft.world.item.TieredItem;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -103,14 +103,13 @@ public class BlockManager {
     }
 
     public static void handleEndPortalFrameBreak(ServerLevel level, BlockState state, BlockPos pos, Player player) {
-        ItemStack drop;
-        ItemStack tool = player.getMainHandItem();
+        ItemStack handItem = player.getMainHandItem();
+        if (!(handItem.getItem() instanceof TieredItem tool)) return;
+        if (!MinecraftUtil.canBreak(tool, Blocks.OBSIDIAN)) return;
 
-        if (tool.getItem() == Items.NETHERITE_PICKAXE && MinecraftUtil.isSilkTouched(tool))
-            drop = new ItemStack(Blocks.END_PORTAL_FRAME);
-        else if (tool.getItem() == Items.DIAMOND_PICKAXE || tool.getItem() == Items.NETHERITE_PICKAXE)
-            drop = new ItemStack(Blocks.END_STONE);
-        else return;
+        ItemStack drop = MinecraftUtil.isSilkTouched(handItem) ?
+                new ItemStack(Blocks.END_PORTAL_FRAME) :
+                new ItemStack(Blocks.END_STONE);
 
         Block.popResource(level, pos, drop);
     }

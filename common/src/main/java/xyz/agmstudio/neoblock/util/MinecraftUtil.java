@@ -11,8 +11,8 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TieredItem;
 import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.trading.MerchantOffer;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -60,6 +60,10 @@ public final class MinecraftUtil {
     }
     public static boolean isSilkTouched(ItemStack stack) {
         return HELPER.isSilkTouched(stack);
+    }
+
+    public static boolean canBreak(TieredItem tool, Block block) {
+        return HELPER.canBreak(tool, block);
     }
 
     public static Optional<Block> getBlock(String name) {

@@ -14,6 +14,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TieredItem;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.item.trading.MerchantOffer;
@@ -22,6 +23,7 @@ import net.minecraft.world.scores.Objective;
 import net.minecraft.world.scores.Score;
 import net.minecraft.world.scores.Scoreboard;
 import net.minecraft.world.scores.criteria.ObjectiveCriteria;
+import net.minecraftforge.common.TierSortingRegistry;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlock;
@@ -62,6 +64,10 @@ public final class ForgeMinecraftHelper implements IMinecraftHelper {
     }
     @Override public boolean isSilkTouched(ItemStack stack) {
         return getEnchantmentLevel(stack, Enchantments.SILK_TOUCH) > 0;
+    }
+
+    @Override public boolean canBreak(TieredItem tool, Block block) {
+        return TierSortingRegistry.isCorrectTierForDrops(tool.getTier(), block.defaultBlockState());
     }
 
     @Override public Optional<Block> getBlock(ResourceLocation location) {

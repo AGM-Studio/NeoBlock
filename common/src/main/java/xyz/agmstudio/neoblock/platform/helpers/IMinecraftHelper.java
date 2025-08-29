@@ -12,6 +12,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TieredItem;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.trading.MerchantOffer;
 import net.minecraft.world.level.block.Block;
@@ -36,6 +37,8 @@ public interface IMinecraftHelper {
     int getEnchantmentLevel(ItemStack stack, Enchantment enchantment);
     int getEnchantmentLevel(ItemStack stack, ResourceKey<Enchantment> enchantment);
     boolean isSilkTouched(ItemStack stack);
+
+    boolean canBreak(TieredItem tool, Block block);
 
     Optional<Block> getBlock(ResourceLocation location);
     Optional<ResourceLocation> getBlockResource(Block block);

@@ -9,6 +9,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.effect.MobEffect;
@@ -18,6 +19,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TieredItem;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.item.enchantment.ItemEnchantments;
@@ -71,6 +73,15 @@ public final class NeoForgeMinecraftHelper implements IMinecraftHelper {
     }
     @Override public boolean isSilkTouched(ItemStack stack) {
         return getEnchantmentLevel(stack, Enchantments.SILK_TOUCH) > 0;
+    }
+
+    @Override public boolean canBreak(TieredItem tool, Block block) {
+        TagKey<Block> tag = tool.getTier().getIncorrectBlocksForDrops();
+        Iterable<Holder<Block>> incorrect = BuiltInRegistries.BLOCK.getTagOrEmpty(tag);
+        for (Holder<Block> holder: incorrect)
+            if (holder.value() == block) return false;
+
+        return true;
     }
 
     @Override public Optional<Block> getBlock(ResourceLocation location) {
