@@ -43,6 +43,9 @@
 
   "command.neoblock.info": "Stats:\n  Blocks broken: %d\n  Unlocked tiers: %s",
 
+  "command.neoblock.home": "%s teleported to NeoBlock",
+  "command.neoblock.home.not_entity": "Unable to teleport a non-entity!",
+
   "command.neoblock.scheme.save.fail": "Unable to save the schematic. Check the server logs for more information.",
   "command.neoblock.scheme.save.success": "Schematic has been saved as \"%s\".",
 
