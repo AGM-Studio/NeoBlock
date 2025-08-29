@@ -70,6 +70,7 @@ public class WorldStatus implements NBTSaveable {
         return getDimension(data.getLevel().getServer());
     }
     public ServerLevel getDimension(MinecraftServer server) {
+        if (this.dimension == null || this.dimension.isEmpty()) return server.getLevel(Level.OVERWORLD);
         @NotNull ResourceLocation location = MinecraftUtil.parseResourceLocation(this.dimension);
         ResourceKey<Level> dimension = ResourceKey.create(Registries.DIMENSION, location);
         return server.getLevel(dimension);
