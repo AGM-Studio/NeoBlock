@@ -36,12 +36,14 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 
 public final class ForgeMinecraftHelper implements IMinecraftHelper {
+    @SuppressWarnings("removal")
     @Override public @NotNull ResourceLocation parseResourceLocation(String name) {
         return new ResourceLocation(name);
     }
     @Override public Optional<ResourceLocation> getResourceLocation(String name) {
         return Optional.ofNullable(ResourceLocation.tryParse(name));
     }
+    @SuppressWarnings("removal")
     @Override public ResourceLocation createResourceLocation(String namespace, String path) {
         return new ResourceLocation(namespace, path);
     }
