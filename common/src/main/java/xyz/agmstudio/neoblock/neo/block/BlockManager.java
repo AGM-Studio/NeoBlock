@@ -13,12 +13,14 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
+import xyz.agmstudio.neoblock.NeoListener;
 import xyz.agmstudio.neoblock.NeoBlock;
 import xyz.agmstudio.neoblock.animations.Animation;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoMerchant;
 import xyz.agmstudio.neoblock.neo.tiers.TierManager;
 import xyz.agmstudio.neoblock.neo.tiers.TierSpec;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
+import xyz.agmstudio.neoblock.neo.world.WorldStatus;
 import xyz.agmstudio.neoblock.util.MinecraftUtil;
 
 import java.util.ArrayList;
@@ -73,7 +75,7 @@ public class BlockManager {
         if (!trigger) return;
         Animation.resetIdleTick();
         WorldData.getWorldStatus().addBlockCount(1);
-        NeoBlock.execute(() -> NeoMerchant.attemptSpawnTrader(level));
+        NeoListener.execute(() -> NeoMerchant.attemptSpawnTrader(level));
 
         for (TierSpec tier: WorldData.getWorldTiers())
             if (tier.canBeResearched()) tier.startResearch();
@@ -102,8 +104,9 @@ public class BlockManager {
         } else if (block.isAir() || block.canBeReplaced()) updateBlock(level, true);
     }
 
-    public static boolean isNeoBlock(BlockPos pos) {
-        return getBlockPos().equals(pos);
+    public static boolean isNeoBlock(ServerLevel level, BlockPos pos) {
+        WorldStatus status = WorldData.getWorldStatus();
+        return status.isCorrectDimension(level) && status.getBlockPos().equals(pos);
     }
 
     public static void handleEndPortalFrameBreak(ServerLevel level, BlockState state, BlockPos pos, Player player) {

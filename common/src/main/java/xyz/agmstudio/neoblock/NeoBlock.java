@@ -1,9 +1,5 @@
 package xyz.agmstudio.neoblock;
 
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.npc.WanderingTrader;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.config.Configurator;
 import org.slf4j.Logger;
@@ -13,22 +9,15 @@ import xyz.agmstudio.neoblock.commands.*;
 import xyz.agmstudio.neoblock.data.Schematic;
 import xyz.agmstudio.neoblock.neo.block.BlockManager;
 import xyz.agmstudio.neoblock.neo.loot.NeoMobSpec;
-import xyz.agmstudio.neoblock.neo.loot.trade.NeoMerchant;
 import xyz.agmstudio.neoblock.neo.tiers.TierManager;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
 import xyz.agmstudio.neoblock.platform.Services;
 import xyz.agmstudio.neoblock.platform.helpers.IRegistryHelper;
 import xyz.agmstudio.neoblock.platform.implants.IConfig;
 import xyz.agmstudio.neoblock.util.ConfigUtil;
-import xyz.agmstudio.neoblock.util.MessengerUtil;
 import xyz.agmstudio.neoblock.util.ResourceUtil;
 
 import java.nio.file.Path;
-import java.util.HashSet;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.function.Consumer;
 
 
 public abstract class NeoBlock {
@@ -71,9 +60,9 @@ public abstract class NeoBlock {
             LOGGER.debug("Enabling debug mode for neoblock (development environment)");
         }
 
-        NeoBlock.registerTicker(Animation::tickAll);
-        NeoBlock.registerTicker(BlockManager::tick);
-        NeoBlock.registerTicker(TierManager::tick);
+        NeoListener.registerTicker(Animation::tickAll);
+        NeoListener.registerTicker(BlockManager::tick);
+        NeoListener.registerTicker(TierManager::tick);
 
         NeoMobSpec.load();
     }
@@ -92,26 +81,5 @@ public abstract class NeoBlock {
 
         new SchematicSaveCommand();
         new SchematicLoadCommand();
-    }
-
-    public static void onEntitySpawn(ServerLevel level, Entity entity) {
-        if (entity instanceof WanderingTrader trader) NeoMerchant.handleTrader(trader);
-        if (entity instanceof ServerPlayer player) {
-            if (TierManager.hasResearch()) TierManager.addPlayer(player);
-            MessengerUtil.onPlayerJoin(level, player);
-        }
-    }
-    public static void onTick(ServerLevel level) {
-        tickers.forEach(ticker -> ticker.accept(level));
-    }
-
-    private static final ExecutorService executor = Executors.newSingleThreadExecutor();
-    public static <T> void execute(Callable<T> callable) {
-        executor.submit(callable);
-    }
-
-    private static final HashSet<Consumer<ServerLevel>> tickers = new HashSet<>();
-    public static void registerTicker(Consumer<ServerLevel> ticker) {
-        tickers.add(ticker);
     }
 }
