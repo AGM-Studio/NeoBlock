@@ -1,6 +1,5 @@
 package xyz.agmstudio.neoblock.compatibility;
 
-import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.effect.MobEffect;
@@ -14,10 +13,10 @@ import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.npc.WanderingTrader;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.Vec3;
 import xyz.agmstudio.neoblock.NeoBlock;
 import xyz.agmstudio.neoblock.neo.block.BlockManager;
+import xyz.agmstudio.neoblock.neo.block.NeoBlockPos;
 import xyz.agmstudio.neoblock.platform.implants.IConfig;
 import xyz.agmstudio.neoblock.util.MinecraftUtil;
 
@@ -37,7 +36,7 @@ public class ForgivingVoid {
     private static boolean animateVillager;
     private static boolean animateLivings;
 
-    private static double offset;
+    private static Vec3 offset;
 
     private static final HashMap<MobEffect, Integer> effects = new HashMap<>();
     private static final List<String> exceptions = new ArrayList<>();
@@ -75,7 +74,8 @@ public class ForgivingVoid {
         ForgivingVoid.animateVillager = config.get("forgiving-void.animate-villager", false);
         ForgivingVoid.animateLivings  = config.get("forgiving-void.animate-livings", false);
 
-        ForgivingVoid.offset = config.get("forgiving-void.y-offset", 1.0);
+        double y = config.get("forgiving-void.y-offset", 1.0);
+        ForgivingVoid.offset = new Vec3(0.5, y + 0.5, 0.5);
 
         ForgivingVoid.exceptions.clear();
         List<String> exceptions = config.get("forgiving-void.exceptions", List.of());
@@ -141,15 +141,14 @@ public class ForgivingVoid {
     public static boolean handleVoid(ServerLevel level, Entity entity) {
         if (!shallBeRescued(entity)) return false;
 
-        BlockPos pos = BlockManager.getBlockPos();
-        int y = level.getHeight(Heightmap.Types.MOTION_BLOCKING, pos.getX(), pos.getZ());
-        entity.teleportTo(pos.getX() + 0.5, y + offset + 0.5, pos.getZ() + 0.5);
+        NeoBlockPos safety = BlockManager.getSafeBlock();
+        safety.teleportTo(entity, offset);
         entity.setDeltaMovement(Vec3.ZERO);
         entity.fallDistance = 0;
 
         if (entity instanceof LivingEntity living) {
             living.hurt(living.damageSources().fall(), getDamage(living));
-            ForgivingVoid.animate(level, living);
+            ForgivingVoid.animate(safety.getLevel(), living);
             if (living instanceof Player player) addEffects(player);
         }
 
