@@ -5,16 +5,24 @@
       "generator": {
         "type": "minecraft:flat",
         "settings":  {
-          "biome": "minecraft:plains",
+          "biome": "minecraft:warm_ocean",
           "lakes": false,
           "features": false,
           "layers": [
             {
-              "height": 0,
-              "block": "minecraft:air"
+              "height": 1,
+              "block": "minecraft:bedrock"
+            }, {
+              "height": 8,
+              "block": "minecraft:gravel"
+            }, {
+              "height": 120,
+              "block": "minecraft:water"
             }
           ],
-          "structure_overrides": []
+          "structure_overrides": [
+            "minecraft:ocean_monuments"
+          ]
         }
       }
     },
@@ -28,8 +36,11 @@
           "features": true,
           "layers": [
             {
-              "height": 0,
-              "block": "minecraft:air"
+              "height": 1,
+              "block": "minecraft:bedrock"
+            }, {
+              "height": 64,
+              "block": "minecraft:lava"
             }
           ]
         }

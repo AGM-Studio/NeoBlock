@@ -1,6 +1,7 @@
 {
   "generator.neoblock.neoblock": "NeoBlock",
   "generator.neoblock.neoblock_no_nether": "NeoBlock (No Nether)",
+  "generator.neoblock.neoblock_oceans": "NeoBlock (Oceans)",
 
   "bossbar.neoblock.upgrade_bar": "Upgrading... (%s)",
   "bossbar.neoblock.upgrade_bar_no_time": "Upgrading...",
