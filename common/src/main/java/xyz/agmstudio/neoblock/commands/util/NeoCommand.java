@@ -21,6 +21,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 
 @SuppressWarnings("unchecked")
@@ -65,6 +66,12 @@ public abstract class NeoCommand {
         NeoArgument<T> argument = (NeoArgument<T>) arguments.get(key);
         if (argument == null) throw new IllegalArgumentException("No such argument has been defined for this command: " + key);
         return argument.capture(context, key);
+    }
+    public <T> T getArgument(CommandContext<CommandSourceStack> context, String key, Supplier<T> defaultValue) throws CommandExtermination {
+        NeoArgument<T> argument = (NeoArgument<T>) arguments.get(key);
+        if (argument == null) throw new IllegalArgumentException("No such argument has been defined for this command: " + key);
+        T value = argument.capture(context, key);
+        return value != null ? value : defaultValue.get();
     }
     public abstract int execute(CommandContext<CommandSourceStack> context) throws CommandExtermination, CommandSyntaxException;
 
