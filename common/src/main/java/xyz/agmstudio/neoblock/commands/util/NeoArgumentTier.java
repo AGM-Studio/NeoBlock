@@ -26,7 +26,7 @@ public class NeoArgumentTier extends NeoArgument<TierSpec> {
     }
 
     @Override public ArgumentBuilder<CommandSourceStack, ?> build() {
-        return Commands.argument(key, IntegerArgumentType.integer(0, WorldData.getWorldTiers().size() - 1)).suggests(provider);
+        return Commands.argument(key, IntegerArgumentType.integer(0)).suggests(provider);
     }
 
     @Override public TierSpec capture(CommandContext<CommandSourceStack> context, String key) throws NeoCommand.CommandExtermination {
