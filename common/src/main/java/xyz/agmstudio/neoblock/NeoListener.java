@@ -17,7 +17,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import xyz.agmstudio.neoblock.commands.util.NeoCommand;
+import xyz.agmstudio.neoblock.commands.NeoblockCommand;
 import xyz.agmstudio.neoblock.compatibility.ForgivingVoid;
 import xyz.agmstudio.neoblock.neo.block.BlockManager;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoMerchant;
@@ -139,8 +139,7 @@ public final class NeoListener {
     }
 
     public static void onRegisterCommands(CommandDispatcher<CommandSourceStack> dispatcher) {
-        NeoBlock.registerCommands();
-        NeoCommand.registerAll(dispatcher);
+        NeoblockCommand.getInstance().register(dispatcher);
     }
 
     public static final class LivingDamageResult extends CancelableEventResult<Float> {

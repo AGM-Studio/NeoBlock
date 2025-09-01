@@ -16,8 +16,7 @@ import net.minecraft.world.scores.criteria.ObjectiveCriteria;
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlock;
 import xyz.agmstudio.neoblock.animations.Animation;
-import xyz.agmstudio.neoblock.commands.ForceBlockCommand;
-import xyz.agmstudio.neoblock.commands.ForceResetTiersCommand;
+import xyz.agmstudio.neoblock.commands.NeoblockForceCommand;
 import xyz.agmstudio.neoblock.commands.util.NeoCommand;
 import xyz.agmstudio.neoblock.compatibility.ForgivingVoid;
 import xyz.agmstudio.neoblock.data.NBTSaveable;
@@ -116,7 +115,7 @@ public abstract class WorldData extends SavedData {
                 instance.status.state = WorldStatus.State.ACTIVE;
                 instance.setDirty();
             } else {
-                Optional<ForceBlockCommand> command = NeoCommand.getFromRegistry(ForceBlockCommand.class);
+                Optional<NeoblockForceCommand.SetBlock> command = NeoCommand.getFromRegistry(NeoblockForceCommand.SetBlock.class);
 
                 NeoBlock.LOGGER.info("NeoBlock has been disabled.");
                 MessengerUtil.sendMessage("message.neoblock.disabled_world_1", level, false);
@@ -126,7 +125,7 @@ public abstract class WorldData extends SavedData {
                 instance.setDirty();
             }
         } else if (instance.status.state == WorldStatus.State.UPDATED) {
-            Optional<ForceResetTiersCommand> command = NeoCommand.getFromRegistry(ForceResetTiersCommand.class);
+            Optional<NeoblockForceCommand.ResetTiers> command = NeoCommand.getFromRegistry(NeoblockForceCommand.ResetTiers.class);
 
             NeoBlock.LOGGER.info("NeoBlock tiers has been updated.");
             MessengerUtil.sendMessage("message.neoblock.updated_world", level, false, command.map(NeoCommand::getCommand).orElse(null));

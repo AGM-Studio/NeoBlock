@@ -27,6 +27,7 @@ import java.util.function.Supplier;
 @SuppressWarnings("unchecked")
 public abstract class NeoCommand {
     private static final List<NeoCommand> registry = new ArrayList<>();
+
     public static <T extends NeoCommand> Optional<T> getFromRegistry(Class<T> clazz) {
         for (NeoCommand command : registry)
             if (command.getClass() == clazz)
@@ -34,21 +35,31 @@ public abstract class NeoCommand {
 
         return Optional.empty();
     }
-    public static void registerAll(CommandDispatcher<CommandSourceStack> dispatcher) {
-        for (NeoCommand command : registry) command.register(dispatcher);
-    }
 
     protected final LinkedHashMap<String, NeoArgument<?>> arguments = new LinkedHashMap<>();
     protected final Predicate<CommandSourceStack> permission;
+    protected final int permission_value;
     protected final String pattern;
+
+    private final List<NeoCommand> subcommands = new ArrayList<>();
 
     public NeoCommand(String pattern) {
         this(pattern, 0);
     }
     public NeoCommand(String pattern, int permission) {
+        this.permission_value = permission;
         this.permission = context -> context.hasPermission(permission);
         this.pattern = pattern;
         registry.add(this);
+    }
+
+    public NeoCommand(NeoCommand parent, String pattern) {
+        this("%s %s".formatted(parent.pattern, pattern), Math.max(0, parent.permission_value));
+        parent.subcommands.add(this);
+    }
+    public NeoCommand(NeoCommand parent, String pattern, int permission) {
+        this("%s %s".formatted(parent.pattern, pattern), Math.max(permission, parent.permission_value));
+        parent.subcommands.add(this);
     }
 
     public MutableComponent getCommand() {
@@ -75,7 +86,7 @@ public abstract class NeoCommand {
     }
     public abstract int execute(CommandContext<CommandSourceStack> context) throws CommandExtermination, CommandSyntaxException;
 
-    public LiteralCommandNode<CommandSourceStack> register(CommandDispatcher<CommandSourceStack> dispatcher) {
+    public List<LiteralCommandNode<CommandSourceStack>> register(CommandDispatcher<CommandSourceStack> dispatcher) {
         Command<CommandSourceStack> executor = (context) -> {
             try {
                 this.execute(context);
@@ -108,7 +119,10 @@ public abstract class NeoCommand {
         if (current == null) root.executes(executor);
         else root.then(current);
 
-        return dispatcher.register(root);
+        List<LiteralCommandNode<CommandSourceStack>> commands = new ArrayList<>();
+        commands.add(dispatcher.register(root));
+        for (NeoCommand subcommand: subcommands) commands.addAll(subcommand.register(dispatcher));
+        return commands;
     }
 
     public static class CommandExtermination extends Exception {}

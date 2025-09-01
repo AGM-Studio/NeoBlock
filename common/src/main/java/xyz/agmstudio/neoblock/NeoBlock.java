@@ -5,7 +5,6 @@ import org.apache.logging.log4j.core.config.Configurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import xyz.agmstudio.neoblock.animations.Animation;
-import xyz.agmstudio.neoblock.commands.*;
 import xyz.agmstudio.neoblock.data.Schematic;
 import xyz.agmstudio.neoblock.neo.block.BlockManager;
 import xyz.agmstudio.neoblock.neo.loot.NeoMobSpec;
@@ -65,21 +64,5 @@ public abstract class NeoBlock {
         NeoListener.registerTicker(TierManager::tick);
 
         NeoMobSpec.load();
-    }
-
-    public static void registerCommands() {
-        new MainCommand();
-
-        new DisableTierCommand();
-        new EnableTierCommand();
-        new CommandTierCommand();
-
-        new ForceStopCommand();
-        new ForceBlockCommand();
-        new ForceResetTiersCommand();
-        new ForceTraderSpawnCommand();
-
-        new SchematicSaveCommand();
-        new SchematicLoadCommand();
     }
 }

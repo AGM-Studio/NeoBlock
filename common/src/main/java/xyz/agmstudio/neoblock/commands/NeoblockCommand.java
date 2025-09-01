@@ -7,12 +7,25 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import xyz.agmstudio.neoblock.commands.util.NeoCommand;
+import xyz.agmstudio.neoblock.neo.block.BlockManager;
 import xyz.agmstudio.neoblock.neo.tiers.TierSpec;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
 
-public class MainCommand extends NeoCommand {
-    public MainCommand() {
+public class NeoblockCommand extends NeoCommand {
+    private static NeoblockCommand instance = null;
+    public static NeoblockCommand getInstance() {
+        if (instance == null) instance = new NeoblockCommand();
+        return instance;
+    }
+
+    public NeoblockCommand() {
         super("neoblock");
+
+        new Home(this);
+
+        new NeoblockForceCommand(this);
+        new NeoblockSchematicCommand(this);
+        new NeoblockTiersCommand(this);
     }
 
     @Override public int execute(CommandContext<CommandSourceStack> context) throws CommandExtermination {
@@ -28,5 +41,23 @@ public class MainCommand extends NeoCommand {
         MutableComponent message = Component.translatable("command.neoblock.info", WorldData.getWorldStatus().getBlockCount(), tiers);
         context.getSource().sendSuccess(() -> message, true);
         return 1;
+    }
+
+    public static class Home extends NeoCommand {
+        public Home(NeoCommand parent) {
+            super(parent, "home");
+        }
+
+        @Override public int execute(CommandContext<CommandSourceStack> context) throws CommandExtermination {
+            CommandSourceStack source = context.getSource();
+            if (source.getEntity() == null) {
+                source.sendFailure(Component.translatable("command.neoblock.home.not_entity"));
+                return 0;
+            }
+
+            BlockManager.getSafeBlock().teleportTo(source.getEntity());
+            context.getSource().sendSuccess(() -> Component.translatable("command.neoblock.home", source.getEntity().getDisplayName()), true);
+            return 1;
+        }
     }
 }
