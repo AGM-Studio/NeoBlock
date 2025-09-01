@@ -1,16 +1,8 @@
 plugins {
     id 'multiloader-loader'
-    id 'net.neoforged.moddev'
-    id 'net.neoforged.moddev.legacyforge'
+    id 'net.minecraftforge.gradle' version '[6.0.24,6.2)'
+    id 'org.spongepowered.mixin' version '0.7-SNAPSHOT' apply true
 }
-
-dependencies {
-    compileOnly 'org.jetbrains:annotations:26.0.2'
-
-    compileOnly "mezz.jei:jei-${minecraft_version}-forge-api:${jei_version}"
-    // runtimeOnly "mezz.jei:jei-${minecraft_version}-forge:${jei_version}" // is not working...
-}
-
 
 mixin {
     add(sourceSets.main, "${mod_id}.refmap.json")
@@ -19,44 +11,50 @@ mixin {
     config("${mod_id}.forge.mixins.json")
 }
 
-neoForge {
-    version = "${minecraft_version}-${forge_version}"
-
-    validateAccessTransformers = true
-
-    def at = project(":common").file('src/main/resources/META-INF/accesstransformer.cfg')
-    if (at.exists()) {
-        accessTransformers = ["src/main/resources/META-INF/accesstransformer.cfg"]
-    }
-
-    parchment {
-        minecraftVersion = parchment_minecraft
-        mappingsVersion = parchment_version
-    }
+minecraft {
+    mappings channel: "official", version: minecraft_version
+    copyIdeResources = true
 
     runs {
         configureEach {
-            //noinspection GroovyAssignabilityCheck
-            systemProperty('neoforge.enabledGameTestNamespaces', mod_id)
-            ideName = "NeoForge ${it.name.capitalize()} (${project.path})" // Unify the run config names with fabric
-
-            gameDirectory.set(file("${rootProject.projectDir}/.runs/${platform}/${project.name}/${it.name}"))
+            workingDirectory file("${rootProject.projectDir}/.runs/${platform}/${project.name}/${it.name}")
+            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.console.level', 'debug'
+            property 'forge.enabledGameTestNamespaces', mod_id
         }
+
         client {
-            client()
+            mods {
+                "${mod_id}" {
+                    source sourceSets.main
+                }
+            }
         }
-        data {
-            data()
-            programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
-        }
-        server {
-            server()
-        }
-    }
 
-    mods {
-        "${mod_id}" {
-            sourceSet sourceSets.main
+        server {
+            mods {
+                "${mod_id}" {
+                    source sourceSets.main
+                }
+            }
+        }
+
+        gameTestServer {
+            mods {
+                "${mod_id}" {
+                    source sourceSets.main
+                }
+            }
+        }
+
+        data {
+            args '--mod', mod_id, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
+
+            mods {
+                "${mod_id}" {
+                    source sourceSets.main
+                }
+            }
         }
     }
 }
@@ -64,15 +62,20 @@ neoForge {
 sourceSets.main.resources.srcDir 'src/generated/resources'
 
 dependencies {
+    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+
     compileOnly project(":common")
+    compileOnly 'org.jetbrains:annotations:26.0.2'
+
+    compileOnly "mezz.jei:jei-${minecraft_version}-forge-api:${jei_version}"
+    // runtimeOnly "mezz.jei:jei-${minecraft_version}-forge:${jei_version}" // is not working...
+
     annotationProcessor("org.spongepowered:mixin:0.8.5-SNAPSHOT:processor")
 }
 
-tasks.jar {
-    finalizedBy(tasks.named('reobfJar'))
-    manifest {
-        attributes("MixinConfigs": "${mod_id}.mixins.json,${mod_id}.forge.mixins.json")
-    }
+jar {
+    finalizedBy('reobfJar')
+    manifest.attributes([
+            "MixinConfigs": "${mod_id}.mixins.json,${mod_id}.forge.mixins.json"
+    ])
 }
-
-sourceSets.main.resources { srcDir 'src/generated/resources' }

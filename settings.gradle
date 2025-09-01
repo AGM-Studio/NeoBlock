@@ -45,6 +45,10 @@ pluginManagement {
             name = "ModMaven"
             url = "https://modmaven.dev"
         }
+        maven {
+            name = "Parchment"
+            url = 'https://maven.parchmentmc.org'
+        }
     }
 }
 

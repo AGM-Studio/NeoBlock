@@ -45,13 +45,4 @@ tasks.named('sourcesJar', Jar) {
     from(configurations.commonResources)
 }
 
-tasks.named("jar", Jar) {
-    doLast {
-        project.copy { spec ->
-            spec.from(archiveFile.get().asFile)
-            spec.into(rootProject.layout.projectDirectory.dir("build").asFile)
-        }
-    }
-}
-
 layout.buildDirectory = file("${rootProject.projectDir}/build/${platform}/${project.name}")
