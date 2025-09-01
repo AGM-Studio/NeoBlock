@@ -1,0 +1,17 @@
+{
+  "homepage": "https://curseforge.com/minecraft/mc-mods/neoblock",
+  "1.21.1": {
+    "0.6.1-Beta": "Performance optimizations; Updated project structure for multi-version/multi-loader builds; Research system fixed; Tier folder generation fixed."
+  },
+  "1.20.1": {
+    "0.6.2-Beta": "Switched Java compatibility to Java 17; Updated Forge to 47.4.x; Fixed mixin loading crashes on Forge/NeoForge 1.20.1.",
+    "0.6.1-Beta": "Performance optimizations; Updated project structure for multi-version/multi-loader builds; Research system fixed; Tier folder generation fixed.",
+    "0.6.0-Beta": "Added chests.toml for custom loot chests; Tier system rework (reloads at world start); Block sequences; Starting blocks per tier; Configurable start block; New commands (force setblock, force stop); Mob trade tickets; Bug fixes."
+  },
+  "promos": {
+    "1.21.1-latest": "0.6.1-Beta",
+    "1.21.1-recommended": "0.6.1-Beta",
+    "1.20.1-latest": "0.6.2-Beta",
+    "1.20.1-recommended": "0.6.2-Beta"
+  }
+}
