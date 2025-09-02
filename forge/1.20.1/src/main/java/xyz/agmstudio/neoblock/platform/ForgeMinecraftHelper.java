@@ -1,5 +1,7 @@
 package xyz.agmstudio.neoblock.platform;
 
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -9,9 +11,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TieredItem;
@@ -19,6 +19,7 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.item.trading.MerchantOffer;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.scores.Objective;
 import net.minecraft.world.scores.Score;
 import net.minecraft.world.scores.Scoreboard;
@@ -26,6 +27,7 @@ import net.minecraft.world.scores.criteria.ObjectiveCriteria;
 import net.minecraftforge.common.TierSortingRegistry;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
+import org.joml.Vector3f;
 import xyz.agmstudio.neoblock.NeoBlock;
 import xyz.agmstudio.neoblock.neo.loot.NeoItemSpec;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
@@ -33,17 +35,16 @@ import xyz.agmstudio.neoblock.platform.helpers.IMinecraftHelper;
 import xyz.agmstudio.neoblock.util.MinecraftUtil;
 
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.BiFunction;
 
 public final class ForgeMinecraftHelper implements IMinecraftHelper {
-    @SuppressWarnings("removal")
     @Override public @NotNull ResourceLocation parseResourceLocation(String name) {
         return new ResourceLocation(name);
     }
     @Override public Optional<ResourceLocation> getResourceLocation(String name) {
         return Optional.ofNullable(ResourceLocation.tryParse(name));
     }
-    @SuppressWarnings("removal")
     @Override public ResourceLocation createResourceLocation(String namespace, String path) {
         return new ResourceLocation(namespace, path);
     }
@@ -68,8 +69,11 @@ public final class ForgeMinecraftHelper implements IMinecraftHelper {
         return getEnchantmentLevel(stack, Enchantments.SILK_TOUCH) > 0;
     }
 
-    @Override public boolean canBreak(TieredItem tool, Block block) {
-        return TierSortingRegistry.isCorrectTierForDrops(tool.getTier(), block.defaultBlockState());
+    @Override public boolean canBreak(Item tool, BlockState block) {
+        if (tool instanceof TieredItem tiered)
+            return TierSortingRegistry.isCorrectTierForDrops(tiered.getTier(), block);
+
+        return false;
     }
 
     @Override public Optional<Block> getBlock(ResourceLocation location) {
@@ -88,6 +92,13 @@ public final class ForgeMinecraftHelper implements IMinecraftHelper {
     @Override public Optional<ResourceLocation> getEntityTypeResource(EntityType<?> type) {
         if (type == null) return Optional.empty();
         return Optional.ofNullable(ForgeRegistries.ENTITY_TYPES.getKey(type));
+    }
+
+    @Override public <T extends Entity> T spawnEntity(ServerLevel level, EntityType<T> type, BlockPos pos) {
+        return type.spawn(level, pos, MobSpawnType.MOB_SUMMONED);
+    }
+    @Override public void teleportEntity(Entity entity, ServerLevel level, double ox, double oy, double oz, int ry, int rx) {
+        entity.teleportTo(level, ox, oy, oz, Set.of(), ry, rx);
     }
 
     @Override public Optional<MobEffect> getMobEffect(ResourceLocation location) {
@@ -148,5 +159,13 @@ public final class ForgeMinecraftHelper implements IMinecraftHelper {
     }
     @Override public int getPlayerScore(Scoreboard scoreboard, ServerPlayer player, Objective objective) {
         return capturePlayerScore(scoreboard, player, objective).getScore();
+    }
+
+    @Override public DustParticleOptions getDustParticle(Vector3f color, float value) {
+        return new DustParticleOptions(color, value);
+    }
+
+    @Override public int getLevelMinY(ServerLevel level) {
+        return level.getMinBuildHeight();
     }
 }

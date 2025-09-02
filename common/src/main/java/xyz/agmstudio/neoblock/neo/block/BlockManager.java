@@ -5,7 +5,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.TieredItem;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -13,8 +12,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
-import xyz.agmstudio.neoblock.NeoListener;
 import xyz.agmstudio.neoblock.NeoBlock;
+import xyz.agmstudio.neoblock.NeoListener;
 import xyz.agmstudio.neoblock.animations.Animation;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoMerchant;
 import xyz.agmstudio.neoblock.neo.tiers.TierManager;
@@ -110,11 +109,10 @@ public class BlockManager {
     }
 
     public static void handleEndPortalFrameBreak(ServerLevel level, BlockState state, BlockPos pos, Player player) {
-        ItemStack handItem = player.getMainHandItem();
-        if (!(handItem.getItem() instanceof TieredItem tool)) return;
-        if (!MinecraftUtil.canBreak(tool, Blocks.OBSIDIAN)) return;
+        ItemStack tool = player.getMainHandItem();
+        if (!MinecraftUtil.canBreak(tool.getItem(), Blocks.OBSIDIAN.defaultBlockState())) return;
 
-        ItemStack drop = MinecraftUtil.isSilkTouched(handItem) ?
+        ItemStack drop = MinecraftUtil.isSilkTouched(tool) ?
                 new ItemStack(Blocks.END_PORTAL_FRAME) :
                 new ItemStack(Blocks.END_STONE);
 

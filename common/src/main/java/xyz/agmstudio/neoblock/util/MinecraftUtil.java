@@ -1,5 +1,7 @@
 package xyz.agmstudio.neoblock.util;
 
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -11,7 +13,6 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.TieredItem;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.trading.MerchantOffer;
 import net.minecraft.world.level.block.Block;
@@ -20,6 +21,7 @@ import net.minecraft.world.scores.Objective;
 import net.minecraft.world.scores.Scoreboard;
 import net.minecraft.world.scores.criteria.ObjectiveCriteria;
 import org.jetbrains.annotations.NotNull;
+import org.joml.Vector3f;
 import xyz.agmstudio.neoblock.neo.loot.NeoItemSpec;
 import xyz.agmstudio.neoblock.platform.Services;
 import xyz.agmstudio.neoblock.platform.helpers.IMinecraftHelper;
@@ -62,7 +64,7 @@ public final class MinecraftUtil {
         return HELPER.isSilkTouched(stack);
     }
 
-    public static boolean canBreak(TieredItem tool, Block block) {
+    public static boolean canBreak(Item tool, BlockState block) {
         return HELPER.canBreak(tool, block);
     }
 
@@ -105,6 +107,13 @@ public final class MinecraftUtil {
         return getEntityTypeResource(entityType).orElse(null) == location;
     }
 
+    public static <T extends Entity> T spawnEntity(ServerLevel level, EntityType<T> type, BlockPos pos) {
+        return HELPER.spawnEntity(level, type, pos);
+    }
+    public static void teleportEntity(Entity entity, ServerLevel level, double ox, double oy, double oz, int ry, int rx) {
+        HELPER.teleportEntity(entity, level, ox, oy, oz, ry, rx);
+    }
+
     public static Optional<MobEffect> getMobEffect(String name) {
         return getMobEffect(getResourceLocation(name).orElse(null));
     }
@@ -117,7 +126,6 @@ public final class MinecraftUtil {
     public static boolean isValidMobEffect(MobEffect effect, ResourceLocation location) {
         return getMobEffectResource(effect).orElse(null) == location;
     }
-
     public static MobEffectInstance getMobEffectInstance(MobEffect effect, int time) {
         return HELPER.effectFactory().apply(effect, time);
     }
@@ -178,5 +186,13 @@ public final class MinecraftUtil {
     }
     public static int getPlayerScore(Scoreboard scoreboard, ServerPlayer player, Objective objective) {
         return HELPER.getPlayerScore(scoreboard, player, objective);
+    }
+
+    public static DustParticleOptions getDustParticle(Vector3f color, float value) {
+        return HELPER.getDustParticle(color, value);
+    }
+
+    public static int getLevelMinY(ServerLevel level) {
+        return HELPER.getLevelMinY(level);
     }
 }

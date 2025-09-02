@@ -11,11 +11,15 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.ARGB;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.Tool;
@@ -52,7 +56,7 @@ public final class NeoForgeMinecraftHelper implements IMinecraftHelper {
 
     @Override public Optional<Item> getItem(ResourceLocation location) {
         if (location == null) return Optional.empty();
-        return Optional.of(BuiltInRegistries.ITEM.get(location));
+        return BuiltInRegistries.ITEM.get(location).map(Holder.Reference::value);
     }
     @Override public Optional<ResourceLocation> getItemResource(Item item) {
         if (item == null) return Optional.empty();
@@ -86,7 +90,7 @@ public final class NeoForgeMinecraftHelper implements IMinecraftHelper {
 
     @Override public Optional<Block> getBlock(ResourceLocation location) {
         if (location == null) return Optional.empty();
-        return Optional.of(BuiltInRegistries.BLOCK.get(location));
+        return BuiltInRegistries.BLOCK.get(location).map(Holder.Reference::value);
     }
     @Override public Optional<ResourceLocation> getBlockResource(Block block) {
         if (block == null) return Optional.empty();
@@ -95,7 +99,7 @@ public final class NeoForgeMinecraftHelper implements IMinecraftHelper {
 
     @Override public Optional<EntityType<?>> getEntityType(ResourceLocation location) {
         if (location == null) return Optional.empty();
-        return Optional.of(BuiltInRegistries.ENTITY_TYPE.get(location));
+        return BuiltInRegistries.ENTITY_TYPE.get(location).map(Holder.Reference::value);
     }
     @Override public Optional<ResourceLocation> getEntityTypeResource(EntityType<?> type) {
         if (type == null) return Optional.empty();
@@ -103,14 +107,14 @@ public final class NeoForgeMinecraftHelper implements IMinecraftHelper {
     }
 
     @Override public <T extends Entity> T spawnEntity(ServerLevel level, EntityType<T> type, BlockPos pos) {
-        return type.spawn(level, pos, MobSpawnType.MOB_SUMMONED);
+        return type.spawn(level, pos, EntitySpawnReason.COMMAND);
     }
     @Override public void teleportEntity(Entity entity, ServerLevel level, double ox, double oy, double oz, int ry, int rx) {
-        entity.teleportTo(level, ox, oy, oz, Set.of(), ry, rx);
+        entity.teleportTo(level, ox, oy, oz, Set.of(), ry, rx, true);
     }
 
     @Override public Optional<MobEffect> getMobEffect(ResourceLocation location) {
-        return Optional.ofNullable(BuiltInRegistries.MOB_EFFECT.get(location));
+        return BuiltInRegistries.MOB_EFFECT.get(location).map(Holder.Reference::value);
     }
     @Override public Optional<ResourceLocation> getMobEffectResource(MobEffect effect) {
         return Optional.ofNullable(BuiltInRegistries.MOB_EFFECT.getKey(effect));
@@ -192,10 +196,10 @@ public final class NeoForgeMinecraftHelper implements IMinecraftHelper {
     }
 
     @Override public DustParticleOptions getDustParticle(Vector3f color, float value) {
-        return new DustParticleOptions(color, value);
+        return new DustParticleOptions(ARGB.colorFromFloat(1.0F, color.x, color.y, color.z) , value);
     }
 
     @Override public int getLevelMinY(ServerLevel level) {
-        return level.getMinBuildHeight();
+        return level.getMinY();
     }
 }

@@ -6,13 +6,11 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.valueproviders.UniformInt;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
+import net.minecraft.world.item.context.UseOnContext;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.agmstudio.neoblock.NeoBlock;
@@ -105,12 +103,12 @@ public class NeoMobSpec extends NeoItemSpec {
             super(properties);
         }
 
-        @Override public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level level, Player player, @NotNull InteractionHand hand) {
-            ItemStack stack = player.getItemInHand(hand);
-            if (level instanceof ServerLevel server)
+        @Override public @NotNull InteractionResult useOn(@NotNull UseOnContext context) {
+            ItemStack stack = context.getItemInHand();
+            if (context.getLevel() instanceof ServerLevel server)
                 handlePossibleMobTrade(stack, server);
 
-            return InteractionResultHolder.success(stack);
+            return InteractionResult.SUCCESS;
         }
 
         @Override public @NotNull Component getName(@NotNull ItemStack stack) {

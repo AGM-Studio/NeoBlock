@@ -4,7 +4,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.npc.WanderingTrader;
 import net.minecraft.world.item.trading.MerchantOffers;
 import org.jetbrains.annotations.NotNull;
@@ -80,7 +79,7 @@ public class NeoMerchant {
         HashMap<EntityType<?>, Integer> tradedMobs = status.getTradedMobs();
         tradedMobs.forEach((type, count) -> {
             for (int i = 0; i < count; i++) {
-                Entity mob = type.spawn(level, trader.getOnPos(), MobSpawnType.MOB_SUMMONED);
+                Entity mob = MinecraftUtil.spawnEntity(level, type, trader.getOnPos());
                 MinecraftUtil.leash(mob, trader);
             }
         });

@@ -6,8 +6,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.Vec3;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
-
-import java.util.Set;
+import xyz.agmstudio.neoblock.util.MinecraftUtil;
 
 public class NeoBlockPos extends BlockPos {
     private final ServerLevel level;
@@ -44,12 +43,12 @@ public class NeoBlockPos extends BlockPos {
         return level;
     }
     public void teleportTo(Entity entity) {
-        entity.teleportTo(level, getX() + 0.5, getY() + 0.5, getZ() + 0.5, Set.of(), 0, 0);
+        MinecraftUtil.teleportEntity(entity, level, getX() + 0.5, getY() + 0.5, getZ() + 0.5, 0, 0);
     }
     public void teleportTo(Entity entity, Vec3 offset) {
-        entity.teleportTo(level, getX() + offset.x, getY() + offset.y, getZ() + offset.z, Set.of(), 0, 0);
+        MinecraftUtil.teleportEntity(entity, level, getX() + offset.x, getY() + offset.y, getZ() + offset.z, 0, 0);
     }
     public void teleportTo(Entity entity, Vec3 offset, int ry, int rx) {
-        entity.teleportTo(level, getX() + offset.x, getY() + offset.y, getZ() + offset.z, Set.of(), ry, rx);
+        MinecraftUtil.teleportEntity(entity, level, getX() + offset.x, getY() + offset.y, getZ() + offset.z, ry, rx);
     }
 }
