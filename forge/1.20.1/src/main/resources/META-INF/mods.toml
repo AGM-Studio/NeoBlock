@@ -8,7 +8,7 @@ modId = "${mod_id}"
 version = "${version}"
 displayName = "${mod_name}"
 
-updateJSONURL="https://raw.githubusercontent.com/AGM-Studio/NeoBlock/1.21.1/update.json"
+updateJSONURL = "${mod_update}"
 displayURL = "${homepage}"
 credits = "${mod_credits}"
 logoFile = "${mod_id}.png"
