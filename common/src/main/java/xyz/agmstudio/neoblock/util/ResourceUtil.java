@@ -3,7 +3,6 @@ package xyz.agmstudio.neoblock.util;
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlock;
 import xyz.agmstudio.neoblock.neo.tiers.TierSpec;
-import xyz.agmstudio.neoblock.platform.Services;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -84,7 +83,7 @@ public class ResourceUtil {
      * @return the path created
      */
     public static @NotNull Path pathOf(String... paths) {
-        return Path.of(Services.PLATFORM.getConfigFolder().toAbsolutePath().toString(), paths);
+        return Path.of(NeoBlock.getConfigFolder().toAbsolutePath().toString(), paths);
     }
 
     /**

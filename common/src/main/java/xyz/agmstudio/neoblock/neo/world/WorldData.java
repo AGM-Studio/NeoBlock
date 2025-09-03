@@ -43,7 +43,7 @@ public abstract class WorldData extends SavedData {
     private static final String BLOCK_BREAK_OBJECTIVE = "neoblocks_broken";
 
     private static WorldData load(ServerLevel level) {
-        return Services.PLATFORM.captureSavedData(level, "neo_block_data", t -> WorldData.load(t, level), () -> WorldData.create(level));
+        return NeoBlock.captureSavedData(level, "neo_block_data", t -> WorldData.load(t, level), () -> WorldData.create(level));
     }
 
     private static WorldData instance;
@@ -136,7 +136,7 @@ public abstract class WorldData extends SavedData {
     }
 
     public static @NotNull WorldData create(@NotNull ServerLevel level) {
-        WorldData data = Services.PLATFORM.instanceWorldData(level);
+        WorldData data = NeoBlock.instanceWorldData(level);
 
         data.status = new WorldStatus(data);
         data.tiers.addAll(TierManager.fetchTiers(true));
@@ -145,7 +145,7 @@ public abstract class WorldData extends SavedData {
         return data;
     }
     public static @NotNull WorldData load(@NotNull CompoundTag tag, ServerLevel level) {
-        WorldData data = Services.PLATFORM.instanceWorldData(level);
+        WorldData data = NeoBlock.instanceWorldData(level);
 
         NeoBlock.LOGGER.debug("Loading WorldData from {}", tag);
         data.status = NBTSaveable.instance(WorldStatus.class, tag, data);

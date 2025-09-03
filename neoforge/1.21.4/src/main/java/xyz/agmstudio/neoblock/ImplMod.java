@@ -1,13 +1,20 @@
 package xyz.agmstudio.neoblock;
 
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.saveddata.SavedData;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.loading.FMLLoader;
+import net.neoforged.fml.loading.FMLPaths;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
@@ -17,8 +24,12 @@ import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import org.jetbrains.annotations.NotNull;
+import xyz.agmstudio.neoblock.neo.world.WorldData;
 import xyz.agmstudio.neoblock.platform.NeoForgeRegistry;
 
+import java.nio.file.Path;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 @Mod(NeoBlock.MOD_ID)
@@ -70,5 +81,30 @@ public final class ImplMod extends NeoBlock {
         if (result == null) return;
         if (result.isCanceled()) event.setNewDamage(0.0F);
         else event.setNewDamage(result.getResult());
+    }
+
+    @Override public String getPlatformNameImpl() {
+        return "NeoForge";
+    }
+    @Override public boolean isModLoadedImpl(String modId) {
+        return ModList.get().isLoaded(modId);
+    }
+    @Override public boolean isDevelopmentEnvironmentImpl() {
+        return !FMLLoader.isProduction();
+    }
+    @Override public Path getConfigFolderImpl() {
+        return FMLPaths.CONFIGDIR.get();
+    }
+    @Override public <T extends SavedData> T captureSavedDataImpl(ServerLevel level, String name, Function<CompoundTag, T> loader, Supplier<T> creator) {
+        BiFunction<CompoundTag, HolderLookup.Provider, T> neoLoader = ((tag, provider) -> loader.apply(tag));
+        return level.getDataStorage().computeIfAbsent(new SavedData.Factory<>(creator, neoLoader), name);
+    }
+    @Override
+    public WorldData instanceWorldDataImpl(ServerLevel level) {
+        return new WorldData(level) {
+            @Override public @NotNull CompoundTag save(@NotNull CompoundTag tag, HolderLookup.@NotNull Provider provider) {
+                return saveDataOnTag(tag);
+            }
+        };
     }
 }

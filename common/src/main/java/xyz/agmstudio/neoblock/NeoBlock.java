@@ -1,5 +1,8 @@
 package xyz.agmstudio.neoblock;
 
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.saveddata.SavedData;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.config.Configurator;
 import org.slf4j.Logger;
@@ -17,6 +20,8 @@ import xyz.agmstudio.neoblock.util.ConfigUtil;
 import xyz.agmstudio.neoblock.util.ResourceUtil;
 
 import java.nio.file.Path;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 
 public abstract class NeoBlock {
@@ -53,7 +58,7 @@ public abstract class NeoBlock {
         // Schematic class will take care of it.
         boolean ignored = Schematic.folder.toFile().exists();
 
-        if (Services.PLATFORM.isDevelopmentEnvironment()) {
+        if (NeoBlock.isDevelopmentEnvironment()) {
             Configurator.setRootLevel(Level.ERROR);
             Configurator.setLevel(LOGGER.getName(), Level.DEBUG);
             LOGGER.debug("Enabling debug mode for neoblock (development environment)");
@@ -64,5 +69,31 @@ public abstract class NeoBlock {
         NeoListener.registerTicker(TierManager::tick);
 
         NeoMobSpec.load();
+    }
+
+    protected abstract String getPlatformNameImpl();
+    protected abstract boolean isModLoadedImpl(String modId);
+    protected abstract boolean isDevelopmentEnvironmentImpl();
+    protected abstract Path getConfigFolderImpl();
+    protected abstract <T extends SavedData> T captureSavedDataImpl(ServerLevel level, String name, Function<CompoundTag, T> loader, Supplier<T> creator);
+    protected abstract WorldData instanceWorldDataImpl(ServerLevel level);
+
+    public static String getPlatformName() {
+        return instance.getPlatformNameImpl();
+    }
+    public static boolean isModLoaded(String modId) {
+	    return instance.isModLoadedImpl(modId);
+    }
+    public static boolean isDevelopmentEnvironment() {
+	    return instance.isDevelopmentEnvironmentImpl();
+    }
+    public static Path getConfigFolder() {
+	    return instance.getConfigFolderImpl();
+    }
+    public static <T extends SavedData> T captureSavedData(ServerLevel level, String name, Function<CompoundTag, T> loader, Supplier<T> creator) {
+	    return instance.captureSavedDataImpl(level, name, loader, creator);
+    }
+    public static WorldData instanceWorldData(ServerLevel level) {
+	    return instance.instanceWorldDataImpl(level);
     }
 }
