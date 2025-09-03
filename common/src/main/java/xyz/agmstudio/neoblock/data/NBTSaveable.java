@@ -4,6 +4,10 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.*;
 import xyz.agmstudio.neoblock.NeoBlock;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -12,7 +16,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-@SuppressWarnings("IfCanBeSwitch")
 public interface NBTSaveable {
     default CompoundTag onSave(CompoundTag tag) {
         return tag;
@@ -191,5 +194,11 @@ public interface NBTSaveable {
         public AbortException(String message) {
             super(message);
         }
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.FIELD)
+    @interface NBTData {
+        String value() default ""; // Optional custom key name
     }
 }

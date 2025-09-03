@@ -2,7 +2,6 @@ package xyz.agmstudio.neoblock.neo.tiers;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
-import xyz.agmstudio.neoblock.data.NBTData;
 import xyz.agmstudio.neoblock.data.NBTSaveable;
 import xyz.agmstudio.neoblock.util.MessengerUtil;
 
