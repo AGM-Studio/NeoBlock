@@ -1,4 +1,4 @@
-package xyz.agmstudio.neoblock.platform.helpers;
+package xyz.agmstudio.neoblock.platform;
 
 import mezz.jei.api.gui.builder.IRecipeSlotBuilder;
 import net.minecraft.core.BlockPos;

@@ -10,7 +10,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
-import xyz.agmstudio.neoblock.platform.helpers.INBTHelper;
 
 import java.io.File;
 import java.io.IOException;

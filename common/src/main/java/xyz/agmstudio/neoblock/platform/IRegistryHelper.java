@@ -1,4 +1,4 @@
-package xyz.agmstudio.neoblock.platform.helpers;
+package xyz.agmstudio.neoblock.platform;
 
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.level.block.Block;

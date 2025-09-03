@@ -18,7 +18,7 @@ import net.minecraft.world.item.Items;
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlock;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
-import xyz.agmstudio.neoblock.platform.helpers.INBTHelper;
+import xyz.agmstudio.neoblock.platform.INBTHelper;
 import xyz.agmstudio.neoblock.util.StringUtil;
 
 import java.util.ArrayList;

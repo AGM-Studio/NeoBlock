@@ -31,7 +31,6 @@ import org.joml.Vector3f;
 import xyz.agmstudio.neoblock.NeoBlock;
 import xyz.agmstudio.neoblock.neo.loot.NeoItemSpec;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
-import xyz.agmstudio.neoblock.platform.helpers.IMinecraftHelper;
 import xyz.agmstudio.neoblock.util.MinecraftUtil;
 
 import java.util.Optional;

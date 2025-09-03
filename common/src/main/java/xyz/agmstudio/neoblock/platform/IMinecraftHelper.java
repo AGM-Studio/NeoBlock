@@ -1,4 +1,4 @@
-package xyz.agmstudio.neoblock.platform.helpers;
+package xyz.agmstudio.neoblock.platform;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.DustParticleOptions;

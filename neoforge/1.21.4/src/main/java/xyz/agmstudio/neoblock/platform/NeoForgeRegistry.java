@@ -12,7 +12,6 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlock;
 import xyz.agmstudio.neoblock.neo.loot.NeoMobSpec;
-import xyz.agmstudio.neoblock.platform.helpers.IRegistryHelper;
 
 import java.util.List;
 
