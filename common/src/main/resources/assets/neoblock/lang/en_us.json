@@ -40,6 +40,8 @@
   "message.neoblock.trader_spawned": "§cA trader has spawned!§r",
   "message.neoblock.trades.mob": "The trader will bring %dx %s next time they visit.",
 
+  "message.neoblock.warning": "Something has gone wrong... please check the logs...\nMessage: %s",
+
   "command.neoblock.invalid_tier": "Tier mentioned not found",
 
   "command.neoblock.info": "Stats:\n  Blocks broken: %d\n  Unlocked tiers: %s",
