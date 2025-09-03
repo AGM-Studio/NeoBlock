@@ -28,8 +28,7 @@ import xyz.agmstudio.neoblock.neo.loot.trade.NeoMerchant;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoTrade;
 import xyz.agmstudio.neoblock.neo.tiers.TierManager;
 import xyz.agmstudio.neoblock.neo.tiers.TierSpec;
-import xyz.agmstudio.neoblock.platform.Services;
-import xyz.agmstudio.neoblock.platform.implants.IConfig;
+import xyz.agmstudio.neoblock.platform.IConfig;
 import xyz.agmstudio.neoblock.util.MessengerUtil;
 import xyz.agmstudio.neoblock.util.MinecraftUtil;
 

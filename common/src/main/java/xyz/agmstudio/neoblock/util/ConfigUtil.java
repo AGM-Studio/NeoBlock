@@ -2,8 +2,7 @@ package xyz.agmstudio.neoblock.util;
 
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlock;
-import xyz.agmstudio.neoblock.platform.helpers.IConfigHelper;
-import xyz.agmstudio.neoblock.platform.implants.IConfig;
+import xyz.agmstudio.neoblock.platform.IConfig;
 
 import java.io.IOException;
 import java.lang.annotation.ElementType;
@@ -38,7 +37,7 @@ public class ConfigUtil {
         } catch (Exception ignored) {}
         if (!Files.exists(configPath)) return null;
 
-        return IConfigHelper.getIConfig(configPath);
+        return IConfig.getIConfig(configPath);
     }
 
     public interface CategorizedConfig {
@@ -65,13 +64,13 @@ public class ConfigUtil {
                     for (String name: label.split("\\|")) {
                         String path = getPath(instance, name);
                         value = config.get(path);
-                        if (IConfigHelper.isINull(value)) break;
+                        if (IConfig.isINull(value)) break;
                     }
 
                     try {
                         field.setAccessible(true);
                         Object def = field.get(instance);
-                        Object result = IConfigHelper.isINull(value) ? value : def;
+                        Object result = IConfig.isINull(value) ? value : def;
                         if (result instanceof Number num) {
                             double min = annotation.min();
                             double max = annotation.max();

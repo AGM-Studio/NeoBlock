@@ -8,7 +8,7 @@ import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlock;
 import xyz.agmstudio.neoblock.neo.loot.NeoItemSpec;
-import xyz.agmstudio.neoblock.platform.implants.IConfig;
+import xyz.agmstudio.neoblock.platform.IConfig;
 import xyz.agmstudio.neoblock.util.ConfigUtil;
 
 import java.util.*;

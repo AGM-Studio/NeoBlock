@@ -1,10 +1,23 @@
-package xyz.agmstudio.neoblock.platform.implants;
+package xyz.agmstudio.neoblock.platform;
 
-import xyz.agmstudio.neoblock.platform.helpers.IConfigHelper;
+import xyz.agmstudio.neoblock.NeoBlock;
 
 import java.util.Map;
 
 public interface IConfig {
+    Helper HELPER = NeoBlock.loadService(Helper.class);
+    interface Helper {
+        IConfig getConfig(java.nio.file.Path path);
+        boolean isNull(Object object);
+    }
+
+    static IConfig getIConfig(java.nio.file.Path path) {
+        return HELPER.getConfig(path);
+    }
+    static boolean isINull(Object object) {
+        return HELPER.isNull(object);
+    }
+
     class Path {
         private final String[] paths;
         private Path(String... paths) {
@@ -23,7 +36,7 @@ public interface IConfig {
     default IConfig getSection(Path path) {
         for (String p: path.getPaths()) {
             IConfig result = getSection(p);
-            if (IConfigHelper.isINull(result)) continue;
+            if (isINull(result)) continue;
             return result;
         }
 
@@ -43,7 +56,7 @@ public interface IConfig {
     default  <T> T get(Path path, T defaultValue) {
         for (String p: path.getPaths()) {
             T result = get(p);
-            if (IConfigHelper.isINull(result)) continue;
+            if (isINull(result)) continue;
             return result;
         }
 

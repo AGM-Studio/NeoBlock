@@ -1,8 +1,9 @@
 package xyz.agmstudio.neoblock.platform;
 
+import com.electronwill.nightconfig.core.NullObject;
 import com.electronwill.nightconfig.core.UnmodifiableConfig;
+import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.core.file.FileConfig;
-import xyz.agmstudio.neoblock.platform.implants.IConfig;
 
 import java.util.Map;
 
@@ -37,5 +38,16 @@ public final class ForgeConfig implements IConfig {
 
     @Override public Map<String, Object> valueMap() {
         return config.valueMap();
+    }
+
+    public static final class Helper implements IConfig.Helper {
+        @Override public IConfig getConfig(java.nio.file.Path path) {
+            CommentedFileConfig config = CommentedFileConfig.builder(path).sync().build();
+            return new ForgeConfig(config);
+        }
+
+        @Override public boolean isNull(Object object) {
+            return object == null || NullObject.NULL_OBJECT == object;
+        }
     }
 }

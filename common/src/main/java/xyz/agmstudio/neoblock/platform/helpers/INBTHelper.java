@@ -10,7 +10,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
-import xyz.agmstudio.neoblock.platform.Services;
+import xyz.agmstudio.neoblock.NeoBlock;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,45 +24,45 @@ public interface INBTHelper {
     final class IO {
         public static void write(Path file, CompoundTag nbt) throws IOException {
             OutputStream os = Files.newOutputStream(file);
-            Services.NBT.writeCompressed(nbt, os);
+            NeoBlock.NBT_HELPER.writeCompressed(nbt, os);
         }
 
         public static CompoundTag read(Path file) throws IOException {
             InputStream is = Files.newInputStream(file);
-            return Services.NBT.readCompressed(is);
+            return NeoBlock.NBT_HELPER.readCompressed(is);
         }
     }
     final class Block {
         public static Tag writeBlockPos(BlockPos pos) {
-            return Services.NBT.writeBlockPos(pos);
+            return NeoBlock.NBT_HELPER.writeBlockPos(pos);
         }
         public static Tag writeBlockState(BlockState state) {
-            return Services.NBT.writeBlockState(state);
+            return NeoBlock.NBT_HELPER.writeBlockState(state);
         }
         public static BlockPos readBlockPos(CompoundTag tag, String key, BlockPos def) {
-            return Services.NBT.readBlockPos(tag, key, def);
+            return NeoBlock.NBT_HELPER.readBlockPos(tag, key, def);
         }
         public static BlockState readBlockState(CompoundTag tag, String key, ServerLevel level) {
-            return Services.NBT.readBlockState(tag, key, level);
+            return NeoBlock.NBT_HELPER.readBlockState(tag, key, level);
         }
         public static CompoundTag getBlockEntity(BlockEntity blockEntity, ServerLevel level) {
-            return Services.NBT.getBlockEntity(blockEntity, level);
+            return NeoBlock.NBT_HELPER.getBlockEntity(blockEntity, level);
         }
         public static void loadBlockEntity(BlockEntity be, CompoundTag tag, ServerLevel level) {
-            Services.NBT.loadBlockEntity(be, tag, level);
+            NeoBlock.NBT_HELPER.loadBlockEntity(be, tag, level);
         }
     }
     final class Item {
         public static CompoundTag getItemTag(@NotNull ItemStack item) {
-            return Services.NBT.getItemTag(item);
+            return NeoBlock.NBT_HELPER.getItemTag(item);
         }
         public static void setItemTag(@NotNull ItemStack item, @NotNull CompoundTag tag) {
-            Services.NBT.setItemTag(item, tag);
+            NeoBlock.NBT_HELPER.setItemTag(item, tag);
         }
     }
     final class JEI {
         public static IRecipeSlotBuilder addTooltip(IRecipeSlotBuilder builder, List<Component> components) {
-            return Services.NBT.addTooltip(builder, components);
+            return NeoBlock.NBT_HELPER.addTooltip(builder, components);
         }
     }
 

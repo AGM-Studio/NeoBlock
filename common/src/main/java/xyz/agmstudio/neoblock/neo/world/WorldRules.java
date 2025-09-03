@@ -3,7 +3,7 @@ package xyz.agmstudio.neoblock.neo.world;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.GameRules;
 import xyz.agmstudio.neoblock.NeoBlock;
-import xyz.agmstudio.neoblock.platform.implants.IConfig;
+import xyz.agmstudio.neoblock.platform.IConfig;
 
 import java.lang.reflect.Field;
 import java.util.Map;

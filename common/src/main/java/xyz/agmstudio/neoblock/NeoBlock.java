@@ -13,13 +13,14 @@ import xyz.agmstudio.neoblock.neo.block.BlockManager;
 import xyz.agmstudio.neoblock.neo.loot.NeoMobSpec;
 import xyz.agmstudio.neoblock.neo.tiers.TierManager;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
-import xyz.agmstudio.neoblock.platform.Services;
+import xyz.agmstudio.neoblock.platform.helpers.INBTHelper;
 import xyz.agmstudio.neoblock.platform.helpers.IRegistryHelper;
-import xyz.agmstudio.neoblock.platform.implants.IConfig;
+import xyz.agmstudio.neoblock.platform.IConfig;
 import xyz.agmstudio.neoblock.util.ConfigUtil;
 import xyz.agmstudio.neoblock.util.ResourceUtil;
 
 import java.nio.file.Path;
+import java.util.ServiceLoader;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -28,9 +29,11 @@ public abstract class NeoBlock {
     public static final String MOD_ID = "neoblock";
     public static final String MOD_NAME = "NeoBlock";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_NAME);
-    public static final Path CONFIG_FOLDER = ResourceUtil.getConfigFolder(NeoBlock.MOD_ID);
 
-    public static final IRegistryHelper REGISTRY = Services.load(IRegistryHelper.class);
+    public static Path CONFIG_FOLDER;
+
+    public static final INBTHelper NBT_HELPER = loadService(INBTHelper.class);
+    public static final IRegistryHelper REGISTRY = loadService(IRegistryHelper.class);
 
     private static NeoBlock instance;
     private static IConfig config;
@@ -50,6 +53,7 @@ public abstract class NeoBlock {
         assert MOD_NAME.equals(name);
 
         NeoBlock.instance = this;
+        NeoBlock.CONFIG_FOLDER = ResourceUtil.getConfigFolder(NeoBlock.MOD_ID);
         NeoBlock.config = ConfigUtil.getConfig(CONFIG_FOLDER, "config.toml");
 
         // To make sure files & folders are created.
@@ -69,6 +73,15 @@ public abstract class NeoBlock {
         NeoListener.registerTicker(TierManager::tick);
 
         NeoMobSpec.load();
+    }
+
+    public static <T> T loadService(Class<T> clazz) {
+
+        final T loadedService = ServiceLoader.load(clazz)
+                .findFirst()
+                .orElseThrow(() -> new NullPointerException("Failed to load service for " + clazz.getName()));
+        LOGGER.debug("Loaded {} for service {}", loadedService, clazz);
+        return loadedService;
     }
 
     protected abstract String getPlatformNameImpl();
