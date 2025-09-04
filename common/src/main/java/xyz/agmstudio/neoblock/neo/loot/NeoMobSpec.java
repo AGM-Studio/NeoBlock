@@ -98,6 +98,17 @@ public class NeoMobSpec extends NeoItemSpec {
         return true;
     }
 
+    public static ItemStack of(EntityType<?> mob, int count) {
+        ItemStack item = new ItemStack(NeoBlock.REGISTRY.getMobTicket(), count);
+        CompoundTag tag = INBTHelper.Item.getItemTag(item);
+
+        @Nullable ResourceLocation location = MinecraftUtil.getEntityTypeResource(mob).orElse(null);
+        tag.putString("neoMobType", location != null ? location.toString() : DEFAULT.toString());
+
+        INBTHelper.Item.setItemTag(item, tag);
+        return item;
+    }
+
     public static abstract class TradeTicket extends Item {
         public TradeTicket(Properties properties) {
             super(properties);

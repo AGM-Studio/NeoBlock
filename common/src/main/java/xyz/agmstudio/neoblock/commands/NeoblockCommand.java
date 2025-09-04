@@ -30,6 +30,7 @@ public class NeoblockCommand extends NeoCommand {
         super(buildContext, "neoblock");
 
         new Home(this);
+        new GiveMobTicket(this);
 
         new NeoblockForceCommand(this);
         new NeoblockSchematicCommand(this);
@@ -66,6 +67,41 @@ public class NeoblockCommand extends NeoCommand {
             BlockManager.getSafeBlock().teleportTo(source.getEntity());
             context.getSource().sendSuccess(() -> Component.translatable("command.neoblock.home", source.getEntity().getDisplayName()), true);
             return 1;
+        }
+    }
+
+    public static class GiveMobTicket extends NeoCommand {
+        protected GiveMobTicket(NeoCommand parent) {
+            super(parent, "get mobticket");
+            new NeoArgumentEntityType.Builder(this, "entity").build(this.buildContext);
+            new NeoArgumentInteger.Builder(this, "count").defaultValue(1).min(1).build();
+        }
+
+        @Override public int execute(CommandContext<CommandSourceStack> context) throws CommandExtermination {
+            CommandSourceStack source = context.getSource();
+            EntityType<?> type = this.getArgument(context, "entity");
+            if (type == null) {
+                source.sendFailure(Component.translatable("command.neoblock.mobticket.not_summonable"));
+                return 0;
+            }
+
+            int count = this.getArgument(context, "count");
+            ItemStack mob_ticket = NeoMobSpec.of(type, count);
+
+            try {
+                ServerPlayer player = source.getPlayerOrException();
+                boolean added = player.getInventory().add(mob_ticket);
+                if (!added) player.drop(mob_ticket, false);
+
+                source.sendSuccess(
+                        () -> Component.translatable("command.neoblock.mobticket.given", count, type.toShortString()),
+                        true
+                );
+                return 1;
+            } catch (CommandSyntaxException e) {
+                source.sendFailure(Component.translatable("command.neoblock.mobticket.no_player"));
+                return 0;
+            }
         }
     }
 }

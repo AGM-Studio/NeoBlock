@@ -62,6 +62,10 @@
   "command.neoblock.research.advance": "Research has been advanced. New research time: %s",
   "command.neoblock.research.advance.invalid_tier": "Only tiers on research can be advanced.",
 
+  "command.neoblock.mobticket.not_summonable": "The mob selected can not be used.",
+  "command.neoblock.mobticket.given": "Mob ticket for %dx of \"%s\" is created.",
+  "command.neoblock.mobticket.no_player": "This command is only for players.",
+
   "command.neoblock.force_block": "Block has been set to the new position. Previous block has been removed.",
   "command.neoblock.force_block.enabled": "Block has been set to the position and the mod has been activated.",
 
