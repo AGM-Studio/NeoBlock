@@ -74,7 +74,7 @@ public class NeoSeqBlockSpec extends NeoBlockSpec {
     public NeoSeqBlockSpec(List<NeoBlockSpec> blocks, int weight, String id) {
         super(Blocks.BEDROCK, weight);
 
-        this.blocks = blocks;
+        this.blocks = List.copyOf(blocks);
         this.id = id;
     }
 
@@ -83,6 +83,8 @@ public class NeoSeqBlockSpec extends NeoBlockSpec {
     }
 
     public void addToQueue(boolean removeFirst) {
+        List<NeoBlockSpec> blocks = new ArrayList<>(this.blocks);
+
         if (removeFirst) {
             NeoBlockSpec first = blocks.remove(0);
             if (first.weight > 1) blocks.add(0, first.copy(first.weight - 1));
