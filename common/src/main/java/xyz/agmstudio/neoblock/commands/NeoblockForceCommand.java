@@ -16,7 +16,7 @@ import xyz.agmstudio.neoblock.neo.world.WorldData;
 import java.util.Optional;
 
 public class NeoblockForceCommand extends NeoCommand {
-    public NeoblockForceCommand(NeoCommand parent) {
+    protected NeoblockForceCommand(NeoCommand parent) {
         super(parent, "force", 4);
 
         new SetBlock(this);
@@ -31,7 +31,7 @@ public class NeoblockForceCommand extends NeoCommand {
     }
 
     public static class SetBlock extends NeoCommand {
-        public SetBlock(NeoCommand parent) {
+        protected SetBlock(NeoCommand parent) {
             super(parent, "setblock");
             new NeoArgumentBlockPos.Builder(this, "pos").build();
             new NeoArgumentDimension.Builder(this, "dimension").defaultValue(null).build();
@@ -55,7 +55,7 @@ public class NeoblockForceCommand extends NeoCommand {
     }
 
     public static class Stop extends NeoCommand {
-        public Stop(NeoCommand parent) {
+        protected Stop(NeoCommand parent) {
             super(parent, "stop");
         }
 
@@ -70,7 +70,7 @@ public class NeoblockForceCommand extends NeoCommand {
     }
 
     public static class TraderSpawn extends NeoCommand {
-        public TraderSpawn(NeoCommand parent) {
+        protected TraderSpawn(NeoCommand parent) {
             super(parent, "trader");
         }
 
@@ -85,7 +85,7 @@ public class NeoblockForceCommand extends NeoCommand {
     }
 
     public static class ResetTiers extends NeoCommand {
-        public ResetTiers(NeoCommand parent) {
+        protected ResetTiers(NeoCommand parent) {
             super(parent, "reset");
         }
 

@@ -13,7 +13,7 @@ import xyz.agmstudio.neoblock.neo.world.WorldData;
 import xyz.agmstudio.neoblock.util.StringUtil;
 
 public class NeoblockTiersCommand extends NeoCommand {
-    public NeoblockTiersCommand(NeoCommand parent) {
+    protected NeoblockTiersCommand(NeoCommand parent) {
         super(parent, "tiers", 3);
 
         new Satisfy(this);
@@ -28,7 +28,7 @@ public class NeoblockTiersCommand extends NeoCommand {
     }
 
     public static class Satisfy extends NeoCommand {
-        public Satisfy(NeoCommand parent) {
+        protected Satisfy(NeoCommand parent) {
             super(parent, "satisfy");
             new NeoArgumentTier.Builder(this, "tier")
                     .provider(NeoArgumentTier.createSuggester(tier -> !tier.hasSpecialRequirement() && !tier.isResearched()))
@@ -47,7 +47,7 @@ public class NeoblockTiersCommand extends NeoCommand {
     }
 
     public static class Disable extends NeoCommand {
-        public Disable(NeoCommand parent) {
+        protected Disable(NeoCommand parent) {
             super(parent, "disable");
             new NeoArgumentTier.Builder(this, "tier")
                     .provider(NeoArgumentTier.createSuggester(tier -> tier.isEnabled() && tier.isResearched()))
@@ -62,7 +62,7 @@ public class NeoblockTiersCommand extends NeoCommand {
     }
 
     public static class Enable extends NeoCommand {
-        public Enable(NeoCommand parent) {
+        protected Enable(NeoCommand parent) {
             super(parent, "enable");
             new NeoArgumentTier.Builder(this, "tier")
                     .provider(NeoArgumentTier.createSuggester(tier -> !tier.isEnabled() && tier.isResearched()))
@@ -77,7 +77,7 @@ public class NeoblockTiersCommand extends NeoCommand {
     }
 
     public static class AdvanceResearch extends NeoCommand {
-        public AdvanceResearch(NeoCommand parent) {
+        protected AdvanceResearch(NeoCommand parent) {
             super(parent, "research advance");
             new NeoArgumentTier.Builder(this, "tier")
                     .provider(NeoArgumentTier.createSuggester(tier -> tier.canBeResearched() && !tier.isResearched()))

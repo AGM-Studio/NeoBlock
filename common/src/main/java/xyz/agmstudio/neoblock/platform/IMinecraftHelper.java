@@ -48,6 +48,7 @@ public interface IMinecraftHelper {
 
     Optional<EntityType<?>> getEntityType(ResourceLocation location);
     Optional<ResourceLocation> getEntityTypeResource(EntityType<?> type);
+    Iterable<ResourceLocation> getAllEntityTypes();
 
     <T extends Entity> T spawnEntity(ServerLevel level, EntityType<T> type, BlockPos pos);
     void teleportEntity(Entity entity, ServerLevel level, double ox, double oy, double oz, int ry, int rx);

@@ -100,6 +100,9 @@ public final class NeoForgeMinecraftHelper implements IMinecraftHelper {
         if (type == null) return Optional.empty();
         return Optional.of(BuiltInRegistries.ENTITY_TYPE.getKey(type));
     }
+    @Override public Iterable<ResourceLocation> getAllEntityTypes() {
+        return BuiltInRegistries.ENTITY_TYPE.keySet();
+    }
 
     @Override public <T extends Entity> T spawnEntity(ServerLevel level, EntityType<T> type, BlockPos pos) {
         return type.spawn(level, pos, MobSpawnType.MOB_SUMMONED);

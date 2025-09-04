@@ -92,6 +92,9 @@ public final class ForgeMinecraftHelper implements IMinecraftHelper {
         if (type == null) return Optional.empty();
         return Optional.ofNullable(ForgeRegistries.ENTITY_TYPES.getKey(type));
     }
+    @Override public Iterable<ResourceLocation> getAllEntityTypes() {
+        return ForgeRegistries.ENTITY_TYPES.getKeys();
+    }
 
     @Override public <T extends Entity> T spawnEntity(ServerLevel level, EntityType<T> type, BlockPos pos) {
         return type.spawn(level, pos, MobSpawnType.MOB_SUMMONED);

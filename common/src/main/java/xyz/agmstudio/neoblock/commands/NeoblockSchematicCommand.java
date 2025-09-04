@@ -13,7 +13,7 @@ import xyz.agmstudio.neoblock.data.Schematic;
 import java.nio.file.Path;
 
 public class NeoblockSchematicCommand extends NeoCommand {
-    public NeoblockSchematicCommand(NeoCommand parent) {
+    protected NeoblockSchematicCommand(NeoCommand parent) {
         super(parent, "scheme", 2);
 
         new Load(this);
@@ -26,7 +26,7 @@ public class NeoblockSchematicCommand extends NeoCommand {
     }
 
     public static class Load extends NeoCommand {
-        public Load(NeoCommand parent) {
+        protected Load(NeoCommand parent) {
             super(parent, "load");
             new NeoArgumentBlockPos.Builder(this, "pos").build();
             new NeoArgumentString.Builder(this, "name").defaultValue(null).build();
@@ -47,7 +47,7 @@ public class NeoblockSchematicCommand extends NeoCommand {
     }
 
     public static class Save extends NeoCommand {
-        public Save(NeoCommand parent) {
+        protected Save(NeoCommand parent) {
             super(parent, "save", 2);
             new NeoArgumentBlockPos.Builder(this, "pos1").build();
             new NeoArgumentBlockPos.Builder(this, "pos2").build();

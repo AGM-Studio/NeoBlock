@@ -61,7 +61,7 @@ public final class ImplMod extends NeoBlock {
 
     @SubscribeEvent
     public static void onRegisterCommands(RegisterCommandsEvent event) {
-        NeoListener.onRegisterCommands(event.getDispatcher());
+        NeoListener.onRegisterCommands(event.getBuildContext(), event.getDispatcher());
     }
 
     @SubscribeEvent

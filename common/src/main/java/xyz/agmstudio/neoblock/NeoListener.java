@@ -1,6 +1,7 @@
 package xyz.agmstudio.neoblock;
 
 import com.mojang.brigadier.CommandDispatcher;
+import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
@@ -138,8 +139,8 @@ public final class NeoListener {
         }
     }
 
-    public static void onRegisterCommands(CommandDispatcher<CommandSourceStack> dispatcher) {
-        NeoblockCommand.getInstance().register(dispatcher);
+    public static void onRegisterCommands(CommandBuildContext buildContext, CommandDispatcher<CommandSourceStack> dispatcher) {
+        NeoblockCommand.getInstance(buildContext).register(dispatcher);
     }
 
     public static final class LivingDamageResult extends CancelableEventResult<Float> {

@@ -8,6 +8,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import net.minecraft.ChatFormatting;
+import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.ClickEvent;
@@ -37,16 +38,18 @@ public abstract class NeoCommand {
     }
 
     protected final LinkedHashMap<String, NeoArgument<?>> arguments = new LinkedHashMap<>();
+    protected final CommandBuildContext buildContext;
     protected final Predicate<CommandSourceStack> permission;
     protected final int permission_value;
     protected final String pattern;
 
     private final List<NeoCommand> subcommands = new ArrayList<>();
 
-    public NeoCommand(String pattern) {
-        this(pattern, 0);
+    public NeoCommand(CommandBuildContext buildContext, String pattern) {
+        this(buildContext, pattern, 0);
     }
-    public NeoCommand(String pattern, int permission) {
+    public NeoCommand(CommandBuildContext buildContext, String pattern, int permission) {
+        this.buildContext = buildContext;
         this.permission_value = permission;
         this.permission = context -> context.hasPermission(permission);
         this.pattern = pattern;
@@ -54,11 +57,11 @@ public abstract class NeoCommand {
     }
 
     public NeoCommand(NeoCommand parent, String pattern) {
-        this("%s %s".formatted(parent.pattern, pattern), Math.max(0, parent.permission_value));
+        this(parent.buildContext, "%s %s".formatted(parent.pattern, pattern), Math.max(0, parent.permission_value));
         parent.subcommands.add(this);
     }
     public NeoCommand(NeoCommand parent, String pattern, int permission) {
-        this("%s %s".formatted(parent.pattern, pattern), Math.max(permission, parent.permission_value));
+        this(parent.buildContext, "%s %s".formatted(parent.pattern, pattern), Math.max(permission, parent.permission_value));
         parent.subcommands.add(this);
     }
 

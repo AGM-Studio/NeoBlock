@@ -106,6 +106,9 @@ public final class MinecraftUtil {
     public static boolean isValidEntityType(EntityType<?> entityType, ResourceLocation location) {
         return getEntityTypeResource(entityType).orElse(null) == location;
     }
+    public static Iterable<ResourceLocation> getAllEntityTypes() {
+        return HELPER.getAllEntityTypes();
+    }
 
     public static <T extends Entity> T spawnEntity(ServerLevel level, EntityType<T> type, BlockPos pos) {
         return HELPER.spawnEntity(level, type, pos);
