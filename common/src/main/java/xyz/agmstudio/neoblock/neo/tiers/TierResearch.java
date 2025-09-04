@@ -43,4 +43,8 @@ public class TierResearch implements NBTSaveable {
     @Override public String toString() {
         return "TierResearch[tier=%d, tick=%d, time=%d, done=%s]".formatted(tier.id, tick, time, done);
     }
+
+    public long advanceBy(long value) {
+        return tick += value;
+    }
 }

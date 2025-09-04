@@ -59,6 +59,8 @@
   "command.neoblock.update.success": "Tiers has been overwritten with the new config. It might have caused some changes in unlocked tiers.",
 
   "command.neoblock.disabled": "Neoblock has been set to dormant in this world. Enable it with \"%s\" if you want to.",
+  "command.neoblock.research.advance": "Research has been advanced. New research time: %s",
+  "command.neoblock.research.advance.invalid_tier": "Only tiers on research can be advanced.",
 
   "command.neoblock.force_block": "Block has been set to the new position. Previous block has been removed.",
   "command.neoblock.force_block.enabled": "Block has been set to the position and the mod has been activated.",
