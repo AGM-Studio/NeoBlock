@@ -6,10 +6,9 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import xyz.agmstudio.neoblock.neo.block.BlockManager;
-import xyz.agmstudio.neoblock.util.ConfigUtil;
 
 public class BreakingAnimation extends UpgradeProgressAnimation {
-    @ConfigUtil.ConfigField(min = 0)
+    @ConfigField(min = 0)
     private float volume = 0.7f;
 
     public BreakingAnimation() {

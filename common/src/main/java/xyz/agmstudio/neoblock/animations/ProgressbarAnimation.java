@@ -5,19 +5,18 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerBossEvent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.BossEvent;
-import xyz.agmstudio.neoblock.util.ConfigUtil;
 import xyz.agmstudio.neoblock.util.StringUtil;
 
 public class ProgressbarAnimation extends Animation {
-    @ConfigUtil.ConfigField
+    @ConfigField
     private String color = "red";
-    @ConfigUtil.ConfigField("show-time")
+    @ConfigField("show-time")
     private boolean dynamic = true;
 
     private final ServerBossEvent bar;
 
     public ProgressbarAnimation() {
-        super("animations.progressbar");
+        super("progressbar");
         bar = new ServerBossEvent(Component.literal(""), BossEvent.BossBarColor.RED, BossEvent.BossBarOverlay.PROGRESS);
     }
 

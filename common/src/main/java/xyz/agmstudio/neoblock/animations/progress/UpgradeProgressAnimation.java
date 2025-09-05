@@ -3,10 +3,9 @@ package xyz.agmstudio.neoblock.animations.progress;
 import net.minecraft.server.level.ServerLevel;
 import xyz.agmstudio.neoblock.animations.Animation;
 import xyz.agmstudio.neoblock.neo.tiers.TierManager;
-import xyz.agmstudio.neoblock.util.ConfigUtil;
 
 public abstract class UpgradeProgressAnimation extends Animation {
-    @ConfigUtil.ConfigField(min = 5)
+    @ConfigField(min = 5)
     protected int interval = 40;
 
     public UpgradeProgressAnimation(String name) {

@@ -3,15 +3,14 @@ package xyz.agmstudio.neoblock.animations.idle;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.phys.Vec3;
-import xyz.agmstudio.neoblock.util.ConfigUtil;
 
 import java.util.HashSet;
 import java.util.Iterator;
 
 public class PulseAnimation extends IdleAnimation {
-    @ConfigUtil.ConfigField(min = 5)
+    @ConfigField(min = 5)
     private int interval = 100;
-    @ConfigUtil.ConfigField(value = "wait-for", min = 0)
+    @ConfigField(value = "wait-for", min = 0)
     private int delay = 200;
 
     private long tick = 0;

@@ -16,7 +16,6 @@ import xyz.agmstudio.neoblock.neo.block.NeoSeqBlockSpec;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoTradePool;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
 import xyz.agmstudio.neoblock.platform.IConfig;
-import xyz.agmstudio.neoblock.util.ConfigUtil;
 import xyz.agmstudio.neoblock.util.ResourceUtil;
 
 import java.nio.file.Files;
@@ -41,7 +40,7 @@ public final class TierManager {
 
     public static void loadTierConfig(final TierSpec spec) {
         Path FOLDER = ResourceUtil.getConfigFolder(NeoBlock.MOD_ID, "tiers");
-        IConfig config = ConfigUtil.getConfig(FOLDER, "tier-" + spec.id);
+        IConfig config = IConfig.getConfig(FOLDER, "tier-" + spec.id);
         if (config == null) throw new NBTSaveable.AbortException("Unable to find config for tier " + spec.id);
 
         NeoBlock.LOGGER.debug("Loading tier {}...", spec.id);

@@ -30,7 +30,7 @@ public final class TierSpecActions {
 
         this.rules = new HashMap<>();
         IConfig rules = config.getSection(type + ".rules");
-        if (rules != null) this.rules.putAll(rules.valueMap());
+        if (rules != null) rules.forEach(this.rules::put);
     }
 
     public TierSpecActions withMessage(String message, Object... args) {

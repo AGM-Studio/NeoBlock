@@ -5,14 +5,13 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import xyz.agmstudio.neoblock.neo.block.BlockManager;
-import xyz.agmstudio.neoblock.util.ConfigUtil;
 
 public class ExplosionAnimation extends UpgradePhaseAnimation {
-    @ConfigUtil.ConfigField("at-start")
+    @ConfigField("at-start")
     private boolean activeOnUpgradeStart = false;
-    @ConfigUtil.ConfigField("at-finish")
+    @ConfigField("at-finish")
     private boolean activeOnUpgradeFinish = true;
-    @ConfigUtil.ConfigField(min = 0)
+    @ConfigField(min = 0)
     private float volume = 0.7f;
 
     public ExplosionAnimation() {

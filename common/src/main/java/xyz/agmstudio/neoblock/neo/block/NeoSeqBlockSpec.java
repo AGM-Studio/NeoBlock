@@ -8,7 +8,6 @@ import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlock;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
 import xyz.agmstudio.neoblock.platform.IConfig;
-import xyz.agmstudio.neoblock.util.ConfigUtil;
 import xyz.agmstudio.neoblock.util.MessengerUtil;
 
 import java.util.ArrayList;
@@ -31,7 +30,7 @@ public class NeoSeqBlockSpec extends NeoBlockSpec {
     }
 
     public static void reloadSequences() {
-        IConfig config = ConfigUtil.getConfig(NeoBlock.CONFIG_FOLDER, "sequences");
+        IConfig config = IConfig.getConfig(NeoBlock.CONFIG_FOLDER, "sequences");
         if (config == null) {
             NeoBlock.LOGGER.error("Failed to load block sequences config.");
             return;
@@ -39,14 +38,14 @@ public class NeoSeqBlockSpec extends NeoBlockSpec {
 
         SEQUENCES.clear();
 
-        for (String key : config.valueMap().keySet()) {
+        config.forEach((key, value) -> {
             List<NeoBlockSpec> list = extractSequenceList(config.get(key));
             if (list.isEmpty()) NeoBlock.LOGGER.info("Unable to load sequence {} because it's empty.", key);
             else {
                 NeoBlock.LOGGER.info("Loaded {} blocks for {}.", list.size(), key);
                 SEQUENCES.put(key, list);
             }
-        }
+        });
 
         NeoBlock.LOGGER.info("Loaded {} block sequences.", SEQUENCES.size());
     }

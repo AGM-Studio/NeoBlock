@@ -3,7 +3,6 @@ package xyz.agmstudio.neoblock.neo.loot.trade;
 import net.minecraft.world.item.trading.MerchantOffer;
 import xyz.agmstudio.neoblock.NeoBlock;
 import xyz.agmstudio.neoblock.platform.IConfig;
-import xyz.agmstudio.neoblock.util.ConfigUtil;
 
 import java.util.*;
 
@@ -14,7 +13,7 @@ public abstract class NeoTrade {
     }
 
     public static void reloadTrades() {
-        IConfig config = ConfigUtil.getConfig(NeoBlock.CONFIG_FOLDER, "trades");
+        IConfig config = IConfig.getConfig(NeoBlock.CONFIG_FOLDER, "trades");
         if (config == null) {
             NeoBlock.LOGGER.error("Failed to load trades config.");
             return;
@@ -22,7 +21,7 @@ public abstract class NeoTrade {
 
         TRADES.clear();
 
-        for (String key : config.valueMap().keySet()) {
+        config.forEach((key, value) -> {
             List<String> entries = config.get(key);
             if (entries == null) {
                 TRADES.put(key, List.of());
@@ -37,7 +36,7 @@ public abstract class NeoTrade {
                 TRADES.put(key, list);
                 NeoBlock.LOGGER.info("Loaded {} trades for {}", list.size(), key);
             }
-        }
+        });
 
         NeoBlock.LOGGER.info("Loaded {} trades.", TRADES.size());
     }

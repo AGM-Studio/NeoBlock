@@ -4,16 +4,15 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.phys.Vec3;
 import xyz.agmstudio.neoblock.neo.block.BlockManager;
-import xyz.agmstudio.neoblock.util.ConfigUtil;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 public class SpiralAnimation extends UpgradeProgressAnimation {
-    @ConfigUtil.ConfigField(min = 1)
+    @ConfigField(min = 1)
     private int length = 50;
-    @ConfigUtil.ConfigField(min = 1)
+    @ConfigField(min = 1)
     private int count = 5;
 
     private final List<Integer> animations = new ArrayList<>();

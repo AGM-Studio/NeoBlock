@@ -6,18 +6,17 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.phys.Vec3;
 import xyz.agmstudio.neoblock.neo.block.BlockManager;
-import xyz.agmstudio.neoblock.util.ConfigUtil;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 public class FuseAnimation extends UpgradePhaseAnimation {
-    @ConfigUtil.ConfigField("at-start")
+    @ConfigField("at-start")
     private boolean activeOnUpgradeStart = false;
-    @ConfigUtil.ConfigField("at-finish")
+    @ConfigField("at-finish")
     private boolean activeOnUpgradeFinish = true;
-    @ConfigUtil.ConfigField(min = 0)
+    @ConfigField(min = 0)
     private float volume = 1.5f;
 
     private final List<Integer> animations = new ArrayList<>();

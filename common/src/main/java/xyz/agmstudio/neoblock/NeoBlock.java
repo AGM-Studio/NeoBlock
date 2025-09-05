@@ -16,7 +16,6 @@ import xyz.agmstudio.neoblock.neo.world.WorldData;
 import xyz.agmstudio.neoblock.platform.INBTHelper;
 import xyz.agmstudio.neoblock.platform.IRegistryHelper;
 import xyz.agmstudio.neoblock.platform.IConfig;
-import xyz.agmstudio.neoblock.util.ConfigUtil;
 import xyz.agmstudio.neoblock.util.ResourceUtil;
 
 import java.nio.file.Path;
@@ -46,7 +45,7 @@ public abstract class NeoBlock {
     }
 
     public static void reloadConfig() {
-        NeoBlock.config = ConfigUtil.getConfig(CONFIG_FOLDER, "config.toml");
+        NeoBlock.config = IConfig.getConfig(CONFIG_FOLDER, "config.toml");
     }
 
     protected NeoBlock(String name) {
@@ -54,7 +53,7 @@ public abstract class NeoBlock {
 
         NeoBlock.instance = this;
         NeoBlock.CONFIG_FOLDER = ResourceUtil.getConfigFolder(NeoBlock.MOD_ID);
-        NeoBlock.config = ConfigUtil.getConfig(CONFIG_FOLDER, "config.toml");
+        NeoBlock.config = IConfig.getConfig(CONFIG_FOLDER, "config.toml");
 
         // To make sure files & folders are created.
         WorldData.reloadConfig();

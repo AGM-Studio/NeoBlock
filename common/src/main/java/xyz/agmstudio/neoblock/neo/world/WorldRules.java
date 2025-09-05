@@ -6,12 +6,10 @@ import xyz.agmstudio.neoblock.NeoBlock;
 import xyz.agmstudio.neoblock.platform.IConfig;
 
 import java.lang.reflect.Field;
-import java.util.Map;
 
 public class WorldRules {
     public static void applyGameRules(ServerLevel level, IConfig config) {
-        for (Map.Entry<String, Object> entry: config.valueMap().entrySet())
-            applyGameRule(level, entry.getKey(), entry.getValue());
+        config.forEach((key, value) -> applyGameRule(level, key, value));
     }
 
     public static boolean applyGameRule(ServerLevel level, String key, Object value) {

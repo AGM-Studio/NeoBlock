@@ -5,7 +5,8 @@ import com.electronwill.nightconfig.core.UnmodifiableConfig;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.core.file.FileConfig;
 
-import java.util.Map;
+import java.util.Set;
+import java.util.function.BiConsumer;
 
 public final class ForgeConfig implements IConfig {
     private final UnmodifiableConfig config;
@@ -36,8 +37,11 @@ public final class ForgeConfig implements IConfig {
         if (config instanceof FileConfig c) c.load();
     }
 
-    @Override public Map<String, Object> valueMap() {
-        return config.valueMap();
+    @Override public Set<String> keys() {
+        return config.valueMap().keySet();
+    }
+    @Override public void forEach(BiConsumer<String, Object> action) {
+        config.entrySet().forEach(entry -> action.accept(entry.getKey(), entry.getValue()));
     }
 
     public static final class Helper implements IConfig.Helper {

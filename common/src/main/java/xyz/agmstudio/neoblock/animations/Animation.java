@@ -1,6 +1,7 @@
 package xyz.agmstudio.neoblock.animations;
 
 import net.minecraft.server.level.ServerLevel;
+import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlock;
 import xyz.agmstudio.neoblock.animations.idle.IdleAnimation;
 import xyz.agmstudio.neoblock.animations.idle.NeoFlowAnimation;
@@ -11,14 +12,16 @@ import xyz.agmstudio.neoblock.animations.progress.BreakingAnimation;
 import xyz.agmstudio.neoblock.animations.progress.SparkleAnimation;
 import xyz.agmstudio.neoblock.animations.progress.SpiralAnimation;
 import xyz.agmstudio.neoblock.neo.tiers.TierManager;
-import xyz.agmstudio.neoblock.util.ConfigUtil;
-import xyz.agmstudio.neoblock.util.StringUtil;
+import xyz.agmstudio.neoblock.platform.IConfig;
+import xyz.agmstudio.neoblock.util.ResourceUtil;
 
 import java.lang.reflect.Field;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class Animation implements ConfigUtil.CategorizedConfig {
+public abstract class Animation implements IConfig.Configured {
+    private static final Path FOLDER = ResourceUtil.getConfigFolder(NeoBlock.MOD_ID, "animations");
     private static final List<Animation> animations = new ArrayList<>();
 
     public static void reloadAnimations() {
@@ -54,21 +57,23 @@ public abstract class Animation implements ConfigUtil.CategorizedConfig {
         return "animations." + category + "." + name + ".";
     }
 
-    public String getPath() {
-        return path;
+    @Override public IConfig getConfig() {
+        return this.config;
     }
 
-    @ConfigUtil.ConfigField
+    @ConfigField
     protected boolean enabled;
-    private final String path;
+    private final IConfig config;
 
-    public Animation(String path) {
-        if (!path.isEmpty() && !path.endsWith(".")) path += ".";
-        this.path = StringUtil.convertToSnakeCase(path);
+    public Animation(@NotNull IConfig config) {
+        this.config = config;
     }
-
+    public Animation(String name) {
+        this.config = IConfig.getConfig(FOLDER, name);
+    }
     public Animation(String category, String name) {
-        this(createPath(category, name));
+        final Path subfolder = FOLDER.resolve(category);
+        this.config = IConfig.getConfig(subfolder, name);
     }
 
     public boolean isEnabled() {
@@ -84,7 +89,7 @@ public abstract class Animation implements ConfigUtil.CategorizedConfig {
     }
 
     public final void reload() {
-        ConfigUtil.loadValues(NeoBlock.getConfig(), this, true);
+        loadValues(true);
         processConfig();
     }
 

@@ -9,7 +9,6 @@ import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlock;
 import xyz.agmstudio.neoblock.neo.loot.NeoItemSpec;
 import xyz.agmstudio.neoblock.platform.IConfig;
-import xyz.agmstudio.neoblock.util.ConfigUtil;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -27,7 +26,7 @@ public class NeoChestSpec extends NeoBlockSpec {
     }
 
     public static void reloadChests() {
-        IConfig config = ConfigUtil.getConfig(NeoBlock.CONFIG_FOLDER, "chests");
+        IConfig config = IConfig.getConfig(NeoBlock.CONFIG_FOLDER, "chests");
         if (config == null) {
             NeoBlock.LOGGER.error("Failed to load chests config.");
             return;
@@ -35,7 +34,7 @@ public class NeoChestSpec extends NeoBlockSpec {
 
         CHESTS.clear();
 
-        for (String key : config.valueMap().keySet()) {
+        config.forEach((key, value) -> {
             List<String> entries = config.get(key, List.of());
 
             List<NeoItemSpec> list = new ArrayList<>();
@@ -45,7 +44,7 @@ public class NeoChestSpec extends NeoBlockSpec {
                 NeoBlock.LOGGER.info("Loaded {} stacks for {}", list.size(), key);
                 CHESTS.put(key, list);
             }
-        }
+        });
 
         NeoBlock.LOGGER.info("Loaded {} chests.", CHESTS.size());
     }

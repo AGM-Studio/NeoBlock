@@ -4,7 +4,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
-import xyz.agmstudio.neoblock.util.ConfigUtil;
 import xyz.agmstudio.neoblock.util.MinecraftUtil;
 
 import java.awt.*;
@@ -13,13 +12,13 @@ import java.util.Arrays;
 import java.util.List;
 
 public class NeoFlowAnimation extends IdleAnimation {
-    @ConfigUtil.ConfigField(min = 1)
+    @ConfigField(min = 1)
     private int count = 1;
-    @ConfigUtil.ConfigField(min = 0.01)
+    @ConfigField(min = 0.01)
     private float speed = 0.05f;
-    @ConfigUtil.ConfigField(value = "color-speed", min = 0, max = 1)
+    @ConfigField(value = "color-speed", min = 0, max = 1)
     private float hueSpeed = 1.0f;
-    @ConfigUtil.ConfigField(value = "wait-for", min = 0)
+    @ConfigField(value = "wait-for", min = 0)
     private int delay = 200;
     
     private final List<AnimationParticle> particles = new ArrayList<>();

@@ -15,7 +15,6 @@ import net.minecraft.world.entity.npc.WanderingTrader;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import xyz.agmstudio.neoblock.NeoBlock;
-import xyz.agmstudio.neoblock.neo.block.BlockManager;
 import xyz.agmstudio.neoblock.neo.block.NeoBlockPos;
 import xyz.agmstudio.neoblock.platform.IConfig;
 import xyz.agmstudio.neoblock.util.MinecraftUtil;
@@ -86,11 +85,11 @@ public class ForgivingVoid {
         ForgivingVoid.livingsDamager = castDamager(config.get("forgiving-void.damage-livings", 0.0));
 
         IConfig potions = config.getSection("forgiving-void.potions");
-        if (potions != null) for (String key: potions.valueMap().keySet()) {
-            double time = potions.getInt(key);
+        if (potions != null) potions.forEach((key, value) -> {
+            if (!(value instanceof Double time)) return;
             Optional<MobEffect> effect = MinecraftUtil.getMobEffect(key.replace('-', ':'));
             if (time > 0 && effect.isPresent()) effects.put(effect.get(), (int) (time * 20));
-        }
+        });
 
         NeoBlock.LOGGER.debug("ForgivingVoid: Config loaded.");
     }
@@ -141,7 +140,7 @@ public class ForgivingVoid {
     public static boolean handleVoid(ServerLevel level, Entity entity) {
         if (!shallBeRescued(entity)) return false;
 
-        NeoBlockPos safety = BlockManager.getSafeBlock();
+        NeoBlockPos safety = NeoBlockPos.safeBlock();
         safety.teleportTo(entity, offset);
         entity.setDeltaMovement(Vec3.ZERO);
         entity.fallDistance = 0;
