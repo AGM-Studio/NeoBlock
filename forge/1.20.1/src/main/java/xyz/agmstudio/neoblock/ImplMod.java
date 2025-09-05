@@ -15,6 +15,7 @@ import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLLoader;
 import net.minecraftforge.fml.loading.FMLPaths;
 import org.jetbrains.annotations.NotNull;
@@ -30,7 +31,7 @@ public final class ImplMod extends NeoBlock {
     public ImplMod() {
         super(NeoBlock.MOD_NAME);
 
-        IEventBus bus = MinecraftForge.EVENT_BUS;
+        IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
 
         ForgeRegistry.BLOCKS.register(bus);
         ForgeRegistry.ITEMS.register(bus);

@@ -15,6 +15,7 @@ import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
+import xyz.agmstudio.neoblock.NeoBlock;
 import xyz.agmstudio.neoblock.util.JavaUtil;
 
 import java.util.ArrayList;
@@ -92,10 +93,12 @@ public abstract class NeoCommand {
     public List<LiteralCommandNode<CommandSourceStack>> register(CommandDispatcher<CommandSourceStack> dispatcher) {
         Command<CommandSourceStack> executor = (context) -> {
             try {
-                this.execute(context);
-                return 1;
+                return this.execute(context);
             } catch (CommandExtermination ignored) {
                 return 0;
+            } catch (Exception e) {
+                NeoBlock.LOGGER.error("Failed to execute command:", e);
+                throw e;
             }
         };
 
