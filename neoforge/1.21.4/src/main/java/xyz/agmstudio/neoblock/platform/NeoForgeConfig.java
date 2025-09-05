@@ -41,9 +41,13 @@ public class NeoForgeConfig implements IConfig {
     @Override public Set<String> keys() {
         return config.entrySet().stream().map(UnmodifiableConfig.Entry::getKey).collect(Collectors.toSet());
     }
+    @Override public Set<String> sections() {
+        return config.entrySet().stream().filter(entry -> entry.getValue() instanceof UnmodifiableConfig).map(UnmodifiableConfig.Entry::getKey).collect(Collectors.toSet());
+    }
     @Override public void forEach(BiConsumer<String, Object> action) {
         config.entrySet().forEach(entry -> action.accept(entry.getKey(), entry.getValue()));
     }
+
 
     public static class Helper implements IConfig.Helper {
         @Override public IConfig getConfig(java.nio.file.Path path) {

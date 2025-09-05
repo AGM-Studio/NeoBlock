@@ -112,6 +112,7 @@ public interface IConfig {
 
     void load();
     Set<String> keys();
+    Set<String> sections();
     void forEach(BiConsumer<String, Object> action);
 
     interface Configured {

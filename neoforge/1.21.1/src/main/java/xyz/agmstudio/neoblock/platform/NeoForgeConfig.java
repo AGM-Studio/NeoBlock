@@ -7,6 +7,7 @@ import com.electronwill.nightconfig.core.file.FileConfig;
 
 import java.util.Set;
 import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 
 public class NeoForgeConfig implements IConfig {
     private final UnmodifiableConfig config;
@@ -39,6 +40,9 @@ public class NeoForgeConfig implements IConfig {
 
     @Override public Set<String> keys() {
         return config.valueMap().keySet();
+    }
+    @Override public Set<String> sections() {
+        return config.entrySet().stream().filter(entry -> entry.getValue() instanceof UnmodifiableConfig).map(UnmodifiableConfig.Entry::getKey).collect(Collectors.toSet());
     }
     @Override public void forEach(BiConsumer<String, Object> action) {
         config.entrySet().forEach(entry -> action.accept(entry.getKey(), entry.getValue()));
