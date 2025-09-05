@@ -1,0 +1,5 @@
+enabled = false
+wait-for = 100
+color-speed = 1.0
+speed = 0.05
+count = 5

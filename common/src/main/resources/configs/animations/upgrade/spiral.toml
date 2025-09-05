@@ -1,0 +1,4 @@
+enabled = true
+interval = 50       # In ticks
+length = 20         # In ticks
+count = 5

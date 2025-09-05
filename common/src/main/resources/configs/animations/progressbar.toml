@@ -1,0 +1,3 @@
+enabled = true              # If the progressbar should be shown to players
+show-time = true            # If the remaining time should be shown to players
+color = "red"               # Supported colors are `red`, `green`, `blue`, `pink`, `yellow`, `purple`, `white`

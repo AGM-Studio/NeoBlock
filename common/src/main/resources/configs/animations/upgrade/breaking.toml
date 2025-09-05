@@ -1,0 +1,3 @@
+enabled = true
+interval = 20       # In ticks
+volume = 0.7

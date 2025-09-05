@@ -1,0 +1,5 @@
+enabled = false
+interval = 200      # In ticks
+length = 20         # In ticks
+factor = 3
+count = 1
