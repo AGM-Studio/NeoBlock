@@ -45,6 +45,7 @@ public class TierResearch implements NBTSaveable {
     }
 
     public long advanceBy(long value) {
-        return tick += value;
+        this.tick = Math.max(1, Math.min(this.tick + value, time));
+        return this.tick;
     }
 }
