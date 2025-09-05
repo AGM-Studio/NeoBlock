@@ -3,6 +3,7 @@ package xyz.agmstudio.neoblock.neo.tiers;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import xyz.agmstudio.neoblock.NeoBlock;
 import xyz.agmstudio.neoblock.animations.Animation;
 import xyz.agmstudio.neoblock.animations.ProgressbarAnimation;
@@ -112,6 +113,10 @@ public final class TierManager {
         WorldData.getInstance().setDirty();
     }
 
+    public static @Nullable TierResearch fetchCurrentResearch() {
+        if (researches.isEmpty()) return null;
+        return researches.get(0);
+    }
     public static void addResearch(TierResearch research) {
         researches.add(research);
     }

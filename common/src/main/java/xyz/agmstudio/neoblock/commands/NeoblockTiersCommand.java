@@ -7,6 +7,7 @@ import xyz.agmstudio.neoblock.commands.util.NeoArgumentBoolean;
 import xyz.agmstudio.neoblock.commands.util.NeoArgumentInteger;
 import xyz.agmstudio.neoblock.commands.util.NeoArgumentTier;
 import xyz.agmstudio.neoblock.commands.util.NeoCommand;
+import xyz.agmstudio.neoblock.neo.tiers.TierManager;
 import xyz.agmstudio.neoblock.neo.tiers.TierResearch;
 import xyz.agmstudio.neoblock.neo.tiers.TierSpec;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
@@ -79,20 +80,24 @@ public class NeoblockTiersCommand extends NeoCommand {
     public static class AdvanceResearch extends NeoCommand {
         protected AdvanceResearch(NeoCommand parent) {
             super(parent, "research advance");
+            new NeoArgumentInteger.Builder(this, "ticks").build();
             new NeoArgumentTier.Builder(this, "tier")
                     .provider(NeoArgumentTier.createSuggester(tier -> tier.canBeResearched() && !tier.isResearched()))
-                    .build();
-            new NeoArgumentInteger.Builder(this, "ticks").build();
+                    .defaultValue(null).build();
         }
 
         @Override public int execute(CommandContext<CommandSourceStack> context) throws CommandExtermination {
             TierSpec tier = this.getArgument(context, "tier", TierSpec.class);
-            if (tier.isResearched() || !tier.canBeResearched()) {
+
+            TierResearch research = null;
+            if (tier == null) research = TierManager.fetchCurrentResearch();
+            else if (!tier.isResearched() && tier.canBeResearched()) research = tier.getResearch();
+
+            if (research == null) {
                 context.getSource().sendFailure(Component.translatable("command.neoblock.research.advance.invalid_tier"));
                 return 0;
             }
 
-            TierResearch research = tier.getResearch();
             int value = this.getArgument(context, "ticks");
             long remain = research.getTime() - research.advanceBy(value);
             context.getSource().sendSuccess(() -> Component.translatable("command.neoblock.research.advance", StringUtil.formatTicks(remain)), false);
