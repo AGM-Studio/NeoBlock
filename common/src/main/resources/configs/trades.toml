@@ -62,12 +62,12 @@ farm-1 = [
     "1-3xminecraft:potato; 4-12xminecraft:apple; 3-6",
     "1-3xminecraft:beetroot_seeds; 4-12xminecraft:apple; 3-6",
     "1-3xminecraft:wheat_seeds; 4-12xminecraft:apple; 3-6",
-    "1-3xminecraft:kelp; 4-12xminecraft:grass; 3-6"
+    "1-3xminecraft:kelp; 4-12xminecraft:short_grass; 3-6"
 ]
 farm-2 = [
     "1-3xminecraft:pumpkin_seeds; 20-40xminecraft:apple; 3-6",
     "1-3xminecraft:melon_seeds; 20-40xminecraft:apple; 3-6",
-    "1-3xminecraft:lily_pad; 20-40xminecraft:grass; 3-6"
+    "1-3xminecraft:lily_pad; 20-40xminecraft:short_grass; 3-6"
 ]
 farm-3 = [
     "2xminecraft:glow_berries; 16-24xminecraft:moss_block; 8-12",
