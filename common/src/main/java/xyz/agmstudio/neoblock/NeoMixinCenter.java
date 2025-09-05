@@ -1,16 +1,15 @@
-package xyz.agmstudio.neoblock.mixincommon;
+package xyz.agmstudio.neoblock;
 
 import net.minecraft.client.gui.screens.worldselection.WorldCreationUiState;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.presets.WorldPreset;
-import xyz.agmstudio.neoblock.NeoBlock;
 import xyz.agmstudio.neoblock.util.MinecraftUtil;
 
 import java.lang.reflect.Field;
 import java.util.List;
 
-public final class CreateWorldScreenMixinCommon {
+public final class NeoMixinCenter {
     private static WorldCreationUiState getUiState(Object screen) {
         for (Field field : screen.getClass().getDeclaredFields()) {
             if (field.getType().equals(WorldCreationUiState.class)) {

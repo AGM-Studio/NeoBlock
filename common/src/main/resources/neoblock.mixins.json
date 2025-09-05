@@ -6,10 +6,7 @@
   "minVersion": "0.8",
   "client": [],
   "server": [],
-  "mixins": [
-    "EntityVoidRescueMixin",
-    "EndPortalFrameBlockMixin"
-  ],
+  "mixins": [],
   "injectors": {
     "defaultRequire": 1
   }

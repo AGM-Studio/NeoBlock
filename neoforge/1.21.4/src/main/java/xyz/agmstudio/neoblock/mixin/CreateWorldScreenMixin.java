@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import xyz.agmstudio.neoblock.mixincommon.CreateWorldScreenMixinCommon;
+import xyz.agmstudio.neoblock.NeoMixinCenter;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
@@ -24,7 +24,7 @@ public final class CreateWorldScreenMixin {
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     @Inject(method = "<init>", at = @At("TAIL"))
     private void CreateWorldScreen(Minecraft minecraft, @Nullable Screen lastScreen, WorldCreationContext context, Optional<ResourceKey<WorldPreset>> preset, OptionalLong seed, CreateWorldCallback createWorldCallback, CallbackInfo ci) {
-        CreateWorldScreenMixinCommon.changeWorldDefault(this);
+        NeoMixinCenter.changeWorldDefault(this);
     }
 
     // No Expremental notice

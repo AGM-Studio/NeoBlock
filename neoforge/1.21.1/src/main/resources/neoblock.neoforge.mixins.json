@@ -5,7 +5,9 @@
   "package": "xyz.agmstudio.neoblock.mixin",
   "minVersion": "0.8",
   "client": [
-    "CreateWorldScreenMixin"
+    "CreateWorldScreenMixin",
+    "EntityVoidRescueMixin",
+    "EndPortalFrameBlockMixin"
   ],
   "server": [],
   "mixins": [],
