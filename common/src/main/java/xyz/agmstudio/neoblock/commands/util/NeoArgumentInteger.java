@@ -27,12 +27,7 @@ public class NeoArgumentInteger extends NeoArgument<Integer> {
     }
 
     @Override public Integer capture(CommandContext<CommandSourceStack> context, String key) {
-        try {
-            return IntegerArgumentType.getInteger(context, key);
-        } catch (IllegalArgumentException e) {
-            if (optional) return defaultValue;
-            throw new RuntimeException("Unable to capture argument " + key, e);
-        }
+        return IntegerArgumentType.getInteger(context, key);
     }
 
     public static class Builder {

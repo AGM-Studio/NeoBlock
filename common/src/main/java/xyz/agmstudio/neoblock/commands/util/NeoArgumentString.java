@@ -17,12 +17,7 @@ public class NeoArgumentString extends NeoArgument<String> {
     }
 
     @Override public String capture(CommandContext<CommandSourceStack> context, String key) {
-        try {
-            return StringArgumentType.getString(context, key);
-        } catch (IllegalArgumentException e) {
-            if (optional) return defaultValue;
-            throw new RuntimeException("Unable to capture argument " + key, e);
-        }
+        return StringArgumentType.getString(context, key);
     }
 
     public static class Builder {

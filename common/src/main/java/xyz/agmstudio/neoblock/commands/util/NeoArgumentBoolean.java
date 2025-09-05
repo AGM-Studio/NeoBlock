@@ -16,12 +16,7 @@ public class NeoArgumentBoolean extends NeoArgument<Boolean> {
     }
 
     @Override public Boolean capture(CommandContext<CommandSourceStack> context, String key) {
-        try {
-            return BoolArgumentType.getBool(context, key);
-        } catch (IllegalArgumentException e) {
-            if (optional) return defaultValue;
-            throw new RuntimeException("Unable to capture argument " + key, e);
-        }
+        return BoolArgumentType.getBool(context, key);
     }
 
     public static class Builder {

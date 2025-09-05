@@ -40,6 +40,7 @@ public class BlockManager {
         BlockPos pos = getBlockPos();
         return new Vec3(pos.getX(), pos.getY(), pos.getZ());
     }
+    @Deprecated(since = "0.7.0-Beta")
     public static NeoBlockPos getSafeBlock() {
         return NeoBlockPos.safeBlock();
     }

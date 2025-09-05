@@ -6,6 +6,7 @@ import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandBuildContext;
@@ -15,6 +16,7 @@ import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
+import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlock;
 import xyz.agmstudio.neoblock.util.JavaUtil;
 
@@ -29,6 +31,8 @@ import java.util.function.Supplier;
 @SuppressWarnings("unchecked")
 public abstract class NeoCommand {
     private static final List<NeoCommand> registry = new ArrayList<>();
+    private static final DynamicCommandExceptionType UNEXPECTED_EXCEPTION =
+            new DynamicCommandExceptionType(e -> Component.translatable("command.neoblock.unexpected_exception", ((Exception) e).getMessage()));
 
     public static <T extends NeoCommand> Optional<T> getFromRegistry(Class<T> clazz) {
         for (NeoCommand command : registry)
@@ -72,33 +76,33 @@ public abstract class NeoCommand {
         );
     }
 
-    public <T> T getArgument(CommandContext<CommandSourceStack> context, String key, Class<T> type) throws CommandExtermination {
+    public <T> T getArgument(CommandContext<CommandSourceStack> context, String key, Class<T> type) throws CommandSyntaxException {
         NeoArgument<T> argument = (NeoArgument<T>) arguments.get(key);
         if (argument == null) throw new IllegalArgumentException("No such argument has been defined for this command: " + key);
-        return argument.capture(context, key);
+        return argument.captureWithDefaultValue(context, key);
     }
-    public <T> T getArgument(CommandContext<CommandSourceStack> context, String key) throws CommandExtermination {
+    public <T> T getArgument(CommandContext<CommandSourceStack> context, String key) throws CommandSyntaxException {
         NeoArgument<T> argument = (NeoArgument<T>) arguments.get(key);
         if (argument == null) throw new IllegalArgumentException("No such argument has been defined for this command: " + key);
-        return argument.capture(context, key);
+        return argument.captureWithDefaultValue(context, key);
     }
-    public <T> T getArgument(CommandContext<CommandSourceStack> context, String key, Supplier<T> defaultValue) throws CommandExtermination {
+    public <T> T getArgument(CommandContext<CommandSourceStack> context, String key, Supplier<T> defaultValue) throws CommandSyntaxException {
         NeoArgument<T> argument = (NeoArgument<T>) arguments.get(key);
         if (argument == null) throw new IllegalArgumentException("No such argument has been defined for this command: " + key);
-        T value = argument.capture(context, key);
+        T value = argument.captureWithDefaultValue(context, key);
         return value != null ? value : defaultValue.get();
     }
-    public abstract int execute(CommandContext<CommandSourceStack> context) throws CommandExtermination, CommandSyntaxException;
+    public abstract int execute(CommandContext<CommandSourceStack> context) throws CommandSyntaxException;
 
     public List<LiteralCommandNode<CommandSourceStack>> register(CommandDispatcher<CommandSourceStack> dispatcher) {
         Command<CommandSourceStack> executor = (context) -> {
             try {
                 return this.execute(context);
-            } catch (CommandExtermination ignored) {
-                return 0;
-            } catch (Exception e) {
-                NeoBlock.LOGGER.error("Failed to execute command:", e);
+            } catch (CommandSyntaxException e) {
                 throw e;
+            } catch (Exception e) {
+                NeoBlock.LOGGER.error("Unhandled exception while executing command", e);
+                throw UNEXPECTED_EXCEPTION.create(e);
             }
         };
 
@@ -131,5 +135,39 @@ public abstract class NeoCommand {
         return commands;
     }
 
-    public static class CommandExtermination extends Exception {}
+    protected int success(@NotNull CommandContext<CommandSourceStack> context, @NotNull Supplier<Component> message) {
+        context.getSource().sendSuccess(message, true);
+        return 1;
+    }
+    protected int success(@NotNull CommandContext<CommandSourceStack> context, @NotNull Component message) {
+        return success(context, () -> message);
+    }
+    protected int success(@NotNull CommandContext<CommandSourceStack> context, @NotNull String message, Object ... args) {
+        return success(context, () -> Component.translatable(message, args));
+    }
+
+    protected int fail(@NotNull CommandContext<CommandSourceStack> context, @NotNull Supplier<Component> message) {
+        context.getSource().sendFailure(message.get());
+        return 0;
+    }
+    protected int fail(@NotNull CommandContext<CommandSourceStack> context, @NotNull Component message) {
+        context.getSource().sendFailure(message);
+        return 0;
+    }
+    protected int fail(@NotNull CommandContext<CommandSourceStack> context, @NotNull String message, Object ... args) {
+        return fail(context, Component.translatable(message, args));
+    }
+
+    public static class ParentHolder extends NeoCommand {
+        protected ParentHolder(NeoCommand parent, String pattern, int permission) {
+            super(parent, pattern, permission);
+        }
+        protected ParentHolder(NeoCommand parent, String pattern) {
+            super(parent, pattern, parent.permission_value);
+        }
+
+        @Override public int execute(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+            throw CommandSyntaxException.BUILT_IN_EXCEPTIONS.dispatcherUnknownCommand().create();
+        }
+    }
 }

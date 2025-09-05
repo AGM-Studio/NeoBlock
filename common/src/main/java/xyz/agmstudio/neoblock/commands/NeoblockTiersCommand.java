@@ -1,6 +1,7 @@
 package xyz.agmstudio.neoblock.commands;
 
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
 import xyz.agmstudio.neoblock.commands.util.NeoArgumentBoolean;
@@ -13,7 +14,7 @@ import xyz.agmstudio.neoblock.neo.tiers.TierSpec;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
 import xyz.agmstudio.neoblock.util.StringUtil;
 
-public class NeoblockTiersCommand extends NeoCommand {
+public class NeoblockTiersCommand extends NeoCommand.ParentHolder {
     protected NeoblockTiersCommand(NeoCommand parent) {
         super(parent, "tiers", 3);
 
@@ -21,11 +22,6 @@ public class NeoblockTiersCommand extends NeoCommand {
         new Enable(this);
         new Disable(this);
         new AdvanceResearch(this);
-    }
-
-    @Override public int execute(CommandContext<CommandSourceStack> context) throws CommandExtermination {
-        context.getSource().sendSuccess(() -> Component.translatable("command.neoblock.tiers"), false);
-        return 1;
     }
 
     public static class Satisfy extends NeoCommand {
@@ -37,13 +33,12 @@ public class NeoblockTiersCommand extends NeoCommand {
             new NeoArgumentBoolean.Builder(this, "force").defaultValue(true).build();
         }
     
-        @Override public int execute(CommandContext<CommandSourceStack> context) throws CommandExtermination {
+        @Override public int execute(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
             TierSpec tier = this.getArgument(context, "tier", TierSpec.class);
             boolean force = getArgument(context, "force", Boolean.class);
     
             WorldData.setCommanded(tier, force);
-            context.getSource().sendSuccess(() -> Component.translatable("command.neoblock.unlock_tier"), false);
-            return 1;
+            return success(context, "command.neoblock.unlock_tier");
         }
     }
 
@@ -55,10 +50,9 @@ public class NeoblockTiersCommand extends NeoCommand {
                     .build();
         }
     
-        @Override public int execute(CommandContext<CommandSourceStack> context) throws CommandExtermination {
+        @Override public int execute(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
             this.getArgument(context, "tier", TierSpec.class).disable();
-            context.getSource().sendSuccess(() -> Component.translatable("command.neoblock.disable_tier"), false);
-            return 1;
+            return success(context, "command.neoblock.disable_tier");
         }
     }
 
@@ -70,10 +64,9 @@ public class NeoblockTiersCommand extends NeoCommand {
                     .build();
         }
     
-        @Override public int execute(CommandContext<CommandSourceStack> context) throws CommandExtermination {
+        @Override public int execute(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
             this.getArgument(context, "tier", TierSpec.class).enable();
-            context.getSource().sendSuccess(() -> Component.translatable("command.neoblock.enable_tier"), false);
-            return 1;
+            return success(context, "command.neoblock.enable_tier");
         }
     }
 
@@ -86,7 +79,7 @@ public class NeoblockTiersCommand extends NeoCommand {
                     .defaultValue(null).build();
         }
 
-        @Override public int execute(CommandContext<CommandSourceStack> context) throws CommandExtermination {
+        @Override public int execute(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
             TierSpec tier = this.getArgument(context, "tier", TierSpec.class);
 
             TierResearch research = null;
@@ -100,8 +93,7 @@ public class NeoblockTiersCommand extends NeoCommand {
 
             int value = this.getArgument(context, "ticks");
             long remain = research.getTime() - research.advanceBy(value);
-            context.getSource().sendSuccess(() -> Component.translatable("command.neoblock.research.advance", StringUtil.formatTicks(remain)), false);
-            return 1;
+            return success(context, "command.neoblock.research.advance", StringUtil.formatTicks(remain));
         }
     }
 }

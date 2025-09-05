@@ -17,12 +17,7 @@ public class NeoArgumentBlockPos extends NeoArgument<BlockPos> {
     }
 
     @Override public BlockPos capture(CommandContext<CommandSourceStack> context, String key) {
-        try {
-            return BlockPosArgument.getBlockPos(context, key);
-        } catch (IllegalArgumentException e) {
-            if (optional) return defaultValue;
-            throw new RuntimeException("Unable to capture argument " + key, e);
-        }
+        return BlockPosArgument.getBlockPos(context, key);
     }
 
     public static class Builder {

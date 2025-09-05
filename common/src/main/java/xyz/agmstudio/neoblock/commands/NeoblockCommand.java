@@ -9,12 +9,13 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
 import xyz.agmstudio.neoblock.commands.util.NeoArgumentEntityType;
 import xyz.agmstudio.neoblock.commands.util.NeoArgumentInteger;
 import xyz.agmstudio.neoblock.commands.util.NeoCommand;
-import xyz.agmstudio.neoblock.neo.block.BlockManager;
+import xyz.agmstudio.neoblock.neo.block.NeoBlockPos;
 import xyz.agmstudio.neoblock.neo.loot.NeoMobSpec;
 import xyz.agmstudio.neoblock.neo.tiers.TierSpec;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
@@ -37,7 +38,7 @@ public class NeoblockCommand extends NeoCommand {
         new NeoblockTiersCommand(this);
     }
 
-    @Override public int execute(CommandContext<CommandSourceStack> context) throws CommandExtermination {
+    @Override public int execute(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         MutableComponent tiers = Component.literal("");
         for (TierSpec tier: WorldData.getWorldTiers()) {
             MutableComponent name = Component.literal(tier.getName());
@@ -47,9 +48,7 @@ public class NeoblockCommand extends NeoCommand {
             tiers.append("\n    - ").append(name);
         }
 
-        MutableComponent message = Component.translatable("command.neoblock.info", WorldData.getWorldStatus().getBlockCount(), tiers);
-        context.getSource().sendSuccess(() -> message, true);
-        return 1;
+        return success(context, "command.neoblock.info", WorldData.getWorldStatus().getBlockCount(), tiers);
     }
 
     public static class Home extends NeoCommand {
@@ -57,16 +56,11 @@ public class NeoblockCommand extends NeoCommand {
             super(parent, "home");
         }
 
-        @Override public int execute(CommandContext<CommandSourceStack> context) throws CommandExtermination {
-            CommandSourceStack source = context.getSource();
-            if (source.getEntity() == null) {
-                source.sendFailure(Component.translatable("command.neoblock.home.not_entity"));
-                return 0;
-            }
+        @Override public int execute(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+            Entity entity = context.getSource().getEntityOrException();
 
-            BlockManager.getSafeBlock().teleportTo(source.getEntity());
-            context.getSource().sendSuccess(() -> Component.translatable("command.neoblock.home", source.getEntity().getDisplayName()), true);
-            return 1;
+            NeoBlockPos.safeBlock().teleportTo(entity);
+            return success(context,"command.neoblock.home", entity.getDisplayName());
         }
     }
 
@@ -77,31 +71,19 @@ public class NeoblockCommand extends NeoCommand {
             new NeoArgumentInteger.Builder(this, "count").defaultValue(1).min(1).build();
         }
 
-        @Override public int execute(CommandContext<CommandSourceStack> context) throws CommandExtermination {
-            CommandSourceStack source = context.getSource();
+        @Override public int execute(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
             EntityType<?> type = this.getArgument(context, "entity");
-            if (type == null) {
-                source.sendFailure(Component.translatable("command.neoblock.mobticket.not_summonable"));
-                return 0;
-            }
+
+            CommandSourceStack source = context.getSource();
+            ServerPlayer player = source.getPlayerOrException();
 
             int count = this.getArgument(context, "count");
             ItemStack mob_ticket = NeoMobSpec.of(type, count);
 
-            try {
-                ServerPlayer player = source.getPlayerOrException();
-                boolean added = player.getInventory().add(mob_ticket);
-                if (!added) player.drop(mob_ticket, false);
+            boolean added = player.getInventory().add(mob_ticket);
+            if (!added) player.drop(mob_ticket, false);
 
-                source.sendSuccess(
-                        () -> Component.translatable("command.neoblock.mobticket.given", count, type.toShortString()),
-                        true
-                );
-                return 1;
-            } catch (CommandSyntaxException e) {
-                source.sendFailure(Component.translatable("command.neoblock.mobticket.no_player"));
-                return 0;
-            }
+            return success(context, "command.neoblock.mobticket.given", count, type.toShortString());
         }
     }
 }

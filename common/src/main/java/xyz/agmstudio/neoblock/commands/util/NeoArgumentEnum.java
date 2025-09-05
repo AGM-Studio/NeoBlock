@@ -27,18 +27,11 @@ public class NeoArgumentEnum<T extends Enum<T>> extends NeoArgument<T> {
 
     @Override
     public T capture(CommandContext<CommandSourceStack> context, String key) {
-        String input;
-        try {
-            input = StringArgumentType.getString(context, key);
-        } catch (IllegalArgumentException e) {
-            if (optional) return defaultValue;
-            throw new RuntimeException("Unable to capture enum argument " + key, e);
-        }
+        String input = StringArgumentType.getString(context, key);
 
         for (T constant : clazz.getEnumConstants())
             if (constant.name().equalsIgnoreCase(input)) return constant;
 
-        if (optional && defaultValue != null) return defaultValue;
         throw new IllegalArgumentException("Invalid enum value: " + input);
     }
 

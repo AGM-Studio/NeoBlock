@@ -1,21 +1,22 @@
 package xyz.agmstudio.neoblock.commands;
 
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.npc.WanderingTrader;
 import xyz.agmstudio.neoblock.commands.util.NeoArgumentBlockPos;
 import xyz.agmstudio.neoblock.commands.util.NeoArgumentDimension;
 import xyz.agmstudio.neoblock.commands.util.NeoCommand;
 import xyz.agmstudio.neoblock.neo.block.BlockManager;
+import xyz.agmstudio.neoblock.neo.block.NeoBlockPos;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoMerchant;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
 
 import java.util.Optional;
 
-public class NeoblockForceCommand extends NeoCommand {
+public class NeoblockForceCommand extends NeoCommand.ParentHolder {
     protected NeoblockForceCommand(NeoCommand parent) {
         super(parent, "force", 4);
 
@@ -25,11 +26,6 @@ public class NeoblockForceCommand extends NeoCommand {
         new ResetTiers(this);
     }
 
-    @Override public int execute(CommandContext<CommandSourceStack> context) throws CommandExtermination {
-        context.getSource().sendSuccess(() -> Component.translatable("command.neoblock.force"), false);
-        return 1;
-    }
-
     public static class SetBlock extends NeoCommand {
         protected SetBlock(NeoCommand parent) {
             super(parent, "setblock");
@@ -37,20 +33,20 @@ public class NeoblockForceCommand extends NeoCommand {
             new NeoArgumentDimension.Builder(this, "dimension").defaultValue(null).build();
         }
 
-        @Override public int execute(CommandContext<CommandSourceStack> context) throws CommandExtermination {
-            CommandSourceStack source = context.getSource();
+        @Override public int execute(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
             BlockPos origin = getArgument(context, "pos");
-            ServerLevel world = getArgument(context, "dimension", source::getLevel);
+            ServerLevel world = getArgument(context, "dimension", context.getSource()::getLevel);
 
             WorldData.getWorldStatus().setBlockPos(origin, WorldData.getWorldLevel());
             WorldData.getWorldStatus().setDimension(world);
+            String message = "command.neoblock.force_block";
             if (WorldData.getWorldStatus().isDisabled()) {
                 WorldData.getWorldStatus().setActive();
-                source.sendSuccess(() -> Component.translatable("command.neoblock.force_block.enabled"), true);
-            } else source.sendSuccess(() -> Component.translatable("command.neoblock.force_block"), true);
+                message += ".enabled";
+            }
+            
             BlockManager.updateBlock(WorldData.getWorldLevel(), false);
-
-            return 1;
+            return success(context, message);
         }
     }
 
@@ -59,13 +55,12 @@ public class NeoblockForceCommand extends NeoCommand {
             super(parent, "stop");
         }
 
-        @Override public int execute(CommandContext<CommandSourceStack> context) throws CommandExtermination {
-            BlockManager.cleanBlock(WorldData.getWorldLevel(), BlockManager.getBlockPos());
+        @Override public int execute(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+            BlockManager.cleanBlock(WorldData.getWorldLevel(), NeoBlockPos.get());
             WorldData.getWorldStatus().setDisabled();
 
             Optional<SetBlock> command = NeoCommand.getFromRegistry(SetBlock.class);
-            context.getSource().sendSuccess(() -> Component.translatable("command.neoblock.disabled", command.map(NeoCommand::getCommand).orElse(null)), true);
-            return 1;
+            return success(context, "command.neoblock.disabled", command.map(NeoCommand::getCommand).orElse(null));
         }
     }
 
@@ -74,13 +69,13 @@ public class NeoblockForceCommand extends NeoCommand {
             super(parent, "trader");
         }
 
-        @Override public int execute(CommandContext<CommandSourceStack> context) throws CommandExtermination {
+        @Override public int execute(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
             CommandSourceStack source = context.getSource();
             WanderingTrader trader = NeoMerchant.forceSpawnTrader(source.getLevel());
             if (trader != null)
-                source.sendSuccess(() -> Component.translatable("command.neoblock.force_trader.success"), true);
-            else source.sendFailure(Component.translatable("command.neoblock.force_trader.failure"));
-            return 1;
+                return success(context, "command.neoblock.force_trader.success");
+            
+            return fail(context, "command.neoblock.force_trader.failure");
         }
     }
 
@@ -89,10 +84,9 @@ public class NeoblockForceCommand extends NeoCommand {
             super(parent, "reset");
         }
 
-        @Override public int execute(CommandContext<CommandSourceStack> context) throws CommandExtermination {
+        @Override public int execute(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
             WorldData.resetTiers();
-            context.getSource().sendSuccess(() -> Component.translatable("command.neoblock.update.success"), true);
-            return 1;
+            return success(context, "command.neoblock.update.success");
         }
     }
 }

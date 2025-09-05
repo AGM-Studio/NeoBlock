@@ -24,13 +24,8 @@ public class NeoArgumentEntityType extends NeoArgument<EntityType<?>> {
     }
 
     @Override
-    public EntityType<?> capture(CommandContext<CommandSourceStack> context, String key) throws NeoCommand.CommandExtermination {
-        try {
-            return ResourceArgument.getEntityType(context, key).value();
-        } catch (IllegalArgumentException | CommandSyntaxException e) {
-            if (optional) return defaultValue;
-            throw new RuntimeException("Unable to capture entity type " + key, e);
-        }
+    public EntityType<?> capture(CommandContext<CommandSourceStack> context, String key) throws CommandSyntaxException {
+        return ResourceArgument.getEntityType(context, key).value();
     }
 
     public static class Builder {

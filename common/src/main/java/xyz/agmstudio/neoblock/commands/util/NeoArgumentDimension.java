@@ -17,13 +17,8 @@ public class NeoArgumentDimension extends NeoArgument<ServerLevel> {
         return Commands.argument(key, DimensionArgument.dimension());
     }
 
-    @Override public ServerLevel capture(CommandContext<CommandSourceStack> context, String key) {
-        try {
-            return DimensionArgument.getDimension(context, key);
-        } catch (IllegalArgumentException | CommandSyntaxException e) {
-            if (optional) return defaultValue;
-            throw new RuntimeException("Unable to capture argument " + key, e);
-        }
+    @Override public ServerLevel capture(CommandContext<CommandSourceStack> context, String key) throws CommandSyntaxException {
+        return DimensionArgument.getDimension(context, key);
     }
 
     public static class Builder {
