@@ -11,6 +11,7 @@ import xyz.agmstudio.neoblock.animations.phase.UpgradePhaseAnimation;
 import xyz.agmstudio.neoblock.animations.progress.UpgradeProgressAnimation;
 import xyz.agmstudio.neoblock.data.NBTSaveable;
 import xyz.agmstudio.neoblock.neo.block.BlockManager;
+import xyz.agmstudio.neoblock.neo.block.NeoBlockPos;
 import xyz.agmstudio.neoblock.neo.block.NeoBlockSpec;
 import xyz.agmstudio.neoblock.neo.block.NeoSeqBlockSpec;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoTradePool;
@@ -85,7 +86,7 @@ public final class TierManager {
         if (research.tick++ == 0) {
             research.onStart(level);
 
-            BlockManager.BEDROCK_SPEC.placeAt(level, BlockManager.getBlockPos());
+            BlockManager.BEDROCK_SPEC.placeAt(level, NeoBlockPos.get());
 
             if (TierManager.progressbar != null) level.players().forEach(TierManager.progressbar::addPlayer);
             for (UpgradePhaseAnimation animation : TierManager.phaseAnimations)
@@ -101,7 +102,7 @@ public final class TierManager {
                 for (UpgradePhaseAnimation animation : TierManager.phaseAnimations)
                     if (animation.isActiveOnUpgradeFinish()) animation.animate(level);
 
-                BlockManager.getRandomBlock().placeAt(level, BlockManager.getBlockPos());
+                BlockManager.getRandomBlock().placeAt(level, NeoBlockPos.get());
             }
         } else {
             if (TierManager.progressbar != null) TierManager.progressbar.update(research.tick, research.time);

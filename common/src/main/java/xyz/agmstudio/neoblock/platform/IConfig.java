@@ -11,6 +11,7 @@ import java.lang.annotation.Target;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.function.BiConsumer;
@@ -26,13 +27,13 @@ public interface IConfig {
      * @param name the config name
      * @return the config (see {@link IConfig})
      */
-    static IConfig getConfig(java.nio.file.Path folder, String name) {
+    static IConfig getConfig(Path folder, String name) {
         if (!folder.toFile().exists()) try {
             Files.createDirectories(folder);
         } catch (IOException ignored) {}
-        java.nio.file.Path configPath = folder.resolve(name.endsWith(".toml") ? name : name + ".toml");
+        Path configPath = folder.resolve(name.endsWith(".toml") ? name : name + ".toml");
         if (!Files.exists(configPath)) try {
-            java.nio.file.Path path = ResourceUtil.pathOf(NeoBlock.MOD_ID);
+            Path path = ResourceUtil.pathOf(NeoBlock.MOD_ID);
             String resource = configPath.toAbsolutePath().toString().replace(path.toAbsolutePath().toString(), "\\configs");
             NeoBlock.LOGGER.debug("Loading resource {} for {}", resource, configPath);
             ResourceUtil.processResourceFile(resource, configPath, new HashMap<>());
@@ -43,12 +44,8 @@ public interface IConfig {
     }
 
     interface Helper {
-        IConfig getConfig(java.nio.file.Path path);
+        IConfig getConfig(Path path);
         boolean isNull(Object object);
-    }
-
-    static boolean isINull(Object object) {
-        return HELPER.isNull(object);
     }
 
     class ConfigPath {
@@ -69,7 +66,7 @@ public interface IConfig {
     default IConfig getSection(ConfigPath path) {
         for (String p: path.getPaths()) {
             IConfig result = getSection(p);
-            if (isINull(result)) continue;
+            if (HELPER.isNull(result)) continue;
             return result;
         }
 
@@ -89,7 +86,7 @@ public interface IConfig {
     default  <T> T get(ConfigPath path, T defaultValue) {
         for (String p: path.getPaths()) {
             T result = get(p);
-            if (isINull(result)) continue;
+            if (HELPER.isNull(result)) continue;
             return result;
         }
 
@@ -152,7 +149,7 @@ public interface IConfig {
                         try {
                             field.setAccessible(true);
                             Object def = field.get(this);
-                            Object result = isINull(value) ? value : def;
+                            Object result = HELPER.isNull(value) ? value : def;
                             if (result instanceof Number num) {
                                 double min = annotation.min();
                                 double max = annotation.max();

@@ -22,6 +22,7 @@ import xyz.agmstudio.neoblock.compatibility.ForgivingVoid;
 import xyz.agmstudio.neoblock.data.NBTSaveable;
 import xyz.agmstudio.neoblock.data.Schematic;
 import xyz.agmstudio.neoblock.neo.block.BlockManager;
+import xyz.agmstudio.neoblock.neo.block.NeoBlockPos;
 import xyz.agmstudio.neoblock.neo.block.NeoChestSpec;
 import xyz.agmstudio.neoblock.neo.block.NeoSeqBlockSpec;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoMerchant;
@@ -95,7 +96,7 @@ public abstract class WorldData extends SavedData {
                 if (rules != null) WorldRules.applyGameRules(level, rules);
 
                 // Load schematics from config!
-                Schematic.loadSchematic(level, BlockManager.getBlockPos(), "main.nbt");
+                Schematic.loadSchematic(level, NeoBlockPos.get(), "main.nbt");
                 BlockManager.updateBlock(level, false);
                 int iterator = 0;
                 while (config.contains("schematics.custom_" + iterator)) {

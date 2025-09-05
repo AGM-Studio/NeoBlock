@@ -38,6 +38,10 @@ public class NeoBlockPos extends BlockPos {
     public static NeoBlockPos get() {
         return new NeoBlockPos();
     }
+    public static Vec3 getCorner() {
+        BlockPos pos = WorldData.getWorldStatus().getBlockPos();
+        return new Vec3(pos.getX(), pos.getY(), pos.getZ());
+    }
 
     public ServerLevel getLevel() {
         return level;

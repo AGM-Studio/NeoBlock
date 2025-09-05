@@ -9,7 +9,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 import xyz.agmstudio.neoblock.NeoBlock;
-import xyz.agmstudio.neoblock.neo.block.BlockManager;
+import xyz.agmstudio.neoblock.neo.block.NeoBlockPos;
 import xyz.agmstudio.neoblock.platform.INBTHelper;
 import xyz.agmstudio.neoblock.util.ResourceUtil;
 
@@ -65,7 +65,7 @@ public class Schematic {
     }
 
     public static Schematic fromNBT(CompoundTag tag, ServerLevel level) {
-        BlockPos origin = INBTHelper.Block.readBlockPos(tag, "origin", BlockManager.getBlockPos());
+        BlockPos origin = INBTHelper.Block.readBlockPos(tag, "origin", NeoBlockPos.get());
         List<BlockInfo> blocks = new ArrayList<>();
         ListTag blockList = tag.getList("blocks", Tag.TAG_COMPOUND);
 

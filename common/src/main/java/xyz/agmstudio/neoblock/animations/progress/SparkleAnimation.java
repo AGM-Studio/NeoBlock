@@ -3,11 +3,12 @@ package xyz.agmstudio.neoblock.animations.progress;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.phys.Vec3;
-import xyz.agmstudio.neoblock.neo.block.BlockManager;
+import xyz.agmstudio.neoblock.neo.block.NeoBlockPos;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
 public class SparkleAnimation extends UpgradeProgressAnimation {
     @ConfigField(min = 1)
     private int length = 10;
@@ -41,7 +42,7 @@ public class SparkleAnimation extends UpgradeProgressAnimation {
             int tick = iterator.next();
             if (tick % factor == 0) {
                 for (int i = 0; i < 1 + (length / 2) - Math.abs(tick - (length / 2)); i++) {
-                    Vec3 glowPos = Vec3.atCenterOf(BlockManager.getBlockPos()).add(
+                    Vec3 glowPos = Vec3.atCenterOf(NeoBlockPos.get()).add(
                             (level.getRandom().nextDouble() - 0.5) * 1.2,
                             level.getRandom().nextDouble() * 1.5,
                             (level.getRandom().nextDouble() - 0.5) * 1.2

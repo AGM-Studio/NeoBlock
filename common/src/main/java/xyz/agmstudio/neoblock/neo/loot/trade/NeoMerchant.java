@@ -9,7 +9,7 @@ import net.minecraft.world.item.trading.MerchantOffers;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.agmstudio.neoblock.NeoBlock;
-import xyz.agmstudio.neoblock.neo.block.BlockManager;
+import xyz.agmstudio.neoblock.neo.block.NeoBlockPos;
 import xyz.agmstudio.neoblock.neo.tiers.TierSpec;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
 import xyz.agmstudio.neoblock.neo.world.WorldStatus;
@@ -101,7 +101,7 @@ public class NeoMerchant {
     private final List<NeoTrade> trades = new ArrayList<>();
     public WanderingTrader spawnTrader(ServerLevel level, String... tags) {
         WanderingTrader trader = new WanderingTrader(EntityType.WANDERING_TRADER, level);
-        trader.setPos(BlockManager.getBlockPos().getCenter().add(0, 2, 0));
+        trader.setPos(NeoBlockPos.get().getCenter().add(0, 2, 0));
         trader.setDespawnDelay(lifespan.sample(WorldData.getRandom()));
         for (String tag: tags) trader.addTag(tag);
 

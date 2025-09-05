@@ -2,7 +2,7 @@ package xyz.agmstudio.neoblock.animations.idle;
 
 import net.minecraft.world.phys.Vec3;
 import xyz.agmstudio.neoblock.animations.Animation;
-import xyz.agmstudio.neoblock.neo.block.BlockManager;
+import xyz.agmstudio.neoblock.neo.block.NeoBlockPos;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -14,7 +14,7 @@ public abstract class IdleAnimation extends Animation {
         return Stream.of(
                 new Vec3(0, 0, 0), new Vec3(1, 0, 0), new Vec3(1, 0, 1), new Vec3(0, 0, 1),
                 new Vec3(0, 1, 0), new Vec3(1, 1, 0), new Vec3(1, 1, 1), new Vec3(0, 1, 1)
-        ).map(vec3 -> vec3.add(BlockManager.getBlockCorner())).toArray(Vec3[]::new);
+        ).map(vec3 -> vec3.add(NeoBlockPos.getCorner())).toArray(Vec3[]::new);
     }
 
     protected static HashSet<HashSet<Vec3>> getEdges() {

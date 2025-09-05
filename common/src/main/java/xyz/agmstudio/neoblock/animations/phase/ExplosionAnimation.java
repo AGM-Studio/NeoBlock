@@ -4,7 +4,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import xyz.agmstudio.neoblock.neo.block.BlockManager;
+import xyz.agmstudio.neoblock.neo.block.NeoBlockPos;
 
 public class ExplosionAnimation extends UpgradePhaseAnimation {
     @ConfigField("at-start")
@@ -31,11 +31,11 @@ public class ExplosionAnimation extends UpgradePhaseAnimation {
 
     @Override public void animate(ServerLevel level) {
         level.sendParticles(ParticleTypes.EXPLOSION_EMITTER,
-                BlockManager.getBlockPos().getX() + 0.5,
-                BlockManager.getBlockPos().getY() + 0.5,
-                BlockManager.getBlockPos().getZ() + 0.5,
+                NeoBlockPos.get().getX() + 0.5,
+                NeoBlockPos.get().getY() + 0.5,
+                NeoBlockPos.get().getZ() + 0.5,
                 1, 0, 0, 0, 1);
 
-        level.playSound(null, BlockManager.getBlockPos(), SoundEvents.ANVIL_LAND, SoundSource.BLOCKS, volume, 0.4f);
+        level.playSound(null, NeoBlockPos.get(), SoundEvents.ANVIL_LAND, SoundSource.BLOCKS, volume, 0.4f);
     }
 }

@@ -32,19 +32,6 @@ public class BlockManager {
     public static final NeoBlockSpec BEDROCK_SPEC = new NeoBlockSpec(Blocks.BEDROCK);
     public static final double AABB_RANGE = 1.0;
 
-    @Deprecated(since = "0.7.0-Beta")
-    public static NeoBlockPos getBlockPos() {
-        return new NeoBlockPos();
-    }
-    public static Vec3 getBlockCorner() {
-        BlockPos pos = getBlockPos();
-        return new Vec3(pos.getX(), pos.getY(), pos.getZ());
-    }
-    @Deprecated(since = "0.7.0-Beta")
-    public static NeoBlockPos getSafeBlock() {
-        return NeoBlockPos.safeBlock();
-    }
-
     public static NeoBlockSpec getRandomBlock() {
         Optional<NeoBlockSpec> queued = WorldData.getWorldStatus().getNextInQueue();
         if (queued.isPresent()) return queued.get();
@@ -69,8 +56,8 @@ public class BlockManager {
     }
 
     public static void updateBlock(ServerLevel level, boolean trigger) {
-        if (!TierManager.hasResearch()) getRandomBlock().placeAt(level, getBlockPos());
-        else BEDROCK_SPEC.placeAt(level, getBlockPos());  // Creative cheaters & Move block in mid-search (Just in case)
+        if (!TierManager.hasResearch()) getRandomBlock().placeAt(level, NeoBlockPos.get());
+        else BEDROCK_SPEC.placeAt(level, NeoBlockPos.get());  // Creative cheaters & Move block in mid-search (Just in case)
 
         if (!trigger) return;
         Animation.resetIdleTick();
@@ -82,13 +69,13 @@ public class BlockManager {
     }
 
     public static void ensureNoFall(@NotNull LevelAccessor access) {
-        Vec3 center = getBlockPos().getCenter();
+        Vec3 center = NeoBlockPos.get().getCenter();
         for(Entity entity: access.getEntities(null, AABB.ofSize(center, AABB_RANGE, AABB_RANGE, AABB_RANGE)))
             entity.teleportTo(entity.getX(), center.y + AABB_RANGE / 2.0, entity.getZ());
     }
 
     public static BlockState getCurrentBlock(ServerLevel level) {
-        return level.getBlockState(getBlockPos());
+        return level.getBlockState(NeoBlockPos.get());
     }
 
     public static void cleanBlock(ServerLevel level, BlockPos pos) {
@@ -98,9 +85,9 @@ public class BlockManager {
     }
 
     public static void tick(ServerLevel level) {
-        final BlockState block = level.getBlockState(getBlockPos());
+        final BlockState block = level.getBlockState(NeoBlockPos.get());
         if (WorldData.getWorldStatus().isUpdated() || TierManager.hasResearch()) {
-            if (block.getBlock() != Blocks.BEDROCK) BEDROCK_SPEC.placeAt(level, getBlockPos());
+            if (block.getBlock() != Blocks.BEDROCK) BEDROCK_SPEC.placeAt(level, NeoBlockPos.get());
         } else if (block.isAir() || block.canBeReplaced()) updateBlock(level, true);
     }
 
