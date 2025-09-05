@@ -16,7 +16,6 @@ import org.jetbrains.annotations.Nullable;
 import xyz.agmstudio.neoblock.NeoBlock;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
 import xyz.agmstudio.neoblock.platform.INBTHelper;
-import xyz.agmstudio.neoblock.util.MessengerUtil;
 import xyz.agmstudio.neoblock.util.MinecraftUtil;
 import xyz.agmstudio.neoblock.util.StringUtil;
 
@@ -91,7 +90,7 @@ public class NeoMobSpec extends NeoItemSpec {
         Optional<EntityType<?>> mob = getMobTradeEntity(item);
         if (mob.isEmpty()) return false;
 
-        MessengerUtil.sendInstantMessage("message.neoblock.trades.mob", level, true, item.getCount(), mob.get().getDescription());
+        NeoBlock.sendInstantMessage("message.neoblock.trades.mob", level, true, item.getCount(), mob.get().getDescription());
         WorldData.getWorldStatus().addTradedMob(mob.get(), item.getCount());
         item.setCount(0);
 

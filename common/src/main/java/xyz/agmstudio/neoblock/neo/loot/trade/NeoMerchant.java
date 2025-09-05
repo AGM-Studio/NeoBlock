@@ -14,7 +14,6 @@ import xyz.agmstudio.neoblock.neo.tiers.TierSpec;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
 import xyz.agmstudio.neoblock.neo.world.WorldStatus;
 import xyz.agmstudio.neoblock.platform.IConfig;
-import xyz.agmstudio.neoblock.util.MessengerUtil;
 import xyz.agmstudio.neoblock.util.MinecraftUtil;
 
 import java.util.ArrayList;
@@ -74,7 +73,7 @@ public class NeoMerchant {
         WanderingTrader trader = spawnTraderWith(trades, level, "NeoMerchant");
         if (trader == null) return null;
 
-        MessengerUtil.sendInstantMessage("message.neoblock.trader_spawned", level, true);
+        NeoBlock.sendInstantMessage("message.neoblock.trader_spawned", level, true);
 
         HashMap<EntityType<?>, Integer> tradedMobs = status.getTradedMobs();
         tradedMobs.forEach((type, count) -> {

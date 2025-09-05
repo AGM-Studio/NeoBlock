@@ -24,7 +24,6 @@ import xyz.agmstudio.neoblock.neo.block.BlockManager;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoMerchant;
 import xyz.agmstudio.neoblock.neo.tiers.TierManager;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
-import xyz.agmstudio.neoblock.util.MessengerUtil;
 
 import java.util.HashSet;
 import java.util.concurrent.Callable;
@@ -135,7 +134,7 @@ public final class NeoListener {
         if (entity instanceof WanderingTrader trader) NeoMerchant.handleTrader(trader);
         if (entity instanceof ServerPlayer player) {
             if (TierManager.hasResearch()) TierManager.addPlayer(player);
-            MessengerUtil.onPlayerJoin(level, player);
+            NeoBlock.onPlayerJoin(level, player);
         }
     }
 

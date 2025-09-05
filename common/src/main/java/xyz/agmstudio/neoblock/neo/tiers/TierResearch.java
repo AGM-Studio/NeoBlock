@@ -2,8 +2,8 @@ package xyz.agmstudio.neoblock.neo.tiers;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
+import xyz.agmstudio.neoblock.NeoBlock;
 import xyz.agmstudio.neoblock.data.NBTSaveable;
-import xyz.agmstudio.neoblock.util.MessengerUtil;
 
 public class TierResearch implements NBTSaveable {
     protected final TierSpec tier;
@@ -26,10 +26,10 @@ public class TierResearch implements NBTSaveable {
         tier.enable();
         tier.startSequence.addToQueue(false);
         tier.unlockActions.applyRulesAndCommands(level);
-        MessengerUtil.sendInstantMessage("message.neoblock.unlocked_tier", level, false, tier.id);
+        NeoBlock.sendInstantMessage("message.neoblock.unlocked_tier", level, false, tier.id);
     }
     public void onStart(ServerLevel level) {
-        MessengerUtil.sendInstantMessage("message.neoblock.unlocking_tier", level, false, tier.id);
+        NeoBlock.sendInstantMessage("message.neoblock.unlocking_tier", level, false, tier.id);
         tier.unlockActions.applyTrader(level);
     }
 

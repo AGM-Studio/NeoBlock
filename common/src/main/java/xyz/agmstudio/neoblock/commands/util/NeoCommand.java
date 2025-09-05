@@ -18,12 +18,8 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlock;
-import xyz.agmstudio.neoblock.util.JavaUtil;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -111,7 +107,10 @@ public abstract class NeoCommand {
 
         ArgumentBuilder<CommandSourceStack, ?> current = null;
         NeoArgument<?> previous = null;
-        for (NeoArgument<?> argument: JavaUtil.reverse(arguments.values())) {
+        Iterator<NeoArgument<?>> iterator = arguments.values().iterator();
+        List<NeoArgument<?>> reversed =  new ArrayList<>();
+        while (iterator.hasNext()) reversed.add(0, iterator.next());
+        for (NeoArgument<?> argument: reversed) {
             ArgumentBuilder<CommandSourceStack, ?> build = argument.build().requires(permission);
             if (previous == null || previous.isOptional()) build.executes(executor);
             if (current != null) build.then(current);

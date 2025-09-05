@@ -8,7 +8,6 @@ import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlock;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
 import xyz.agmstudio.neoblock.platform.IConfig;
-import xyz.agmstudio.neoblock.util.MessengerUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -106,7 +105,7 @@ public class NeoSeqBlockSpec extends NeoBlockSpec {
 
     @Override public void placeAt(@NotNull LevelAccessor level, BlockPos pos) {
         if (blocks.isEmpty()) {
-            MessengerUtil.warnPlayers(level, "Unable to place {} because it's empty. Capturing a random block again.", getID());
+            NeoBlock.warnPlayers(level, "Unable to place {} because it's empty. Capturing a random block again.", getID());
             BlockManager.getRandomBlock().placeAt(level, pos);
             return;
         }

@@ -30,7 +30,6 @@ import xyz.agmstudio.neoblock.neo.loot.trade.NeoTrade;
 import xyz.agmstudio.neoblock.neo.tiers.TierManager;
 import xyz.agmstudio.neoblock.neo.tiers.TierSpec;
 import xyz.agmstudio.neoblock.platform.IConfig;
-import xyz.agmstudio.neoblock.util.MessengerUtil;
 import xyz.agmstudio.neoblock.util.MinecraftUtil;
 
 import java.io.FileNotFoundException;
@@ -118,8 +117,8 @@ public abstract class WorldData extends SavedData {
                 Optional<NeoblockForceCommand.SetBlock> command = NeoCommand.getFromRegistry(NeoblockForceCommand.SetBlock.class);
 
                 NeoBlock.LOGGER.info("NeoBlock has been disabled.");
-                MessengerUtil.sendMessage("message.neoblock.disabled_world_1", level, false);
-                MessengerUtil.sendMessage("message.neoblock.disabled_world_2", level, false, command.map(NeoCommand::getCommand).orElse(null));
+                NeoBlock.sendMessage("message.neoblock.disabled_world_1", level, false);
+                NeoBlock.sendMessage("message.neoblock.disabled_world_2", level, false, command.map(NeoCommand::getCommand).orElse(null));
 
                 instance.status.state = WorldStatus.State.DISABLED;
                 instance.setDirty();
@@ -128,7 +127,7 @@ public abstract class WorldData extends SavedData {
             Optional<NeoblockForceCommand.ResetTiers> command = NeoCommand.getFromRegistry(NeoblockForceCommand.ResetTiers.class);
 
             NeoBlock.LOGGER.info("NeoBlock tiers has been updated.");
-            MessengerUtil.sendMessage("message.neoblock.updated_world", level, false, command.map(NeoCommand::getCommand).orElse(null));
+            NeoBlock.sendMessage("message.neoblock.updated_world", level, false, command.map(NeoCommand::getCommand).orElse(null));
 
             instance.status.state = WorldStatus.State.UPDATED;
             instance.setDirty();
@@ -165,7 +164,7 @@ public abstract class WorldData extends SavedData {
             tier.load(tt);
 
             if (!tier.isStable()) {
-                MessengerUtil.sendMessage("message.neoblock.tier_updated", level, false, id);
+                NeoBlock.sendMessage("message.neoblock.tier_updated", level, false, id);
                 isUpdated = true;
             }
         }

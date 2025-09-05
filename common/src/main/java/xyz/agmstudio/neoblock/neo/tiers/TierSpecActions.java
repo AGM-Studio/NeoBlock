@@ -4,11 +4,11 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.npc.WanderingTrader;
+import xyz.agmstudio.neoblock.NeoBlock;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoMerchant;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoTradePool;
 import xyz.agmstudio.neoblock.neo.world.WorldRules;
 import xyz.agmstudio.neoblock.platform.IConfig;
-import xyz.agmstudio.neoblock.util.MessengerUtil;
 
 import java.util.HashMap;
 import java.util.List;
@@ -59,6 +59,6 @@ public final class TierSpecActions {
     }
     public void applyTrader(ServerLevel level) {
         WanderingTrader trader = NeoMerchant.spawnTraderWith(trades.getPool(), level, "UnlockTrader");
-        if (trader != null) MessengerUtil.sendInstantMessage(traderMessage, level, false, traderMessageArgs);
+        if (trader != null) NeoBlock.sendInstantMessage(traderMessage, level, false, traderMessageArgs);
     }
 }
