@@ -25,6 +25,9 @@ public class NeoBlockSpec {
         Optional<NeoChestSpec> chest = NeoChestSpec.parseChest(input);
         if (chest.isPresent()) return chest;
 
+        Optional<NeoTagBlockSpec> tag = NeoTagBlockSpec.parseTagBlock(input);
+        if (tag.isPresent()) return tag;
+
         Matcher matcher = PATTERN.matcher(input.trim());
         if (!matcher.matches()) {
             NeoBlock.LOGGER.warn("Invalid block: '{}'", input);

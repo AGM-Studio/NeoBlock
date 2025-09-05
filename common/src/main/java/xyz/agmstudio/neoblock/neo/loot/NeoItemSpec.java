@@ -13,7 +13,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class NeoItemSpec {
-    private static final Pattern PATTERN = Pattern.compile("(?<count>\\d+(-\\d+)?)?x(?<id>[\\w:]+)(?:\\s+(?<chance>\\d+\\.?\\d*)%?)?");
+    private static final Pattern PATTERN = Pattern.compile(
+            "(?:(?<count>\\d+(?:-\\d+)?)x)?(?<id>[\\w:]+)(?:\\s+(?<chance>\\d+(?:\\.\\d*)?)%?)?"
+    );
     private static final ResourceLocation DEFAULT = MinecraftUtil.parseResourceLocation("minecraft:stone");
 
     protected final Item item;
@@ -66,6 +68,9 @@ public class NeoItemSpec {
         Optional<NeoMobSpec> mob = NeoMobSpec.parseMob(input);
         if (mob.isPresent()) return mob;
 
+        Optional<NeoTagItemSpec> tag = NeoTagItemSpec.parseTagItem(input);
+        if (tag.isPresent()) return tag;
+
         Matcher matcher = PATTERN.matcher(input.trim().toLowerCase());
         if (!matcher.matches()) return Optional.empty();
 
@@ -77,5 +82,4 @@ public class NeoItemSpec {
 
         return Optional.of(new NeoItemSpec(item, range, chance));
     }
-
 }

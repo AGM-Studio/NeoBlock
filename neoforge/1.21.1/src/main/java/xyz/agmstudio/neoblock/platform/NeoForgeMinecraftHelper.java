@@ -3,14 +3,17 @@ package xyz.agmstudio.neoblock.platform;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.effect.MobEffect;
@@ -34,6 +37,8 @@ import xyz.agmstudio.neoblock.neo.loot.NeoItemSpec;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
 import xyz.agmstudio.neoblock.util.MinecraftUtil;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
@@ -56,6 +61,14 @@ public final class NeoForgeMinecraftHelper implements IMinecraftHelper {
     @Override public Optional<ResourceLocation> getItemResource(Item item) {
         if (item == null) return Optional.empty();
         return Optional.of(BuiltInRegistries.ITEM.getKey(item));
+    }
+
+    @Override public List<Item> getItemsOfTag(TagKey<Item> tag) {
+        RegistryAccess access = WorldData.getWorldLevel().registryAccess();
+        Iterable<Holder<Item>> items = access.registryOrThrow(Registries.ITEM).getTagOrEmpty(tag);
+        List<Item> list = new ArrayList<>();
+        items.forEach(holder -> list.add(holder.value()));
+        return list;
     }
 
     @Override public int getEnchantmentLevel(ItemStack stack, Enchantment enchantment) {
@@ -90,6 +103,14 @@ public final class NeoForgeMinecraftHelper implements IMinecraftHelper {
     @Override public Optional<ResourceLocation> getBlockResource(Block block) {
         if (block == null) return Optional.empty();
         return Optional.of(BuiltInRegistries.BLOCK.getKey(block));
+    }
+
+    @Override public List<Block> getBlocksOfTag(TagKey<Block> tag) {
+        RegistryAccess access = WorldData.getWorldLevel().registryAccess();
+        Iterable<Holder<Block>> items = access.registryOrThrow(Registries.BLOCK).getTagOrEmpty(tag);
+        List<Block> list = new ArrayList<>();
+        items.forEach(holder -> list.add(holder.value()));
+        return list;
     }
 
     @Override public Optional<EntityType<?>> getEntityType(ResourceLocation location) {

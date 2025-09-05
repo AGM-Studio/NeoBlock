@@ -48,7 +48,6 @@ public class NeoForgeConfig implements IConfig {
         config.entrySet().forEach(entry -> action.accept(entry.getKey(), entry.getValue()));
     }
 
-
     public static class Helper implements IConfig.Helper {
         @Override public IConfig getConfig(java.nio.file.Path path) {
             CommentedFileConfig config = CommentedFileConfig.builder(path).sync().build();

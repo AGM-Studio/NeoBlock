@@ -6,6 +6,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -26,6 +27,7 @@ import org.joml.Vector3f;
 import xyz.agmstudio.neoblock.neo.loot.NeoItemSpec;
 import xyz.agmstudio.neoblock.util.MinecraftUtil;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
 
@@ -37,6 +39,8 @@ public interface IMinecraftHelper {
     Optional<Item> getItem(ResourceLocation location);
     Optional<ResourceLocation> getItemResource(Item item);
 
+    List<Item> getItemsOfTag(TagKey<Item> tag);
+
     int getEnchantmentLevel(ItemStack stack, Enchantment enchantment);
     int getEnchantmentLevel(ItemStack stack, ResourceKey<Enchantment> enchantment);
     boolean isSilkTouched(ItemStack stack);
@@ -45,6 +49,8 @@ public interface IMinecraftHelper {
 
     Optional<Block> getBlock(ResourceLocation location);
     Optional<ResourceLocation> getBlockResource(Block block);
+
+    List<Block> getBlocksOfTag(TagKey<Block> tag);
 
     Optional<EntityType<?>> getEntityType(ResourceLocation location);
     Optional<ResourceLocation> getEntityTypeResource(EntityType<?> type);

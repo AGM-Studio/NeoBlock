@@ -5,6 +5,7 @@ import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -26,6 +27,7 @@ import xyz.agmstudio.neoblock.NeoBlock;
 import xyz.agmstudio.neoblock.neo.loot.NeoItemSpec;
 import xyz.agmstudio.neoblock.platform.IMinecraftHelper;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -57,6 +59,10 @@ public final class MinecraftUtil {
         return getItemResource(item).orElse(null) == location;
     }
 
+    public static List<Item> getItemsOfTag(TagKey<Item> tag) {
+        return HELPER.getItemsOfTag(tag);
+    }
+
     public static int getEnchantmentLevel(ItemStack stack, Enchantment enchantment) {
         return HELPER.getEnchantmentLevel(stack, enchantment);
     }
@@ -79,6 +85,10 @@ public final class MinecraftUtil {
     }
     public static boolean isValidBlock(Block block, ResourceLocation location) {
         return getBlockResource(block).orElse(null) == location;
+    }
+
+    public static List<Block> getBlocksOfTag(TagKey<Block> tag) {
+        return HELPER.getBlocksOfTag(tag);
     }
 
     public static Optional<BlockState> getBlockState(String name) {

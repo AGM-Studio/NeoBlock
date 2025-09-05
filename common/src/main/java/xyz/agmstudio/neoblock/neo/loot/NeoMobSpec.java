@@ -25,7 +25,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class NeoMobSpec extends NeoItemSpec {
-    private static final Pattern MOB_PATTERN = Pattern.compile("mob:(?<count>\\d+(-\\d+)?)?x?(?<id>[\\w:]+)(?:\\s+(?<chance>\\d+\\.?\\d*)%?)?");
+    private static final Pattern MOB_PATTERN = Pattern.compile(
+            "mob:(?:(?<count>\\d+(?:-\\d+)?)x)?(?<id>[\\w:]+)(?:\\s+(?<chance>\\d+(?:\\.\\d*)?)%?)?"
+    );
     @NotNull private static final ResourceLocation DEFAULT = MinecraftUtil.parseResourceLocation("minecraft:pig");
 
     public static void load() {}
