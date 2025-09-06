@@ -4,6 +4,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.component.DataComponentPredicate;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -15,7 +16,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.ARGB;
-import net.minecraft.util.RandomSource;
 import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -25,6 +25,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.Tool;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
@@ -37,6 +38,7 @@ import net.minecraft.world.scores.*;
 import net.minecraft.world.scores.criteria.ObjectiveCriteria;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
+import xyz.agmstudio.neoblock.NeoBlock;
 import xyz.agmstudio.neoblock.neo.loot.NeoItemSpec;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
 import xyz.agmstudio.neoblock.util.MinecraftUtil;
@@ -156,25 +158,24 @@ public final class NeoForgeMinecraftHelper implements IMinecraftHelper {
         if (mob instanceof Mob leashable) leashable.setLeashedTo(to, true);
     }
 
-    private static ItemStack toItemStack(NeoItemSpec item, RandomSource random) {
-        ItemStack stack = new ItemStack(item.getItem(), item.getRange().sample(random));
-        return item.modify(stack);
-    }
-
-    private static ItemCost toItemCost(NeoItemSpec item, RandomSource random) {
-        return new ItemCost(item.getItem(), item.getRange().sample(random));
+    private static ItemCost toItemCost(NeoItemSpec item) {
+        ItemStack stack = item.getStack();
+        return new ItemCost(stack.getItemHolder(), stack.getCount(), DataComponentPredicate.allOf(stack.getComponents()));
     }
 
     @Override public Optional<MerchantOffer> getOfferOf(NeoItemSpec result, NeoItemSpec costA, NeoItemSpec costB, UniformInt uses) {
-        @NotNull final RandomSource RNG = WorldData.getRandom();
-        @NotNull final Item AIR = net.minecraft.world.item.Items.AIR;
+        @NotNull final Item AIR = Items.AIR;
 
-        ItemStack r = toItemStack(result, RNG);
-        ItemCost a = toItemCost(costA, RNG);
-        Optional<ItemCost> b = costB != null ? Optional.of(toItemCost(costB, RNG)) : Optional.empty();
+        NeoBlock.LOGGER.info("Offer of {}, {}, {}", result, costA, costB);
+
+        ItemStack r = result.getStack();
+        ItemCost a = toItemCost(costA);
+        Optional<ItemCost> b = costB != null ? Optional.of(toItemCost(costB)) : Optional.empty();
+
+        NeoBlock.LOGGER.info("Result Offer of {}, {}, {}", r, a, b);
 
         if (r.getItem() == AIR || a.itemStack().getItem() == AIR) return Optional.empty();
-        return Optional.of(new MerchantOffer(a, b, r, uses.sample(RNG), 0, 0));
+        return Optional.of(new MerchantOffer(a, b, r, uses.sample(WorldData.getRandom()), 0, 0));
     }
 
     @Override public Objective createScoreboardObjective(Scoreboard scoreboard, String name, ObjectiveCriteria criteria, String title, ObjectiveCriteria.RenderType renderType) {

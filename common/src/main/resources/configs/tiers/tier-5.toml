@@ -19,7 +19,8 @@ trades = [
     "16xminecraft:wind_charge; 3-4xminecraft:iron_ingot; 32-64 50%",
     "trade:blocks-4 50%",
     "trade:saplings-2",
-    "trade:mobs-5"
+    "trade:mobs-5",
+    "1x#neoblock:trims; 8-12xminecraft:diamond; 1-2 5%"     # Tag defined in tags.toml
 ]
 
 [unlock]

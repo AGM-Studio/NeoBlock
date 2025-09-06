@@ -14,6 +14,9 @@ import java.util.regex.Pattern;
 
 public class NeoBlockSpec {
     private static final Pattern PATTERN = Pattern.compile("^(?:(?<count>\\d+)x *)?(?<id>[a-z0-9_]+:[a-z0-9_/]+)$");
+    protected static Block getDefault() {
+        return BlockManager.DEFAULT_SPEC.getBlock();
+    }
 
     protected final Block block;
     protected final int weight;

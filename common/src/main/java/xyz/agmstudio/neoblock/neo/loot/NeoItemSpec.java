@@ -4,6 +4,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
 import xyz.agmstudio.neoblock.util.MinecraftUtil;
 import xyz.agmstudio.neoblock.util.StringUtil;
@@ -17,6 +18,9 @@ public class NeoItemSpec {
             "(?:(?<count>\\d+(?:-\\d+)?)x)?(?<id>[\\w:]+)(?:\\s+(?<chance>\\d+(?:\\.\\d*)?)%?)?"
     );
     private static final ResourceLocation DEFAULT = MinecraftUtil.parseResourceLocation("minecraft:stone");
+    protected static ItemStack getDefault() {
+        return new ItemStack(Items.STONE, 1);
+    }
 
     protected final Item item;
     protected final UniformInt range;
@@ -28,9 +32,10 @@ public class NeoItemSpec {
         this.chance = Math.min(Math.max(chance, 0.0), 1.0);
     }
 
+
     public ItemStack getStack() {
         int count = range.sample(WorldData.getRandom());
-        return new ItemStack(getItem(), count);
+        return modify(new ItemStack(getItem(), count));
     }
 
     public ItemStack getStackWithChance() {

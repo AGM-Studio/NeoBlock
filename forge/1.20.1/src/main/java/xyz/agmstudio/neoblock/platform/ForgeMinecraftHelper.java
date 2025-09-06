@@ -11,11 +11,13 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.TagKey;
-import net.minecraft.util.RandomSource;
 import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TieredItem;
@@ -144,25 +146,15 @@ public final class ForgeMinecraftHelper implements IMinecraftHelper {
         if (mob instanceof Mob leashable) leashable.setLeashedTo(to, true);
     }
 
-    private static ItemStack toItemStack(NeoItemSpec item, RandomSource random) {
-        ItemStack stack = new ItemStack(item.getItem(), item.getRange().sample(random));
-        return item.modify(stack);
-    }
-
-    private static ItemStack toItemCost(NeoItemSpec item, RandomSource random) {
-        return new ItemStack(item.getItem(), item.getRange().sample(random));
-    }
-
     @Override public Optional<MerchantOffer> getOfferOf(NeoItemSpec result, NeoItemSpec costA, NeoItemSpec costB, UniformInt uses) {
-        @NotNull final RandomSource RNG = WorldData.getRandom();
         @NotNull final Item AIR = net.minecraft.world.item.Items.AIR;
 
-        ItemStack r = toItemStack(result, RNG);
-        ItemStack a = toItemCost(costA, RNG);
-        ItemStack b = costB != null ? toItemCost(costB, RNG) : ItemStack.EMPTY;
+        ItemStack r = result.getStack();
+        ItemStack a = costA.getStack();
+        ItemStack b = costB != null ? costB.getStack() : ItemStack.EMPTY;
 
         if (r.getItem() == AIR || a.getItem() == AIR) return Optional.empty();
-        return Optional.of(new MerchantOffer(a, b, r, uses.sample(RNG), 0, 0));
+        return Optional.of(new MerchantOffer(a, b, r, uses.sample(WorldData.getRandom()), 0, 0));
     }
 
     @Override public Objective createScoreboardObjective(Scoreboard scoreboard, String name, ObjectiveCriteria criteria, String title, ObjectiveCriteria.RenderType renderType) {

@@ -4,6 +4,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.component.DataComponentPredicate;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -14,11 +15,13 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.TagKey;
-import net.minecraft.util.RandomSource;
 import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -154,25 +157,20 @@ public final class ForgeMinecraftHelper implements IMinecraftHelper {
         if (mob instanceof Mob leashable) leashable.setLeashedTo(to, true);
     }
 
-    private static ItemStack toItemStack(NeoItemSpec item, RandomSource random) {
-        ItemStack stack = new ItemStack(item.getItem(), item.getRange().sample(random));
-        return item.modify(stack);
-    }
-
-    private static ItemCost toItemCost(NeoItemSpec item, RandomSource random) {
-        return new ItemCost(item.getItem(), item.getRange().sample(random));
+    private static ItemCost toItemCost(NeoItemSpec item) {
+        ItemStack stack = item.getStack();
+        return new ItemCost(stack.getItemHolder(), stack.getCount(), DataComponentPredicate.allOf(stack.getComponents()));
     }
 
     @Override public Optional<MerchantOffer> getOfferOf(NeoItemSpec result, NeoItemSpec costA, NeoItemSpec costB, UniformInt uses) {
-        @NotNull final RandomSource RNG = WorldData.getRandom();
         @NotNull final Item AIR = Items.AIR;
 
-        ItemStack r = toItemStack(result, RNG);
-        ItemCost a = toItemCost(costA, RNG);
-        Optional<ItemCost> b = costB != null ? Optional.of(toItemCost(costB, RNG)) : Optional.empty();
+        ItemStack r = result.getStack();
+        ItemCost a = toItemCost(costA);
+        Optional<ItemCost> b = costB != null ? Optional.of(toItemCost(costB)) : Optional.empty();
 
         if (r.getItem() == AIR || a.itemStack().getItem() == AIR) return Optional.empty();
-        return Optional.of(new MerchantOffer(a, b, r, uses.sample(RNG), 0, 0));
+        return Optional.of(new MerchantOffer(a, b, r, uses.sample(WorldData.getRandom()), 0, 0));
     }
 
     @Override

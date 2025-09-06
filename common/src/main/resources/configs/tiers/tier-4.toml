@@ -6,7 +6,8 @@ starting-blocks = [
 ]
 
 blocks = [
-    "20xminecraft:netherrack",
+    "10xminecraft:netherrack",
+    "10x#neoblock:netherracks",     # Tag key defined in tags.toml
     "16xminecraft:basalt",
     "12xminecraft:blackstone",
     "4xminecraft:soul_sand",

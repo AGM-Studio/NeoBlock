@@ -21,10 +21,8 @@ import xyz.agmstudio.neoblock.commands.util.NeoCommand;
 import xyz.agmstudio.neoblock.compatibility.ForgivingVoid;
 import xyz.agmstudio.neoblock.data.NBTSaveable;
 import xyz.agmstudio.neoblock.data.Schematic;
-import xyz.agmstudio.neoblock.neo.block.BlockManager;
-import xyz.agmstudio.neoblock.neo.block.NeoBlockPos;
-import xyz.agmstudio.neoblock.neo.block.NeoChestSpec;
-import xyz.agmstudio.neoblock.neo.block.NeoSeqBlockSpec;
+import xyz.agmstudio.neoblock.neo.block.*;
+import xyz.agmstudio.neoblock.neo.loot.NeoTagItemSpec;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoMerchant;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoTrade;
 import xyz.agmstudio.neoblock.neo.tiers.TierManager;
@@ -33,10 +31,7 @@ import xyz.agmstudio.neoblock.platform.IConfig;
 import xyz.agmstudio.neoblock.util.MinecraftUtil;
 
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public abstract class WorldData extends SavedData {
     private static final String BLOCK_BREAK_OBJECTIVE = "neoblocks_broken";
@@ -62,9 +57,11 @@ public abstract class WorldData extends SavedData {
     public static void reloadConfig() {
         NeoBlock.reloadConfig();
 
+        NeoTagItemSpec.reloadTags();
         NeoTrade.reloadTrades();
         NeoMerchant.loadConfig();
 
+        NeoTagBlockSpec.reloadTags();
         NeoChestSpec.reloadChests();
         NeoSeqBlockSpec.reloadSequences();
 
@@ -195,6 +192,11 @@ public abstract class WorldData extends SavedData {
     public static @NotNull RandomSource getRandom() {
         return instance.level.getRandom();
     }
+    public static <T> Optional<T> getRandomItem(List<T> collection) {
+        if (collection.isEmpty()) return Optional.empty();
+        return Optional.of(collection.get(getRandom().nextInt(collection.size())));
+    }
+
     public WorldStatus getStatus() {
         return status;
     }
