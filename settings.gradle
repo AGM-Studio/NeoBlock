@@ -62,6 +62,7 @@ include('common')
 include(
         'forge:1.20.1',
         'forge:1.21.1',
+        'forge:1.21.4',
 )
 include(
         'neoforge:1.21.1',
