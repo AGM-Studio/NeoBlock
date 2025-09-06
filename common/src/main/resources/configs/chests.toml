@@ -1,4 +1,9 @@
-tier1-chest = [
+[tier1-chest]
+min=5			# After first roll checks if the min is in the chest, if not, will roll again to add more, default: 0
+max=12			# If reaches this count will stop even if in middle of a roll, default: 27 (full chest)
+# There is only one override to prevent crashes, and that is the limit of 20 rolls.
+# Even if the min is not reached in 20th roll, it will be stopped.
+items = [
 	"1xminecraft:wooden_pickaxe 75%",
 	"1xminecraft:stone_pickaxe 50%",
 	"4-8xminecraft:oak_log",
@@ -9,7 +14,10 @@ tier1-chest = [
 	"1xminecraft:torch 70%"
 ]
 
-tier2-chest = [
+[tier2-chest]
+min=12
+max=8
+items = [
 	"1xminecraft:stone_pickaxe 70%",
 	"1xminecraft:iron_pickaxe 40%",
 	"8-12xminecraft:carrot",
@@ -20,19 +28,25 @@ tier2-chest = [
 	"2-4xminecraft:oak_log"
 ]
 
-tier4-chest = [
+[tier4-chest]
+min=3
+items = [
 	"1xminecraft:iron_chestplate 25%",
 	"4-8xminecraft:coal 60%",
 	"1xminecraft:gold_ingot 40%",
 	"1xminecraft:blaze_rod 20%",
 	"1xminecraft:nether_quartz 30%",
 	"1xminecraft:ender_pearl 10%",
-	"1xminecraft:experience_bottle 15%"
+	"1xminecraft:experience_bottle"
 ]
 
-casual-chest = [ # Use example in tier 1, line 12
+[casual-chest]
+min=3
+max=5
+items = [ # Use example in tier 1, line 12
 	"3-6xminecraft:oak_log 80%",
 	"4-8xminecraft:bread 40%",
 	"1xminecraft:torch 50%",
-	"1xminecraft:apple 30%"
+	"1xminecraft:apple 30%",
+	"1-10xminecraft:experience_bottle 85%"
 ]
