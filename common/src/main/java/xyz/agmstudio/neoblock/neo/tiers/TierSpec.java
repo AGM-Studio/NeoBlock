@@ -144,13 +144,15 @@ public class TierSpec implements NBTSaveable {
     public boolean isEnabled() {
         return research.done && enabled;
     }
-    public void enable() {
+    public TierSpec enable() {
         enabled = true;
         enableActions.apply(WorldData.getWorldLevel());
+        return this;
     }
-    public void disable() {
+    public TierSpec disable() {
         enabled = false;
         disableActions.apply(WorldData.getWorldLevel());
+        return this;
     }
 
     public int getID() {

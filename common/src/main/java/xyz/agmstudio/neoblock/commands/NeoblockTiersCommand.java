@@ -51,8 +51,8 @@ public class NeoblockTiersCommand extends NeoCommand.ParentHolder {
         }
     
         @Override public int execute(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-            this.getArgument(context, "tier", TierSpec.class).disable();
-            return success(context, "command.neoblock.disable_tier");
+            TierSpec tier = this.getArgument(context, "tier", TierSpec.class).disable();
+            return success(context, "command.neoblock.disable_tier", tier.getName());
         }
     }
 
@@ -65,8 +65,8 @@ public class NeoblockTiersCommand extends NeoCommand.ParentHolder {
         }
     
         @Override public int execute(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-            this.getArgument(context, "tier", TierSpec.class).enable();
-            return success(context, "command.neoblock.enable_tier");
+            TierSpec tier = this.getArgument(context, "tier", TierSpec.class).enable();
+            return success(context, "command.neoblock.enable_tier", tier.getName());
         }
     }
 

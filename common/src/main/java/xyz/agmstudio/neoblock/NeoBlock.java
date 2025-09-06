@@ -148,7 +148,7 @@ public abstract class NeoBlock {
         String formatted = MessageFormatter.arrayFormat(message, objects).getMessage();
         LOGGER.warn(message, objects);
         if (level instanceof net.minecraft.world.level.Level server)
-            sendInstantMessage(Component.translatable("message.neoblock.warn", formatted).withStyle(ChatFormatting.RED), server, false);
+            sendInstantMessage(Component.translatable("message.neoblock.warning", formatted).withStyle(ChatFormatting.RED), server, false);
     }
 
     private static final class MessageHolder {

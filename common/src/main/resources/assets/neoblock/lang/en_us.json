@@ -22,7 +22,7 @@
   "jei.neoblock.requirement.blocks_broken": "Break %s blocks (%s broken)",
   "jei.neoblock.requirement.play_time": "Play for %s (Played for %s)",
   "jei.neoblock.requirement.command": "Has special requirement by modpack.",
-  "jei.neoblock.requirement.command.me": "✅ Special requirement met.",
+  "jei.neoblock.requirement.command.met": "✅ Special requirement met.",
 
   "tooltip.neoblock.spawn_lore": "Using this will ask the trader to bring a %s next time they visit.",
   "tooltip.neoblock.tier_chance": "Tier chance: %f%%",
@@ -33,21 +33,26 @@
   "message.neoblock.updated_world": "This world has been using an old tier config. You need to force update the world with %s.",
   "message.neoblock.tier_updated": "Tier %d has been updated and is incompatible.",
   "message.neoblock.unlocked_tier": "Tier %d has been unlocked!",
-  "message.neoblock.disable_tier": "Tier %d has been disabled!",
-  "message.neoblock.enable_tier": "Tier %d has been enabled!",
   "message.neoblock.unlocking_tier": "Tier %d is going to be unlocked!",
-  "message.neoblock.unlocking_trader": "As a reward for unlocking this tier, a trader with significant trades has been spawned.",
   "message.neoblock.trader_spawned": "§cA trader has spawned!§r",
   "message.neoblock.trades.mob": "The trader will bring %dx %s next time they visit.",
 
+  "message.neoblock.unlocking_trader": "As a reward for unlocking this tier, a trader with significant trades has been spawned.",
+  "message.neoblock.research_trader": "As a reward for reaching this tier, a trader with significant trades has been spawned.",
+  "message.neoblock.enabling_trader": "As for enabling this tier, a trader with significant trades has been spawned.",
+  "message.neoblock.disabling_trader": "As for disabling this tier, a trader with significant trades has been spawned.",
+
   "message.neoblock.warning": "Something has gone wrong... please check the logs...\nMessage: %s",
 
+  "command.neoblock.unexpected_exception": "An unexpected error happened while executing the command:\n  - %s",
+
   "command.neoblock.invalid_tier": "Tier mentioned not found",
+  "command.neoblock.disable_tier": "Tier \"%s\" has been disabled!",
+  "command.neoblock.enable_tier": "Tier \"%s\" has been enabled!",
 
   "command.neoblock.info": "Stats:\n  Blocks broken: %d\n  Unlocked tiers: %s",
-
   "command.neoblock.home": "%s teleported to NeoBlock",
-  "command.neoblock.home.not_entity": "Unable to teleport a non-entity!",
+  "command.neoblock.mobticket": "Mob ticket for %dx of \"%s\" is created.",
 
   "command.neoblock.scheme.save.fail": "Unable to save the schematic. Check the server logs for more information.",
   "command.neoblock.scheme.save.success": "Schematic has been saved as \"%s\".",
@@ -61,10 +66,6 @@
   "command.neoblock.disabled": "Neoblock has been set to dormant in this world. Enable it with \"%s\" if you want to.",
   "command.neoblock.research.advance": "Research has been advanced. New research time: %s",
   "command.neoblock.research.advance.invalid_tier": "Only tiers on research can be advanced.",
-
-  "command.neoblock.mobticket.not_summonable": "The mob selected can not be used.",
-  "command.neoblock.mobticket.given": "Mob ticket for %dx of \"%s\" is created.",
-  "command.neoblock.mobticket.no_player": "This command is only for players.",
 
   "command.neoblock.force_block": "Block has been set to the new position. Previous block has been removed.",
   "command.neoblock.force_block.enabled": "Block has been set to the position and the mod has been activated.",

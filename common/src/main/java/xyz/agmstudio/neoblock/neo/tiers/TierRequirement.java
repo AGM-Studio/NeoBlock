@@ -68,7 +68,7 @@ public interface TierRequirement {
 
         @Override public void addJEIBox(List<NeoJEIPlugin.TextBox> boxes, AtomicInteger y, TierSpec spec) {
             NeoJEIPlugin.addBox(boxes,
-                    spec.commanded ? "jei.neoblock.status.requirement.command.met" : "jei.neoblock.status.requirement.command",
+                    spec.commanded ? "jei.neoblock.requirement.command.met" : "jei.neoblock.requirement.command",
                     7, y.addAndGet(12), spec.commanded
             );
         }

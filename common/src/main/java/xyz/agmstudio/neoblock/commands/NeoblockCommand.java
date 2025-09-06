@@ -83,7 +83,7 @@ public class NeoblockCommand extends NeoCommand {
             boolean added = player.getInventory().add(mob_ticket);
             if (!added) player.drop(mob_ticket, false);
 
-            return success(context, "command.neoblock.mobticket.given", count, type.toShortString());
+            return success(context, "command.neoblock.mobticket", count, type.toShortString());
         }
     }
 }
