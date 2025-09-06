@@ -59,11 +59,13 @@ unlock-time = 1200  # Upgrade time in ticks. During upgrade the NeoBlock will tu
 commands = [
     "give @a apple 8"
 ]
+
+[on-unlock.rules]
+doMobSpawning = true
+
+[on-research]
 trades = [
     "trade:farm-1",
     "trade:oak-saplings",
     "1xminecraft:ice; 2-4xminecraft:oak_log; 8-16xminecraft:dirt; 8-12"
 ]
-
-[on-unlock.rules]
-doMobSpawning = true

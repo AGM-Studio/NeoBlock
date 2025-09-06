@@ -61,6 +61,7 @@ public class TierSpec implements NBTSaveable {
     protected TierSpecActions unlockActions;
     protected TierSpecActions enableActions;
     protected TierSpecActions disableActions;
+    protected TierSpecActions researchActions;
 
     public boolean isStable() {
         return Objects.equals(hash, getHashCode());

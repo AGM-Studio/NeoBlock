@@ -16,7 +16,7 @@ command = false
 game-time = -1
 unlock-time = 36000
 
-[on-unlock]
+[on-research]
 trades = [
     "2xminecraft:shulker_shell; 16-32xminecraft:diamond; 4-6",
     "1xminecraft:chorus_fruit; 16-32xminecraft:gold_ingot; 4-6",

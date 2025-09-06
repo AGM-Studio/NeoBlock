@@ -25,7 +25,7 @@ command = false
 game-time = -1
 unlock-time = 3600
 
-[on-unlock]
+[on-research]
 trades = [
     "6xminecraft:gravel; 8xminecraft:cobblestone; 64",
     "5xminecraft:sand; 8xminecraft:cobblestone; 64",

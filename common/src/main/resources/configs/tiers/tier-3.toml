@@ -29,7 +29,7 @@ command = false
 game-time = -1
 unlock-time = 9600
 
-[on-unlock]
+[on-research]
 trades = [
     "1xminecraft:bamboo; 36-64xminecraft:oak_sapling; 1-3",
     "1xminecraft:lava_bucket; 16-32xminecraft:cobblestone; 1xminecraft:bucket; 3",

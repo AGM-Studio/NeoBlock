@@ -76,6 +76,7 @@ public final class TierManager {
         spec.unlockActions = new TierSpecActions(config, "on-unlock").withMessage("message.neoblock.unlocking_trader", spec.id);
         spec.enableActions = new TierSpecActions(config, "on-enable").withMessage("message.neoblock.enabling_trader", spec.id);
         spec.disableActions = new TierSpecActions(config, "on-disable").withMessage("message.neoblock.disabling_trader", spec.id);
+        spec.researchActions = new TierSpecActions(config, "on-research").withMessage("message.neoblock.research_trader", spec.id);
 
         NeoBlock.LOGGER.debug("Tier {} loaded. Hash key: {}", spec.id, spec.getHashCode());
     }

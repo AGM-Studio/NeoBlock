@@ -32,7 +32,7 @@ command = false
 game-time = -1
 unlock-time = 18000
 
-[on-unlock]
+[on-research]
 trades = [
     "3-6xminecraft:warped_nylium; 8-16xminecraft:netherrack; 12-24",
     "3-6xminecraft:crimson_nylium; 8-16xminecraft:netherrack; 12-24",

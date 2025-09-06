@@ -29,7 +29,7 @@ command = false
 game-time = -1
 unlock-time = 24000
 
-[on-unlock]
+[on-research]
 trades = [
     "1xminecraft:azalea; 8-16xminecraft:gold_ingot; 8-12",
     "1xminecraft:flowering_azalea; 8-16xminecraft:gold_ingot; 8-12",
