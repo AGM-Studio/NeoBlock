@@ -3,6 +3,7 @@ package xyz.agmstudio.neoblock.mixin;
 import com.mojang.serialization.Lifecycle;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.worldselection.CreateWorldCallback;
 import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraft.client.gui.screens.worldselection.WorldCreationContext;
 import net.minecraft.resources.ResourceKey;
@@ -14,6 +15,7 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xyz.agmstudio.neoblock.NeoMixinCenter;
 
+import javax.annotation.Nullable;
 import java.util.Optional;
 import java.util.OptionalLong;
 
@@ -21,7 +23,7 @@ import java.util.OptionalLong;
 public final class CreateWorldScreenMixin {
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     @Inject(method = "<init>", at = @At("TAIL"))
-    private void CreateWorldScreen(Minecraft minecraft, Screen lastScreen, WorldCreationContext settings, Optional<ResourceKey<WorldPreset>> preset, OptionalLong seed, CallbackInfo ci) {
+    private void CreateWorldScreen(Minecraft minecraft, @Nullable Screen lastScreen, WorldCreationContext context, Optional<ResourceKey<WorldPreset>> preset, OptionalLong seed, CreateWorldCallback createWorldCallback, CallbackInfo ci) {
         NeoMixinCenter.changeWorldDefault(this);
     }
 
