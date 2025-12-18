@@ -32,10 +32,7 @@ public class BlockManager {
     public static final NeoBlockSpec BEDROCK_SPEC = new NeoBlockSpec(Blocks.BEDROCK);
     public static final double AABB_RANGE = 1.0;
 
-    public static NeoBlockSpec getRandomBlock() {
-        Optional<NeoBlockSpec> queued = WorldData.getWorldStatus().getNextInQueue();
-        if (queued.isPresent()) return queued.get();
-
+    public static TierSpec getRandomTierSpec() {
         AtomicInteger totalChance = new AtomicInteger();
         List<TierSpec> tiers = new ArrayList<>();
 
@@ -44,18 +41,31 @@ public class BlockManager {
             totalChance.addAndGet(tier.getWeight());
         });
 
-        if (totalChance.get() == 0) return DEFAULT_SPEC;
+        if (totalChance.get() == 0) return null;
         int randomValue = WorldData.getRandom().nextInt(totalChance.get());
         for (TierSpec tier : tiers) {
             randomValue -= tier.getWeight();
-            if (randomValue < 0) return tier.getRandomBlock();
+            if (randomValue < 0) return tier;
         }
 
-        NeoBlock.LOGGER.error("Unable to find a block for {} blocks", WorldData.getWorldStatus().getBlockCount());
-        return DEFAULT_SPEC;
+        return null;
+    }
+    public static NeoBlockSpec getRandomBlock() {
+        Optional<NeoBlockSpec> queued = WorldData.getWorldStatus().getNextInQueue();
+        if (queued.isPresent()) return queued.get();
+
+        TierSpec tier = getRandomTierSpec();
+        if (tier == null) {
+            NeoBlock.LOGGER.error("Unable to find a block for {} blocks", WorldData.getWorldStatus().getBlockCount());
+            return DEFAULT_SPEC;
+        }
+
+        WorldData.getWorldStatus().setLastTierSpawn(tier.getID());
+        return tier.getRandomBlock();
     }
 
     public static void updateBlock(ServerLevel level, boolean trigger) {
+        int lastSpawnTier = WorldData.getWorldStatus().getLastTierSpawn();
         if (!TierManager.hasResearch()) getRandomBlock().placeAt(level, NeoBlockPos.get());
         else BEDROCK_SPEC.placeAt(level, NeoBlockPos.get());  // Creative cheaters & Move block in mid-search (Just in case)
 
@@ -63,6 +73,8 @@ public class BlockManager {
         Animation.resetIdleTick();
         WorldData.getWorldStatus().addBlockCount(1);
         NeoListener.execute(() -> NeoMerchant.attemptSpawnTrader(level));
+        TierSpec last = WorldData.getWorldTier(lastSpawnTier);
+        if (last != null) last.addCount(1);
 
         for (TierSpec tier: WorldData.getWorldTiers())
             if (tier.canBeResearched()) tier.startResearch();

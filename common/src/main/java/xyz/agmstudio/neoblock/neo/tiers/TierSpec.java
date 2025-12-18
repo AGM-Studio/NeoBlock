@@ -21,6 +21,7 @@ public class TierSpec implements NBTSaveable {
 
     // Stored data in world info
     @NBTData protected int id;
+    @NBTData protected int count = 0;
     @NBTData protected boolean enabled;
     @NBTData protected boolean commanded = false;
     @NBTData protected TierResearch research;
@@ -153,6 +154,18 @@ public class TierSpec implements NBTSaveable {
         enabled = false;
         disableActions.apply(WorldData.getWorldLevel());
         return this;
+    }
+
+    public int setCount(int count) {
+        this.count = count;
+        return count;
+    }
+    public int getCount() {
+        return count;
+    }
+    public int addCount(int count) {
+        this.count += count;
+        return this.count;
     }
 
     public int getID() {

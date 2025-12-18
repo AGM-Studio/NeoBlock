@@ -28,6 +28,7 @@ public class WorldStatus implements NBTSaveable {
 
     @NBTData("WorldState") protected State state = State.INACTIVE;
     @NBTData("BlockCount") protected int blockCount = 0;
+    @NBTData("LastTierSpawn") protected int lastTierSpawn = 0;
     @NBTData("TraderFailedAttempts") protected int traderFailedAttempts = 0;
     @NBTData("NeoBlock") protected BlockPos pos = new BlockPos(0, 64, 0);
     @NBTData("Dimension") protected String dimension = "minecraft:overworld";
@@ -122,9 +123,16 @@ public class WorldStatus implements NBTSaveable {
         blockCount = count;
         data.setDirty();
     }
-
     public void addBlockCount(int count) {
         blockCount += count;
+        data.setDirty();
+    }
+
+    public int getLastTierSpawn() {
+        return lastTierSpawn;
+    }
+    public void setLastTierSpawn(int tier) {
+        this.lastTierSpawn = tier;
         data.setDirty();
     }
 
