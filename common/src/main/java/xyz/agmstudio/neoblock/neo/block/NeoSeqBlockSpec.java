@@ -63,12 +63,12 @@ public class NeoSeqBlockSpec extends NeoBlockSpec {
         Matcher matcher = PATTERN.matcher(input.trim());
         if (!matcher.matches()) return Optional.empty();
 
-        List<NeoBlockSpec> blocks = SEQUENCES.getOrDefault(matcher.group("id"), List.of());
+        List<NeoBlockSpec> blocks = SEQUENCES.getOrDefault(matcher.group("name"), List.of());
         if (blocks.isEmpty()) NeoBlock.LOGGER.warn("Unknown sequence ID: '{}'", matcher.group("id"));
 
         String countString = matcher.group("count");
         int count = (countString != null) ? Integer.parseInt(countString) : 1;
-        return Optional.of(new NeoSeqBlockSpec(blocks, count, matcher.group("id")));
+        return Optional.of(new NeoSeqBlockSpec(blocks, count, matcher.group("name")));
     }
 
     public NeoSeqBlockSpec(List<NeoBlockSpec> blocks, int weight, String id) {

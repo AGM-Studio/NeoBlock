@@ -54,7 +54,7 @@ public class NeoChestSpec extends NeoBlockSpec {
         Matcher matcher = PATTERN.matcher(input.trim());
         if (!matcher.matches()) return Optional.empty();
 
-        String name = matcher.group("id");
+        String name = matcher.group("name");
         Holder chest = CHESTS.getOrDefault(name, null);
         if (chest == null) NeoBlock.LOGGER.warn("Unknown chest ID: '{}'", name);
 
