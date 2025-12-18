@@ -6,6 +6,7 @@ import xyz.agmstudio.neoblock.NeoBlock;
 import xyz.agmstudio.neoblock.neo.loot.NeoItemSpec;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
 import xyz.agmstudio.neoblock.util.MinecraftUtil;
+import xyz.agmstudio.neoblock.util.PatternUtil;
 import xyz.agmstudio.neoblock.util.StringUtil;
 
 import javax.annotation.Nullable;
@@ -14,13 +15,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class NeoTradeSingle extends NeoTrade {
-    private static final Pattern PATTERN = Pattern.compile(
-            "\\s*(?<result>[^;]+?)\\s*;" +
-                    "\\s*(?<costA>[^;]+?)\\s*;" +
-                    "(?:\\s*(?<costB>[^;]+?)\\s*;)?" +
-                    "(?:\\s*(?<uses>\\d+(?:-\\d+)?)\\s*)?" +
-                    "(?:\\s*(?<chance>\\d+(?:\\.\\d+)?)%\\s*)?"
-    );
+    private static final Pattern PATTERN = PatternUtil.group("result", " ;").then(";").space()
+            .then(PatternUtil.group("costA", " ;").then(";")).space()
+            .then(PatternUtil.group("costB", " ;").then(";").optional()).space()
+            .then(PatternUtil.RANGE_NOX.optional()).space()
+            .then(PatternUtil.CHANCE.optional()).build(false);
 
     private final NeoItemSpec result;
     private final NeoItemSpec costA;
@@ -45,7 +44,10 @@ public class NeoTradeSingle extends NeoTrade {
         if (input == null) return Optional.empty();
 
         Matcher matcher = PATTERN.matcher(input.trim().toLowerCase());
-        if (!matcher.matches()) return Optional.empty();
+        if (!matcher.matches()) {
+            NeoBlock.LOGGER.error("Invalid trade syntax: {}", input);
+            return Optional.empty();
+        }
 
         NeoItemSpec result = NeoItemSpec.parseItem(matcher.group("result")).orElse(null);
         NeoItemSpec costA = NeoItemSpec.parseItem(matcher.group("costA")).orElse(null);
@@ -57,7 +59,7 @@ public class NeoTradeSingle extends NeoTrade {
 
         NeoItemSpec costB = NeoItemSpec.parseItem(matcher.group("costB")).orElse(null);
         double chance = StringUtil.parseChance(matcher.group("chance"));
-        UniformInt uses = StringUtil.parseRange(matcher.group("uses"));
+        UniformInt uses = StringUtil.parseRange(matcher.group("count"));
 
         return Optional.of(new NeoTradeSingle(result, costA, costB, chance, uses));
     }

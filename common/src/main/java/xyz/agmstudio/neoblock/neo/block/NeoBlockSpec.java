@@ -7,13 +7,15 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlock;
 import xyz.agmstudio.neoblock.util.MinecraftUtil;
+import xyz.agmstudio.neoblock.util.PatternUtil;
 
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class NeoBlockSpec {
-    private static final Pattern PATTERN = Pattern.compile("^(?:(?<count>\\d+)x *)?(?<id>[a-z0-9_]+:[a-z0-9_/]+)$");
+    private static final Pattern PATTERN =
+            PatternUtil.COUNT.optional().then(PatternUtil.namespace("block")).build(true);
     protected static Block getDefault() {
         return BlockManager.DEFAULT_SPEC.getBlock();
     }
@@ -37,9 +39,10 @@ public class NeoBlockSpec {
             return Optional.empty();
         }
 
-        Optional<Block> block = MinecraftUtil.getBlock(matcher.group("id"));
+        String blockString = matcher.group("block");
+        Optional<Block> block = MinecraftUtil.getBlock(blockString);
         if (block.isEmpty()) {
-            NeoBlock.LOGGER.warn("Unknown block ID: '{}'", matcher.group("id"));
+            NeoBlock.LOGGER.warn("Unknown block ID: '{}'", blockString);
             return Optional.empty();
         }
 

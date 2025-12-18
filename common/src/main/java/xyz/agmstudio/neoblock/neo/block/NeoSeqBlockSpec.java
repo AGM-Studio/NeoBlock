@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlock;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
 import xyz.agmstudio.neoblock.platform.IConfig;
+import xyz.agmstudio.neoblock.util.PatternUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,7 +19,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class NeoSeqBlockSpec extends NeoBlockSpec {
-    private static final Pattern PATTERN = Pattern.compile("^(?:(?<count>\\d+)x *)?neoblock:(?:seq|sequence):(?<id>[^ ]+)$");
+    private static final Pattern PATTERN =
+            PatternUtil.COUNT.optional().then("neoblock:(?:seq|sequence):").then(PatternUtil.NAME).build(true);
 
     private static final HashMap<String, List<NeoBlockSpec>> SEQUENCES = new HashMap<>();
     private final List<NeoBlockSpec> blocks;

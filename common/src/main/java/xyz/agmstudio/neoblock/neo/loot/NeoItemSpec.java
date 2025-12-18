@@ -7,6 +7,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
 import xyz.agmstudio.neoblock.util.MinecraftUtil;
+import xyz.agmstudio.neoblock.util.PatternUtil;
 import xyz.agmstudio.neoblock.util.StringUtil;
 
 import java.util.Optional;
@@ -14,9 +15,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class NeoItemSpec {
-    private static final Pattern PATTERN = Pattern.compile(
-            "(?:(?<count>\\d+(?:-\\d+)?)x)?(?<id>[\\w:]+)(?:\\s+(?<chance>\\d+(?:\\.\\d*)?)%?)?"
-    );
+    private static final Pattern PATTERN =
+            PatternUtil.RANGE.optional().then(PatternUtil.NAMESPACE).then(PatternUtil.CHANCE.optional()).build(false);
     private static final ResourceLocation DEFAULT = MinecraftUtil.parseResourceLocation("minecraft:stone");
     protected static ItemStack getDefault() {
         return new ItemStack(Items.STONE, 1);

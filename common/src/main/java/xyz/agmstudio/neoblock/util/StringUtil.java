@@ -4,10 +4,8 @@ import net.minecraft.util.valueproviders.UniformInt;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Base64;
-import java.util.regex.Pattern;
 
 public class StringUtil {
-    private static final Pattern BLOCK_PATTERN = Pattern.compile("^(?:(?<count>\\d+)x)?(?<id>[a-z0-9_]+:[a-z0-9_/]+)$");
     private static final UniformInt ONE = UniformInt.of(1, 1);
 
     /**

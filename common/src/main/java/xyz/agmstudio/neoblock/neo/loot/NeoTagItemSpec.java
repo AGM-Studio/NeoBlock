@@ -11,6 +11,7 @@ import xyz.agmstudio.neoblock.NeoBlock;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
 import xyz.agmstudio.neoblock.platform.IConfig;
 import xyz.agmstudio.neoblock.util.MinecraftUtil;
+import xyz.agmstudio.neoblock.util.PatternUtil;
 import xyz.agmstudio.neoblock.util.StringUtil;
 
 import java.util.ArrayList;
@@ -22,7 +23,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class NeoTagItemSpec extends NeoItemSpec {
-    private static final Pattern TAG_PATTERN = Pattern.compile("(?:(?<count>\\d+(?:-\\d+)?)x)?#(?<id>[\\w:]+)(?:\\s+(?<chance>\\d+(?:\\.\\d*)?)%?)?");
+    private static final Pattern TAG_PATTERN =
+            PatternUtil.RANGE.optional().then("#").then(PatternUtil.NAMESPACE).then(PatternUtil.CHANCE.optional()).build(false);
     private static final HashMap<String, List<NeoItemSpec>> MAP = new HashMap<>();
 
     public static void reloadTags() {

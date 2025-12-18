@@ -2,6 +2,7 @@ package xyz.agmstudio.neoblock.neo.loot.trade;
 
 import net.minecraft.world.item.trading.MerchantOffer;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
+import xyz.agmstudio.neoblock.util.PatternUtil;
 import xyz.agmstudio.neoblock.util.StringUtil;
 
 import java.util.List;
@@ -10,7 +11,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class NeoTradeGroup extends NeoTrade {
-    private static final Pattern PATTERN = Pattern.compile("trade:(?<name>[\\w\\-]+)(?:\\s+(?<chance>\\d+\\.?\\d*)%?)?");
+    private static final Pattern PATTERN =
+            PatternUtil.literal("trade:").then(PatternUtil.NAME).then(PatternUtil.CHANCE.optional()).build(false);
 
     private final String name;
     private final double chance;

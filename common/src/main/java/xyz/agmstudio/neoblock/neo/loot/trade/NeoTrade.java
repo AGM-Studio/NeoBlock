@@ -30,8 +30,9 @@ public abstract class NeoTrade {
             else {
                 List<NeoTrade> list = new ArrayList<>();
                 for (String entry : entries) {
-                    NeoTradeGroup.parse(entry).ifPresent(list::add);
-                    NeoTradeSingle.parse(entry).ifPresent(list::add);
+                    Optional<NeoTrade> group = NeoTradeGroup.parse(entry);
+                    if (group.isPresent()) list.add(group.get());
+                    else NeoTradeSingle.parse(entry).ifPresent(list::add);
                 }
                 TRADES.put(key, list);
                 NeoBlock.LOGGER.info("Loaded {} trades for {}", list.size(), key);

@@ -17,6 +17,7 @@ import xyz.agmstudio.neoblock.NeoBlock;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
 import xyz.agmstudio.neoblock.platform.INBTHelper;
 import xyz.agmstudio.neoblock.util.MinecraftUtil;
+import xyz.agmstudio.neoblock.util.PatternUtil;
 import xyz.agmstudio.neoblock.util.StringUtil;
 
 import java.util.List;
@@ -25,9 +26,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class NeoMobSpec extends NeoItemSpec {
-    private static final Pattern MOB_PATTERN = Pattern.compile(
-            "mob:(?:(?<count>\\d+(?:-\\d+)?)x)?(?<id>[\\w:]+)(?:\\s+(?<chance>\\d+(?:\\.\\d*)?)%?)?"
-    );
+    private static final Pattern MOB_PATTERN =
+            PatternUtil.literal("mob:").then(PatternUtil.RANGE.optional()).then(PatternUtil.NAMESPACE).then(PatternUtil.CHANCE.optional()).build(false);
     @NotNull private static final ResourceLocation DEFAULT = MinecraftUtil.parseResourceLocation("minecraft:pig");
 
     public static void load() {}

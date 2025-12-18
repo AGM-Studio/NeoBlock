@@ -5,6 +5,7 @@ import net.minecraft.world.item.trading.MerchantOffer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 public class NeoTradePool {
     private final List<NeoTrade> trades;
@@ -16,8 +17,9 @@ public class NeoTradePool {
     public static NeoTradePool parse(List<String> entries) {
         List<NeoTrade> list = new ArrayList<>();
         for (String entry : entries) {
-            NeoTradeGroup.parse(entry).ifPresent(list::add);
-            NeoTradeSingle.parse(entry).ifPresent(list::add);
+            Optional<NeoTrade> group = NeoTradeGroup.parse(entry);
+            if (group.isPresent()) list.add(group.get());
+            else NeoTradeSingle.parse(entry).ifPresent(list::add);
         }
 
         return new NeoTradePool(list);

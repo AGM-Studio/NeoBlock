@@ -9,6 +9,7 @@ import xyz.agmstudio.neoblock.NeoBlock;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
 import xyz.agmstudio.neoblock.platform.IConfig;
 import xyz.agmstudio.neoblock.util.MinecraftUtil;
+import xyz.agmstudio.neoblock.util.PatternUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,7 +20,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class NeoTagBlockSpec extends NeoBlockSpec {
-    private static final Pattern PATTERN = Pattern.compile("^(?:(?<count>\\d+)x *)?#(?<id>[a-z0-9_]+:[a-z0-9_/]+)$");
+    private static final Pattern PATTERN =
+            PatternUtil.COUNT.optional().then("#").then(PatternUtil.NAMESPACE).build(true);
     private static final HashMap<String, List<NeoBlockSpec>> MAP = new HashMap<>();
 
     public static void reloadTags() {

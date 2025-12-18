@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlock;
 import xyz.agmstudio.neoblock.neo.loot.NeoItemSpec;
 import xyz.agmstudio.neoblock.platform.IConfig;
+import xyz.agmstudio.neoblock.util.PatternUtil;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -17,7 +18,8 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class NeoChestSpec extends NeoBlockSpec {
-    private static final Pattern PATTERN = Pattern.compile("^(?:(?<count>\\d+)x *)?neoblock:chest:(?<id>[^ ]+)$");
+    private static final Pattern PATTERN =
+            PatternUtil.COUNT.optional().then("neoblock:chest:").then(PatternUtil.NAME).build(true);
 
     private static final HashMap<String, Holder> CHESTS = new HashMap<>();
 
