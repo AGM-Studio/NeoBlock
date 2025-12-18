@@ -42,7 +42,7 @@ trades = [
 # Conditions to unlock the mod, all conditions must be met to unlock.
 [unlock]
 blocks = 50         # Amount of blocks needed to be broken, set to -1 to deactivate
-command = false     # If server has to execute a command to unlock this.  /neoblock unlock <tier-number>
+command = false     # If server has to execute a command to unlock this. /neoblock tiers satisfy <tier-number>
 game-time = -1      # Amount of ticks world has been loaded, set to -1 to deactivate
 unlock-time = 1200  # Upgrade time in ticks. During upgrade the NeoBlock will turn into Bedrock.
 
