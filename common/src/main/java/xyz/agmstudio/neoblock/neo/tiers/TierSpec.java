@@ -64,6 +64,9 @@ public class TierSpec implements NBTSaveable {
     protected TierSpecActions disableActions;
     protected TierSpecActions researchActions;
 
+    protected final LinkedHashMap<Integer, TierSpecActions> onBlockActions = new LinkedHashMap<>();
+    protected final LinkedHashMap<Integer, TierSpecActions> everyBlockActions = new LinkedHashMap<>();
+
     public boolean isStable() {
         return Objects.equals(hash, getHashCode());
     }
@@ -158,14 +161,15 @@ public class TierSpec implements NBTSaveable {
 
     public int setCount(int count) {
         this.count = count;
+        for (int i: everyBlockActions.keySet()) if (count % i == 0) everyBlockActions.get(i).apply(WorldData.getWorldLevel());
+        if (onBlockActions.containsKey(count)) onBlockActions.get(count).apply(WorldData.getWorldLevel());
         return count;
     }
     public int getCount() {
         return count;
     }
     public int addCount(int count) {
-        this.count += count;
-        return this.count;
+        return setCount(this.count + count);
     }
 
     public int getID() {

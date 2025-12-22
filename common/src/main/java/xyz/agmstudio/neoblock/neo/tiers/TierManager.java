@@ -17,6 +17,7 @@ import xyz.agmstudio.neoblock.neo.block.NeoSeqBlockSpec;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoTradePool;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
 import xyz.agmstudio.neoblock.platform.IConfig;
+import xyz.agmstudio.neoblock.util.PatternUtil;
 import xyz.agmstudio.neoblock.util.ResourceUtil;
 
 import java.nio.file.Files;
@@ -24,6 +25,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.regex.Matcher;
 
 public final class TierManager {
     private static final List<TierResearch> researches = new ArrayList<>();
@@ -77,6 +79,23 @@ public final class TierManager {
         spec.enableActions = new TierSpecActions(config, "on-enable").withMessage("message.neoblock.enabling_trader", spec.id);
         spec.disableActions = new TierSpecActions(config, "on-disable").withMessage("message.neoblock.disabling_trader", spec.id);
         spec.researchActions = new TierSpecActions(config, "on-research").withMessage("message.neoblock.research_trader", spec.id);
+
+        for (String key: config.keys()) {
+            Matcher obm = PatternUtil.ON_BLOCK_PATTERN.matcher(key);
+            if (obm.matches()) {
+                int count = Integer.parseInt(obm.group("count"));
+                TierSpecActions actions = new TierSpecActions(config, obm.group()).withMessage("message.neoblock.random_trader", spec.id);
+                spec.onBlockActions.put(count, actions);
+                NeoBlock.LOGGER.debug("Added on-block action {} for tier {}.", key, spec.id);
+            }
+            Matcher ebm = PatternUtil.EVERY_BLOCK_PATTERN.matcher(key);
+            if (ebm.matches()) {
+                int count = Integer.parseInt(ebm.group("count"));
+                TierSpecActions actions = new TierSpecActions(config, ebm.group()).withMessage("message.neoblock.random_trader", spec.id);
+                spec.everyBlockActions.put(count, actions);
+                NeoBlock.LOGGER.debug("Added on-every-block action {} for tier {}.", key, spec.id);
+            }
+        }
 
         NeoBlock.LOGGER.debug("Tier {} loaded. Hash key: {}", spec.id, spec.getHashCode());
     }

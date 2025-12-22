@@ -6,6 +6,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.regex.Pattern;
 
 public final class PatternUtil {
+    public static final Pattern ON_BLOCK_PATTERN = Pattern.compile("^on-(?<count>\\d+)(st|nd|rd|th)?-block$");
+    public static final Pattern EVERY_BLOCK_PATTERN = Pattern.compile("^on-every-(?<count>\\d+)-block(s)?$");
+
     public interface Fragment {
         String regex();
 

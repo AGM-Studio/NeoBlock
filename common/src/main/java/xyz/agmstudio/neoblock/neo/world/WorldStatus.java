@@ -13,15 +13,17 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
+import xyz.agmstudio.neoblock.NeoBlock;
 import xyz.agmstudio.neoblock.data.NBTSaveable;
 import xyz.agmstudio.neoblock.neo.block.BlockManager;
 import xyz.agmstudio.neoblock.neo.block.NeoBlockSpec;
+import xyz.agmstudio.neoblock.neo.tiers.TierSpecActions;
+import xyz.agmstudio.neoblock.platform.IConfig;
 import xyz.agmstudio.neoblock.util.MinecraftUtil;
+import xyz.agmstudio.neoblock.util.PatternUtil;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.regex.Matcher;
 
 public class WorldStatus implements NBTSaveable {
     private final WorldData data;
@@ -36,6 +38,9 @@ public class WorldStatus implements NBTSaveable {
     protected final HashMap<EntityType<?>, Integer> tradedMobs = new HashMap<>();
     protected final List<NeoBlockSpec> queue = new ArrayList<>();
 
+    protected final LinkedHashMap<Integer, TierSpecActions> onBlockActions = new LinkedHashMap<>();
+    protected final LinkedHashMap<Integer, TierSpecActions> everyBlockActions = new LinkedHashMap<>();
+
     @Override public void onLoad(CompoundTag tag) {
         final CompoundTag mobs = tag.getCompound("TradedMobs");
         mobs.getAllKeys().forEach(key -> tradedMobs.merge(MinecraftUtil.getEntityType(key).orElse(null), mobs.getInt(key), Integer::sum));
@@ -43,6 +48,24 @@ public class WorldStatus implements NBTSaveable {
         queue.clear();
         final ListTag blocks = tag.getList("Queue", Tag.TAG_STRING);
         blocks.forEach(block -> NeoBlockSpec.parse(block.getAsString()).ifPresent(queue::add));
+
+        IConfig config = NeoBlock.getConfig();
+        for (String key: config.keys()) {
+            Matcher obm = PatternUtil.ON_BLOCK_PATTERN.matcher(key);
+            if (obm.matches()) {
+                int count = Integer.parseInt(obm.group("count"));
+                TierSpecActions actions = new TierSpecActions(config, obm.group()).withMessage("message.neoblock.random_trader", "GLOBAL");
+                onBlockActions.put(count, actions);
+                NeoBlock.LOGGER.debug("Added on-block action {} for world.", key);
+            }
+            Matcher ebm = PatternUtil.EVERY_BLOCK_PATTERN.matcher(key);
+            if (ebm.matches()) {
+                int count = Integer.parseInt(ebm.group("count"));
+                TierSpecActions actions = new TierSpecActions(config, ebm.group()).withMessage("message.neoblock.random_trader", "GLOBAL");
+                everyBlockActions.put(count, actions);
+                NeoBlock.LOGGER.debug("Added on-every-block action {} for world.", key);
+            }
+        }
     }
     @Override public CompoundTag onSave(CompoundTag tag) {
         final CompoundTag mobs = new CompoundTag();
@@ -121,11 +144,12 @@ public class WorldStatus implements NBTSaveable {
     }
     public void setBlockCount(int count) {
         blockCount = count;
+        for (int i: everyBlockActions.keySet()) if (count % i == 0) everyBlockActions.get(i).apply(WorldData.getWorldLevel());
+        if (onBlockActions.containsKey(count)) onBlockActions.get(count).apply(WorldData.getWorldLevel());
         data.setDirty();
     }
     public void addBlockCount(int count) {
-        blockCount += count;
-        data.setDirty();
+        setBlockCount(blockCount + count);
     }
 
     public int getLastTierSpawn() {
