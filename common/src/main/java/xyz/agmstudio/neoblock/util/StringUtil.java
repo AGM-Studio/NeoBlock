@@ -1,9 +1,12 @@
 package xyz.agmstudio.neoblock.util;
 
+import net.minecraft.network.chat.*;
 import net.minecraft.util.valueproviders.UniformInt;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.List;
 
 public class StringUtil {
     private static final UniformInt ONE = UniformInt.of(1, 1);
@@ -62,6 +65,135 @@ public class StringUtil {
     public static @NotNull String formatTicks(int ticks) {
         return formatTicks((long) ticks);
     }
+
+    /**
+     * Translate given text with tags to component used by minecraft
+     *
+     * @param input the text you want to translate
+     * @return the parsed component
+     */
+    public static Component parseMessage(String input) {
+        MutableComponent component = Component.literal("");
+        StringBuilder buffer = new StringBuilder();
+        Style style = Style.EMPTY;
+
+        boolean styling = false;
+        for (int i = 0; i < input.length(); i++) {
+            char c = input.charAt(i);
+
+            if (styling && c == '}') {
+                styling = false;
+                List<String> tags = smartSplit(buffer.toString());
+                buffer.setLength(0);
+
+                for (String tag: tags) {
+                    if (tag.equals("r")) style = Style.EMPTY;
+                    else if (tag.equals("b")) style = style.withBold(true);
+                    else if (tag.equals("i")) style = style.withItalic(true);
+                    else if (tag.equals("s")) style = style.withStrikethrough(true);
+                    else if (tag.equals("u")) style = style.withUnderlined(true);
+                    else if (tag.startsWith("c=#")) {
+                        try {
+                            int rgb = Integer.parseInt(tag.substring(3), 16);
+                            style = style.withColor(rgb);
+                        } catch (NumberFormatException ignored) {}
+                    }
+                    else if (tag.startsWith("command=")) {
+                        ClickEvent action = new ClickEvent(ClickEvent.Action.RUN_COMMAND, unquote(tag.substring(8)));
+                        style = style.withClickEvent(action);
+                    }
+                    else if (tag.startsWith("suggest=")) {
+                        ClickEvent action = new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, unquote(tag.substring(8)));
+                        style = style.withClickEvent(action);
+                    }
+                    else if (tag.startsWith("href=")) {
+                        ClickEvent action = new ClickEvent(ClickEvent.Action.OPEN_URL,  unquote(tag.substring(5)));
+                        style = style.withClickEvent(action);
+                    }
+                    else if (tag.startsWith("h=")) {
+                        HoverEvent hover = new HoverEvent(HoverEvent.Action.SHOW_TEXT, parseMessage(unquote(tag.substring(2))));
+                        style = style.withHoverEvent(hover);
+                    }
+                }
+            } else if (c == '{') {
+                if (input.length() > i + 1 && input.charAt(i + 1) == '{') {
+                    buffer.append('{');
+                    i += 1;
+                } else {
+                    styling = true;
+                    if (!buffer.isEmpty()) {
+                        component.append(Component.literal(buffer.toString()).withStyle(style));
+                        buffer.setLength(0);
+                        style = Style.EMPTY;
+                    }
+                }
+            } else {
+                buffer.append(c);
+            }
+        }
+
+        if (!buffer.isEmpty() && !styling) component.append(Component.literal(buffer.toString()).withStyle(style));
+
+        return component;
+    }
+
+    public static List<String> smartSplit(String input) {
+        List<String> result = new ArrayList<>();
+        StringBuilder current = new StringBuilder();
+
+        boolean inQuotes = false;
+        char quote = 0;
+        boolean escaped = false;
+
+        for (int i = 0; i < input.length(); i++) {
+            char c = input.charAt(i);
+            if (escaped) escaped = false;
+            else if (c == '\\') escaped = true;
+            else if ((c == '\'' || c == '"')) {
+                if (inQuotes && c == quote) inQuotes = false;
+                else if (!inQuotes) {
+                    inQuotes = true;
+                    quote = c;
+                }
+            } else if (c == ',' && !inQuotes) {
+                result.add(current.toString().trim());
+                current.setLength(0);
+                continue;
+            }
+
+            current.append(c);
+        }
+
+        if (!current.isEmpty()) result.add(current.toString().trim());
+
+        return result;
+    }
+
+    public static String unquote(String value) {
+        if (value == null || value.length() < 2) return value;
+
+        char first = value.charAt(0);
+        char last  = value.charAt(value.length() - 1);
+
+        if (first != last) return value;
+        if (first != '\'' && first != '"') return value;
+
+        String inner = value.substring(1, value.length() - 1);
+        StringBuilder out = new StringBuilder(inner.length());
+
+        boolean escaped = false;
+        for (int i = 0; i < inner.length(); i++) {
+            char c = inner.charAt(i);
+            if (escaped) {
+                out.append(c);
+                escaped = false;
+            } else if (c == '\\') escaped = true;
+            else out.append(c);
+        }
+
+        return out.toString();
+    }
+
 
     /**
      * Formats the double into the digits requested.

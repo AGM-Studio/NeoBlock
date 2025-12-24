@@ -44,7 +44,7 @@ minecraft-nausea = 12       # 12 seconds of nausea
 # name = "NeoBlockSchematic_0.nbt"
 # x = 20                      # The title must increase in order (schematics.custom_0, schematics.custom_1, schematics.custom_2, ...)
 # y = 67                      # The name of file in the schematics folder and the position you want the structure be placed.
-# z = 12                      # Note: "main.nbt" is always loaded over the NeoBlock and is centered around 0, 64, 0
+# z = 12                      # Note: "main.nbt" is always loaded over the NeoBlock and is centered around neoblock position
 
 [neo-trader]
 chance = 0.3                # Chance of spawning a NeoMerchant per interval. If no trades are available or another trader lives, no NeoMerchant will be spawned.

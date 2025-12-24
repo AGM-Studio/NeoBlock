@@ -6,3 +6,22 @@ blocks = [
     "1xminecraft:podzol",
     "1xminecraft:mycelium"
 ]
+
+[on-1st-block]
+messages = [
+    "This is {c=#22ff22}NeoBlock{r}."
+]
+[on-2nd-block]
+messages = [
+    "Thank you for choosing this mod!"
+]
+[on-3rd-block]
+messages = [
+    "Please if you encounter any errors please inform us on github or our discord server:",
+    "Discord Server: {c=#2222aa,u,href='https://discord.gg/DsT9kKByT2'}https://discord.gg/DsT9kKByT2",
+    "GitHub Page: {c=#2222aa,u,href='https://github.com/AGM-Studio/NeoBlock'}https://github.com/AGM-Studio/NeoBlock"
+]
+[on-4th-block]
+messages = [
+    "Oh, Before I forget... These messages are confiurable like everything else, check them out in tier-0.toml"
+]
