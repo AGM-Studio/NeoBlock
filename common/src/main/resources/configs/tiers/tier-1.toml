@@ -46,15 +46,33 @@ command = false     # If server has to execute a command to unlock this. /neoblo
 game-time = -1      # Amount of ticks world has been loaded, set to -1 to deactivate
 unlock-time = 1200  # Upgrade time in ticks. During upgrade the NeoBlock will turn into Bedrock.
 
-# The event system (Could be called reward system) has 3 types:
+# The event system (Could be called reward system) has 4 static and 3 dynamic types. Static ones are:
 # on-unlock: Which is when the research/unlocking is done.
 # on-enable: When the tier is enabled. When unlocked it will be enabled immediatly.
 # on-disable: When tier is disabled.
-# All three use the same format as on-unlock given here.
+# on-research: When the research starts.
+# Dyniamic ones are:
+# on-X(st|nd|rd|th)-block: Like `on-10th-block`, triggers when the Xth block from this tier is broken.
+# on-every-X-block: Like `on-every-10-block`, triggers when every X block from this tier is broken.
+#                   For example on 10th, 20th, 30th and so on
+# on-every-X-block-offset-Y: Like `on-every-10-block-offset-5`, triggers when every X block from this tier with an offset of Y is broken.
+#                            For example on 15th, 25th, 35th and so on
+# You can use these dynamic versions in config.toml for a global block break effect, just use same format
+# All the events use the same format as given here
 # For now there are following actions possible, all examples can be found here:
 # rules: Changes the game rules, like enabling the mob spawn.
 # commands: Which executes the commands given exactly.
 # trades: A trader is forced to be spawned with these trades.
+# messages: As demonstrated in tier-0.toml, will be sent to all online players
+# trader-message: Replaces the default trader spawn message
+# action-message: The message is shown above the exp bar
+# The messages use a message tag system which helps you decorate them easier.
+# Use a {} to define a tag and inside use following keys like {b,u,h="Example"}
+# b: for bold,      u: for underline        i: for italic           r: to reset tag
+# s: for strikethrough                      k: for obfuscate
+# c=#RRGGBB: for rgb color                  href="LINK": for opening links
+# h="TEXT": for hover text                  command="COMMAND": for running a command
+# suggesst="TEXT": to suggesst a command
 [on-unlock]
 commands = [
     "give @a apple 8"
