@@ -21,6 +21,8 @@ import java.util.stream.Collectors;
 public final class TierSpecActions {
     private final List<String> commands;
     private final List<Component> messages;
+    private final Component actionMessage;
+    private final Component customTraderMessage;
     private final NeoTradePool trades;
     private final HashMap<String, Object> rules;
 
@@ -31,6 +33,10 @@ public final class TierSpecActions {
         this.commands = config.get(type + ".commands", List.of());
         List<String> messages = config.get(type + ".messages", List.of());
         this.messages = messages.stream().map(StringUtil::parseMessage).collect(Collectors.toList());
+        String actionMessage = config.get(type + ".action-message", "");
+        this.actionMessage = StringUtil.parseMessage(actionMessage);
+        String traderMessage = config.get(type + ".trader-message", "");
+        this.customTraderMessage = traderMessage.isEmpty() ? null : StringUtil.parseMessage(traderMessage);
 
         List<String> trades = config.get(type + ".trades", List.of());
         this.trades = NeoTradePool.parse(trades);
@@ -56,8 +62,11 @@ public final class TierSpecActions {
             server.getCommands().performPrefixedCommand(source, command);
 
         WanderingTrader trader = NeoMerchant.spawnTraderWith(trades.getPool(), level, "UnlockTrader");
-        if (trader != null) NeoBlock.sendInstantMessage(traderMessage, level, false, traderMessageArgs);
+        if (trader != null)
+            if (customTraderMessage != null) NeoBlock.sendInstantMessage(customTraderMessage, level, false);
+            else NeoBlock.sendInstantMessage(traderMessage, level, false, traderMessageArgs);
 
+        NeoBlock.sendInstantMessage(actionMessage, level, true);
         for (Component message: this.messages) NeoBlock.sendInstantMessage(message, level, false);
     }
 }

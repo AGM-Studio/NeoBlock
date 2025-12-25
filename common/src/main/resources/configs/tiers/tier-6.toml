@@ -22,3 +22,4 @@ trades = [
     "1xminecraft:chorus_fruit; 16-32xminecraft:gold_ingot; 4-6",
     "8xminecraft:end_stone; 16-32xminecraft:iron_ingot; 4-6"
 ]
+trader-message = "{b,c=#ffffff}Wandering trader{r}: {c=#75FA8D}The dragon was scary! You must kill him!"

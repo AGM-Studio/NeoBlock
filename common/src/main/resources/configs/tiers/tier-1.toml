@@ -69,3 +69,5 @@ trades = [
     "trade:oak-saplings",
     "1xminecraft:ice; 2-4xminecraft:oak_log; 8-16xminecraft:dirt; 8-12"
 ]
+trader-message = "{b,c=#ffffff}Wandering trader{r}: {c=#75FA8D}Don't kill me! You need my resources!"
+action-message = "Neoblock is envolving... Do not worry! It will be back!"

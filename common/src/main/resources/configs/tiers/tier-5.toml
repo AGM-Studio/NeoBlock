@@ -35,3 +35,4 @@ trades = [
     "1xminecraft:flowering_azalea; 8-16xminecraft:gold_ingot; 8-12",
     "16xminecraft:wind_charge; 3-4xminecraft:iron_ingot; 32-64"
 ]
+trader-message = "{b,c=#ffffff}Wandering trader{r}: {c=#75FA8D}Guess who's back!"

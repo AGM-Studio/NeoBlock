@@ -32,3 +32,4 @@ trades = [
     "4xminecraft:red_sand; 8xminecraft:cobblestone; 64",
     "1xminecraft:spruce_sapling; 10-20xminecraft:oak_log; 48-64xminecraft:dirt; 4-8"
 ]
+trader-message = "{b,c=#ffffff}Wandering trader{r}: {c=#75FA8D}I'm back with more resources!"

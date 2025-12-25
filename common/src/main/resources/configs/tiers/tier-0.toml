@@ -18,8 +18,8 @@ messages = [
 [on-3rd-block]
 messages = [
     "Please if you encounter any errors please inform us on github or our discord server:",
-    "Discord Server: {c=#2222aa,u,href='https://discord.gg/DsT9kKByT2'}https://discord.gg/DsT9kKByT2",
-    "GitHub Page: {c=#2222aa,u,href='https://github.com/AGM-Studio/NeoBlock'}https://github.com/AGM-Studio/NeoBlock"
+    "Discord Server: {c=#73FBFD,u,href='https://discord.gg/DsT9kKByT2'}https://discord.gg/DsT9kKByT2",
+    "GitHub Page: {c=#73FBFD,u,href='https://github.com/AGM-Studio/NeoBlock'}https://github.com/AGM-Studio/NeoBlock"
 ]
 [on-4th-block]
 messages = [

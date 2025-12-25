@@ -37,3 +37,4 @@ trades = [
     "4xminecraft:sweet_berries; 8-12xminecraft:moss_block; 8-12",
     "1xminecraft:pointed_dripstone; 8-24xminecraft:cobblestone; 6-12"
 ]
+trader-message = "{b,c=#ffffff}Wandering trader{r}: {c=#75FA8D}Finally some light!"

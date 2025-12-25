@@ -39,3 +39,4 @@ trades = [
     "3-6xminecraft:warped_fungus; 1-2xminecraft:warped_nylium; 10-20xminecraft:oak_sapling; 4-12",
     "3-6xminecraft:crimson_fungus; 1-2xminecraft:crimson_nylium; 10-20xminecraft:oak_sapling; 4-12"
 ]
+trader-message = "{b,c=#ffffff}Wandering trader{r}: {c=#75FA8D}Wow! I never felt this hot!"
