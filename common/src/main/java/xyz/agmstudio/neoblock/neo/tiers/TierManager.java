@@ -86,14 +86,22 @@ public final class TierManager {
                 int count = Integer.parseInt(obm.group("count"));
                 TierSpecActions actions = new TierSpecActions(config, obm.group()).withMessage("message.neoblock.random_trader", spec.id);
                 spec.onBlockActions.put(count, actions);
-                NeoBlock.LOGGER.debug("Added on-block action {} for tier {}.", key, spec.id);
+                NeoBlock.LOGGER.debug("Added OB {} action for tier {}.", key, spec.id);
             }
             Matcher ebm = PatternUtil.EVERY_BLOCK_PATTERN.matcher(key);
             if (ebm.matches()) {
                 int count = Integer.parseInt(ebm.group("count"));
                 TierSpecActions actions = new TierSpecActions(config, ebm.group()).withMessage("message.neoblock.random_trader", spec.id);
-                spec.everyBlockActions.put(count, actions);
-                NeoBlock.LOGGER.debug("Added on-every-block action {} for tier {}.", key, spec.id);
+                spec.otherBlockActions.put(new TierSpecActions.BlockTrigger.Every(count), actions);
+                NeoBlock.LOGGER.debug("Added EB {} action for tier {}.", key, spec.id);
+            }
+            Matcher ebo = PatternUtil.EVERY_BLOCK_OFFSET_PATTERN.matcher(key);
+            if (ebo.matches()) {
+                int count = Integer.parseInt(ebo.group("count"));
+                int offset = Integer.parseInt(ebo.group("offset"));
+                TierSpecActions actions = new TierSpecActions(config, ebo.group()).withMessage("message.neoblock.random_trader", spec.id);
+                spec.otherBlockActions.put(new TierSpecActions.BlockTrigger.EveryOffset(count, offset), actions);
+                NeoBlock.LOGGER.debug("Added EBO {} action for tier {}.", key, spec.id);
             }
         }
 

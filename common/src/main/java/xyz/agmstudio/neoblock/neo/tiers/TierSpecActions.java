@@ -19,6 +19,21 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public final class TierSpecActions {
+    public interface BlockTrigger {
+        boolean matches(int count);
+        record Every(int n) implements BlockTrigger {
+            @Override public boolean matches(int count) {
+                return count % n == 0;
+            }
+        }
+        record EveryOffset(int n, int offset) implements BlockTrigger {
+            @Override public boolean matches(int count) {
+                if (count < n) return false;
+                return (count - offset) % n == 0;
+            }
+        }
+    }
+
     private final List<String> commands;
     private final List<Component> messages;
     private final Component actionMessage;

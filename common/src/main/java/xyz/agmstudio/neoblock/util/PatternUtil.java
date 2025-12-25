@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 public final class PatternUtil {
     public static final Pattern ON_BLOCK_PATTERN = Pattern.compile("^on-(?<count>\\d+)(st|nd|rd|th)?-block$");
     public static final Pattern EVERY_BLOCK_PATTERN = Pattern.compile("^on-every-(?<count>\\d+)-block(s)?$");
+    public static final Pattern EVERY_BLOCK_OFFSET_PATTERN = Pattern.compile("^on-every-(?<count>\\d+)-block(s)?-offset-(?<offset>\\d+)$");
 
     public interface Fragment {
         String regex();
@@ -36,7 +37,6 @@ public final class PatternUtil {
             System.out.println(result.pattern());
             return result;
         }
-
     }
 
     public static final Fragment SPACE      = () -> "\\s+";
