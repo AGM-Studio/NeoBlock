@@ -92,6 +92,7 @@ public class StringUtil {
                     else if (tag.equals("i")) style = style.withItalic(true);
                     else if (tag.equals("s")) style = style.withStrikethrough(true);
                     else if (tag.equals("u")) style = style.withUnderlined(true);
+                    else if (tag.equals("k")) style = style.withObfuscated(true);
                     else if (tag.startsWith("c=#")) {
                         try {
                             int rgb = Integer.parseInt(tag.substring(3), 16);
