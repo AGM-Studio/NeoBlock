@@ -6,7 +6,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import xyz.agmstudio.neoblock.NeoBlock;
-import xyz.agmstudio.neoblock.neo.world.WorldData;
+import xyz.agmstudio.neoblock.neo.world.WorldManager;
 import xyz.agmstudio.neoblock.platform.IConfig;
 import xyz.agmstudio.neoblock.util.MinecraftUtil;
 import xyz.agmstudio.neoblock.util.PatternUtil;
@@ -57,7 +57,7 @@ public class NeoTagBlockSpec extends NeoBlockSpec {
     }
     private Block ofTag(TagKey<Block> tag) {
         List<Block> blocks = MinecraftUtil.getBlocksOfTag(tag);
-        Optional<Block> block = WorldData.getRandomItem(blocks);
+        Optional<Block> block = WorldManager.getRandomItem(blocks);
         if (block.isEmpty()) {
             NeoBlock.LOGGER.warn("Tag key {} has no items to choose from.", location);
             return NeoBlockSpec.getDefault();
@@ -73,7 +73,7 @@ public class NeoTagBlockSpec extends NeoBlockSpec {
         this.supplier = () -> this.ofList(list);
     }
     private Block ofList(List<NeoBlockSpec> list) {
-        Optional<NeoBlockSpec> block = WorldData.getRandomItem(list);
+        Optional<NeoBlockSpec> block = WorldManager.getRandomItem(list);
         if (block.isEmpty()) {
             NeoBlock.LOGGER.warn("Custom list {} has no items to choose from.", list);
             return NeoBlockSpec.getDefault();

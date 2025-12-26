@@ -11,7 +11,7 @@ import xyz.agmstudio.neoblock.commands.util.NeoCommand;
 import xyz.agmstudio.neoblock.neo.tiers.TierManager;
 import xyz.agmstudio.neoblock.neo.tiers.TierResearch;
 import xyz.agmstudio.neoblock.neo.tiers.TierSpec;
-import xyz.agmstudio.neoblock.neo.world.WorldData;
+import xyz.agmstudio.neoblock.neo.world.WorldManager;
 import xyz.agmstudio.neoblock.util.StringUtil;
 
 public class NeoblockTiersCommand extends NeoCommand.ParentHolder {
@@ -37,7 +37,7 @@ public class NeoblockTiersCommand extends NeoCommand.ParentHolder {
             TierSpec tier = this.getArgument(context, "tier", TierSpec.class);
             boolean force = getArgument(context, "force", Boolean.class);
     
-            WorldData.setCommanded(tier, force);
+            WorldManager.setCommanded(tier, force);
             return success(context, "command.neoblock.unlock_tier");
         }
     }

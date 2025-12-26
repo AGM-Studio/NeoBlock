@@ -18,7 +18,7 @@ import xyz.agmstudio.neoblock.data.Schematic;
 import xyz.agmstudio.neoblock.neo.block.BlockManager;
 import xyz.agmstudio.neoblock.neo.loot.NeoMobSpec;
 import xyz.agmstudio.neoblock.neo.tiers.TierManager;
-import xyz.agmstudio.neoblock.neo.world.WorldData;
+import xyz.agmstudio.neoblock.neo.world.WorldManager;
 import xyz.agmstudio.neoblock.platform.IConfig;
 import xyz.agmstudio.neoblock.platform.INBTHelper;
 import xyz.agmstudio.neoblock.platform.IRegistryHelper;
@@ -66,7 +66,7 @@ public abstract class NeoBlock {
         NeoBlock.config = IConfig.getConfig(CONFIG_FOLDER, "config.toml");
 
         // To make sure files & folders are created.
-        WorldData.reloadConfig();
+        WorldManager.reloadConfig();
         ResourceUtil.loadAllTierConfigs();
         // Schematic class will take care of it.
         boolean ignored = Schematic.folder.toFile().exists();
@@ -98,7 +98,7 @@ public abstract class NeoBlock {
     protected abstract boolean isDevelopmentEnvironmentImpl();
     protected abstract Path getConfigFolderImpl();
     protected abstract <T extends SavedData> T captureSavedDataImpl(ServerLevel level, String name, Function<CompoundTag, T> loader, Supplier<T> creator);
-    protected abstract WorldData instanceWorldDataImpl(ServerLevel level);
+    protected abstract WorldManager instanceWorldDataImpl(ServerLevel level);
 
     public static String getPlatformName() {
         return instance.getPlatformNameImpl();
@@ -115,7 +115,7 @@ public abstract class NeoBlock {
     public static <T extends SavedData> T captureSavedData(ServerLevel level, String name, Function<CompoundTag, T> loader, Supplier<T> creator) {
 	    return instance.captureSavedDataImpl(level, name, loader, creator);
     }
-    public static WorldData instanceWorldData(ServerLevel level) {
+    public static WorldManager instanceWorldData(ServerLevel level) {
 	    return instance.instanceWorldDataImpl(level);
     }
 

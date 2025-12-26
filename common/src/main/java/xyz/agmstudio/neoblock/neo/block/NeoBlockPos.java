@@ -5,18 +5,18 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.Vec3;
-import xyz.agmstudio.neoblock.neo.world.WorldData;
+import xyz.agmstudio.neoblock.neo.world.WorldManager;
 import xyz.agmstudio.neoblock.util.MinecraftUtil;
 
 public class NeoBlockPos extends BlockPos {
     private final ServerLevel level;
 
     protected NeoBlockPos() {
-        this(WorldData.getWorldStatus().getBlockPos());
+        this(WorldManager.getWorldStatus().getBlockPos());
     }
 
     protected NeoBlockPos(BlockPos pos) {
-        this(pos, WorldData.getWorldStatus().getDimension());
+        this(pos, WorldManager.getWorldStatus().getDimension());
     }
 
     protected NeoBlockPos(BlockPos pos, ServerLevel level) {
@@ -30,8 +30,8 @@ public class NeoBlockPos extends BlockPos {
     }
 
     public static NeoBlockPos safeBlock() {
-        ServerLevel level = WorldData.getWorldStatus().getDimension();
-        BlockPos pos = WorldData.getWorldStatus().getBlockPos();
+        ServerLevel level = WorldManager.getWorldStatus().getDimension();
+        BlockPos pos = WorldManager.getWorldStatus().getBlockPos();
         int y = level.getHeight(Heightmap.Types.MOTION_BLOCKING, pos.getX(), pos.getZ());
         return new NeoBlockPos(pos.getX(), y, pos.getZ(), level);
     }
@@ -39,7 +39,7 @@ public class NeoBlockPos extends BlockPos {
         return new NeoBlockPos();
     }
     public static Vec3 getCorner() {
-        BlockPos pos = WorldData.getWorldStatus().getBlockPos();
+        BlockPos pos = WorldManager.getWorldStatus().getBlockPos();
         return new Vec3(pos.getX(), pos.getY(), pos.getZ());
     }
 

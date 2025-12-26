@@ -33,22 +33,22 @@ import xyz.agmstudio.neoblock.util.MinecraftUtil;
 import java.io.FileNotFoundException;
 import java.util.*;
 
-public abstract class WorldData extends SavedData {
+public abstract class WorldManager extends SavedData {
     private static final String BLOCK_BREAK_OBJECTIVE = "neoblocks_broken";
 
-    private static WorldData load(ServerLevel level) {
-        return NeoBlock.captureSavedData(level, "neo_block_data", t -> WorldData.load(t, level), () -> WorldData.create(level));
+    private static WorldManager load(ServerLevel level) {
+        return NeoBlock.captureSavedData(level, "neo_block_data", t -> WorldManager.load(t, level), () -> WorldManager.create(level));
     }
 
-    private static WorldData instance;
-    public static WorldData getInstance() {
+    private static WorldManager instance;
+    public static WorldManager getInstance() {
         return instance;
     }
 
     public static List<TierSpec> resetTiers() {
         return resetTiers(instance);
     }
-    public static List<TierSpec> resetTiers(WorldData data) {
+    public static List<TierSpec> resetTiers(WorldManager data) {
         data.tiers.clear();
         data.tiers.addAll(TierManager.fetchTiers(true));
         return data.tiers;
@@ -131,8 +131,8 @@ public abstract class WorldData extends SavedData {
         } else if (instance.status.state == WorldStatus.State.ACTIVE) TierManager.reloadResearches();
     }
 
-    public static @NotNull WorldData create(@NotNull ServerLevel level) {
-        WorldData data = NeoBlock.instanceWorldData(level);
+    public static @NotNull WorldManager create(@NotNull ServerLevel level) {
+        WorldManager data = NeoBlock.instanceWorldData(level);
 
         data.status = new WorldStatus(data);
         data.tiers.addAll(TierManager.fetchTiers(true));
@@ -140,8 +140,8 @@ public abstract class WorldData extends SavedData {
         NeoBlock.LOGGER.debug("Creating new world data");
         return data;
     }
-    public static @NotNull WorldData load(@NotNull CompoundTag tag, ServerLevel level) {
-        WorldData data = NeoBlock.instanceWorldData(level);
+    public static @NotNull WorldManager load(@NotNull CompoundTag tag, ServerLevel level) {
+        WorldManager data = NeoBlock.instanceWorldData(level);
 
         NeoBlock.LOGGER.debug("Loading WorldData from {}", tag);
         data.status = NBTSaveable.instance(WorldStatus.class, tag, data);
@@ -185,7 +185,7 @@ public abstract class WorldData extends SavedData {
     private WorldStatus status;
     private final List<TierSpec> tiers = new ArrayList<>();
 
-    public WorldData(ServerLevel level) {
+    public WorldManager(ServerLevel level) {
         this.level = level;
     }
 

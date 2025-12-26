@@ -23,7 +23,7 @@ import xyz.agmstudio.neoblock.compatibility.ForgivingVoid;
 import xyz.agmstudio.neoblock.neo.block.BlockManager;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoMerchant;
 import xyz.agmstudio.neoblock.neo.tiers.TierManager;
-import xyz.agmstudio.neoblock.neo.world.WorldData;
+import xyz.agmstudio.neoblock.neo.world.WorldManager;
 
 import java.util.HashSet;
 import java.util.concurrent.Callable;
@@ -103,14 +103,14 @@ public final class NeoListener {
 
     private static @Nullable ServerLevel getServerConditioned(LevelAccessor level, boolean isNotDisabled) {
         if (!(level instanceof ServerLevel server)) return null;
-        if (isNotDisabled && WorldData.getWorldStatus().isDisabled()) return null;
+        if (isNotDisabled && WorldManager.getWorldStatus().isDisabled()) return null;
 
         return server;
     }
 
     public static void onWorldLoad(LevelAccessor accessor) {
         ServerLevel level = getServerConditioned(accessor, false);
-        if (level != null && level.dimension() == Level.OVERWORLD) WorldData.setup(level);
+        if (level != null && level.dimension() == Level.OVERWORLD) WorldManager.setup(level);
     }
 
     public static void onWorldTick(LevelAccessor accessor) {
@@ -122,7 +122,7 @@ public final class NeoListener {
         ServerLevel level = getServerConditioned(accessor, true);
         if (player.isCreative()) return;
         if (BlockManager.isNeoBlock(level, pos))
-            WorldData.addBlocksBroken(player, 1);
+            WorldManager.addBlocksBroken(player, 1);
         if (state.getBlock() == Blocks.END_PORTAL_FRAME)
             BlockManager.handleEndPortalFrameBreak(level, state, pos, player);
     }

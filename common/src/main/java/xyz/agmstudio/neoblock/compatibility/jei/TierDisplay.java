@@ -4,7 +4,7 @@ import net.minecraft.world.item.Item;
 import xyz.agmstudio.neoblock.neo.block.NeoBlockSpec;
 import xyz.agmstudio.neoblock.neo.block.NeoChestSpec;
 import xyz.agmstudio.neoblock.neo.tiers.TierSpec;
-import xyz.agmstudio.neoblock.neo.world.WorldData;
+import xyz.agmstudio.neoblock.neo.world.WorldManager;
 import xyz.agmstudio.neoblock.util.StringUtil;
 
 import java.util.*;
@@ -56,10 +56,10 @@ public class TierDisplay {
 
         NeoJEIPlugin.addBox(boxes,
                 "jei.neoblock.tier", 2, y.getAndAdd(12),
-                tier.isEnabled() && WorldData.getWorldStatus().isActive(),
+                tier.isEnabled() && WorldManager.getWorldStatus().isActive(),
                 tier.getID(), getTierName()
         );
-        if (!WorldData.getWorldStatus().isActive()) {
+        if (!WorldManager.getWorldStatus().isActive()) {
             NeoJEIPlugin.addBox(boxes,
                     "jei.neoblock.dormant", 2, y.getAndAdd(12), RED_COLOR
             );
@@ -76,7 +76,7 @@ public class TierDisplay {
         } else {
             NeoJEIPlugin.addBox(boxes,
                     "jei.neoblock.chance", 2, y.getAndAdd(12), GRAY_COLOR,
-                    StringUtil.percentage((double) tier.getWeight() / WorldData.totalWeight(), 2)
+                    StringUtil.percentage((double) tier.getWeight() / WorldManager.totalWeight(), 2)
             );
         }
 

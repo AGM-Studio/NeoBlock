@@ -36,7 +36,7 @@ import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 import xyz.agmstudio.neoblock.NeoBlock;
 import xyz.agmstudio.neoblock.neo.loot.NeoItemSpec;
-import xyz.agmstudio.neoblock.neo.world.WorldData;
+import xyz.agmstudio.neoblock.neo.world.WorldManager;
 import xyz.agmstudio.neoblock.util.MinecraftUtil;
 
 import java.util.ArrayList;
@@ -66,7 +66,7 @@ public final class ForgeMinecraftHelper implements IMinecraftHelper {
     }
 
     @Override public List<Item> getItemsOfTag(TagKey<Item> tag) {
-        RegistryAccess access = WorldData.getWorldLevel().registryAccess();
+        RegistryAccess access = WorldManager.getWorldLevel().registryAccess();
         Iterable<Holder<Item>> items = access.registryOrThrow(Registries.ITEM).getTagOrEmpty(tag);
         List<Item> list = new ArrayList<>();
         items.forEach(holder -> list.add(holder.value()));
@@ -101,7 +101,7 @@ public final class ForgeMinecraftHelper implements IMinecraftHelper {
     }
 
     @Override public List<Block> getBlocksOfTag(TagKey<Block> tag) {
-        RegistryAccess access = WorldData.getWorldLevel().registryAccess();
+        RegistryAccess access = WorldManager.getWorldLevel().registryAccess();
         Iterable<Holder<Block>> items = access.registryOrThrow(Registries.BLOCK).getTagOrEmpty(tag);
         List<Block> list = new ArrayList<>();
         items.forEach(holder -> list.add(holder.value()));
@@ -154,7 +154,7 @@ public final class ForgeMinecraftHelper implements IMinecraftHelper {
         ItemStack b = costB != null ? costB.getStack() : ItemStack.EMPTY;
 
         if (r.getItem() == AIR || a.getItem() == AIR) return Optional.empty();
-        return Optional.of(new MerchantOffer(a, b, r, uses.sample(WorldData.getRandom()), 0, 0));
+        return Optional.of(new MerchantOffer(a, b, r, uses.sample(WorldManager.getRandom()), 0, 0));
     }
 
     @Override public Objective createScoreboardObjective(Scoreboard scoreboard, String name, ObjectiveCriteria criteria, String title, ObjectiveCriteria.RenderType renderType) {

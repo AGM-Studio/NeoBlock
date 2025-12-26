@@ -26,7 +26,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 
 public class WorldStatus implements NBTSaveable {
-    private final WorldData data;
+    private final WorldManager data;
 
     @NBTData("WorldState") protected State state = State.INACTIVE;
     @NBTData("BlockCount") protected int blockCount = 0;
@@ -79,7 +79,7 @@ public class WorldStatus implements NBTSaveable {
         return tag;
     }
 
-    public WorldStatus(WorldData data) {
+    public WorldStatus(WorldManager data) {
         this.data = data;
     }
 
@@ -144,8 +144,8 @@ public class WorldStatus implements NBTSaveable {
     }
     public void setBlockCount(int count) {
         blockCount = count;
-        for (int i: everyBlockActions.keySet()) if (count % i == 0) everyBlockActions.get(i).apply(WorldData.getWorldLevel());
-        if (onBlockActions.containsKey(count)) onBlockActions.get(count).apply(WorldData.getWorldLevel());
+        for (int i: everyBlockActions.keySet()) if (count % i == 0) everyBlockActions.get(i).apply(WorldManager.getWorldLevel());
+        if (onBlockActions.containsKey(count)) onBlockActions.get(count).apply(WorldManager.getWorldLevel());
         data.setDirty();
     }
     public void addBlockCount(int count) {

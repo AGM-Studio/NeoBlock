@@ -17,7 +17,7 @@ import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlock;
 import xyz.agmstudio.neoblock.neo.tiers.TierSpec;
-import xyz.agmstudio.neoblock.neo.world.WorldData;
+import xyz.agmstudio.neoblock.neo.world.WorldManager;
 import xyz.agmstudio.neoblock.util.MinecraftUtil;
 
 import java.util.*;
@@ -43,11 +43,11 @@ public class NeoJEIPlugin implements IModPlugin {
         return runtime.getJeiHelpers().getFocusFactory();
     }
 
-    private static final List<TierDisplay> displays = new ArrayList<>(WorldData.getWorldTiers().stream().map(TierDisplay::new).toList());
+    private static final List<TierDisplay> displays = new ArrayList<>(WorldManager.getWorldTiers().stream().map(TierDisplay::new).toList());
     private static final LinkedHashMap<Item, Double> chances = new LinkedHashMap<>();
     public static void recalculate() {
         chances.clear();
-        int weights = WorldData.totalWeight();
+        int weights = WorldManager.totalWeight();
         for (TierDisplay display: displays) {
             TierSpec tier = display.getTierSpec();
             if (tier != null && tier.isEnabled()) for (Map.Entry<Item, Double> entry : display.getChances())
@@ -73,7 +73,7 @@ public class NeoJEIPlugin implements IModPlugin {
 
     @Override public void registerRecipes(IRecipeRegistration registration) {
         displays.clear();
-        displays.addAll(WorldData.getWorldTiers().stream().map(TierDisplay::new).toList());
+        displays.addAll(WorldManager.getWorldTiers().stream().map(TierDisplay::new).toList());
 
         registration.addRecipes(TierDisplayCategory.TYPE, displays);
     }

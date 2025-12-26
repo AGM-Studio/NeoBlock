@@ -11,7 +11,7 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import xyz.agmstudio.neoblock.neo.tiers.TierSpec;
-import xyz.agmstudio.neoblock.neo.world.WorldData;
+import xyz.agmstudio.neoblock.neo.world.WorldManager;
 
 import java.util.function.Predicate;
 
@@ -21,7 +21,7 @@ public class NeoArgumentTier extends NeoArgument<TierSpec> {
 
     public static SuggestionProvider<CommandSourceStack> createSuggester(final Predicate<TierSpec> filter) {
         return (CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) -> {
-            WorldData.getWorldTiers().stream().filter(filter).mapToInt(TierSpec::getID).forEach(builder::suggest);
+            WorldManager.getWorldTiers().stream().filter(filter).mapToInt(TierSpec::getID).forEach(builder::suggest);
             return builder.buildFuture();
         };
     }
@@ -36,10 +36,10 @@ public class NeoArgumentTier extends NeoArgument<TierSpec> {
 
     @Override public TierSpec capture(CommandContext<CommandSourceStack> context, String key) throws CommandSyntaxException {
         int index = IntegerArgumentType.getInteger(context, key);
-        if (index < 0 || index > WorldData.getWorldTiers().size())
-            throw EXCEPTION.create(WorldData.getWorldTiers().size() - 1);
+        if (index < 0 || index > WorldManager.getWorldTiers().size())
+            throw EXCEPTION.create(WorldManager.getWorldTiers().size() - 1);
 
-        return WorldData.getInstance().getTier(index);
+        return WorldManager.getInstance().getTier(index);
     }
 
     public static class Builder {

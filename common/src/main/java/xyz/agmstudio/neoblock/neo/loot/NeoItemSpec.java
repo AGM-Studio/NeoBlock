@@ -5,7 +5,7 @@ import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import xyz.agmstudio.neoblock.neo.world.WorldData;
+import xyz.agmstudio.neoblock.neo.world.WorldManager;
 import xyz.agmstudio.neoblock.util.MinecraftUtil;
 import xyz.agmstudio.neoblock.util.PatternUtil;
 import xyz.agmstudio.neoblock.util.StringUtil;
@@ -34,13 +34,13 @@ public class NeoItemSpec {
 
 
     public ItemStack getStack() {
-        int count = range.sample(WorldData.getRandom());
+        int count = range.sample(WorldManager.getRandom());
         return modify(new ItemStack(getItem(), count));
     }
 
     public ItemStack getStackWithChance() {
         if (chance >= 1.0) return getStack();
-        return (WorldData.getRandom().nextDouble() <= chance) ? getStack() : null;
+        return (WorldManager.getRandom().nextDouble() <= chance) ? getStack() : null;
     }
 
     public ResourceLocation getResource() {

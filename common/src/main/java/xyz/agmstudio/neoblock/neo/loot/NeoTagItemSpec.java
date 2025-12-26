@@ -8,7 +8,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import xyz.agmstudio.neoblock.NeoBlock;
-import xyz.agmstudio.neoblock.neo.world.WorldData;
+import xyz.agmstudio.neoblock.neo.world.WorldManager;
 import xyz.agmstudio.neoblock.platform.IConfig;
 import xyz.agmstudio.neoblock.util.MinecraftUtil;
 import xyz.agmstudio.neoblock.util.PatternUtil;
@@ -60,12 +60,12 @@ public class NeoTagItemSpec extends NeoItemSpec {
     }
     private ItemStack ofTag(TagKey<Item> tag) {
         List<Item> items = MinecraftUtil.getItemsOfTag(tag);
-        Optional<Item> item = WorldData.getRandomItem(items);
+        Optional<Item> item = WorldManager.getRandomItem(items);
         if (item.isEmpty()) {
             NeoBlock.LOGGER.warn("Tag key {} has no items to choose from.", location);
             return NeoItemSpec.getDefault();
         }
-        return new ItemStack(item.get(), range.sample(WorldData.getRandom()));
+        return new ItemStack(item.get(), range.sample(WorldManager.getRandom()));
     }
 
     public NeoTagItemSpec(String name, UniformInt range, double chance) {
@@ -76,7 +76,7 @@ public class NeoTagItemSpec extends NeoItemSpec {
         this.supplier = () -> this.ofList(list);
     }
     private ItemStack ofList(List<NeoItemSpec> list) {
-        Optional<NeoItemSpec> item = WorldData.getRandomItem(list);
+        Optional<NeoItemSpec> item = WorldManager.getRandomItem(list);
         if (item.isEmpty()) {
             NeoBlock.LOGGER.warn("Custom list {} has no items to choose from.", list);
             return NeoItemSpec.getDefault();

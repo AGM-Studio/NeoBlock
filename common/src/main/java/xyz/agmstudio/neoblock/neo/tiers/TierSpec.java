@@ -11,7 +11,7 @@ import xyz.agmstudio.neoblock.neo.events.NeoEventAction;
 import xyz.agmstudio.neoblock.neo.events.NeoEventBlockTrigger;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoTrade;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoTradePool;
-import xyz.agmstudio.neoblock.neo.world.WorldData;
+import xyz.agmstudio.neoblock.neo.world.WorldManager;
 import xyz.agmstudio.neoblock.util.ResourceUtil;
 import xyz.agmstudio.neoblock.util.StringUtil;
 
@@ -87,7 +87,7 @@ public class TierSpec implements NBTSaveable {
     public NeoBlockSpec getRandomBlock() {
         if (blocks.isEmpty()) return BlockManager.DEFAULT_SPEC;
 
-        int randomValue = WorldData.getRandom().nextInt(totalBlockWeight);
+        int randomValue = WorldManager.getRandom().nextInt(totalBlockWeight);
         for (NeoBlockSpec entry: blocks) {
             randomValue -= entry.getWeight();
             if (randomValue < 0) return entry;
@@ -117,9 +117,9 @@ public class TierSpec implements NBTSaveable {
         return research.done;
     }
     public boolean canBeResearched() {
-        return canBeResearched(WorldData.getInstance());
+        return canBeResearched(WorldManager.getInstance());
     }
-    public boolean canBeResearched(WorldData data) {
+    public boolean canBeResearched(WorldManager data) {
         if (research.done) return false;
         for (TierRequirement requirement: requirements)
             if (!requirement.isMet(data, this)) return false;
@@ -152,20 +152,20 @@ public class TierSpec implements NBTSaveable {
     }
     public TierSpec enable() {
         enabled = true;
-        enableActions.apply(WorldData.getWorldLevel());
+        enableActions.apply(WorldManager.getWorldLevel());
         return this;
     }
     public TierSpec disable() {
         enabled = false;
-        disableActions.apply(WorldData.getWorldLevel());
+        disableActions.apply(WorldManager.getWorldLevel());
         return this;
     }
 
     public int setCount(int count) {
         this.count = count;
         for (Map.Entry<NeoEventBlockTrigger, NeoEventAction> entry: otherBlockActions.entrySet())
-            if (entry.getKey().matches(count)) entry.getValue().apply(WorldData.getWorldLevel());
-        if (onBlockActions.containsKey(count)) onBlockActions.get(count).apply(WorldData.getWorldLevel());
+            if (entry.getKey().matches(count)) entry.getValue().apply(WorldManager.getWorldLevel());
+        if (onBlockActions.containsKey(count)) onBlockActions.get(count).apply(WorldManager.getWorldLevel());
         return count;
     }
     public int getCount() {

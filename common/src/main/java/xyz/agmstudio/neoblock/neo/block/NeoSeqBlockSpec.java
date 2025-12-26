@@ -6,7 +6,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlock;
-import xyz.agmstudio.neoblock.neo.world.WorldData;
+import xyz.agmstudio.neoblock.neo.world.WorldManager;
 import xyz.agmstudio.neoblock.platform.IConfig;
 import xyz.agmstudio.neoblock.util.PatternUtil;
 
@@ -92,7 +92,7 @@ public class NeoSeqBlockSpec extends NeoBlockSpec {
 
         blocks.forEach(block -> {
             for (int i = 0; i < block.weight; i++)
-                WorldData.getWorldStatus().addToQueue(block.copy(1));
+                WorldManager.getWorldStatus().addToQueue(block.copy(1));
         });
     }
 

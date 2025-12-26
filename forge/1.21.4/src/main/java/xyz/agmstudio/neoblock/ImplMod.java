@@ -19,7 +19,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.loading.FMLLoader;
 import net.minecraftforge.fml.loading.FMLPaths;
 import org.jetbrains.annotations.NotNull;
-import xyz.agmstudio.neoblock.neo.world.WorldData;
+import xyz.agmstudio.neoblock.neo.world.WorldManager;
 import xyz.agmstudio.neoblock.platform.ForgeRegistry;
 
 import java.nio.file.Path;
@@ -91,8 +91,8 @@ public final class ImplMod extends NeoBlock {
         //noinspection DataFlowIssue
         return level.getDataStorage().computeIfAbsent(new SavedData.Factory<>(creator, neoLoader, null), name);    }
     @Override
-    public WorldData instanceWorldDataImpl(ServerLevel level) {
-        return new WorldData(level) {
+    public WorldManager instanceWorldDataImpl(ServerLevel level) {
+        return new WorldManager(level) {
             @Override public @NotNull CompoundTag save(@NotNull CompoundTag tag, HolderLookup.@NotNull Provider provider) {
                 return saveDataOnTag(tag);
             }

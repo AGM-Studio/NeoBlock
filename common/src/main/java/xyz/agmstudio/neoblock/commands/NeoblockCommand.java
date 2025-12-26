@@ -18,7 +18,7 @@ import xyz.agmstudio.neoblock.commands.util.NeoCommand;
 import xyz.agmstudio.neoblock.neo.block.NeoBlockPos;
 import xyz.agmstudio.neoblock.neo.loot.NeoMobSpec;
 import xyz.agmstudio.neoblock.neo.tiers.TierSpec;
-import xyz.agmstudio.neoblock.neo.world.WorldData;
+import xyz.agmstudio.neoblock.neo.world.WorldManager;
 
 public class NeoblockCommand extends NeoCommand {
     private static NeoblockCommand instance = null;
@@ -40,7 +40,7 @@ public class NeoblockCommand extends NeoCommand {
 
     @Override public int execute(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         MutableComponent tiers = Component.literal("");
-        for (TierSpec tier: WorldData.getWorldTiers()) {
+        for (TierSpec tier: WorldManager.getWorldTiers()) {
             MutableComponent name = Component.literal(tier.getName());
             if (!tier.isResearched()) name.setStyle(Style.EMPTY.withColor(ChatFormatting.GRAY));
             else if (tier.isEnabled()) name.setStyle(Style.EMPTY.withColor(ChatFormatting.GREEN));
@@ -48,7 +48,7 @@ public class NeoblockCommand extends NeoCommand {
             tiers.append("\n    - ").append(name);
         }
 
-        return success(context, "command.neoblock.info", WorldData.getWorldStatus().getBlockCount(), tiers);
+        return success(context, "command.neoblock.info", WorldManager.getWorldStatus().getBlockCount(), tiers);
     }
 
     public static class Home extends NeoCommand {

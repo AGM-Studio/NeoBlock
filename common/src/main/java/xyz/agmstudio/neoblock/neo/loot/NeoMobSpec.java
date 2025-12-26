@@ -14,7 +14,7 @@ import net.minecraft.world.item.context.UseOnContext;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.agmstudio.neoblock.NeoBlock;
-import xyz.agmstudio.neoblock.neo.world.WorldData;
+import xyz.agmstudio.neoblock.neo.world.WorldManager;
 import xyz.agmstudio.neoblock.platform.INBTHelper;
 import xyz.agmstudio.neoblock.util.MinecraftUtil;
 import xyz.agmstudio.neoblock.util.PatternUtil;
@@ -93,7 +93,7 @@ public class NeoMobSpec extends NeoItemSpec {
         if (mob.isEmpty()) return false;
 
         NeoBlock.sendInstantMessage("message.neoblock.trades.mob", level, true, item.getCount(), mob.get().getDescription());
-        WorldData.getWorldStatus().addTradedMob(mob.get(), item.getCount());
+        WorldManager.getWorldStatus().addTradedMob(mob.get(), item.getCount());
         item.setCount(0);
 
         return true;

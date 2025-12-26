@@ -1,7 +1,7 @@
 package xyz.agmstudio.neoblock.neo.tiers;
 
 import xyz.agmstudio.neoblock.compatibility.jei.NeoJEIPlugin;
-import xyz.agmstudio.neoblock.neo.world.WorldData;
+import xyz.agmstudio.neoblock.neo.world.WorldManager;
 import xyz.agmstudio.neoblock.util.StringUtil;
 
 import java.util.List;
@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public interface TierRequirement {
     void addJEIBox(List<NeoJEIPlugin.TextBox> boxes, AtomicInteger y, TierSpec spec);
-    boolean isMet(WorldData data, TierSpec spec);
+    boolean isMet(WorldManager data, TierSpec spec);
     String hash();
 
     class BlockBroken implements TierRequirement {
@@ -19,7 +19,7 @@ public interface TierRequirement {
             this.count = count;
         }
 
-        @Override public boolean isMet(WorldData data, TierSpec spec) {
+        @Override public boolean isMet(WorldManager data, TierSpec spec) {
             return data.getStatus().getBlockCount() >= count;
         }
 
@@ -28,7 +28,7 @@ public interface TierRequirement {
         }
 
         @Override public void addJEIBox(List<NeoJEIPlugin.TextBox> boxes, AtomicInteger y, TierSpec spec) {
-            int count = WorldData.getWorldStatus().getBlockCount();
+            int count = WorldManager.getWorldStatus().getBlockCount();
             NeoJEIPlugin.addBox(boxes, "jei.neoblock.requirement.blocks_broken", 7, y.getAndAdd(12), this.count <= count, this.count, count);
         }
     }
@@ -40,7 +40,7 @@ public interface TierRequirement {
             this.time = time;
         }
 
-        @Override public boolean isMet(WorldData data, TierSpec spec) {
+        @Override public boolean isMet(WorldManager data, TierSpec spec) {
             return data.getLevel().getGameTime() >= time;
         }
 
@@ -49,7 +49,7 @@ public interface TierRequirement {
         }
 
         @Override public void addJEIBox(List<NeoJEIPlugin.TextBox> boxes, AtomicInteger y, TierSpec spec) {
-            long time = WorldData.getWorldLevel().getGameTime();
+            long time = WorldManager.getWorldLevel().getGameTime();
             NeoJEIPlugin.addBox(boxes,
                     "jei.neoblock.requirement.play_time", 7, y.getAndAdd(12), this.time <= time,
                     StringUtil.formatTicks(this.time), StringUtil.formatTicks(time)
@@ -58,7 +58,7 @@ public interface TierRequirement {
     }
 
     class Special implements TierRequirement {
-        @Override public boolean isMet(WorldData data, TierSpec spec) {
+        @Override public boolean isMet(WorldManager data, TierSpec spec) {
             return spec.id == 0 || spec.commanded;
         }
 

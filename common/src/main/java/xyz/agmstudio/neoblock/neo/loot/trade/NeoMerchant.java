@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 import xyz.agmstudio.neoblock.NeoBlock;
 import xyz.agmstudio.neoblock.neo.block.NeoBlockPos;
 import xyz.agmstudio.neoblock.neo.tiers.TierSpec;
-import xyz.agmstudio.neoblock.neo.world.WorldData;
+import xyz.agmstudio.neoblock.neo.world.WorldManager;
 import xyz.agmstudio.neoblock.neo.world.WorldStatus;
 import xyz.agmstudio.neoblock.platform.IConfig;
 import xyz.agmstudio.neoblock.util.MinecraftUtil;
@@ -54,10 +54,10 @@ public class NeoMerchant {
         return false;
     }
     public static WanderingTrader attemptSpawnTrader(ServerLevel level) {
-        WorldStatus status = WorldData.getWorldStatus();
+        WorldStatus status = WorldManager.getWorldStatus();
         if (status.getBlockCount() % attemptInterval != 0 || exists(level, "NeoMerchant")) return null;
         double chance = NeoMerchant.chance + (increment * status.getTraderFailedAttempts());
-        if (WorldData.getRandom().nextFloat() > chance) {
+        if (WorldManager.getRandom().nextFloat() > chance) {
             int fails = status.addTraderFailedAttempts();
             NeoBlock.LOGGER.debug("Trader chance {} failed for {} times in a row", chance, fails);
             return null;
@@ -65,10 +65,10 @@ public class NeoMerchant {
         return forceSpawnTrader(level);
     }
     public static WanderingTrader forceSpawnTrader(ServerLevel level) {
-        WorldStatus status = WorldData.getWorldStatus();
+        WorldStatus status = WorldManager.getWorldStatus();
         status.resetTraderFailedAttempts();
         List<NeoTrade> trades = new ArrayList<>();
-        WorldData.getWorldTiers().stream().filter(TierSpec::isEnabled).forEach(tier -> trades.addAll(tier.getTrades()));
+        WorldManager.getWorldTiers().stream().filter(TierSpec::isEnabled).forEach(tier -> trades.addAll(tier.getTrades()));
 
         WanderingTrader trader = spawnTraderWith(trades, level, "NeoMerchant");
         if (trader == null) return null;
@@ -101,7 +101,7 @@ public class NeoMerchant {
     public WanderingTrader spawnTrader(ServerLevel level, String... tags) {
         WanderingTrader trader = new WanderingTrader(EntityType.WANDERING_TRADER, level);
         trader.setPos(NeoBlockPos.get().getCenter().add(0, 2, 0));
-        trader.setDespawnDelay(lifespan.sample(WorldData.getRandom()));
+        trader.setDespawnDelay(lifespan.sample(WorldManager.getRandom()));
         for (String tag: tags) trader.addTag(tag);
 
         MerchantOffers offers = new MerchantOffers();

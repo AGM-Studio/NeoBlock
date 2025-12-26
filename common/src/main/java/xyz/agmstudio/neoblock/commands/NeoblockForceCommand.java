@@ -12,7 +12,7 @@ import xyz.agmstudio.neoblock.commands.util.NeoCommand;
 import xyz.agmstudio.neoblock.neo.block.BlockManager;
 import xyz.agmstudio.neoblock.neo.block.NeoBlockPos;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoMerchant;
-import xyz.agmstudio.neoblock.neo.world.WorldData;
+import xyz.agmstudio.neoblock.neo.world.WorldManager;
 
 import java.util.Optional;
 
@@ -37,15 +37,15 @@ public class NeoblockForceCommand extends NeoCommand.ParentHolder {
             BlockPos origin = getArgument(context, "pos");
             ServerLevel world = getArgument(context, "dimension", context.getSource()::getLevel);
 
-            WorldData.getWorldStatus().setBlockPos(origin, WorldData.getWorldLevel());
-            WorldData.getWorldStatus().setDimension(world);
+            WorldManager.getWorldStatus().setBlockPos(origin, WorldManager.getWorldLevel());
+            WorldManager.getWorldStatus().setDimension(world);
             String message = "command.neoblock.force_block";
-            if (WorldData.getWorldStatus().isDisabled()) {
-                WorldData.getWorldStatus().setActive();
+            if (WorldManager.getWorldStatus().isDisabled()) {
+                WorldManager.getWorldStatus().setActive();
                 message += ".enabled";
             }
             
-            BlockManager.updateBlock(WorldData.getWorldLevel(), false);
+            BlockManager.updateBlock(WorldManager.getWorldLevel(), false);
             return success(context, message);
         }
     }
@@ -56,8 +56,8 @@ public class NeoblockForceCommand extends NeoCommand.ParentHolder {
         }
 
         @Override public int execute(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-            BlockManager.cleanBlock(WorldData.getWorldLevel(), NeoBlockPos.get());
-            WorldData.getWorldStatus().setDisabled();
+            BlockManager.cleanBlock(WorldManager.getWorldLevel(), NeoBlockPos.get());
+            WorldManager.getWorldStatus().setDisabled();
 
             Optional<SetBlock> command = NeoCommand.getFromRegistry(SetBlock.class);
             return success(context, "command.neoblock.disabled", command.map(NeoCommand::getCommand).orElse(null));
@@ -85,7 +85,7 @@ public class NeoblockForceCommand extends NeoCommand.ParentHolder {
         }
 
         @Override public int execute(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-            WorldData.resetTiers();
+            WorldManager.resetTiers();
             return success(context, "command.neoblock.update.success");
         }
     }

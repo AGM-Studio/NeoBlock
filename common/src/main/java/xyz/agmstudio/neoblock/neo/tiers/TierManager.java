@@ -17,7 +17,7 @@ import xyz.agmstudio.neoblock.neo.block.NeoSeqBlockSpec;
 import xyz.agmstudio.neoblock.neo.events.NeoEventAction;
 import xyz.agmstudio.neoblock.neo.events.NeoEventBlockTrigger;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoTradePool;
-import xyz.agmstudio.neoblock.neo.world.WorldData;
+import xyz.agmstudio.neoblock.neo.world.WorldManager;
 import xyz.agmstudio.neoblock.platform.IConfig;
 import xyz.agmstudio.neoblock.util.PatternUtil;
 import xyz.agmstudio.neoblock.util.ResourceUtil;
@@ -140,7 +140,7 @@ public final class TierManager {
                 animation.upgradeTick(level, research.tick);
         }
 
-        WorldData.getInstance().setDirty();
+        WorldManager.getInstance().setDirty();
     }
 
     public static @Nullable TierResearch fetchCurrentResearch() {
@@ -155,7 +155,7 @@ public final class TierManager {
     }
     public static void reloadResearches() {
         researches.clear();
-        WorldData.getWorldTiers().forEach(tier -> {
+        WorldManager.getWorldTiers().forEach(tier -> {
             if (tier.canBeResearched()) tier.startResearch();
         });
     }

@@ -24,7 +24,7 @@ import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import org.jetbrains.annotations.NotNull;
-import xyz.agmstudio.neoblock.neo.world.WorldData;
+import xyz.agmstudio.neoblock.neo.world.WorldManager;
 import xyz.agmstudio.neoblock.platform.NeoForgeRegistry;
 
 import java.nio.file.Path;
@@ -100,8 +100,8 @@ public final class ImplMod extends NeoBlock {
         return level.getDataStorage().computeIfAbsent(new SavedData.Factory<>(creator, neoLoader), name);
     }
     @Override
-    public WorldData instanceWorldDataImpl(ServerLevel level) {
-        return new WorldData(level) {
+    public WorldManager instanceWorldDataImpl(ServerLevel level) {
+        return new WorldManager(level) {
             @Override public @NotNull CompoundTag save(@NotNull CompoundTag tag, HolderLookup.@NotNull Provider provider) {
                 return saveDataOnTag(tag);
             }
