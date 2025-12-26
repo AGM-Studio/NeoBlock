@@ -14,6 +14,8 @@ import xyz.agmstudio.neoblock.neo.block.BlockManager;
 import xyz.agmstudio.neoblock.neo.block.NeoBlockPos;
 import xyz.agmstudio.neoblock.neo.block.NeoBlockSpec;
 import xyz.agmstudio.neoblock.neo.block.NeoSeqBlockSpec;
+import xyz.agmstudio.neoblock.neo.events.NeoEventAction;
+import xyz.agmstudio.neoblock.neo.events.NeoEventBlockTrigger;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoTradePool;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
 import xyz.agmstudio.neoblock.platform.IConfig;
@@ -75,32 +77,32 @@ public final class TierManager {
         final List<NeoBlockSpec> start = NeoSeqBlockSpec.extractSequenceList(config.get("starting-blocks", List.of()));
         spec.startSequence = new NeoSeqBlockSpec(start, 1, "tier-" + spec.id + "-start");
 
-        spec.unlockActions = new TierSpecActions(config, "on-unlock").withMessage("message.neoblock.unlocking_trader", spec.id);
-        spec.enableActions = new TierSpecActions(config, "on-enable").withMessage("message.neoblock.enabling_trader", spec.id);
-        spec.disableActions = new TierSpecActions(config, "on-disable").withMessage("message.neoblock.disabling_trader", spec.id);
-        spec.researchActions = new TierSpecActions(config, "on-research").withMessage("message.neoblock.research_trader", spec.id);
+        spec.unlockActions = new NeoEventAction(config, "on-unlock").withMessage("message.neoblock.unlocking_trader", spec.id);
+        spec.enableActions = new NeoEventAction(config, "on-enable").withMessage("message.neoblock.enabling_trader", spec.id);
+        spec.disableActions = new NeoEventAction(config, "on-disable").withMessage("message.neoblock.disabling_trader", spec.id);
+        spec.researchActions = new NeoEventAction(config, "on-research").withMessage("message.neoblock.research_trader", spec.id);
 
         for (String key: config.keys()) {
             Matcher obm = PatternUtil.ON_BLOCK_PATTERN.matcher(key);
             if (obm.matches()) {
                 int count = Integer.parseInt(obm.group("count"));
-                TierSpecActions actions = new TierSpecActions(config, obm.group()).withMessage("message.neoblock.random_trader", spec.id);
+                NeoEventAction actions = new NeoEventAction(config, obm.group()).withMessage("message.neoblock.random_trader", spec.id);
                 spec.onBlockActions.put(count, actions);
                 NeoBlock.LOGGER.debug("Added OB {} action for tier {}.", key, spec.id);
             }
             Matcher ebm = PatternUtil.EVERY_BLOCK_PATTERN.matcher(key);
             if (ebm.matches()) {
                 int count = Integer.parseInt(ebm.group("count"));
-                TierSpecActions actions = new TierSpecActions(config, ebm.group()).withMessage("message.neoblock.random_trader", spec.id);
-                spec.otherBlockActions.put(new TierSpecActions.BlockTrigger.Every(count), actions);
+                NeoEventAction actions = new NeoEventAction(config, ebm.group()).withMessage("message.neoblock.random_trader", spec.id);
+                spec.otherBlockActions.put(new NeoEventBlockTrigger.Every(count), actions);
                 NeoBlock.LOGGER.debug("Added EB {} action for tier {}.", key, spec.id);
             }
             Matcher ebo = PatternUtil.EVERY_BLOCK_OFFSET_PATTERN.matcher(key);
             if (ebo.matches()) {
                 int count = Integer.parseInt(ebo.group("count"));
                 int offset = Integer.parseInt(ebo.group("offset"));
-                TierSpecActions actions = new TierSpecActions(config, ebo.group()).withMessage("message.neoblock.random_trader", spec.id);
-                spec.otherBlockActions.put(new TierSpecActions.BlockTrigger.EveryOffset(count, offset), actions);
+                NeoEventAction actions = new NeoEventAction(config, ebo.group()).withMessage("message.neoblock.random_trader", spec.id);
+                spec.otherBlockActions.put(new NeoEventBlockTrigger.EveryOffset(count, offset), actions);
                 NeoBlock.LOGGER.debug("Added EBO {} action for tier {}.", key, spec.id);
             }
         }

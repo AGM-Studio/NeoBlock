@@ -7,6 +7,8 @@ import xyz.agmstudio.neoblock.data.NBTSaveable;
 import xyz.agmstudio.neoblock.neo.block.BlockManager;
 import xyz.agmstudio.neoblock.neo.block.NeoBlockSpec;
 import xyz.agmstudio.neoblock.neo.block.NeoSeqBlockSpec;
+import xyz.agmstudio.neoblock.neo.events.NeoEventAction;
+import xyz.agmstudio.neoblock.neo.events.NeoEventBlockTrigger;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoTrade;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoTradePool;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
@@ -59,13 +61,13 @@ public class TierSpec implements NBTSaveable {
     protected NeoTradePool trades;
     protected NeoSeqBlockSpec startSequence;
 
-    protected TierSpecActions unlockActions;
-    protected TierSpecActions enableActions;
-    protected TierSpecActions disableActions;
-    protected TierSpecActions researchActions;
+    protected NeoEventAction unlockActions;
+    protected NeoEventAction enableActions;
+    protected NeoEventAction disableActions;
+    protected NeoEventAction researchActions;
 
-    protected final LinkedHashMap<Integer, TierSpecActions> onBlockActions = new LinkedHashMap<>();
-    protected final LinkedHashMap<TierSpecActions.BlockTrigger, TierSpecActions> otherBlockActions = new LinkedHashMap<>();
+    protected final LinkedHashMap<Integer, NeoEventAction> onBlockActions = new LinkedHashMap<>();
+    protected final LinkedHashMap<NeoEventBlockTrigger, NeoEventAction> otherBlockActions = new LinkedHashMap<>();
 
     public boolean isStable() {
         return Objects.equals(hash, getHashCode());
@@ -161,7 +163,7 @@ public class TierSpec implements NBTSaveable {
 
     public int setCount(int count) {
         this.count = count;
-        for (Map.Entry<TierSpecActions.BlockTrigger, TierSpecActions> entry: otherBlockActions.entrySet())
+        for (Map.Entry<NeoEventBlockTrigger, NeoEventAction> entry: otherBlockActions.entrySet())
             if (entry.getKey().matches(count)) entry.getValue().apply(WorldData.getWorldLevel());
         if (onBlockActions.containsKey(count)) onBlockActions.get(count).apply(WorldData.getWorldLevel());
         return count;

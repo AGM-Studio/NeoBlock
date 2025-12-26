@@ -1,4 +1,4 @@
-package xyz.agmstudio.neoblock.neo.tiers;
+package xyz.agmstudio.neoblock.neo.events;
 
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
@@ -18,21 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public final class TierSpecActions {
-    public interface BlockTrigger {
-        boolean matches(int count);
-        record Every(int n) implements BlockTrigger {
-            @Override public boolean matches(int count) {
-                return count % n == 0;
-            }
-        }
-        record EveryOffset(int n, int offset) implements BlockTrigger {
-            @Override public boolean matches(int count) {
-                if (count < n) return false;
-                return (count - offset) % n == 0;
-            }
-        }
-    }
+public final class NeoEventAction {
 
     private final List<String> commands;
     private final List<Component> messages;
@@ -44,7 +30,7 @@ public final class TierSpecActions {
     private String traderMessage = null;
     private Object[] traderMessageArgs = new Object[] {};
 
-    public TierSpecActions(@NotNull IConfig config, String type) {
+    public NeoEventAction(@NotNull IConfig config, String type) {
         this.commands = config.get(type + ".commands", List.of());
         List<String> messages = config.get(type + ".messages", List.of());
         this.messages = messages.stream().map(StringUtil::parseMessage).collect(Collectors.toList());
@@ -61,7 +47,7 @@ public final class TierSpecActions {
         if (rules != null) rules.forEach(this.rules::put);
     }
 
-    public TierSpecActions withMessage(String message, Object... args) {
+    public NeoEventAction withMessage(String message, Object... args) {
         this.traderMessage = message;
         this.traderMessageArgs = args;
         return this;

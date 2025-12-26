@@ -17,7 +17,7 @@ import xyz.agmstudio.neoblock.NeoBlock;
 import xyz.agmstudio.neoblock.data.NBTSaveable;
 import xyz.agmstudio.neoblock.neo.block.BlockManager;
 import xyz.agmstudio.neoblock.neo.block.NeoBlockSpec;
-import xyz.agmstudio.neoblock.neo.tiers.TierSpecActions;
+import xyz.agmstudio.neoblock.neo.events.NeoEventAction;
 import xyz.agmstudio.neoblock.platform.IConfig;
 import xyz.agmstudio.neoblock.util.MinecraftUtil;
 import xyz.agmstudio.neoblock.util.PatternUtil;
@@ -38,8 +38,8 @@ public class WorldStatus implements NBTSaveable {
     protected final HashMap<EntityType<?>, Integer> tradedMobs = new HashMap<>();
     protected final List<NeoBlockSpec> queue = new ArrayList<>();
 
-    protected final LinkedHashMap<Integer, TierSpecActions> onBlockActions = new LinkedHashMap<>();
-    protected final LinkedHashMap<Integer, TierSpecActions> everyBlockActions = new LinkedHashMap<>();
+    protected final LinkedHashMap<Integer, NeoEventAction> onBlockActions = new LinkedHashMap<>();
+    protected final LinkedHashMap<Integer, NeoEventAction> everyBlockActions = new LinkedHashMap<>();
 
     @Override public void onLoad(CompoundTag tag) {
         final CompoundTag mobs = tag.getCompound("TradedMobs");
@@ -54,14 +54,14 @@ public class WorldStatus implements NBTSaveable {
             Matcher obm = PatternUtil.ON_BLOCK_PATTERN.matcher(key);
             if (obm.matches()) {
                 int count = Integer.parseInt(obm.group("count"));
-                TierSpecActions actions = new TierSpecActions(config, obm.group()).withMessage("message.neoblock.random_trader", "GLOBAL");
+                NeoEventAction actions = new NeoEventAction(config, obm.group()).withMessage("message.neoblock.random_trader", "GLOBAL");
                 onBlockActions.put(count, actions);
                 NeoBlock.LOGGER.debug("Added on-block action {} for world.", key);
             }
             Matcher ebm = PatternUtil.EVERY_BLOCK_PATTERN.matcher(key);
             if (ebm.matches()) {
                 int count = Integer.parseInt(ebm.group("count"));
-                TierSpecActions actions = new TierSpecActions(config, ebm.group()).withMessage("message.neoblock.random_trader", "GLOBAL");
+                NeoEventAction actions = new NeoEventAction(config, ebm.group()).withMessage("message.neoblock.random_trader", "GLOBAL");
                 everyBlockActions.put(count, actions);
                 NeoBlock.LOGGER.debug("Added on-every-block action {} for world.", key);
             }
