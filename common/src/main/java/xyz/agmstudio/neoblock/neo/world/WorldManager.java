@@ -76,7 +76,7 @@ public abstract class WorldManager extends SavedData {
 
         if (instance == null) return;
         IConfig config = NeoBlock.getConfig();
-        if (instance.status.state == WorldStatus.State.INACTIVE) {
+        if (instance.status.state == WorldData.State.INACTIVE) {
             boolean allowNeoBlock = true;
             final int x = config.get("world.block.x", 0);
             final int y = config.get("world.block.y", 64);
@@ -108,7 +108,7 @@ public abstract class WorldManager extends SavedData {
                     iterator++;
                 }
 
-                instance.status.state = WorldStatus.State.ACTIVE;
+                instance.status.state = WorldData.State.ACTIVE;
                 instance.setDirty();
             } else {
                 Optional<NeoblockForceCommand.SetBlock> command = NeoCommand.getFromRegistry(NeoblockForceCommand.SetBlock.class);
@@ -117,24 +117,24 @@ public abstract class WorldManager extends SavedData {
                 NeoBlock.sendMessage("message.neoblock.disabled_world_1", level, false);
                 NeoBlock.sendMessage("message.neoblock.disabled_world_2", level, false, command.map(NeoCommand::getCommand).orElse(null));
 
-                instance.status.state = WorldStatus.State.DISABLED;
+                instance.status.state = WorldData.State.DISABLED;
                 instance.setDirty();
             }
-        } else if (instance.status.state == WorldStatus.State.UPDATED) {
+        } else if (instance.status.state == WorldData.State.UPDATED) {
             Optional<NeoblockForceCommand.ResetTiers> command = NeoCommand.getFromRegistry(NeoblockForceCommand.ResetTiers.class);
 
             NeoBlock.LOGGER.info("NeoBlock tiers has been updated.");
             NeoBlock.sendMessage("message.neoblock.updated_world", level, false, command.map(NeoCommand::getCommand).orElse(null));
 
-            instance.status.state = WorldStatus.State.UPDATED;
+            instance.status.state = WorldData.State.UPDATED;
             instance.setDirty();
-        } else if (instance.status.state == WorldStatus.State.ACTIVE) TierManager.reloadResearches();
+        } else if (instance.status.state == WorldData.State.ACTIVE) TierManager.reloadResearches();
     }
 
     public static @NotNull WorldManager create(@NotNull ServerLevel level) {
         WorldManager data = NeoBlock.instanceWorldData(level);
 
-        data.status = new WorldStatus(data);
+        data.status = new WorldData(data);
         data.tiers.addAll(TierManager.fetchTiers(true));
 
         NeoBlock.LOGGER.debug("Creating new world data");
@@ -144,7 +144,7 @@ public abstract class WorldManager extends SavedData {
         WorldManager data = NeoBlock.instanceWorldData(level);
 
         NeoBlock.LOGGER.debug("Loading WorldData from {}", tag);
-        data.status = NBTSaveable.instance(WorldStatus.class, tag, data);
+        data.status = NBTSaveable.instance(WorldData.class, tag, data);
         data.tiers.addAll(TierManager.fetchTiers(false));
 
         boolean isUpdated = false;
@@ -182,7 +182,7 @@ public abstract class WorldManager extends SavedData {
 
     private final ServerLevel level;
 
-    private WorldStatus status;
+    private WorldData status;
     private final List<TierSpec> tiers = new ArrayList<>();
 
     public WorldManager(ServerLevel level) {
@@ -197,10 +197,10 @@ public abstract class WorldManager extends SavedData {
         return Optional.of(collection.get(getRandom().nextInt(collection.size())));
     }
 
-    public WorldStatus getStatus() {
+    public WorldData getStatus() {
         return status;
     }
-    public static WorldStatus getWorldStatus() {
+    public static WorldData getWorldStatus() {
         return instance.status;
     }
     public ServerLevel getLevel() {

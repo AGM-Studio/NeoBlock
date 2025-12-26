@@ -25,7 +25,7 @@ import xyz.agmstudio.neoblock.util.PatternUtil;
 import java.util.*;
 import java.util.regex.Matcher;
 
-public class WorldStatus implements NBTSaveable {
+public class WorldData implements NBTSaveable {
     private final WorldManager data;
 
     @NBTData("WorldState") protected State state = State.INACTIVE;
@@ -79,7 +79,7 @@ public class WorldStatus implements NBTSaveable {
         return tag;
     }
 
-    public WorldStatus(WorldManager data) {
+    public WorldData(WorldManager data) {
         this.data = data;
     }
 

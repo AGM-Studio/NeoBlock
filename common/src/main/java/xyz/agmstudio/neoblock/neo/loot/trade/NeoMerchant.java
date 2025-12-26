@@ -12,7 +12,7 @@ import xyz.agmstudio.neoblock.NeoBlock;
 import xyz.agmstudio.neoblock.neo.block.NeoBlockPos;
 import xyz.agmstudio.neoblock.neo.tiers.TierSpec;
 import xyz.agmstudio.neoblock.neo.world.WorldManager;
-import xyz.agmstudio.neoblock.neo.world.WorldStatus;
+import xyz.agmstudio.neoblock.neo.world.WorldData;
 import xyz.agmstudio.neoblock.platform.IConfig;
 import xyz.agmstudio.neoblock.util.MinecraftUtil;
 
@@ -54,7 +54,7 @@ public class NeoMerchant {
         return false;
     }
     public static WanderingTrader attemptSpawnTrader(ServerLevel level) {
-        WorldStatus status = WorldManager.getWorldStatus();
+        WorldData status = WorldManager.getWorldStatus();
         if (status.getBlockCount() % attemptInterval != 0 || exists(level, "NeoMerchant")) return null;
         double chance = NeoMerchant.chance + (increment * status.getTraderFailedAttempts());
         if (WorldManager.getRandom().nextFloat() > chance) {
@@ -65,7 +65,7 @@ public class NeoMerchant {
         return forceSpawnTrader(level);
     }
     public static WanderingTrader forceSpawnTrader(ServerLevel level) {
-        WorldStatus status = WorldManager.getWorldStatus();
+        WorldData status = WorldManager.getWorldStatus();
         status.resetTraderFailedAttempts();
         List<NeoTrade> trades = new ArrayList<>();
         WorldManager.getWorldTiers().stream().filter(TierSpec::isEnabled).forEach(tier -> trades.addAll(tier.getTrades()));

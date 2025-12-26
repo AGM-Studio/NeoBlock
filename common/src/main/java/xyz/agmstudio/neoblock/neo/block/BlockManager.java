@@ -19,7 +19,7 @@ import xyz.agmstudio.neoblock.neo.loot.trade.NeoMerchant;
 import xyz.agmstudio.neoblock.neo.tiers.TierManager;
 import xyz.agmstudio.neoblock.neo.tiers.TierSpec;
 import xyz.agmstudio.neoblock.neo.world.WorldManager;
-import xyz.agmstudio.neoblock.neo.world.WorldStatus;
+import xyz.agmstudio.neoblock.neo.world.WorldData;
 import xyz.agmstudio.neoblock.util.MinecraftUtil;
 
 import java.util.ArrayList;
@@ -104,7 +104,7 @@ public class BlockManager {
     }
 
     public static boolean isNeoBlock(ServerLevel level, BlockPos pos) {
-        WorldStatus status = WorldManager.getWorldStatus();
+        WorldData status = WorldManager.getWorldStatus();
         return status.isCorrectDimension(level) && status.getBlockPos().equals(pos);
     }
 
