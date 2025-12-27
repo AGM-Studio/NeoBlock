@@ -15,8 +15,8 @@ items = [
 ]
 
 [tier2-chest]
-min=12
-max=8
+min=8
+max=12
 items = [
 	"1xminecraft:stone_pickaxe 70%",
 	"1xminecraft:iron_pickaxe 40%",

@@ -43,7 +43,7 @@ public class NeoChestSpec extends NeoBlockSpec {
                 NeoBlock.LOGGER.info("Loaded {} stacks for {}", list.size(), key);
                 int min = Math.max(0, section.getInt("min", 0));
                 int max = Math.min(27, section.getInt("max", 27));
-                CHESTS.put(key, new Holder(list, min, max));
+                CHESTS.put(key, new Holder(list, Math.min(min, max), Math.max(min, max)));
             }
         });
 
@@ -97,6 +97,7 @@ public class NeoChestSpec extends NeoBlockSpec {
                 }
 
                 roll += 1;
+                if (count >= 27) break;  // Security for reported error
             } while (count < holder.min || roll < 20);
         }
     }
