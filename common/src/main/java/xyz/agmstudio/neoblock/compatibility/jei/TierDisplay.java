@@ -66,7 +66,7 @@ public class TierDisplay {
         } else if (!tier.isResearched()) {
             NeoJEIPlugin.addBox(boxes,
                     "jei.neoblock.unlock_time", 2, y.getAndAdd(12), GRAY_COLOR,
-                    StringUtil.formatTicks(tier.getResearch().getTime())
+                    StringUtil.formatTicks(tier.getResearchTime())
             );
             NeoJEIPlugin.addBox(boxes,
                     "jei.neoblock.requirements.header", 2, y.getAndAdd(12), GRAY_COLOR

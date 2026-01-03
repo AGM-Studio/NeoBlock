@@ -17,7 +17,7 @@ import xyz.agmstudio.neoblock.animations.Animation;
 import xyz.agmstudio.neoblock.data.Schematic;
 import xyz.agmstudio.neoblock.neo.block.BlockManager;
 import xyz.agmstudio.neoblock.neo.loot.NeoMobSpec;
-import xyz.agmstudio.neoblock.neo.tiers.TierManager;
+import xyz.agmstudio.neoblock.neo.world.WorldCooldown;
 import xyz.agmstudio.neoblock.neo.world.WorldManager;
 import xyz.agmstudio.neoblock.platform.IConfig;
 import xyz.agmstudio.neoblock.platform.INBTHelper;
@@ -79,7 +79,7 @@ public abstract class NeoBlock {
 
         NeoListener.registerTicker(Animation::tickAll);
         NeoListener.registerTicker(BlockManager::tick);
-        NeoListener.registerTicker(TierManager::tick);
+        NeoListener.registerTicker(WorldCooldown::tick);
 
         NeoMobSpec.load();
     }

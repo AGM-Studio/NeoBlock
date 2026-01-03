@@ -11,6 +11,7 @@ import xyz.agmstudio.neoblock.neo.events.NeoEventAction;
 import xyz.agmstudio.neoblock.neo.events.NeoEventBlockTrigger;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoTrade;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoTradePool;
+import xyz.agmstudio.neoblock.neo.world.WorldCooldown;
 import xyz.agmstudio.neoblock.neo.world.WorldManager;
 import xyz.agmstudio.neoblock.util.ResourceUtil;
 import xyz.agmstudio.neoblock.util.StringUtil;
@@ -26,12 +27,11 @@ public class TierSpec implements NBTSaveable {
     @NBTData protected int count = 0;
     @NBTData protected boolean enabled;
     @NBTData protected boolean commanded = false;
-    @NBTData protected TierResearch research;
+    @NBTData protected boolean researched = false;
     @NBTData protected String hash = "";
 
     public TierSpec(final int id, boolean loadConfig) {
         this.id = id;
-        this.research = new TierResearch(this);
         this.enabled = id == 0;
 
         if (loadConfig) {
@@ -52,22 +52,23 @@ public class TierSpec implements NBTSaveable {
     // Data loaded from config
     protected String name;
     protected int weight;
+    protected int researchTime;
 
     protected final HashSet<TierRequirement> requirements = new HashSet<>();
 
     protected final List<NeoBlockSpec> blocks = new ArrayList<>();
     protected int totalBlockWeight = 0;
 
-    protected NeoTradePool trades;
-    protected NeoSeqBlockSpec startSequence;
-
-    protected NeoEventAction unlockActions;
-    protected NeoEventAction enableActions;
-    protected NeoEventAction disableActions;
-    protected NeoEventAction researchActions;
-
     protected final LinkedHashMap<Integer, NeoEventAction> onBlockActions = new LinkedHashMap<>();
     protected final LinkedHashMap<NeoEventBlockTrigger, NeoEventAction> otherBlockActions = new LinkedHashMap<>();
+
+    public NeoTradePool trades;
+    public NeoSeqBlockSpec startSequence;
+
+    public NeoEventAction unlockActions;
+    public NeoEventAction enableActions;
+    public NeoEventAction disableActions;
+    public NeoEventAction researchActions;
 
     public boolean isStable() {
         return Objects.equals(hash, getHashCode());
@@ -114,24 +115,27 @@ public class TierSpec implements NBTSaveable {
     }
 
     public boolean isResearched() {
-        return research.done;
+        return researched;
     }
     public boolean canBeResearched() {
         return canBeResearched(WorldManager.getInstance());
     }
-    public boolean canBeResearched(WorldManager data) {
-        if (research.done) return false;
+    public boolean canBeResearched(WorldManager manager) {
+        if (researched) return false;
         for (TierRequirement requirement: requirements)
-            if (!requirement.isMet(data, this)) return false;
+            if (!requirement.isMet(manager, this)) return false;
 
         return true;
     }
     public void startResearch() {
-        TierManager.addResearch(this.research);
+        if (researched) return;
+        WorldCooldown.Type.TierResearch.create(this);
     }
-    public TierResearch getResearch() {
-        if (research == null) research = new TierResearch(this);
-        return research;
+    public void setResearched(boolean value) {
+        researched = value;
+    }
+    public int getResearchTime() {
+        return researchTime;
     }
 
     public void setSpecialRequirement(boolean special) {
@@ -148,7 +152,7 @@ public class TierSpec implements NBTSaveable {
     }
 
     public boolean isEnabled() {
-        return research.done && enabled;
+        return researched && enabled;
     }
     public TierSpec enable() {
         enabled = true;

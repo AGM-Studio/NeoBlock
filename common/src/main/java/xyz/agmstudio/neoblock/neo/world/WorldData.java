@@ -16,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlock;
 import xyz.agmstudio.neoblock.data.NBTSaveable;
 import xyz.agmstudio.neoblock.neo.block.BlockManager;
+import xyz.agmstudio.neoblock.neo.block.NeoBlockPos;
 import xyz.agmstudio.neoblock.neo.block.NeoBlockSpec;
 import xyz.agmstudio.neoblock.neo.events.NeoEventAction;
 import xyz.agmstudio.neoblock.platform.IConfig;
@@ -37,6 +38,7 @@ public class WorldData implements NBTSaveable {
 
     protected final HashMap<EntityType<?>, Integer> tradedMobs = new HashMap<>();
     protected final List<NeoBlockSpec> queue = new ArrayList<>();
+    protected final List<WorldCooldown> cooldowns = new ArrayList<>();
 
     protected final LinkedHashMap<Integer, NeoEventAction> onBlockActions = new LinkedHashMap<>();
     protected final LinkedHashMap<Integer, NeoEventAction> everyBlockActions = new LinkedHashMap<>();
@@ -48,6 +50,13 @@ public class WorldData implements NBTSaveable {
         queue.clear();
         final ListTag blocks = tag.getList("Queue", Tag.TAG_STRING);
         blocks.forEach(block -> NeoBlockSpec.parse(block.getAsString()).ifPresent(queue::add));
+
+        cooldowns.clear();
+        final ListTag cools = tag.getList("Cooldowns", Tag.TAG_COMPOUND);
+        cools.forEach(cool -> {
+            WorldCooldown cooldown = NBTSaveable.instance(WorldCooldown.class, (CompoundTag) cool);
+            cooldowns.add(cooldown);
+        });
 
         IConfig config = NeoBlock.getConfig();
         for (String key: config.keys()) {
@@ -75,6 +84,10 @@ public class WorldData implements NBTSaveable {
         final ListTag blocks = new ListTag();
         queue.forEach(block -> blocks.add(StringTag.valueOf(block.getID())));
         tag.put("Queue", blocks);
+
+        final ListTag cools = new ListTag();
+        cooldowns.forEach(cool -> cools.add(cool.save()));
+        tag.put("Cooldowns", cools);
 
         return tag;
     }
@@ -121,6 +134,9 @@ public class WorldData implements NBTSaveable {
     public boolean isUpdated() {
         return state == State.UPDATED;
     }
+    public boolean isOnCooldown() {
+        return state == State.STOPPED;
+    }
 
     public void setInactive() {
         state = State.INACTIVE;
@@ -137,6 +153,24 @@ public class WorldData implements NBTSaveable {
     public void setUpdated() {
         state = State.UPDATED;
         data.setDirty();
+    }
+    public void setOnCooldown() {
+        state = State.STOPPED;
+        data.setDirty();
+    }
+
+    public void addCooldown(WorldCooldown cooldown) {
+        cooldowns.add(cooldown);
+        setOnCooldown();
+
+        BlockManager.BEDROCK_SPEC.placeAt(WorldManager.getWorldLevel(), NeoBlockPos.get());
+    }
+    public void removeCooldown(WorldCooldown cooldown) {
+        cooldowns.remove(cooldown);
+        if (cooldowns.isEmpty()) {
+            setActive();
+            BlockManager.updateBlock(WorldManager.getWorldLevel(), false);
+        } else data.setDirty();
     }
 
     public int getBlockCount() {
@@ -206,7 +240,8 @@ public class WorldData implements NBTSaveable {
         INACTIVE(0),    // Default, before activation
         ACTIVE(1),      // NeoBlock is running
         DISABLED(2),    // NeoBlock is disabled
-        UPDATED(3);     // NeoBlock configs has been updated / Incompatible HASH
+        UPDATED(3),     // NeoBlock configs has been updated / Incompatible HASH
+        STOPPED(4);     // NeoBlock is running but is on cooldown
 
         private final int id;
 
@@ -219,9 +254,7 @@ public class WorldData implements NBTSaveable {
         }
 
         public static State fromId(int id) {
-            for (State state : values()) {
-                if (state.id == id) return state;
-            }
+            for (State state : values()) if (state.id == id) return state;
             return INACTIVE;
         }
     }

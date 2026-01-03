@@ -16,10 +16,9 @@ import xyz.agmstudio.neoblock.NeoBlock;
 import xyz.agmstudio.neoblock.NeoListener;
 import xyz.agmstudio.neoblock.animations.Animation;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoMerchant;
-import xyz.agmstudio.neoblock.neo.tiers.TierManager;
 import xyz.agmstudio.neoblock.neo.tiers.TierSpec;
-import xyz.agmstudio.neoblock.neo.world.WorldManager;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
+import xyz.agmstudio.neoblock.neo.world.WorldManager;
 import xyz.agmstudio.neoblock.util.MinecraftUtil;
 
 import java.util.ArrayList;
@@ -65,8 +64,9 @@ public class BlockManager {
     }
 
     public static void updateBlock(ServerLevel level, boolean trigger) {
-        int lastSpawnTier = WorldManager.getWorldStatus().getLastTierSpawn();
-        if (!TierManager.hasResearch()) getRandomBlock().placeAt(level, NeoBlockPos.get());
+        WorldData data = WorldManager.getWorldStatus();
+        int lastSpawnTier = data.getLastTierSpawn();
+        if (data.isActive()) getRandomBlock().placeAt(level, NeoBlockPos.get());
         else BEDROCK_SPEC.placeAt(level, NeoBlockPos.get());  // Creative cheaters & Move block in mid-search (Just in case)
 
         if (!trigger) return;
@@ -98,7 +98,8 @@ public class BlockManager {
 
     public static void tick(ServerLevel level) {
         final BlockState block = level.getBlockState(NeoBlockPos.get());
-        if (WorldManager.getWorldStatus().isUpdated() || TierManager.hasResearch()) {
+        WorldData data = WorldManager.getWorldStatus();
+        if (data.isUpdated() || data.isOnCooldown()) {
             if (block.getBlock() != Blocks.BEDROCK) BEDROCK_SPEC.placeAt(level, NeoBlockPos.get());
         } else if (block.isAir() || block.canBeReplaced()) updateBlock(level, true);
     }

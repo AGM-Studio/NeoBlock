@@ -3,16 +3,12 @@ package xyz.agmstudio.neoblock.commands;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.network.chat.Component;
 import xyz.agmstudio.neoblock.commands.util.NeoArgumentBoolean;
 import xyz.agmstudio.neoblock.commands.util.NeoArgumentInteger;
 import xyz.agmstudio.neoblock.commands.util.NeoArgumentTier;
 import xyz.agmstudio.neoblock.commands.util.NeoCommand;
-import xyz.agmstudio.neoblock.neo.tiers.TierManager;
-import xyz.agmstudio.neoblock.neo.tiers.TierResearch;
 import xyz.agmstudio.neoblock.neo.tiers.TierSpec;
 import xyz.agmstudio.neoblock.neo.world.WorldManager;
-import xyz.agmstudio.neoblock.util.StringUtil;
 
 public class NeoblockTiersCommand extends NeoCommand.ParentHolder {
     protected NeoblockTiersCommand(NeoCommand parent) {
@@ -82,6 +78,7 @@ public class NeoblockTiersCommand extends NeoCommand.ParentHolder {
         @Override public int execute(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
             TierSpec tier = this.getArgument(context, "tier", TierSpec.class);
 
+            /*
             TierResearch research = null;
             if (tier == null) research = TierManager.fetchCurrentResearch();
             else if (!tier.isResearched() && tier.canBeResearched()) research = tier.getResearch();
@@ -94,6 +91,8 @@ public class NeoblockTiersCommand extends NeoCommand.ParentHolder {
             int value = this.getArgument(context, "ticks");
             long remain = research.getTime() - research.advanceBy(value);
             return success(context, "command.neoblock.research.advance", StringUtil.formatTicks(remain));
+             */
+            return 0;
         }
     }
 }

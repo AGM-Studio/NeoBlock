@@ -93,7 +93,6 @@ public abstract class WorldManager extends SavedData {
 
                 // Load schematics from config!
                 Schematic.loadSchematic(level, NeoBlockPos.get(), "main.nbt");
-                BlockManager.updateBlock(level, false);
                 int iterator = 0;
                 while (config.contains("schematics.custom_" + iterator)) {
                     try {
@@ -107,9 +106,10 @@ public abstract class WorldManager extends SavedData {
                     }
                     iterator++;
                 }
-
                 instance.status.state = WorldData.State.ACTIVE;
                 instance.setDirty();
+
+                BlockManager.updateBlock(level, false);
             } else {
                 Optional<NeoblockForceCommand.SetBlock> command = NeoCommand.getFromRegistry(NeoblockForceCommand.SetBlock.class);
 
@@ -128,7 +128,7 @@ public abstract class WorldManager extends SavedData {
 
             instance.status.state = WorldData.State.UPDATED;
             instance.setDirty();
-        } else if (instance.status.state == WorldData.State.ACTIVE) TierManager.reloadResearches();
+        }
     }
 
     public static @NotNull WorldManager create(@NotNull ServerLevel level) {
@@ -200,7 +200,7 @@ public abstract class WorldManager extends SavedData {
     public WorldData getStatus() {
         return status;
     }
-    public static WorldData getWorldStatus() {
+    public static WorldData getWorldStatus() {  // Todo: Rename to getWorldData
         return instance.status;
     }
     public ServerLevel getLevel() {

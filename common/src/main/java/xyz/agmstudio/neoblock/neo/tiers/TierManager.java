@@ -1,23 +1,18 @@
 package xyz.agmstudio.neoblock.neo.tiers;
 
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import xyz.agmstudio.neoblock.NeoBlock;
 import xyz.agmstudio.neoblock.animations.Animation;
 import xyz.agmstudio.neoblock.animations.ProgressbarAnimation;
 import xyz.agmstudio.neoblock.animations.phase.UpgradePhaseAnimation;
 import xyz.agmstudio.neoblock.animations.progress.UpgradeProgressAnimation;
 import xyz.agmstudio.neoblock.data.NBTSaveable;
-import xyz.agmstudio.neoblock.neo.block.BlockManager;
-import xyz.agmstudio.neoblock.neo.block.NeoBlockPos;
 import xyz.agmstudio.neoblock.neo.block.NeoBlockSpec;
 import xyz.agmstudio.neoblock.neo.block.NeoSeqBlockSpec;
 import xyz.agmstudio.neoblock.neo.events.NeoEventAction;
 import xyz.agmstudio.neoblock.neo.events.NeoEventBlockTrigger;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoTradePool;
-import xyz.agmstudio.neoblock.neo.world.WorldManager;
 import xyz.agmstudio.neoblock.platform.IConfig;
 import xyz.agmstudio.neoblock.util.PatternUtil;
 import xyz.agmstudio.neoblock.util.ResourceUtil;
@@ -30,8 +25,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 
 public final class TierManager {
-    private static final List<TierResearch> researches = new ArrayList<>();
-
     public static List<TierSpec> fetchTiers(boolean loadConfig) {
         ResourceUtil.loadAllTierConfigs();
 
@@ -52,7 +45,7 @@ public final class TierManager {
         spec.name = config.get("name", "Tier-" + spec.id);
 
         spec.requirements.clear();
-        spec.research.time = config.getInt("unlock.unlock-time", 0);
+        spec.researchTime = config.getInt("unlock.unlock-time", 0);
         if (spec.id > 0) {
             long time = config.getInt("unlock.game-time", -1);
             if (time > 0) spec.requirements.add(new TierRequirement.GameTime(time));
@@ -60,9 +53,7 @@ public final class TierManager {
             if (blocks > 0) spec.requirements.add(new TierRequirement.BlockBroken(blocks));
             if (config.get("unlock.command", spec.requirements.isEmpty()))
                 spec.requirements.add(new TierRequirement.Special());
-        } else {
-            spec.research.done = true;
-        }
+        } else spec.researched = true;
 
         spec.blocks.clear();
         final List<String> blocks_list = config.get("blocks", List.of("minecraft:grass_block"));
@@ -108,56 +99,6 @@ public final class TierManager {
         }
 
         NeoBlock.LOGGER.debug("Tier {} loaded. Hash key: {}", spec.id, spec.getHashCode());
-    }
-
-    public static void tick(ServerLevel level) {
-        if (researches.isEmpty()) return;
-        TierResearch research = researches.get(0);
-        if (research.tick++ == 0) {
-            research.onStart(level);
-
-            BlockManager.BEDROCK_SPEC.placeAt(level, NeoBlockPos.get());
-
-            if (TierManager.progressbar != null) level.players().forEach(TierManager.progressbar::addPlayer);
-            for (UpgradePhaseAnimation animation : TierManager.phaseAnimations)
-                if (animation.isActiveOnUpgradeStart()) animation.animate(level);
-        }
-        if (research.isTimeDone()) {
-            research.done = true;
-            research.onFinish(level);
-
-            researches.remove(0);
-            if (researches.isEmpty()) {
-                if (TierManager.progressbar != null) TierManager.progressbar.removeAllPlayers();
-                for (UpgradePhaseAnimation animation : TierManager.phaseAnimations)
-                    if (animation.isActiveOnUpgradeFinish()) animation.animate(level);
-
-                BlockManager.getRandomBlock().placeAt(level, NeoBlockPos.get());
-            }
-        } else {
-            if (TierManager.progressbar != null) TierManager.progressbar.update(research.tick, research.time);
-            for (UpgradeProgressAnimation animation : TierManager.progressAnimations)
-                animation.upgradeTick(level, research.tick);
-        }
-
-        WorldManager.getInstance().setDirty();
-    }
-
-    public static @Nullable TierResearch fetchCurrentResearch() {
-        if (researches.isEmpty()) return null;
-        return researches.get(0);
-    }
-    public static void addResearch(TierResearch research) {
-        researches.add(research);
-    }
-    public static boolean hasResearch() {
-        return !researches.isEmpty();
-    }
-    public static void reloadResearches() {
-        researches.clear();
-        WorldManager.getWorldTiers().forEach(tier -> {
-            if (tier.canBeResearched()) tier.startResearch();
-        });
     }
 
     // Animations

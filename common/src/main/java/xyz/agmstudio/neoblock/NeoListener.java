@@ -133,7 +133,8 @@ public final class NeoListener {
 
         if (entity instanceof WanderingTrader trader) NeoMerchant.handleTrader(trader);
         if (entity instanceof ServerPlayer player) {
-            if (TierManager.hasResearch()) TierManager.addPlayer(player);
+            if (WorldManager.getWorldStatus().isOnCooldown())
+                TierManager.addPlayer(player);
             NeoBlock.onPlayerJoin(level, player);
         }
     }
