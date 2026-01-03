@@ -27,7 +27,7 @@ public class WorldCooldown implements NBTSaveable {
                 cooldown.type = new TierResearch(tier);
                 cooldown.time = tier.getResearchTime();
 
-                WorldManager.getWorldStatus().addCooldown(cooldown);
+                WorldManager.getWorldData().addCooldown(cooldown);
             }
 
             public String id() {
@@ -81,7 +81,7 @@ public class WorldCooldown implements NBTSaveable {
     
     // Static methods
     public static void tick(ServerLevel level) {
-        WorldData data = WorldManager.getWorldStatus();
+        WorldData data = WorldManager.getWorldData();
         if (data == null || !data.isOnCooldown()) return;
         if (data.cooldowns.isEmpty()) return;
         WorldCooldown cooldown = data.cooldowns.get(0);

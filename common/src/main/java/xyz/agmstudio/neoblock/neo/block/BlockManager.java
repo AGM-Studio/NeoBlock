@@ -50,28 +50,28 @@ public class BlockManager {
         return null;
     }
     public static NeoBlockSpec getRandomBlock() {
-        Optional<NeoBlockSpec> queued = WorldManager.getWorldStatus().getNextInQueue();
+        Optional<NeoBlockSpec> queued = WorldManager.getWorldData().getNextInQueue();
         if (queued.isPresent()) return queued.get();
 
         TierSpec tier = getRandomTierSpec();
         if (tier == null) {
-            NeoBlock.LOGGER.error("Unable to find a block for {} blocks", WorldManager.getWorldStatus().getBlockCount());
+            NeoBlock.LOGGER.error("Unable to find a block for {} blocks", WorldManager.getWorldData().getBlockCount());
             return DEFAULT_SPEC;
         }
 
-        WorldManager.getWorldStatus().setLastTierSpawn(tier.getID());
+        WorldManager.getWorldData().setLastTierSpawn(tier.getID());
         return tier.getRandomBlock();
     }
 
     public static void updateBlock(ServerLevel level, boolean trigger) {
-        WorldData data = WorldManager.getWorldStatus();
+        WorldData data = WorldManager.getWorldData();
         int lastSpawnTier = data.getLastTierSpawn();
         if (data.isActive()) getRandomBlock().placeAt(level, NeoBlockPos.get());
         else BEDROCK_SPEC.placeAt(level, NeoBlockPos.get());  // Creative cheaters & Move block in mid-search (Just in case)
 
         if (!trigger) return;
         Animation.resetIdleTick();
-        WorldManager.getWorldStatus().addBlockCount(1);
+        WorldManager.getWorldData().addBlockCount(1);
         NeoListener.execute(() -> NeoMerchant.attemptSpawnTrader(level));
         TierSpec last = WorldManager.getWorldTier(lastSpawnTier);
         if (last != null) last.addCount(1);
@@ -98,14 +98,14 @@ public class BlockManager {
 
     public static void tick(ServerLevel level) {
         final BlockState block = level.getBlockState(NeoBlockPos.get());
-        WorldData data = WorldManager.getWorldStatus();
+        WorldData data = WorldManager.getWorldData();
         if (data.isUpdated() || data.isOnCooldown()) {
             if (block.getBlock() != Blocks.BEDROCK) BEDROCK_SPEC.placeAt(level, NeoBlockPos.get());
         } else if (block.isAir() || block.canBeReplaced()) updateBlock(level, true);
     }
 
     public static boolean isNeoBlock(ServerLevel level, BlockPos pos) {
-        WorldData status = WorldManager.getWorldStatus();
+        WorldData status = WorldManager.getWorldData();
         return status.isCorrectDimension(level) && status.getBlockPos().equals(pos);
     }
 

@@ -48,7 +48,7 @@ public class NeoblockCommand extends NeoCommand {
             tiers.append("\n    - ").append(name);
         }
 
-        return success(context, "command.neoblock.info", WorldManager.getWorldStatus().getBlockCount(), tiers);
+        return success(context, "command.neoblock.info", WorldManager.getWorldData().getBlockCount(), tiers);
     }
 
     public static class Home extends NeoCommand {

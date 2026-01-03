@@ -12,11 +12,11 @@ public class NeoBlockPos extends BlockPos {
     private final ServerLevel level;
 
     protected NeoBlockPos() {
-        this(WorldManager.getWorldStatus().getBlockPos());
+        this(WorldManager.getWorldData().getBlockPos());
     }
 
     protected NeoBlockPos(BlockPos pos) {
-        this(pos, WorldManager.getWorldStatus().getDimension());
+        this(pos, WorldManager.getWorldData().getDimension());
     }
 
     protected NeoBlockPos(BlockPos pos, ServerLevel level) {
@@ -30,8 +30,8 @@ public class NeoBlockPos extends BlockPos {
     }
 
     public static NeoBlockPos safeBlock() {
-        ServerLevel level = WorldManager.getWorldStatus().getDimension();
-        BlockPos pos = WorldManager.getWorldStatus().getBlockPos();
+        ServerLevel level = WorldManager.getWorldData().getDimension();
+        BlockPos pos = WorldManager.getWorldData().getBlockPos();
         int y = level.getHeight(Heightmap.Types.MOTION_BLOCKING, pos.getX(), pos.getZ());
         return new NeoBlockPos(pos.getX(), y, pos.getZ(), level);
     }
@@ -39,7 +39,7 @@ public class NeoBlockPos extends BlockPos {
         return new NeoBlockPos();
     }
     public static Vec3 getCorner() {
-        BlockPos pos = WorldManager.getWorldStatus().getBlockPos();
+        BlockPos pos = WorldManager.getWorldData().getBlockPos();
         return new Vec3(pos.getX(), pos.getY(), pos.getZ());
     }
 

@@ -103,7 +103,7 @@ public final class NeoListener {
 
     private static @Nullable ServerLevel getServerConditioned(LevelAccessor level, boolean isNotDisabled) {
         if (!(level instanceof ServerLevel server)) return null;
-        if (isNotDisabled && WorldManager.getWorldStatus().isDisabled()) return null;
+        if (isNotDisabled && WorldManager.getWorldData().isDisabled()) return null;
 
         return server;
     }
@@ -133,7 +133,7 @@ public final class NeoListener {
 
         if (entity instanceof WanderingTrader trader) NeoMerchant.handleTrader(trader);
         if (entity instanceof ServerPlayer player) {
-            if (WorldManager.getWorldStatus().isOnCooldown())
+            if (WorldManager.getWorldData().isOnCooldown())
                 TierManager.addPlayer(player);
             NeoBlock.onPlayerJoin(level, player);
         }

@@ -28,7 +28,7 @@ public interface TierRequirement {
         }
 
         @Override public void addJEIBox(List<NeoJEIPlugin.TextBox> boxes, AtomicInteger y, TierSpec spec) {
-            int count = WorldManager.getWorldStatus().getBlockCount();
+            int count = WorldManager.getWorldData().getBlockCount();
             NeoJEIPlugin.addBox(boxes, "jei.neoblock.requirement.blocks_broken", 7, y.getAndAdd(12), this.count <= count, this.count, count);
         }
     }

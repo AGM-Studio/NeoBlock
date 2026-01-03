@@ -56,10 +56,10 @@ public class TierDisplay {
 
         NeoJEIPlugin.addBox(boxes,
                 "jei.neoblock.tier", 2, y.getAndAdd(12),
-                tier.isEnabled() && WorldManager.getWorldStatus().isActive(),
+                tier.isEnabled() && WorldManager.getWorldData().isActive(),
                 tier.getID(), getTierName()
         );
-        if (!WorldManager.getWorldStatus().isActive()) {
+        if (!WorldManager.getWorldData().isActive()) {
             NeoJEIPlugin.addBox(boxes,
                     "jei.neoblock.dormant", 2, y.getAndAdd(12), RED_COLOR
             );

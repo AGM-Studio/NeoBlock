@@ -84,7 +84,7 @@ public abstract class WorldManager extends SavedData {
 
             ChunkGenerator gen = level.getChunkSource().getGenerator();
             if (gen instanceof FlatLevelSource || config.get("world.force-block", false)) {
-                getWorldStatus().setBlockPos(new BlockPos(x, y, z), level);
+                getWorldData().setBlockPos(new BlockPos(x, y, z), level);
                 TierSpec tier0 = getWorldTier(0);
                 if (tier0 != null) tier0.getStartSequence().addToQueue(false);
 
@@ -200,7 +200,7 @@ public abstract class WorldManager extends SavedData {
     public WorldData getStatus() {
         return status;
     }
-    public static WorldData getWorldStatus() {  // Todo: Rename to getWorldData
+    public static WorldData getWorldData() {
         return instance.status;
     }
     public ServerLevel getLevel() {

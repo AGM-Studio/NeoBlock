@@ -54,7 +54,7 @@ public class NeoMerchant {
         return false;
     }
     public static WanderingTrader attemptSpawnTrader(ServerLevel level) {
-        WorldData status = WorldManager.getWorldStatus();
+        WorldData status = WorldManager.getWorldData();
         if (status.getBlockCount() % attemptInterval != 0 || exists(level, "NeoMerchant")) return null;
         double chance = NeoMerchant.chance + (increment * status.getTraderFailedAttempts());
         if (WorldManager.getRandom().nextFloat() > chance) {
@@ -65,7 +65,7 @@ public class NeoMerchant {
         return forceSpawnTrader(level);
     }
     public static WanderingTrader forceSpawnTrader(ServerLevel level) {
-        WorldData status = WorldManager.getWorldStatus();
+        WorldData status = WorldManager.getWorldData();
         status.resetTraderFailedAttempts();
         List<NeoTrade> trades = new ArrayList<>();
         WorldManager.getWorldTiers().stream().filter(TierSpec::isEnabled).forEach(tier -> trades.addAll(tier.getTrades()));

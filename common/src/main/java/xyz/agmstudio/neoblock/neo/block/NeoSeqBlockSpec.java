@@ -92,7 +92,7 @@ public class NeoSeqBlockSpec extends NeoBlockSpec {
 
         blocks.forEach(block -> {
             for (int i = 0; i < block.weight; i++)
-                WorldManager.getWorldStatus().addToQueue(block.copy(1));
+                WorldManager.getWorldData().addToQueue(block.copy(1));
         });
     }
 
