@@ -10,7 +10,7 @@ import xyz.agmstudio.neoblock.compatibility.ForgivingVoid;
 
 @Mixin(Entity.class)
 public abstract class EntityVoidRescueMixin {
-    @Inject(method = "discard", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "discard()V", at = @At("HEAD"), cancellable = true)
     private void onEntityDiscard(CallbackInfo ci) {
         //noinspection DataFlowIssue
         Entity self = (Entity) (Object) this;
