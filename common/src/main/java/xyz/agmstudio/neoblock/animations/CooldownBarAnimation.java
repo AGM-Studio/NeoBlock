@@ -3,6 +3,7 @@ package xyz.agmstudio.neoblock.animations;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerBossEvent;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.BossEvent;
 import xyz.agmstudio.neoblock.util.StringUtil;
@@ -29,14 +30,21 @@ public class CooldownBarAnimation extends Animation {
         bar.setName(name);
     }
 
-    public void addPlayerToBar(ServerPlayer player) {
-        bar.addPlayer(player);
-    }
-    public void removeAllPlayers() {
-        bar.removeAllPlayers();
+    @Override
+    protected void onRegister() {
+        bar.setColor(BossEvent.BossBarColor.byName(color));
     }
 
-    @Override protected void onRegister() {
-        bar.setColor(BossEvent.BossBarColor.byName(color));
+    public static void addPlayer(ServerPlayer player) {
+        if (cooldownBar != null) cooldownBar.bar.addPlayer(player);
+    }
+    public static void addAllPlayers(ServerLevel level) {
+        if (cooldownBar != null) level.players().forEach(cooldownBar.bar::addPlayer);
+    }
+    public static void removePlayer(ServerPlayer player) {
+        if (cooldownBar != null) cooldownBar.bar.removePlayer(player);
+    }
+    public static void removeAllPlayers(ServerLevel level) {
+        cooldownBar.bar.removeAllPlayers();
     }
 }

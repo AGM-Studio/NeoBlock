@@ -4,11 +4,8 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import xyz.agmstudio.neoblock.NeoBlock;
 import xyz.agmstudio.neoblock.animations.Animation;
-import xyz.agmstudio.neoblock.animations.phase.CooldownPhaseAnimation;
-import xyz.agmstudio.neoblock.animations.progress.CooldownProgressAnimation;
 import xyz.agmstudio.neoblock.data.NBTSaveable;
 import xyz.agmstudio.neoblock.neo.block.BlockManager;
-import xyz.agmstudio.neoblock.neo.block.NeoBlockPos;
 import xyz.agmstudio.neoblock.neo.tiers.TierSpec;
 
 public class WorldCooldown implements NBTSaveable {
@@ -60,7 +57,6 @@ public class WorldCooldown implements NBTSaveable {
                 BlockManager.updateBlock(level, false);
             }
             public void onStart(ServerLevel level) {
-                BlockManager.BEDROCK_SPEC.placeAt(level, NeoBlockPos.get());
             }
         }
 
@@ -101,6 +97,7 @@ public class WorldCooldown implements NBTSaveable {
     }
 
     // Static methods
+    private static boolean FIRST = true;
     public static void tick(ServerLevel level) {
         WorldData data = WorldManager.getWorldData();
         if (data == null || !data.isOnCooldown()) return;
@@ -108,25 +105,17 @@ public class WorldCooldown implements NBTSaveable {
         WorldCooldown cooldown = data.cooldowns.get(0);
         if (cooldown.tick++ == 0) {
             cooldown.type.onStart(level);
-
-            if (Animation.cooldownBar != null) level.players().forEach(Animation::addPlayer);
-            for (CooldownPhaseAnimation animation : Animation.phaseAnimations)
-                if (animation.isActiveOnUpgradeStart()) animation.animate(level);
+            if (FIRST) Animation.animateCooldownStart(level);
         }
+        FIRST = false;          // Will make sure to not play the cooldown start multiple times.
         if (cooldown.time > 0 && cooldown.tick >= cooldown.time) {
             cooldown.type.onFinish(level);
             data.removeCooldown(cooldown);
-
             if (data.cooldowns.isEmpty()) {
-                if (Animation.cooldownBar != null) Animation.cooldownBar.removeAllPlayers();
-                for (CooldownPhaseAnimation animation : Animation.phaseAnimations)
-                    if (animation.isActiveOnUpgradeFinish()) animation.animate(level);
+                Animation.animateCooldownFinish(level);
+                FIRST = true;   // Will make sure to play cooldown start animations
             }
-        } else {
-            if (Animation.cooldownBar != null) Animation.cooldownBar.update(cooldown.tick, cooldown.time);
-            for (CooldownProgressAnimation animation : Animation.progressAnimations)
-                animation.upgradeTick(level, cooldown.tick);
-        }
+        } else Animation.tickCooldown(level, cooldown);
 
         WorldManager.getInstance().setDirty();
     }

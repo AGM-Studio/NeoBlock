@@ -18,7 +18,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import xyz.agmstudio.neoblock.animations.Animation;
+import xyz.agmstudio.neoblock.animations.CooldownBarAnimation;
 import xyz.agmstudio.neoblock.commands.NeoblockCommand;
 import xyz.agmstudio.neoblock.compatibility.ForgivingVoid;
 import xyz.agmstudio.neoblock.neo.block.BlockManager;
@@ -134,7 +134,7 @@ public final class NeoListener {
         if (entity instanceof WanderingTrader trader) NeoMerchant.handleTrader(trader);
         if (entity instanceof ServerPlayer player) {
             if (WorldManager.getWorldData().isOnCooldown())
-                Animation.addPlayer(player);
+                CooldownBarAnimation.addPlayer(player);
             NeoBlock.onPlayerJoin(level, player);
         }
     }

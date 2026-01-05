@@ -1,7 +1,6 @@
 package xyz.agmstudio.neoblock.animations;
 
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlock;
 import xyz.agmstudio.neoblock.animations.idle.IdleAnimation;
@@ -14,6 +13,7 @@ import xyz.agmstudio.neoblock.animations.progress.BreakingAnimation;
 import xyz.agmstudio.neoblock.animations.progress.CooldownProgressAnimation;
 import xyz.agmstudio.neoblock.animations.progress.SparkleAnimation;
 import xyz.agmstudio.neoblock.animations.progress.SpiralAnimation;
+import xyz.agmstudio.neoblock.neo.world.WorldCooldown;
 import xyz.agmstudio.neoblock.platform.IConfig;
 import xyz.agmstudio.neoblock.util.ResourceUtil;
 
@@ -160,7 +160,20 @@ public abstract class Animation implements IConfig.Configured {
         list.addAll(phaseAnimations);
         return list;
     }
-    public static void addPlayer(ServerPlayer player) {
-        if (cooldownBar != null) cooldownBar.addPlayerToBar(player);
+
+    public static void animateCooldownFinish(ServerLevel level) {
+        CooldownBarAnimation.removeAllPlayers(level);
+        for (CooldownPhaseAnimation animation : Animation.phaseAnimations)
+            if (animation.isActiveOnUpgradeFinish()) animation.animate(level);
+    }
+    public static void animateCooldownStart(ServerLevel level) {
+        CooldownBarAnimation.addAllPlayers(level);
+        for (CooldownPhaseAnimation animation : Animation.phaseAnimations)
+            if (animation.isActiveOnUpgradeStart()) animation.animate(level);
+    }
+    public static void tickCooldown(ServerLevel level, WorldCooldown cooldown) {
+        if (cooldownBar != null) cooldownBar.update(cooldown.getTick(), cooldown.getTime());
+        for (CooldownProgressAnimation animation : Animation.progressAnimations)
+            animation.upgradeTick(level, cooldown.getTick());
     }
 }
