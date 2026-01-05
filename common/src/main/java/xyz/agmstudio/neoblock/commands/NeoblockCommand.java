@@ -43,6 +43,7 @@ public class NeoblockCommand extends NeoCommand {
         MutableComponent tiers = Component.literal("");
         for (TierSpec tier: WorldManager.getWorldTiers()) {
             MutableComponent name = Component.literal(tier.getName());
+            if (tier.isResearched()) name.append("(" + tier.getCount() + ")");
             if (!tier.isResearched()) name.setStyle(Style.EMPTY.withColor(ChatFormatting.GRAY));
             else if (tier.isEnabled()) name.setStyle(Style.EMPTY.withColor(ChatFormatting.GREEN));
             else name.setStyle(Style.EMPTY.withColor(ChatFormatting.RED));
