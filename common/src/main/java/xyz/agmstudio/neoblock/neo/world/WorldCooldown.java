@@ -46,6 +46,13 @@ public class WorldCooldown implements NBTSaveable {
             }
         }
         class Normal implements Type {
+            public static void create(long ticks) {
+                WorldCooldown cooldown = new WorldCooldown();
+                cooldown.type = new Normal();
+                cooldown.time = ticks;
+
+                WorldManager.getWorldData().addCooldown(cooldown);
+            }
             public String id() {
                 return "normal";
             }
@@ -78,7 +85,21 @@ public class WorldCooldown implements NBTSaveable {
     @Override public void onLoad(CompoundTag tag) {
         this.type = Type.parse(tag.getString("type"));
     }
-    
+
+    public long advanceBy(int value) {
+        tick += value;
+        return tick;
+    }
+    public long getTime() {
+        return time;
+    }
+    public Type getType() {
+        return type;
+    }
+    public long getTick() {
+        return tick;
+    }
+
     // Static methods
     public static void tick(ServerLevel level) {
         WorldData data = WorldManager.getWorldData();

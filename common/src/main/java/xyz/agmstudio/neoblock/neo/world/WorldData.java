@@ -13,6 +13,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import xyz.agmstudio.neoblock.NeoBlock;
 import xyz.agmstudio.neoblock.data.NBTSaveable;
 import xyz.agmstudio.neoblock.neo.block.BlockManager;
@@ -63,14 +64,14 @@ public class WorldData implements NBTSaveable {
             Matcher obm = PatternUtil.ON_BLOCK_PATTERN.matcher(key);
             if (obm.matches()) {
                 int count = Integer.parseInt(obm.group("count"));
-                NeoEventAction actions = new NeoEventAction(config, obm.group()).withMessage("message.neoblock.random_trader", "GLOBAL");
+                NeoEventAction actions = new NeoEventAction(config, obm.group()).withMessage("message.neoblock.trader_spawned", "GLOBAL");
                 onBlockActions.put(count, actions);
                 NeoBlock.LOGGER.debug("Added on-block action {} for world.", key);
             }
             Matcher ebm = PatternUtil.EVERY_BLOCK_PATTERN.matcher(key);
             if (ebm.matches()) {
                 int count = Integer.parseInt(ebm.group("count"));
-                NeoEventAction actions = new NeoEventAction(config, ebm.group()).withMessage("message.neoblock.random_trader", "GLOBAL");
+                NeoEventAction actions = new NeoEventAction(config, ebm.group()).withMessage("message.neoblock.trader_spawned", "GLOBAL");
                 everyBlockActions.put(count, actions);
                 NeoBlock.LOGGER.debug("Added on-every-block action {} for world.", key);
             }
@@ -172,7 +173,10 @@ public class WorldData implements NBTSaveable {
             BlockManager.updateBlock(WorldManager.getWorldLevel(), false);
         } else data.setDirty();
     }
-
+    public @Nullable WorldCooldown getCooldown() {
+        if (cooldowns.isEmpty()) return null;
+        return cooldowns.get(0);
+    }
     public int getBlockCount() {
         return blockCount;
     }

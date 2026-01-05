@@ -36,6 +36,7 @@ public class NeoblockCommand extends NeoCommand {
         new NeoblockForceCommand(this);
         new NeoblockSchematicCommand(this);
         new NeoblockTiersCommand(this);
+        new NeoBlockCooldownCommand(this);
     }
 
     @Override public int execute(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {

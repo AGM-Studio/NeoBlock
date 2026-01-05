@@ -4,7 +4,6 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.commands.CommandSourceStack;
 import xyz.agmstudio.neoblock.commands.util.NeoArgumentBoolean;
-import xyz.agmstudio.neoblock.commands.util.NeoArgumentInteger;
 import xyz.agmstudio.neoblock.commands.util.NeoArgumentTier;
 import xyz.agmstudio.neoblock.commands.util.NeoCommand;
 import xyz.agmstudio.neoblock.neo.tiers.TierSpec;
@@ -17,7 +16,6 @@ public class NeoblockTiersCommand extends NeoCommand.ParentHolder {
         new Satisfy(this);
         new Enable(this);
         new Disable(this);
-        new AdvanceResearch(this);
     }
 
     public static class Satisfy extends NeoCommand {
@@ -63,36 +61,6 @@ public class NeoblockTiersCommand extends NeoCommand.ParentHolder {
         @Override public int execute(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
             TierSpec tier = this.getArgument(context, "tier", TierSpec.class).enable();
             return success(context, "command.neoblock.enable_tier", tier.getName());
-        }
-    }
-
-    public static class AdvanceResearch extends NeoCommand {
-        protected AdvanceResearch(NeoCommand parent) {
-            super(parent, "research advance");
-            new NeoArgumentInteger.Builder(this, "ticks").build();
-            new NeoArgumentTier.Builder(this, "tier")
-                    .provider(NeoArgumentTier.createSuggester(tier -> tier.canBeResearched() && !tier.isResearched()))
-                    .defaultValue(null).build();
-        }
-
-        @Override public int execute(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-            TierSpec tier = this.getArgument(context, "tier", TierSpec.class);
-
-            /*
-            TierResearch research = null;
-            if (tier == null) research = TierManager.fetchCurrentResearch();
-            else if (!tier.isResearched() && tier.canBeResearched()) research = tier.getResearch();
-
-            if (research == null) {
-                context.getSource().sendFailure(Component.translatable("command.neoblock.research.advance.invalid_tier"));
-                return 0;
-            }
-
-            int value = this.getArgument(context, "ticks");
-            long remain = research.getTime() - research.advanceBy(value);
-            return success(context, "command.neoblock.research.advance", StringUtil.formatTicks(remain));
-             */
-            return 0;
         }
     }
 }
