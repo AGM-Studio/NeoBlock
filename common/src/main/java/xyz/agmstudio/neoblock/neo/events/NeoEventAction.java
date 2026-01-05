@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlock;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoMerchant;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoTradePool;
+import xyz.agmstudio.neoblock.neo.world.WorldCooldown;
 import xyz.agmstudio.neoblock.neo.world.WorldRules;
 import xyz.agmstudio.neoblock.platform.IConfig;
 import xyz.agmstudio.neoblock.util.StringUtil;
@@ -19,7 +20,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public final class NeoEventAction {
-
+    private final int cooldown;
     private final List<String> commands;
     private final List<Component> messages;
     private final Component actionMessage;
@@ -31,6 +32,7 @@ public final class NeoEventAction {
     private Object[] traderMessageArgs = new Object[] {};
 
     public NeoEventAction(@NotNull IConfig config, String type) {
+        this.cooldown = config.getInt(type + ".cooldown", 0);
         this.commands = config.get(type + ".commands", List.of());
         List<String> messages = config.get(type + ".messages", List.of());
         this.messages = messages.stream().map(StringUtil::parseMessage).collect(Collectors.toList());
@@ -69,5 +71,6 @@ public final class NeoEventAction {
 
         NeoBlock.sendInstantMessage(actionMessage, level, true);
         for (Component message: this.messages) NeoBlock.sendInstantMessage(message, level, false);
+        if (cooldown > 0) WorldCooldown.Type.Normal.create(cooldown);
     }
 }

@@ -58,3 +58,7 @@ doFireTick = false
 doPatrolSpawning = false
 doInsomnia = false
 doMobSpawning = false
+
+[on-every-100-blocks]
+action-message = "{c=#999999}NeoBlock is exhausted! It will be back soon!"
+cooldown = 1200
