@@ -2,18 +2,17 @@ package xyz.agmstudio.neoblock.animations.phase;
 
 
 import xyz.agmstudio.neoblock.animations.Animation;
-import xyz.agmstudio.neoblock.neo.tiers.TierManager;
 
-public abstract class UpgradePhaseAnimation extends Animation {
-    public UpgradePhaseAnimation(String name) {
+public abstract class CooldownPhaseAnimation extends Animation {
+    public CooldownPhaseAnimation(String name) {
         super("phase", name);
     }
-    public UpgradePhaseAnimation(String category, String name) {
+    public CooldownPhaseAnimation(String category, String name) {
         super(category, name);
     }
 
     @Override protected void onRegister() {
-        TierManager.addPhaseAnimation(this);
+        Animation.addPhaseAnimation(this);
     }
 
     public abstract boolean isActiveOnUpgradeFinish();

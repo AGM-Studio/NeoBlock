@@ -6,7 +6,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import xyz.agmstudio.neoblock.neo.block.NeoBlockPos;
 
-public class ExplosionAnimation extends UpgradePhaseAnimation {
+public class ExplosionAnimation extends CooldownPhaseAnimation {
     @ConfigField("at-start")
     private boolean activeOnUpgradeStart = false;
     @ConfigField("at-finish")

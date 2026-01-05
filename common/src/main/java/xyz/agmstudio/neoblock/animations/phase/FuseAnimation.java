@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class FuseAnimation extends UpgradePhaseAnimation {
+public class FuseAnimation extends CooldownPhaseAnimation {
     @ConfigField("at-start")
     private boolean activeOnUpgradeStart = false;
     @ConfigField("at-finish")

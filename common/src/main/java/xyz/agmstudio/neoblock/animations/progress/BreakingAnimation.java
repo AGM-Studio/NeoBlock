@@ -7,7 +7,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import xyz.agmstudio.neoblock.neo.block.NeoBlockPos;
 
-public class BreakingAnimation extends UpgradeProgressAnimation {
+public class BreakingAnimation extends CooldownProgressAnimation {
     @ConfigField(min = 0)
     private float volume = 0.7f;
 

@@ -2,21 +2,20 @@ package xyz.agmstudio.neoblock.animations.progress;
 
 import net.minecraft.server.level.ServerLevel;
 import xyz.agmstudio.neoblock.animations.Animation;
-import xyz.agmstudio.neoblock.neo.tiers.TierManager;
 
-public abstract class UpgradeProgressAnimation extends Animation {
+public abstract class CooldownProgressAnimation extends Animation {
     @ConfigField(min = 5)
     protected int interval = 40;
 
-    public UpgradeProgressAnimation(String name) {
+    public CooldownProgressAnimation(String name) {
         super("upgrade", name);
     }
-    public UpgradeProgressAnimation(String category, String name) {
+    public CooldownProgressAnimation(String category, String name) {
         super(category, name);
     }
 
     @Override protected void onRegister() {
-        TierManager.addProgressAnimation(this);
+        Animation.addProgressAnimation(this);
     }
 
     /**

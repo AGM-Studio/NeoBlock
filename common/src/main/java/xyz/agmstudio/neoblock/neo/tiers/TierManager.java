@@ -1,12 +1,6 @@
 package xyz.agmstudio.neoblock.neo.tiers;
 
-import net.minecraft.server.level.ServerPlayer;
-import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlock;
-import xyz.agmstudio.neoblock.animations.Animation;
-import xyz.agmstudio.neoblock.animations.ProgressbarAnimation;
-import xyz.agmstudio.neoblock.animations.phase.UpgradePhaseAnimation;
-import xyz.agmstudio.neoblock.animations.progress.UpgradeProgressAnimation;
 import xyz.agmstudio.neoblock.data.NBTSaveable;
 import xyz.agmstudio.neoblock.neo.block.NeoBlockSpec;
 import xyz.agmstudio.neoblock.neo.block.NeoSeqBlockSpec;
@@ -20,7 +14,6 @@ import xyz.agmstudio.neoblock.util.ResourceUtil;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.regex.Matcher;
 
@@ -99,37 +92,5 @@ public final class TierManager {
         }
 
         NeoBlock.LOGGER.debug("Tier {} loaded. Hash key: {}", spec.id, spec.getHashCode());
-    }
-
-    // Animations
-    public static final HashSet<UpgradeProgressAnimation> progressAnimations = new HashSet<>();
-    public static final HashSet<UpgradePhaseAnimation> phaseAnimations = new HashSet<>();
-    public static ProgressbarAnimation progressbar = null;
-
-    public static void clearProgressAnimations() {
-        progressAnimations.clear();
-    }
-    public static void addProgressAnimation(UpgradeProgressAnimation animation) {
-        progressAnimations.add(animation);
-    }
-    public static void clearPhaseAnimations() {
-        phaseAnimations.clear();
-    }
-    public static void addPhaseAnimation(UpgradePhaseAnimation animation) {
-        phaseAnimations.add(animation);
-    }
-    public static void reloadProgressbarAnimations() {
-        progressbar = new ProgressbarAnimation();
-        progressbar.reload();
-        if (!progressbar.isEnabled()) progressbar = null;
-    }
-    public static @NotNull List<Animation> getAllAnimations() {
-        List<Animation> list = new ArrayList<>();
-        list.addAll(progressAnimations);
-        list.addAll(phaseAnimations);
-        return list;
-    }
-    public static void addPlayer(ServerPlayer player) {
-        if (progressbar != null) progressbar.addPlayer(player);
     }
 }

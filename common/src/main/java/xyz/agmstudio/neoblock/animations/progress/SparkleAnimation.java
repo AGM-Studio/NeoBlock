@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class SparkleAnimation extends UpgradeProgressAnimation {
+public class SparkleAnimation extends CooldownProgressAnimation {
     @ConfigField(min = 1)
     private int length = 10;
     @ConfigField(min = 1)

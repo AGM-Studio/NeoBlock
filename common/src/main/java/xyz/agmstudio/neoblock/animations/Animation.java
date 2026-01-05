@@ -1,35 +1,41 @@
 package xyz.agmstudio.neoblock.animations;
 
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlock;
 import xyz.agmstudio.neoblock.animations.idle.IdleAnimation;
 import xyz.agmstudio.neoblock.animations.idle.NeoFlowAnimation;
 import xyz.agmstudio.neoblock.animations.idle.PulseAnimation;
+import xyz.agmstudio.neoblock.animations.phase.CooldownPhaseAnimation;
 import xyz.agmstudio.neoblock.animations.phase.ExplosionAnimation;
 import xyz.agmstudio.neoblock.animations.phase.FuseAnimation;
 import xyz.agmstudio.neoblock.animations.progress.BreakingAnimation;
+import xyz.agmstudio.neoblock.animations.progress.CooldownProgressAnimation;
 import xyz.agmstudio.neoblock.animations.progress.SparkleAnimation;
 import xyz.agmstudio.neoblock.animations.progress.SpiralAnimation;
-import xyz.agmstudio.neoblock.neo.tiers.TierManager;
 import xyz.agmstudio.neoblock.platform.IConfig;
 import xyz.agmstudio.neoblock.util.ResourceUtil;
 
 import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 public abstract class Animation implements IConfig.Configured {
     private static final Path FOLDER = ResourceUtil.getConfigFolder(NeoBlock.MOD_ID, "animations");
     private static final List<Animation> animations = new ArrayList<>();
+    public static final HashSet<CooldownProgressAnimation> progressAnimations = new HashSet<>();
+    public static final HashSet<CooldownPhaseAnimation> phaseAnimations = new HashSet<>();
+    public static CooldownBarAnimation cooldownBar = null;
 
     public static void reloadAnimations() {
         animations.clear();
 
-        TierManager.clearPhaseAnimations();
-        TierManager.clearProgressAnimations();
-        TierManager.reloadProgressbarAnimations();
+        clearPhaseAnimations();
+        clearProgressAnimations();
+        reloadProgressbarAnimations();
 
         new ExplosionAnimation().register();
         new FuseAnimation().register();
@@ -129,5 +135,32 @@ public abstract class Animation implements IConfig.Configured {
 
         if (sb.length() > 2) sb.setLength(sb.length() - 2);
         return getClass().getSimpleName() + "{" + sb + "}";
+    }
+
+    public static void clearProgressAnimations() {
+        progressAnimations.clear();
+    }
+    public static void addProgressAnimation(CooldownProgressAnimation animation) {
+        progressAnimations.add(animation);
+    }
+    public static void clearPhaseAnimations() {
+        phaseAnimations.clear();
+    }
+    public static void addPhaseAnimation(CooldownPhaseAnimation animation) {
+        phaseAnimations.add(animation);
+    }
+    public static void reloadProgressbarAnimations() {
+        cooldownBar = new CooldownBarAnimation();
+        cooldownBar.reload();
+        if (!cooldownBar.isEnabled()) cooldownBar = null;
+    }
+    public static @NotNull List<Animation> getAllAnimations() {
+        List<Animation> list = new ArrayList<>();
+        list.addAll(progressAnimations);
+        list.addAll(phaseAnimations);
+        return list;
+    }
+    public static void addPlayer(ServerPlayer player) {
+        if (cooldownBar != null) cooldownBar.addPlayerToBar(player);
     }
 }

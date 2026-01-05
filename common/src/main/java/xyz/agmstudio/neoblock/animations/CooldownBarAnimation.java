@@ -7,7 +7,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.BossEvent;
 import xyz.agmstudio.neoblock.util.StringUtil;
 
-public class ProgressbarAnimation extends Animation {
+public class CooldownBarAnimation extends Animation {
     @ConfigField
     private String color = "red";
     @ConfigField("show-time")
@@ -15,7 +15,7 @@ public class ProgressbarAnimation extends Animation {
 
     private final ServerBossEvent bar;
 
-    public ProgressbarAnimation() {
+    public CooldownBarAnimation() {
         super("progressbar");
         bar = new ServerBossEvent(Component.literal(""), BossEvent.BossBarColor.RED, BossEvent.BossBarOverlay.PROGRESS);
     }
@@ -29,7 +29,7 @@ public class ProgressbarAnimation extends Animation {
         bar.setName(name);
     }
 
-    public void addPlayer(ServerPlayer player) {
+    public void addPlayerToBar(ServerPlayer player) {
         bar.addPlayer(player);
     }
     public void removeAllPlayers() {

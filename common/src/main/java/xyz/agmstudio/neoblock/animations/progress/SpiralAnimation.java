@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class SpiralAnimation extends UpgradeProgressAnimation {
+public class SpiralAnimation extends CooldownProgressAnimation {
     @ConfigField(min = 1)
     private int length = 50;
     @ConfigField(min = 1)
