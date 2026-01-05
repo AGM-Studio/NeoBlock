@@ -25,12 +25,13 @@ import xyz.agmstudio.neoblock.neo.block.*;
 import xyz.agmstudio.neoblock.neo.loot.NeoTagItemSpec;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoMerchant;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoTrade;
-import xyz.agmstudio.neoblock.neo.tiers.TierManager;
 import xyz.agmstudio.neoblock.neo.tiers.TierSpec;
 import xyz.agmstudio.neoblock.platform.IConfig;
 import xyz.agmstudio.neoblock.util.MinecraftUtil;
+import xyz.agmstudio.neoblock.util.ResourceUtil;
 
 import java.io.FileNotFoundException;
+import java.nio.file.Files;
 import java.util.*;
 
 public abstract class WorldManager extends SavedData {
@@ -50,7 +51,7 @@ public abstract class WorldManager extends SavedData {
     }
     public static List<TierSpec> resetTiers(WorldManager data) {
         data.tiers.clear();
-        data.tiers.addAll(TierManager.fetchTiers(true));
+        data.tiers.addAll(fetchTiers(true));
         return data.tiers;
     }
 
@@ -135,7 +136,7 @@ public abstract class WorldManager extends SavedData {
         WorldManager data = NeoBlock.instanceWorldData(level);
 
         data.status = new WorldData(data);
-        data.tiers.addAll(TierManager.fetchTiers(true));
+        data.tiers.addAll(fetchTiers(true));
 
         NeoBlock.LOGGER.debug("Creating new world data");
         return data;
@@ -145,7 +146,7 @@ public abstract class WorldManager extends SavedData {
 
         NeoBlock.LOGGER.debug("Loading WorldData from {}", tag);
         data.status = NBTSaveable.instance(WorldData.class, tag, data);
-        data.tiers.addAll(TierManager.fetchTiers(false));
+        data.tiers.addAll(fetchTiers(false));
 
         boolean isUpdated = false;
         final ListTag tiers = tag.getList("Tiers", StringTag.TAG_COMPOUND);
@@ -168,6 +169,17 @@ public abstract class WorldManager extends SavedData {
 
         if (isUpdated || tiers.size() < data.tiers.size()) data.status.setUpdated();
         return data;
+    }
+
+    public static List<TierSpec> fetchTiers(boolean loadConfig) {
+        ResourceUtil.loadAllTierConfigs();
+
+        List<TierSpec> tiers = new ArrayList<>();
+        for (int i = 0; Files.exists(TierSpec.FOLDER.resolve("tier-" + i + ".toml")); i++)
+            tiers.add(new TierSpec(i, loadConfig));
+
+        NeoBlock.LOGGER.info("Loaded {} tiers from the tiers folder.", tiers.size());
+        return tiers;
     }
 
     public @NotNull CompoundTag saveDataOnTag(@NotNull CompoundTag tag) {
