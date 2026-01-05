@@ -173,6 +173,9 @@ public class WorldData implements NBTSaveable {
             BlockManager.updateBlock(WorldManager.getWorldLevel(), false);
         } else data.setDirty();
     }
+    public List<WorldCooldown> getCooldowns() {
+        return cooldowns;
+    }
     public @Nullable WorldCooldown getCooldown() {
         if (cooldowns.isEmpty()) return null;
         return cooldowns.get(0);

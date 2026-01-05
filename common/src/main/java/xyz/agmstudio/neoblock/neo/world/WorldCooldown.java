@@ -8,6 +8,8 @@ import xyz.agmstudio.neoblock.data.NBTSaveable;
 import xyz.agmstudio.neoblock.neo.block.BlockManager;
 import xyz.agmstudio.neoblock.neo.tiers.TierSpec;
 
+import java.util.List;
+
 public class WorldCooldown implements NBTSaveable {
     public interface Type {
         String id();
@@ -44,6 +46,15 @@ public class WorldCooldown implements NBTSaveable {
         }
         class Normal implements Type {
             public static void create(long ticks) {
+                List<WorldCooldown> cooldowns = WorldManager.getWorldData().getCooldowns();
+                if (!cooldowns.isEmpty()) {
+                    WorldCooldown last = cooldowns.get(cooldowns.size() - 1);
+                    if (last.type instanceof Normal) {
+                        last.time += ticks;
+                        return;
+                    }
+                }
+
                 WorldCooldown cooldown = new WorldCooldown();
                 cooldown.type = new Normal();
                 cooldown.time = ticks;
@@ -107,7 +118,10 @@ public class WorldCooldown implements NBTSaveable {
             cooldown.type.onStart(level);
             if (FIRST) Animation.animateCooldownStart(level);
         }
-        FIRST = false;          // Will make sure to not play the cooldown start multiple times.
+        if (FIRST) {
+            FIRST = false;      // Will make sure to not play the cooldown start multiple times.
+            WorldManager.getInstance().setDirty();
+        }
         if (cooldown.time > 0 && cooldown.tick >= cooldown.time) {
             cooldown.type.onFinish(level);
             data.removeCooldown(cooldown);
