@@ -120,7 +120,7 @@ public final class NeoListener {
 
     public static void onBlockBroken(LevelAccessor accessor, ServerPlayer player, BlockPos pos, BlockState state) {
         ServerLevel level = getServerConditioned(accessor, true);
-        if (player.isCreative()) return;
+        if (player.isCreative() || accessor == null) return;
         if (BlockManager.isNeoBlock(level, pos))
             WorldManager.addBlocksBroken(player, 1);
         if (state.getBlock() == Blocks.END_PORTAL_FRAME)
