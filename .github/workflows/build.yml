@@ -1,0 +1,56 @@
+#file: noinspection UndefinedAction,UndefinedParamsPresent
+name: Build and Release
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Configure git to use PAT
+        run: git config --global url."https://${{ secrets.GH_PAT }}@github.com/".insteadOf "https://github.com/"
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: "21"
+          distribution: "temurin"
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build JAR
+        run: ./gradlew build
+
+      - name: Delete local tag if exists
+        run: git tag -d experimental-build || true
+
+      - name: Delete remote tag if exists
+        run: git push origin :refs/tags/experimental-build || true
+
+      - name: Create tag
+        run: git tag experimental-build
+
+      - name: Push tag
+        run: git push origin experimental-build
+
+      - name: Create or update release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: experimental-build
+          name: Experimental Build
+          body_path: .github/experimental-build.md
+          files: build/libs/*.jar
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
