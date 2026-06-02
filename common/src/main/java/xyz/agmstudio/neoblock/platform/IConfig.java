@@ -1,6 +1,6 @@
 package xyz.agmstudio.neoblock.platform;
 
-import xyz.agmstudio.neoblock.NeoBlock;
+import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.util.ResourceUtil;
 
 import java.io.IOException;
@@ -17,7 +17,7 @@ import java.util.Set;
 import java.util.function.BiConsumer;
 
 public interface IConfig {
-    Helper HELPER = NeoBlock.loadService(Helper.class);
+    Helper HELPER = NeoBlockMod.loadService(Helper.class);
 
     /**
      * Returns the {@link IConfig} corresponding to name in folder.
@@ -33,9 +33,9 @@ public interface IConfig {
         } catch (IOException ignored) {}
         Path configPath = folder.resolve(name.endsWith(".toml") ? name : name + ".toml");
         if (!Files.exists(configPath)) try {
-            Path path = ResourceUtil.pathOf(NeoBlock.MOD_ID);
+            Path path = ResourceUtil.pathOf(NeoBlockMod.MOD_ID);
             String resource = configPath.toAbsolutePath().toString().replace(path.toAbsolutePath().toString(), "\\configs");
-            NeoBlock.LOGGER.debug("Loading resource {} for {}", resource, configPath);
+            NeoBlockMod.LOGGER.debug("Loading resource {} for {}", resource, configPath);
             ResourceUtil.processResourceFile(resource, configPath, new HashMap<>());
         } catch (Exception ignored) {}
         if (!Files.exists(configPath)) return null;
@@ -169,7 +169,7 @@ public interface IConfig {
                                 field.set(this, value != null ? value : def);
                             }
                         } catch (Exception e) {
-                            NeoBlock.LOGGER.error("Failed to load config value for \"{}\" from \"{}\"", field.getName(), label, e);
+                            NeoBlockMod.LOGGER.error("Failed to load config value for \"{}\" from \"{}\"", field.getName(), label, e);
                         }
                     }
                 }

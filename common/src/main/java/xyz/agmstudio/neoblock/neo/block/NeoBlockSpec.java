@@ -5,7 +5,7 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
-import xyz.agmstudio.neoblock.NeoBlock;
+import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.util.MinecraftUtil;
 import xyz.agmstudio.neoblock.util.PatternUtil;
 
@@ -35,14 +35,14 @@ public class NeoBlockSpec {
 
         Matcher matcher = PATTERN.matcher(input.trim());
         if (!matcher.matches()) {
-            NeoBlock.LOGGER.warn("Invalid block: '{}'", input);
+            NeoBlockMod.LOGGER.warn("Invalid block: '{}'", input);
             return Optional.empty();
         }
 
         String blockString = matcher.group("block");
         Optional<Block> block = MinecraftUtil.getBlock(blockString);
         if (block.isEmpty()) {
-            NeoBlock.LOGGER.warn("Unknown block ID: '{}'", blockString);
+            NeoBlockMod.LOGGER.warn("Unknown block ID: '{}'", blockString);
             return Optional.empty();
         }
 

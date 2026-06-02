@@ -135,7 +135,7 @@ public final class NeoListener {
         if (entity instanceof ServerPlayer player) {
             if (WorldManager.getWorldData().isOnCooldown())
                 CooldownBarAnimation.addPlayer(player);
-            NeoBlock.onPlayerJoin(level, player);
+            NeoBlockMod.onPlayerJoin(level, player);
         }
     }
 

@@ -23,7 +23,7 @@ import net.minecraft.world.scores.Scoreboard;
 import net.minecraft.world.scores.criteria.ObjectiveCriteria;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
-import xyz.agmstudio.neoblock.NeoBlock;
+import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.neo.loot.NeoItemSpec;
 import xyz.agmstudio.neoblock.platform.IMinecraftHelper;
 
@@ -34,7 +34,7 @@ import java.util.Optional;
  * This class a utility class and based on the version of minecraft build should help to keep all code similar
  */
 public final class MinecraftUtil {
-    private static final IMinecraftHelper HELPER = NeoBlock.loadService(IMinecraftHelper.class);
+    private static final IMinecraftHelper HELPER = NeoBlockMod.loadService(IMinecraftHelper.class);
 
     public static @NotNull ResourceLocation parseResourceLocation(String name) {
         return HELPER.parseResourceLocation(name);

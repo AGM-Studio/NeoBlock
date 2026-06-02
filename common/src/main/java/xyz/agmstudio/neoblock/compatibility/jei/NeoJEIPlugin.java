@@ -15,7 +15,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import xyz.agmstudio.neoblock.NeoBlock;
+import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.neo.tiers.TierSpec;
 import xyz.agmstudio.neoblock.neo.world.WorldManager;
 import xyz.agmstudio.neoblock.util.MinecraftUtil;
@@ -68,7 +68,7 @@ public class NeoJEIPlugin implements IModPlugin {
     }
 
     @Override public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
-        registration.addRecipeCatalyst(new ItemStack(NeoBlock.REGISTRY.getNeoBlockItem()), TierDisplayCategory.TYPE);
+        registration.addRecipeCatalyst(new ItemStack(NeoBlockMod.REGISTRY.getNeoBlockItem()), TierDisplayCategory.TYPE);
     }
 
     @Override public void registerRecipes(IRecipeRegistration registration) {

@@ -8,7 +8,7 @@ import net.minecraft.world.entity.npc.WanderingTrader;
 import net.minecraft.world.item.trading.MerchantOffers;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import xyz.agmstudio.neoblock.NeoBlock;
+import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.neo.block.NeoBlockPos;
 import xyz.agmstudio.neoblock.neo.tiers.TierSpec;
 import xyz.agmstudio.neoblock.neo.world.WorldManager;
@@ -28,7 +28,7 @@ public class NeoMerchant {
     public static UniformInt lifespan;
 
     public static void loadConfig() {
-        IConfig config = NeoBlock.getConfig();
+        IConfig config = NeoBlockMod.getConfig();
         NeoMerchant.chance = config.get("neo-trader.chance");
         NeoMerchant.increment = config.get("neo-trader.chance-increment");
         NeoMerchant.attemptInterval = config.get("neo-trader.attempt-interval");
@@ -37,7 +37,7 @@ public class NeoMerchant {
                 Math.max(0, config.get("neo-trader.life-span-max"))
         );
 
-        NeoBlock.LOGGER.debug("NeoMerchant: Config loaded. \n\tChance: {}\n\tChance Increment: {}\n\tAttempt Interval: {}\n\tLifespan: {}", NeoMerchant.chance, NeoMerchant.increment, NeoMerchant.attemptInterval, NeoMerchant.lifespan);
+        NeoBlockMod.LOGGER.debug("NeoMerchant: Config loaded. \n\tChance: {}\n\tChance Increment: {}\n\tAttempt Interval: {}\n\tLifespan: {}", NeoMerchant.chance, NeoMerchant.increment, NeoMerchant.attemptInterval, NeoMerchant.lifespan);
     }
 
     public static @Nullable WanderingTrader spawnTraderWith(List<NeoTrade> trades, ServerLevel level, String... tags) {
@@ -59,7 +59,7 @@ public class NeoMerchant {
         double chance = NeoMerchant.chance + (increment * status.getTraderFailedAttempts());
         if (WorldManager.getRandom().nextFloat() > chance) {
             int fails = status.addTraderFailedAttempts();
-            NeoBlock.LOGGER.debug("Trader chance {} failed for {} times in a row", chance, fails);
+            NeoBlockMod.LOGGER.debug("Trader chance {} failed for {} times in a row", chance, fails);
             return null;
         }
         return forceSpawnTrader(level);
@@ -73,7 +73,7 @@ public class NeoMerchant {
         WanderingTrader trader = spawnTraderWith(trades, level, "NeoMerchant");
         if (trader == null) return null;
 
-        NeoBlock.sendInstantMessage("message.neoblock.trader_spawned", level, true);
+        NeoBlockMod.sendInstantMessage("message.neoblock.trader_spawned", level, true);
 
         HashMap<EntityType<?>, Integer> tradedMobs = status.getTradedMobs();
         tradedMobs.forEach((type, count) -> {

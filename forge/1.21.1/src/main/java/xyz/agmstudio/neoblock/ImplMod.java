@@ -27,10 +27,10 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-@Mod(NeoBlock.MOD_ID)
-public final class ImplMod extends NeoBlock {
+@Mod(NeoBlockMod.MOD_ID)
+public final class ImplMod extends NeoBlockMod {
     public ImplMod() {
-        super(NeoBlock.MOD_NAME);
+        super(NeoBlockMod.MOD_NAME);
 
         IEventBus bus = MinecraftForge.EVENT_BUS;
 

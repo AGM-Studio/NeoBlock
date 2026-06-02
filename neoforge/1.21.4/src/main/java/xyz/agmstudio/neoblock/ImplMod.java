@@ -32,8 +32,8 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-@Mod(NeoBlock.MOD_ID)
-public final class ImplMod extends NeoBlock {
+@Mod(NeoBlockMod.MOD_ID)
+public final class ImplMod extends NeoBlockMod {
     public static <T extends Block> DeferredBlock<T> registerBlock(String name, Supplier<T> block) {
         DeferredBlock<T> register = NeoForgeRegistry.BLOCKS.register(name, block);
         NeoForgeRegistry.ITEMS.register(name, () -> new BlockItem(block.get(), new Item.Properties()));
@@ -41,7 +41,7 @@ public final class ImplMod extends NeoBlock {
     }
 
     public ImplMod(IEventBus bus, ModContainer container) {
-        super(NeoBlock.MOD_NAME);
+        super(NeoBlockMod.MOD_NAME);
 
         NeoForgeRegistry.BLOCKS.register(bus);
         NeoForgeRegistry.ITEMS.register(bus);

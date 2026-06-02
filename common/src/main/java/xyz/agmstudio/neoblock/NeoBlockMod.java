@@ -33,7 +33,7 @@ import static org.apache.logging.log4j.Level.DEBUG;
 import static org.apache.logging.log4j.Level.ERROR;
 
 
-public abstract class NeoBlock {
+public abstract class NeoBlockMod {
     public static final String MOD_ID = "neoblock";
     public static final String MOD_NAME = "NeoBlock";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_NAME);
@@ -44,10 +44,10 @@ public abstract class NeoBlock {
     public static final INBTHelper NBT_HELPER = loadService(INBTHelper.class);
     public static final IRegistryHelper REGISTRY = loadService(IRegistryHelper.class);
 
-    private static NeoBlock instance;
+    private static NeoBlockMod instance;
     private static IConfig config;
 
-    public static NeoBlock getInstance() {
+    public static NeoBlockMod getInstance() {
         return instance;
     }
     public static IConfig getConfig() {
@@ -55,15 +55,15 @@ public abstract class NeoBlock {
     }
 
     public static void reloadConfig() {
-        NeoBlock.config = IConfig.getConfig(CONFIG_FOLDER, "config.toml");
+        NeoBlockMod.config = IConfig.getConfig(CONFIG_FOLDER, "config.toml");
     }
 
-    protected NeoBlock(String name) {
+    protected NeoBlockMod(String name) {
         assert MOD_NAME.equals(name);
 
-        NeoBlock.instance = this;
-        NeoBlock.CONFIG_FOLDER = ResourceUtil.getConfigFolder(NeoBlock.MOD_ID);
-        NeoBlock.config = IConfig.getConfig(CONFIG_FOLDER, "config.toml");
+        NeoBlockMod.instance = this;
+        NeoBlockMod.CONFIG_FOLDER = ResourceUtil.getConfigFolder(NeoBlockMod.MOD_ID);
+        NeoBlockMod.config = IConfig.getConfig(CONFIG_FOLDER, "config.toml");
 
         // To make sure files & folders are created.
         WorldManager.reloadConfig();
@@ -71,7 +71,7 @@ public abstract class NeoBlock {
         // Schematic class will take care of it.
         boolean ignored = Schematic.folder.toFile().exists();
 
-        if (NeoBlock.isDevelopmentEnvironment()) {
+        if (NeoBlockMod.isDevelopmentEnvironment()) {
             Configurator.setRootLevel(ERROR);
             Configurator.setLevel(LOGGER.getName(), DEBUG);
             LOGGER.debug("Enabling debug mode for neoblock (development environment)");

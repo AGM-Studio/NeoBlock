@@ -14,7 +14,7 @@ import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.npc.WanderingTrader;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
-import xyz.agmstudio.neoblock.NeoBlock;
+import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.neo.block.NeoBlockPos;
 import xyz.agmstudio.neoblock.platform.IConfig;
 import xyz.agmstudio.neoblock.util.MinecraftUtil;
@@ -60,7 +60,7 @@ public class ForgivingVoid {
     }
 
     public static void loadConfig() {
-        IConfig config = NeoBlock.getConfig();
+        IConfig config = NeoBlockMod.getConfig();
         ForgivingVoid.players   = config.get("forgiving-void.players", true);
         ForgivingVoid.hostile   = config.get("forgiving-void.hostile", true);
         ForgivingVoid.villager  = config.get("forgiving-void.villager", true);
@@ -91,7 +91,7 @@ public class ForgivingVoid {
             if (time > 0 && effect.isPresent()) effects.put(effect.get(), (int) (time * 20));
         });
 
-        NeoBlock.LOGGER.debug("ForgivingVoid: Config loaded.");
+        NeoBlockMod.LOGGER.debug("ForgivingVoid: Config loaded.");
     }
 
     private static boolean shallBeRescued(Entity entity) {

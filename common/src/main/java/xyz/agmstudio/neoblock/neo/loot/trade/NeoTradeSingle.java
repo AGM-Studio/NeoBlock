@@ -2,7 +2,7 @@ package xyz.agmstudio.neoblock.neo.loot.trade;
 
 import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.item.trading.MerchantOffer;
-import xyz.agmstudio.neoblock.NeoBlock;
+import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.neo.loot.NeoItemSpec;
 import xyz.agmstudio.neoblock.neo.world.WorldManager;
 import xyz.agmstudio.neoblock.util.MinecraftUtil;
@@ -45,7 +45,7 @@ public class NeoTradeSingle extends NeoTrade {
 
         Matcher matcher = PATTERN.matcher(input.trim().toLowerCase());
         if (!matcher.matches()) {
-            NeoBlock.LOGGER.error("Invalid trade syntax: {}", input);
+            NeoBlockMod.LOGGER.error("Invalid trade syntax: {}", input);
             return Optional.empty();
         }
 
@@ -53,7 +53,7 @@ public class NeoTradeSingle extends NeoTrade {
         NeoItemSpec costA = NeoItemSpec.parseItem(matcher.group("costA")).orElse(null);
         if (result == null || costA == null) {
             String key = result == null ? "result" : "costA";
-            NeoBlock.LOGGER.error("Invalid trade {} '{}' for: {}", key, matcher.group(key), input);
+            NeoBlockMod.LOGGER.error("Invalid trade {} '{}' for: {}", key, matcher.group(key), input);
             return Optional.empty();
         }
 

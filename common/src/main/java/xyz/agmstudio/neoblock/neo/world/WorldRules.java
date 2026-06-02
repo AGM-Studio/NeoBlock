@@ -2,7 +2,7 @@ package xyz.agmstudio.neoblock.neo.world;
 
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.GameRules;
-import xyz.agmstudio.neoblock.NeoBlock;
+import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.platform.IConfig;
 
 import java.lang.reflect.Field;
@@ -25,7 +25,7 @@ public class WorldRules {
                 GameRules.Key<?> key = (GameRules.Key<?>) field.get(null);
                 if (key.getId().equals(name)) return key;
             } catch (IllegalAccessException e) {
-                NeoBlock.LOGGER.warn("Unable to find game rule \"{}\" due to {}", name, e);
+                NeoBlockMod.LOGGER.warn("Unable to find game rule \"{}\" due to {}", name, e);
             }
         }
 
@@ -36,7 +36,7 @@ public class WorldRules {
         GameRules gameRules = level.getGameRules();
         T rule = gameRules.getRule(key);
 
-        NeoBlock.LOGGER.info("Setting game rule \"{}\" to \"{}\"", key.getId(), value);
+        NeoBlockMod.LOGGER.info("Setting game rule \"{}\" to \"{}\"", key.getId(), value);
         if (rule instanceof GameRules.BooleanValue bool) {
             bool.set(Boolean.parseBoolean(value), level.getServer());
             return true;
@@ -46,11 +46,11 @@ public class WorldRules {
                 integer.set(Integer.parseInt(value), level.getServer());
                 return true;
             } catch (NumberFormatException e) {
-                NeoBlock.LOGGER.warn("Invalid number for GameRule: {}", key.getId());
+                NeoBlockMod.LOGGER.warn("Invalid number for GameRule: {}", key.getId());
                 return false;
             }
         }
-        NeoBlock.LOGGER.warn("Unknown game rule {}({}) type...", key, rule.getClass().getName());
+        NeoBlockMod.LOGGER.warn("Unknown game rule {}({}) type...", key, rule.getClass().getName());
         return false;
     }
 }

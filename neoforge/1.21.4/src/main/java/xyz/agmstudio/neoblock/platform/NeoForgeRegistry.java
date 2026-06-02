@@ -10,17 +10,17 @@ import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import org.jetbrains.annotations.NotNull;
-import xyz.agmstudio.neoblock.NeoBlock;
+import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.neo.loot.NeoMobSpec;
 
 import java.util.List;
 
 public class NeoForgeRegistry implements IRegistryHelper {
-    public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(NeoBlock.MOD_ID);
-    public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(NeoBlock.MOD_ID);
+    public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(NeoBlockMod.MOD_ID);
+    public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(NeoBlockMod.MOD_ID);
 
     public static ResourceKey<Item> createItemKey(String name) {
-        return ResourceKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(NeoBlock.MOD_ID, name));
+        return ResourceKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(NeoBlockMod.MOD_ID, name));
     }
 
     public static final DeferredItem<NeoMobSpec.TradeTicket> TICKET =

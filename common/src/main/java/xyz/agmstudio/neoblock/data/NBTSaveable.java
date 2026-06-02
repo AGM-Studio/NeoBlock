@@ -2,7 +2,7 @@ package xyz.agmstudio.neoblock.data;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.*;
-import xyz.agmstudio.neoblock.NeoBlock;
+import xyz.agmstudio.neoblock.NeoBlockMod;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -56,7 +56,7 @@ public interface NBTSaveable {
                             Object enumValue = fromId.invoke(null, id);
                             field.set(this, enumValue);
                         } catch (Exception e) {
-                            NeoBlock.LOGGER.error("Failed to load enum field: {}", field.getName(), e);
+                            NeoBlockMod.LOGGER.error("Failed to load enum field: {}", field.getName(), e);
                             throw new RuntimeException("Failed to load enum field: " + field.getName(), e);
                         }
                     } else {
@@ -67,9 +67,9 @@ public interface NBTSaveable {
             }
             this.onLoad(tag);
         } catch (AbortException e) {
-            NeoBlock.LOGGER.error("NBT loading into {} has been aborted by {}", clazz.getSimpleName(), e);
+            NeoBlockMod.LOGGER.error("NBT loading into {} has been aborted by {}", clazz.getSimpleName(), e);
         } catch (Exception e) {
-            NeoBlock.LOGGER.error("Failed to load NBT into {}", clazz.getSimpleName(), e);
+            NeoBlockMod.LOGGER.error("Failed to load NBT into {}", clazz.getSimpleName(), e);
             throw new RuntimeException("Failed to load NBT into " + clazz.getSimpleName(), e);
         }
     }
@@ -160,7 +160,7 @@ public interface NBTSaveable {
             }
             return (R) list;
         } else {
-            NeoBlock.LOGGER.error("Unsupported tag type: {}", type);
+            NeoBlockMod.LOGGER.error("Unsupported tag type: {}", type);
             return null;
         }
     }

@@ -14,7 +14,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import xyz.agmstudio.neoblock.NeoBlock;
+import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.data.NBTSaveable;
 import xyz.agmstudio.neoblock.neo.block.BlockManager;
 import xyz.agmstudio.neoblock.neo.block.NeoBlockPos;
@@ -59,21 +59,21 @@ public class WorldData implements NBTSaveable {
             cooldowns.add(cooldown);
         });
 
-        IConfig config = NeoBlock.getConfig();
+        IConfig config = NeoBlockMod.getConfig();
         for (String key: config.keys()) {
             Matcher obm = PatternUtil.ON_BLOCK_PATTERN.matcher(key);
             if (obm.matches()) {
                 int count = Integer.parseInt(obm.group("count"));
                 NeoEventAction actions = new NeoEventAction(config, obm.group()).withMessage("message.neoblock.trader_spawned", "GLOBAL");
                 onBlockActions.put(count, actions);
-                NeoBlock.LOGGER.debug("Added on-block action {} for world.", key);
+                NeoBlockMod.LOGGER.debug("Added on-block action {} for world.", key);
             }
             Matcher ebm = PatternUtil.EVERY_BLOCK_PATTERN.matcher(key);
             if (ebm.matches()) {
                 int count = Integer.parseInt(ebm.group("count"));
                 NeoEventAction actions = new NeoEventAction(config, ebm.group()).withMessage("message.neoblock.trader_spawned", "GLOBAL");
                 everyBlockActions.put(count, actions);
-                NeoBlock.LOGGER.debug("Added on-every-block action {} for world.", key);
+                NeoBlockMod.LOGGER.debug("Added on-every-block action {} for world.", key);
             }
         }
     }

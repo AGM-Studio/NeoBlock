@@ -13,7 +13,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import xyz.agmstudio.neoblock.NeoBlock;
+import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.neo.world.WorldManager;
 import xyz.agmstudio.neoblock.platform.INBTHelper;
 import xyz.agmstudio.neoblock.util.MinecraftUtil;
@@ -44,7 +44,7 @@ public class NeoMobSpec extends NeoItemSpec {
     }
 
     @Override public Item getItem() {
-        return NeoBlock.REGISTRY.getMobTicket();
+        return NeoBlockMod.REGISTRY.getMobTicket();
     }
 
     @Override public ItemStack modify(ItemStack item) {
@@ -82,7 +82,7 @@ public class NeoMobSpec extends NeoItemSpec {
     }
 
     public static Optional<EntityType<?>> getMobTradeEntity(ItemStack item) {
-        if (item == null || !item.getItem().equals(NeoBlock.REGISTRY.getMobTicket())) return Optional.empty();
+        if (item == null || !item.getItem().equals(NeoBlockMod.REGISTRY.getMobTicket())) return Optional.empty();
 
         CompoundTag tag = INBTHelper.Item.getItemTag(item);
         return MinecraftUtil.getEntityType(tag.getString("neoMobType"));
@@ -92,7 +92,7 @@ public class NeoMobSpec extends NeoItemSpec {
         Optional<EntityType<?>> mob = getMobTradeEntity(item);
         if (mob.isEmpty()) return false;
 
-        NeoBlock.sendInstantMessage("message.neoblock.trades.mob", level, true, item.getCount(), mob.get().getDescription());
+        NeoBlockMod.sendInstantMessage("message.neoblock.trades.mob", level, true, item.getCount(), mob.get().getDescription());
         WorldManager.getWorldData().addTradedMob(mob.get(), item.getCount());
         item.setCount(0);
 
@@ -100,7 +100,7 @@ public class NeoMobSpec extends NeoItemSpec {
     }
 
     public static ItemStack of(EntityType<?> mob, int count) {
-        ItemStack item = new ItemStack(NeoBlock.REGISTRY.getMobTicket(), count);
+        ItemStack item = new ItemStack(NeoBlockMod.REGISTRY.getMobTicket(), count);
         CompoundTag tag = INBTHelper.Item.getItemTag(item);
 
         @Nullable ResourceLocation location = MinecraftUtil.getEntityTypeResource(mob).orElse(null);

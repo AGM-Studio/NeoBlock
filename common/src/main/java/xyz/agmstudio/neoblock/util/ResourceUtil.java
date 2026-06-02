@@ -1,7 +1,7 @@
 package xyz.agmstudio.neoblock.util;
 
 import org.jetbrains.annotations.NotNull;
-import xyz.agmstudio.neoblock.NeoBlock;
+import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.neo.tiers.TierSpec;
 
 import java.io.*;
@@ -13,7 +13,7 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class ResourceUtil {
-    private static final Class<?> clazz = NeoBlock.class;
+    private static final Class<?> clazz = NeoBlockMod.class;
 
     /**
      * Checks if a resource file exists in the classpath.
@@ -38,7 +38,7 @@ public class ResourceUtil {
      * @throws IOException If an I/O error occurs.
      */
     public static void processResourceFile(String resourcePath, Path outputPath, Map<String, String> placeholders) throws IOException {
-        NeoBlock.LOGGER.debug("Processing resource {} to {}", resourcePath, outputPath.toAbsolutePath());
+        NeoBlockMod.LOGGER.debug("Processing resource {} to {}", resourcePath, outputPath.toAbsolutePath());
         try (InputStream inputStream = clazz.getResourceAsStream(resourcePath.replace("\\", "/"));
              BufferedReader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(inputStream)));
              BufferedWriter writer = Files.newBufferedWriter(outputPath, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)) {
@@ -72,7 +72,7 @@ public class ResourceUtil {
      */
     public static @NotNull Path getConfigFolder(String... paths) {
         Path path = pathOf(paths);
-        if (!path.toFile().exists() && path.toFile().mkdirs()) NeoBlock.LOGGER.debug("Creating folder {}", path);
+        if (!path.toFile().exists() && path.toFile().mkdirs()) NeoBlockMod.LOGGER.debug("Creating folder {}", path);
         return path;
     }
 
@@ -83,7 +83,7 @@ public class ResourceUtil {
      * @return the path created
      */
     public static @NotNull Path pathOf(String... paths) {
-        return Path.of(NeoBlock.getConfigFolder().toAbsolutePath().toString(), paths);
+        return Path.of(NeoBlockMod.getConfigFolder().toAbsolutePath().toString(), paths);
     }
 
     /**
@@ -95,16 +95,16 @@ public class ResourceUtil {
         if (!Files.exists(templateLocation)) {
             try {
                 processResourceFile("/configs/tiers/tier-template.toml", templateLocation, Map.of("[TIER]", "10"));
-                NeoBlock.LOGGER.debug("Loaded tier template config.");
+                NeoBlockMod.LOGGER.debug("Loaded tier template config.");
             } catch (IOException e) {
-                NeoBlock.LOGGER.error("Unable to process tier template resource", e);
+                NeoBlockMod.LOGGER.error("Unable to process tier template resource", e);
             }
         }
 
         // If tier-0.toml is present, no need to proceed
         if (Files.exists(TierSpec.FOLDER.resolve("tier-0.toml"))) return;
         if (TierSpec.FOLDER.toFile().mkdirs())
-            NeoBlock.LOGGER.debug("Created config folder: {}", TierSpec.FOLDER);
+            NeoBlockMod.LOGGER.debug("Created config folder: {}", TierSpec.FOLDER);
 
         int tier = 0;
         while (true) {
@@ -117,9 +117,9 @@ public class ResourceUtil {
 
             try {
                 processResourceFile(resource, location, map);
-                NeoBlock.LOGGER.debug("Loaded tier config from resource: {}", resource);
+                NeoBlockMod.LOGGER.debug("Loaded tier config from resource: {}", resource);
             } catch (IOException e) {
-                NeoBlock.LOGGER.error("Unable to process resource {}", resource, e);
+                NeoBlockMod.LOGGER.error("Unable to process resource {}", resource, e);
                 break;
             }
         }

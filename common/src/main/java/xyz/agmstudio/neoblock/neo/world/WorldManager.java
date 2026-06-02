@@ -14,7 +14,7 @@ import net.minecraft.world.scores.Objective;
 import net.minecraft.world.scores.Scoreboard;
 import net.minecraft.world.scores.criteria.ObjectiveCriteria;
 import org.jetbrains.annotations.NotNull;
-import xyz.agmstudio.neoblock.NeoBlock;
+import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.animations.Animation;
 import xyz.agmstudio.neoblock.commands.NeoblockForceCommand;
 import xyz.agmstudio.neoblock.commands.util.NeoCommand;
@@ -38,7 +38,7 @@ public abstract class WorldManager extends SavedData {
     private static final String BLOCK_BREAK_OBJECTIVE = "neoblocks_broken";
 
     private static WorldManager load(ServerLevel level) {
-        return NeoBlock.captureSavedData(level, "neo_block_data", t -> WorldManager.load(t, level), () -> WorldManager.create(level));
+        return NeoBlockMod.captureSavedData(level, "neo_block_data", t -> WorldManager.load(t, level), () -> WorldManager.create(level));
     }
 
     private static WorldManager instance;
@@ -56,7 +56,7 @@ public abstract class WorldManager extends SavedData {
     }
 
     public static void reloadConfig() {
-        NeoBlock.reloadConfig();
+        NeoBlockMod.reloadConfig();
 
         NeoTagItemSpec.reloadTags();
         NeoTrade.reloadTrades();
@@ -76,7 +76,7 @@ public abstract class WorldManager extends SavedData {
         instance = load(level);
 
         if (instance == null) return;
-        IConfig config = NeoBlock.getConfig();
+        IConfig config = NeoBlockMod.getConfig();
         if (instance.status.state == WorldData.State.INACTIVE) {
             boolean allowNeoBlock = true;
             final int x = config.get("world.block.x", 0);
@@ -103,7 +103,7 @@ public abstract class WorldManager extends SavedData {
                         int result = Schematic.loadSchematic(level, pos, name);
                         if (result == 0) throw new FileNotFoundException("File \"" + name + "\" not found");
                     } catch (Exception e) {
-                        NeoBlock.LOGGER.error("Unable to load schematic {}", iterator, e);
+                        NeoBlockMod.LOGGER.error("Unable to load schematic {}", iterator, e);
                     }
                     iterator++;
                 }
@@ -114,9 +114,9 @@ public abstract class WorldManager extends SavedData {
             } else {
                 Optional<NeoblockForceCommand.SetBlock> command = NeoCommand.getFromRegistry(NeoblockForceCommand.SetBlock.class);
 
-                NeoBlock.LOGGER.info("NeoBlock has been disabled.");
-                NeoBlock.sendMessage("message.neoblock.disabled_world_1", level, false);
-                NeoBlock.sendMessage("message.neoblock.disabled_world_2", level, false, command.map(NeoCommand::getCommand).orElse(null));
+                NeoBlockMod.LOGGER.info("NeoBlock has been disabled.");
+                NeoBlockMod.sendMessage("message.neoblock.disabled_world_1", level, false);
+                NeoBlockMod.sendMessage("message.neoblock.disabled_world_2", level, false, command.map(NeoCommand::getCommand).orElse(null));
 
                 instance.status.state = WorldData.State.DISABLED;
                 instance.setDirty();
@@ -124,8 +124,8 @@ public abstract class WorldManager extends SavedData {
         } else if (instance.status.state == WorldData.State.UPDATED) {
             Optional<NeoblockForceCommand.ResetTiers> command = NeoCommand.getFromRegistry(NeoblockForceCommand.ResetTiers.class);
 
-            NeoBlock.LOGGER.info("NeoBlock tiers has been updated.");
-            NeoBlock.sendMessage("message.neoblock.updated_world", level, false, command.map(NeoCommand::getCommand).orElse(null));
+            NeoBlockMod.LOGGER.info("NeoBlock tiers has been updated.");
+            NeoBlockMod.sendMessage("message.neoblock.updated_world", level, false, command.map(NeoCommand::getCommand).orElse(null));
 
             instance.status.state = WorldData.State.UPDATED;
             instance.setDirty();
@@ -133,18 +133,18 @@ public abstract class WorldManager extends SavedData {
     }
 
     public static @NotNull WorldManager create(@NotNull ServerLevel level) {
-        WorldManager data = NeoBlock.instanceWorldData(level);
+        WorldManager data = NeoBlockMod.instanceWorldData(level);
 
         data.status = new WorldData(data);
         data.tiers.addAll(fetchTiers(true));
 
-        NeoBlock.LOGGER.debug("Creating new world data");
+        NeoBlockMod.LOGGER.debug("Creating new world data");
         return data;
     }
     public static @NotNull WorldManager load(@NotNull CompoundTag tag, ServerLevel level) {
-        WorldManager data = NeoBlock.instanceWorldData(level);
+        WorldManager data = NeoBlockMod.instanceWorldData(level);
 
-        NeoBlock.LOGGER.debug("Loading WorldData from {}", tag);
+        NeoBlockMod.LOGGER.debug("Loading WorldData from {}", tag);
         data.status = NBTSaveable.instance(WorldData.class, tag, data);
         data.tiers.addAll(fetchTiers(false));
 
@@ -162,7 +162,7 @@ public abstract class WorldManager extends SavedData {
             tier.load(tt);
 
             if (!tier.isStable()) {
-                NeoBlock.sendMessage("message.neoblock.tier_updated", level, false, id);
+                NeoBlockMod.sendMessage("message.neoblock.tier_updated", level, false, id);
                 isUpdated = true;
             }
         }
@@ -178,7 +178,7 @@ public abstract class WorldManager extends SavedData {
         for (int i = 0; Files.exists(TierSpec.FOLDER.resolve("tier-" + i + ".toml")); i++)
             tiers.add(new TierSpec(i, loadConfig));
 
-        NeoBlock.LOGGER.info("Loaded {} tiers from the tiers folder.", tiers.size());
+        NeoBlockMod.LOGGER.info("Loaded {} tiers from the tiers folder.", tiers.size());
         return tiers;
     }
 
@@ -188,7 +188,7 @@ public abstract class WorldManager extends SavedData {
         for (TierSpec tier: tiers) list.add(tier.save());
         tag.put("Tiers", list);
 
-        NeoBlock.LOGGER.debug("WorldData saved as {}", tag);
+        NeoBlockMod.LOGGER.debug("WorldData saved as {}", tag);
         return tag;
     }
 

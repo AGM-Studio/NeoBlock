@@ -2,7 +2,7 @@ package xyz.agmstudio.neoblock.animations;
 
 import net.minecraft.server.level.ServerLevel;
 import org.jetbrains.annotations.NotNull;
-import xyz.agmstudio.neoblock.NeoBlock;
+import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.animations.idle.IdleAnimation;
 import xyz.agmstudio.neoblock.animations.idle.NeoFlowAnimation;
 import xyz.agmstudio.neoblock.animations.idle.PulseAnimation;
@@ -24,7 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 
 public abstract class Animation implements IConfig.Configured {
-    private static final Path FOLDER = ResourceUtil.getConfigFolder(NeoBlock.MOD_ID, "animations");
+    private static final Path FOLDER = ResourceUtil.getConfigFolder(NeoBlockMod.MOD_ID, "animations");
     private static final List<Animation> animations = new ArrayList<>();
     public static final HashSet<CooldownProgressAnimation> progressAnimations = new HashSet<>();
     public static final HashSet<CooldownPhaseAnimation> phaseAnimations = new HashSet<>();

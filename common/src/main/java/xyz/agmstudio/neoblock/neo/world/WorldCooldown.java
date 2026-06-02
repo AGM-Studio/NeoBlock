@@ -2,7 +2,7 @@ package xyz.agmstudio.neoblock.neo.world;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
-import xyz.agmstudio.neoblock.NeoBlock;
+import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.animations.Animation;
 import xyz.agmstudio.neoblock.data.NBTSaveable;
 import xyz.agmstudio.neoblock.neo.block.BlockManager;
@@ -37,10 +37,10 @@ public class WorldCooldown implements NBTSaveable {
                 tier.setResearched(true);
                 tier.startSequence.addToQueue(false);
                 tier.unlockActions.apply(level);
-                NeoBlock.sendInstantMessage("message.neoblock.unlocked_tier", level, false, tier.getID());
+                NeoBlockMod.sendInstantMessage("message.neoblock.unlocked_tier", level, false, tier.getID());
             }
             public void onStart(ServerLevel level) {
-                NeoBlock.sendInstantMessage("message.neoblock.unlocking_tier", level, false, tier.getID());
+                NeoBlockMod.sendInstantMessage("message.neoblock.unlocking_tier", level, false, tier.getID());
                 tier.researchActions.apply(level);
             }
         }

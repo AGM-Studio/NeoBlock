@@ -6,7 +6,7 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import org.jetbrains.annotations.NotNull;
-import xyz.agmstudio.neoblock.NeoBlock;
+import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.neo.loot.NeoItemSpec;
 import xyz.agmstudio.neoblock.platform.IConfig;
 import xyz.agmstudio.neoblock.util.PatternUtil;
@@ -24,9 +24,9 @@ public class NeoChestSpec extends NeoBlockSpec {
     private static final HashMap<String, Holder> CHESTS = new HashMap<>();
 
     public static void reloadChests() {
-        IConfig config = IConfig.getConfig(NeoBlock.CONFIG_FOLDER, "chests");
+        IConfig config = IConfig.getConfig(NeoBlockMod.CONFIG_FOLDER, "chests");
         if (config == null) {
-            NeoBlock.LOGGER.error("Failed to load chests config.");
+            NeoBlockMod.LOGGER.error("Failed to load chests config.");
             return;
         }
 
@@ -38,16 +38,16 @@ public class NeoChestSpec extends NeoBlockSpec {
             List<NeoItemSpec> list = new ArrayList<>();
             List<String> items = section.get("items", List.of());
             items.forEach(entry -> NeoItemSpec.parseItem(entry).ifPresent(list::add));
-            if (list.isEmpty()) NeoBlock.LOGGER.info("Unable to load chest {} because it's empty.", key);
+            if (list.isEmpty()) NeoBlockMod.LOGGER.info("Unable to load chest {} because it's empty.", key);
             else {
-                NeoBlock.LOGGER.info("Loaded {} stacks for {}", list.size(), key);
+                NeoBlockMod.LOGGER.info("Loaded {} stacks for {}", list.size(), key);
                 int min = Math.max(0, section.getInt("min", 0));
                 int max = Math.min(27, section.getInt("max", 27));
                 CHESTS.put(key, new Holder(list, Math.min(min, max), Math.max(min, max)));
             }
         });
 
-        NeoBlock.LOGGER.info("Loaded {} chests.", CHESTS.size());
+        NeoBlockMod.LOGGER.info("Loaded {} chests.", CHESTS.size());
     }
 
     public static Optional<NeoChestSpec> parseChest(String input) {
@@ -56,7 +56,7 @@ public class NeoChestSpec extends NeoBlockSpec {
 
         String name = matcher.group("name");
         Holder chest = CHESTS.getOrDefault(name, null);
-        if (chest == null) NeoBlock.LOGGER.warn("Unknown chest ID: '{}'", name);
+        if (chest == null) NeoBlockMod.LOGGER.warn("Unknown chest ID: '{}'", name);
 
         String countString = matcher.group("count");
         int count = (countString != null) ? Integer.parseInt(countString) : 1;

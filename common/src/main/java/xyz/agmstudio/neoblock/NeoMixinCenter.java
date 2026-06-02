@@ -30,14 +30,14 @@ public final class NeoMixinCenter {
         try {
             uiState = getUiState(screen);
         } catch (RuntimeException e) {
-            NeoBlock.LOGGER.error("Could not access the \"uiState\". Aborting the mixin!", e);
+            NeoBlockMod.LOGGER.error("Could not access the \"uiState\". Aborting the mixin!", e);
             return;
         }
 
         List<WorldCreationUiState.WorldTypeEntry> list = uiState.getNormalPresetList();
-        String name = NeoBlock.getConfig().get(
+        String name = NeoBlockMod.getConfig().get(
                 "world.preset",
-                NeoBlock.getConfig().get("world.no-nether", true) ?
+                NeoBlockMod.getConfig().get("world.no-nether", true) ?
                         "neoblock:neoblock_no_nether" : "neoblock:neoblock"
         );
 

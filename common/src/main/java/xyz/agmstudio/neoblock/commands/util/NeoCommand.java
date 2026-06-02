@@ -17,7 +17,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import org.jetbrains.annotations.NotNull;
-import xyz.agmstudio.neoblock.NeoBlock;
+import xyz.agmstudio.neoblock.NeoBlockMod;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -97,7 +97,7 @@ public abstract class NeoCommand {
             } catch (CommandSyntaxException e) {
                 throw e;
             } catch (Exception e) {
-                NeoBlock.LOGGER.error("Unhandled exception while executing command", e);
+                NeoBlockMod.LOGGER.error("Unhandled exception while executing command", e);
                 throw UNEXPECTED_EXCEPTION.create(e);
             }
         };

@@ -16,7 +16,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import org.jetbrains.annotations.NotNull;
-import xyz.agmstudio.neoblock.NeoBlock;
+import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.neo.world.WorldManager;
 import xyz.agmstudio.neoblock.platform.INBTHelper;
 import xyz.agmstudio.neoblock.util.StringUtil;
@@ -47,7 +47,7 @@ public class TierDisplayCategory implements IRecipeCategory<TierDisplay> {
         height = 78 + 18 * rows;
         background = helper.createBlankDrawable(166, height);
         slot = helper.getSlotDrawable();
-        icon = helper.createDrawableIngredient(VanillaTypes.ITEM_STACK, new ItemStack(NeoBlock.REGISTRY.getNeoBlockItem()));
+        icon = helper.createDrawableIngredient(VanillaTypes.ITEM_STACK, new ItemStack(NeoBlockMod.REGISTRY.getNeoBlockItem()));
     }
 
     @Override public @NotNull Component getTitle() {

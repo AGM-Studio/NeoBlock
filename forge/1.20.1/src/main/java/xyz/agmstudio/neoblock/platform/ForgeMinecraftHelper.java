@@ -34,7 +34,7 @@ import net.minecraftforge.common.TierSortingRegistry;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
-import xyz.agmstudio.neoblock.NeoBlock;
+import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.neo.loot.NeoItemSpec;
 import xyz.agmstudio.neoblock.neo.world.WorldManager;
 import xyz.agmstudio.neoblock.util.MinecraftUtil;
@@ -77,7 +77,7 @@ public final class ForgeMinecraftHelper implements IMinecraftHelper {
         return stack.getEnchantmentLevel(enchantment);
     }
     @Override public int getEnchantmentLevel(ItemStack stack, ResourceKey<Enchantment> enchantment) {
-        NeoBlock.LOGGER.warn("getEnchantmentLevel(ItemStack, ResourceKey<Enchantment>) not implemented");
+        NeoBlockMod.LOGGER.warn("getEnchantmentLevel(ItemStack, ResourceKey<Enchantment>) not implemented");
         return 0;
     }
     @Override public boolean isSilkTouched(ItemStack stack) {

@@ -8,7 +8,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
-import xyz.agmstudio.neoblock.NeoBlock;
+import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.neo.block.NeoBlockPos;
 import xyz.agmstudio.neoblock.platform.INBTHelper;
 import xyz.agmstudio.neoblock.util.ResourceUtil;
@@ -21,9 +21,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Schematic {
-    public static final Path folder = ResourceUtil.getConfigFolder(NeoBlock.MOD_ID, "schematics");
+    public static final Path folder = ResourceUtil.getConfigFolder(NeoBlockMod.MOD_ID, "schematics");
     static {
-        if (folder.toFile().mkdirs()) NeoBlock.LOGGER.debug("Created {}", folder);
+        if (folder.toFile().mkdirs()) NeoBlockMod.LOGGER.debug("Created {}", folder);
     }
 
     public static @Nullable Path saveSchematic(ServerLevel level, BlockPos pos1, BlockPos pos2, @Nullable BlockPos center, @Nullable String name) {
@@ -39,7 +39,7 @@ public class Schematic {
             INBTHelper.IO.write(file, nbt);
             return file;
         } catch (IOException e) {
-            NeoBlock.LOGGER.error("Failed to save schematic", e);
+            NeoBlockMod.LOGGER.error("Failed to save schematic", e);
             return null;
         }
     }
@@ -59,7 +59,7 @@ public class Schematic {
             Schematic.fromNBT(tag, level).place(level, origin);
             return 1;
         } catch (Exception e) {
-            NeoBlock.LOGGER.error("Failed to load schematic", e);
+            NeoBlockMod.LOGGER.error("Failed to load schematic", e);
             return -1;
         }
     }

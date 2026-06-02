@@ -12,7 +12,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
-import xyz.agmstudio.neoblock.NeoBlock;
+import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.NeoListener;
 import xyz.agmstudio.neoblock.animations.Animation;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoMerchant;
@@ -55,7 +55,7 @@ public class BlockManager {
 
         TierSpec tier = getRandomTierSpec();
         if (tier == null) {
-            NeoBlock.LOGGER.error("Unable to find a block for {} blocks", WorldManager.getWorldData().getBlockCount());
+            NeoBlockMod.LOGGER.error("Unable to find a block for {} blocks", WorldManager.getWorldData().getBlockCount());
             return DEFAULT_SPEC;
         }
 

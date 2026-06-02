@@ -6,7 +6,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.npc.WanderingTrader;
 import org.jetbrains.annotations.NotNull;
-import xyz.agmstudio.neoblock.NeoBlock;
+import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoMerchant;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoTradePool;
 import xyz.agmstudio.neoblock.neo.world.WorldCooldown;
@@ -66,11 +66,11 @@ public final class NeoEventAction {
 
         WanderingTrader trader = NeoMerchant.spawnTraderWith(trades.getPool(), level, "UnlockTrader");
         if (trader != null)
-            if (customTraderMessage != null) NeoBlock.sendInstantMessage(customTraderMessage, level, false);
-            else NeoBlock.sendInstantMessage(traderMessage, level, false, traderMessageArgs);
+            if (customTraderMessage != null) NeoBlockMod.sendInstantMessage(customTraderMessage, level, false);
+            else NeoBlockMod.sendInstantMessage(traderMessage, level, false, traderMessageArgs);
 
-        NeoBlock.sendInstantMessage(actionMessage, level, true);
-        for (Component message: this.messages) NeoBlock.sendInstantMessage(message, level, false);
+        NeoBlockMod.sendInstantMessage(actionMessage, level, true);
+        for (Component message: this.messages) NeoBlockMod.sendInstantMessage(message, level, false);
         if (cooldown > 0) WorldCooldown.Type.Normal.create(cooldown);
     }
 }

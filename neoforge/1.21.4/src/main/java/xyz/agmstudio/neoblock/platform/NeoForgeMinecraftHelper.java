@@ -38,7 +38,7 @@ import net.minecraft.world.scores.*;
 import net.minecraft.world.scores.criteria.ObjectiveCriteria;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
-import xyz.agmstudio.neoblock.NeoBlock;
+import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.neo.loot.NeoItemSpec;
 import xyz.agmstudio.neoblock.neo.world.WorldManager;
 import xyz.agmstudio.neoblock.util.MinecraftUtil;
@@ -166,13 +166,13 @@ public final class NeoForgeMinecraftHelper implements IMinecraftHelper {
     @Override public Optional<MerchantOffer> getOfferOf(NeoItemSpec result, NeoItemSpec costA, NeoItemSpec costB, UniformInt uses) {
         @NotNull final Item AIR = Items.AIR;
 
-        NeoBlock.LOGGER.info("Offer of {}, {}, {}", result, costA, costB);
+        NeoBlockMod.LOGGER.info("Offer of {}, {}, {}", result, costA, costB);
 
         ItemStack r = result.getStack();
         ItemCost a = toItemCost(costA);
         Optional<ItemCost> b = costB != null ? Optional.of(toItemCost(costB)) : Optional.empty();
 
-        NeoBlock.LOGGER.info("Result Offer of {}, {}, {}", r, a, b);
+        NeoBlockMod.LOGGER.info("Result Offer of {}, {}, {}", r, a, b);
 
         if (r.getItem() == AIR || a.itemStack().getItem() == AIR) return Optional.empty();
         return Optional.of(new MerchantOffer(a, b, r, uses.sample(WorldManager.getRandom()), 0, 0));
