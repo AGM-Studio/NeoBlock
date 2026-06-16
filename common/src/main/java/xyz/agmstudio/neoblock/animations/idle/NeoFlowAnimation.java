@@ -4,7 +4,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
-import xyz.agmstudio.neoblock.util.MinecraftUtil;
+import xyz.agmstudio.neocore.NeoMC;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -44,7 +44,7 @@ public class NeoFlowAnimation extends IdleAnimation {
         for (AnimationParticle particle: particles) {
             Vec3 next = particle.next(speed);
             Vector3f color = getRainbowColor();
-            level.sendParticles(MinecraftUtil.getDustParticle(color, 1.0f), next.x, next.y, next.z, 1, 0, 0, 0, 0.01);
+            level.sendParticles(NeoMC.getDustParticle(color, 1.0f), next.x, next.y, next.z, 1, 0, 0, 0, 0.01);
         }
     }
 

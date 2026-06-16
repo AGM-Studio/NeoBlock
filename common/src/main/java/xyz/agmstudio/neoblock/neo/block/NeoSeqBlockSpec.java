@@ -7,8 +7,8 @@ import net.minecraft.world.level.block.Blocks;
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.neo.world.WorldManager;
-import xyz.agmstudio.neoblock.platform.IConfig;
-import xyz.agmstudio.neoblock.util.PatternUtil;
+import xyz.agmstudio.neocore.platform.IConfig;
+import xyz.agmstudio.neocore.util.StringUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 
 public class NeoSeqBlockSpec extends NeoBlockSpec {
     private static final Pattern PATTERN =
-            PatternUtil.COUNT.optional().then("neoblock:(?:seq|sequence):").then(PatternUtil.NAME).build(true);
+            StringUtil.COUNT.optional().then("neoblock:(?:seq|sequence):").then(StringUtil.NAME).build(true);
 
     private static final HashMap<String, List<NeoBlockSpec>> SEQUENCES = new HashMap<>();
     private final List<NeoBlockSpec> blocks;
@@ -31,9 +31,9 @@ public class NeoSeqBlockSpec extends NeoBlockSpec {
     }
 
     public static void reloadSequences() {
-        IConfig config = IConfig.getConfig(NeoBlockMod.CONFIG_FOLDER, "sequences");
+        IConfig config = NeoBlockMod.get().getConfig("sequences");
         if (config == null) {
-            NeoBlockMod.LOGGER.error("Failed to load block sequences config.");
+            NeoBlockMod.getLogger().error("Failed to load block sequences config.");
             return;
         }
 
@@ -41,14 +41,14 @@ public class NeoSeqBlockSpec extends NeoBlockSpec {
 
         config.forEach((key, value) -> {
             List<NeoBlockSpec> list = extractSequenceList(config.get(key));
-            if (list.isEmpty()) NeoBlockMod.LOGGER.info("Unable to load sequence {} because it's empty.", key);
+            if (list.isEmpty()) NeoBlockMod.getLogger().info("Unable to load sequence {} because it's empty.", key);
             else {
-                NeoBlockMod.LOGGER.info("Loaded {} blocks for {}.", list.size(), key);
+                NeoBlockMod.getLogger().info("Loaded {} blocks for {}.", list.size(), key);
                 SEQUENCES.put(key, list);
             }
         });
 
-        NeoBlockMod.LOGGER.info("Loaded {} block sequences.", SEQUENCES.size());
+        NeoBlockMod.getLogger().info("Loaded {} block sequences.", SEQUENCES.size());
     }
 
     public static List<NeoBlockSpec> extractSequenceList(List<String> entries) {
@@ -64,7 +64,7 @@ public class NeoSeqBlockSpec extends NeoBlockSpec {
         if (!matcher.matches()) return Optional.empty();
 
         List<NeoBlockSpec> blocks = SEQUENCES.getOrDefault(matcher.group("name"), List.of());
-        if (blocks.isEmpty()) NeoBlockMod.LOGGER.warn("Unknown sequence ID: '{}'", matcher.group("id"));
+        if (blocks.isEmpty()) NeoBlockMod.getLogger().warn("Unknown sequence ID: '{}'", matcher.group("id"));
 
         String countString = matcher.group("count");
         int count = (countString != null) ? Integer.parseInt(countString) : 1;

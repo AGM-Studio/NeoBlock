@@ -15,10 +15,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.neo.world.WorldManager;
-import xyz.agmstudio.neoblock.platform.INBTHelper;
-import xyz.agmstudio.neoblock.util.MinecraftUtil;
-import xyz.agmstudio.neoblock.util.PatternUtil;
-import xyz.agmstudio.neoblock.util.StringUtil;
+import xyz.agmstudio.neocore.NeoNBT;
+import xyz.agmstudio.neocore.NeoMC;
+import xyz.agmstudio.neocore.util.StringUtil;
 
 import java.util.List;
 import java.util.Optional;
@@ -27,8 +26,8 @@ import java.util.regex.Pattern;
 
 public class NeoMobSpec extends NeoItemSpec {
     private static final Pattern MOB_PATTERN =
-            PatternUtil.literal("mob:").then(PatternUtil.RANGE.optional()).then(PatternUtil.NAMESPACE).then(PatternUtil.CHANCE.optional()).build(false);
-    @NotNull private static final ResourceLocation DEFAULT = MinecraftUtil.parseResourceLocation("minecraft:pig");
+            StringUtil.literal("mob:").then(StringUtil.RANGE.optional()).then(StringUtil.NAMESPACE).then(StringUtil.CHANCE.optional()).build(false);
+    @NotNull private static final ResourceLocation DEFAULT = NeoMC.parseResourceLocation("minecraft:pig");
 
     public static void load() {}
 
@@ -44,21 +43,21 @@ public class NeoMobSpec extends NeoItemSpec {
     }
 
     @Override public Item getItem() {
-        return NeoBlockMod.REGISTRY.getMobTicket();
+        return NeoBlockMod.getRegistry().getMobTicket();
     }
 
     @Override public ItemStack modify(ItemStack item) {
-        CompoundTag tag = INBTHelper.Item.getItemTag(item);
+        CompoundTag tag = NeoNBT.Item.getItemTag(item);
 
-        @Nullable ResourceLocation location = MinecraftUtil.getEntityTypeResource(mob).orElse(null);
+        @Nullable ResourceLocation location = NeoMC.getEntityTypeResource(mob).orElse(null);
         tag.putString("neoMobType", location != null ? location.toString() : DEFAULT.toString());
 
-        INBTHelper.Item.setItemTag(item, tag);
+        NeoNBT.Item.setItemTag(item, tag);
         return item;
     }
 
     @Override public ResourceLocation getResource() {
-        return MinecraftUtil.getEntityTypeResource(mob).orElse(DEFAULT);
+        return NeoMC.getEntityTypeResource(mob).orElse(DEFAULT);
     }
     @Override
     public String getId() {
@@ -82,10 +81,10 @@ public class NeoMobSpec extends NeoItemSpec {
     }
 
     public static Optional<EntityType<?>> getMobTradeEntity(ItemStack item) {
-        if (item == null || !item.getItem().equals(NeoBlockMod.REGISTRY.getMobTicket())) return Optional.empty();
+        if (item == null || !item.getItem().equals(NeoBlockMod.getRegistry().getMobTicket())) return Optional.empty();
 
-        CompoundTag tag = INBTHelper.Item.getItemTag(item);
-        return MinecraftUtil.getEntityType(tag.getString("neoMobType"));
+        CompoundTag tag = NeoNBT.Item.getItemTag(item);
+        return NeoMC.getEntityType(tag.getString("neoMobType"));
     }
 
     public static boolean handlePossibleMobTrade(ItemStack item, ServerLevel level) {
@@ -100,13 +99,13 @@ public class NeoMobSpec extends NeoItemSpec {
     }
 
     public static ItemStack of(EntityType<?> mob, int count) {
-        ItemStack item = new ItemStack(NeoBlockMod.REGISTRY.getMobTicket(), count);
-        CompoundTag tag = INBTHelper.Item.getItemTag(item);
+        ItemStack item = new ItemStack(NeoBlockMod.getRegistry().getMobTicket(), count);
+        CompoundTag tag = NeoNBT.Item.getItemTag(item);
 
-        @Nullable ResourceLocation location = MinecraftUtil.getEntityTypeResource(mob).orElse(null);
+        @Nullable ResourceLocation location = NeoMC.getEntityTypeResource(mob).orElse(null);
         tag.putString("neoMobType", location != null ? location.toString() : DEFAULT.toString());
 
-        INBTHelper.Item.setItemTag(item, tag);
+        NeoNBT.Item.setItemTag(item, tag);
         return item;
     }
 

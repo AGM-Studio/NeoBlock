@@ -6,18 +6,18 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import xyz.agmstudio.neoblock.neo.world.WorldManager;
-import xyz.agmstudio.neoblock.util.MinecraftUtil;
-import xyz.agmstudio.neoblock.util.PatternUtil;
-import xyz.agmstudio.neoblock.util.StringUtil;
+import xyz.agmstudio.neocore.providers.ItemStackProvider;
+import xyz.agmstudio.neocore.NeoMC;
+import xyz.agmstudio.neocore.util.StringUtil;
 
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class NeoItemSpec {
+public class NeoItemSpec implements ItemStackProvider {
     private static final Pattern PATTERN =
-            PatternUtil.RANGE.optional().then(PatternUtil.NAMESPACE).then(PatternUtil.CHANCE.optional()).build(false);
-    private static final ResourceLocation DEFAULT = MinecraftUtil.parseResourceLocation("minecraft:stone");
+            StringUtil.RANGE.optional().then(StringUtil.NAMESPACE).then(StringUtil.CHANCE.optional()).build(false);
+    private static final ResourceLocation DEFAULT = NeoMC.parseResourceLocation("minecraft:stone");
     protected static ItemStack getDefault() {
         return new ItemStack(Items.STONE, 1);
     }
@@ -33,7 +33,7 @@ public class NeoItemSpec {
     }
 
 
-    public ItemStack getStack() {
+    @Override public ItemStack getStack() {
         int count = range.sample(WorldManager.getRandom());
         return modify(new ItemStack(getItem(), count));
     }
@@ -44,7 +44,7 @@ public class NeoItemSpec {
     }
 
     public ResourceLocation getResource() {
-        return MinecraftUtil.getItemResource(getItem()).orElse(DEFAULT);
+        return NeoMC.getItemResource(getItem()).orElse(DEFAULT);
     }
     public String getId() {
         return getResource().toString();
@@ -79,7 +79,7 @@ public class NeoItemSpec {
         Matcher matcher = PATTERN.matcher(input.trim().toLowerCase());
         if (!matcher.matches()) return Optional.empty();
 
-        Item item = MinecraftUtil.getItem(matcher.group("id")).orElse(null);
+        Item item = NeoMC.getItem(matcher.group("id")).orElse(null);
         if (item == null) return Optional.empty();
 
         UniformInt range = StringUtil.parseRange(matcher.group("count"));

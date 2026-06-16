@@ -14,8 +14,7 @@ import xyz.agmstudio.neoblock.animations.progress.CooldownProgressAnimation;
 import xyz.agmstudio.neoblock.animations.progress.SparkleAnimation;
 import xyz.agmstudio.neoblock.animations.progress.SpiralAnimation;
 import xyz.agmstudio.neoblock.neo.world.WorldCooldown;
-import xyz.agmstudio.neoblock.platform.IConfig;
-import xyz.agmstudio.neoblock.util.ResourceUtil;
+import xyz.agmstudio.neocore.platform.IConfig;
 
 import java.lang.reflect.Field;
 import java.nio.file.Path;
@@ -24,7 +23,7 @@ import java.util.HashSet;
 import java.util.List;
 
 public abstract class Animation implements IConfig.Configured {
-    private static final Path FOLDER = ResourceUtil.getConfigFolder(NeoBlockMod.MOD_ID, "animations");
+    private static final Path FOLDER = NeoBlockMod.get().getConfigFolder("animations");
     private static final List<Animation> animations = new ArrayList<>();
     public static final HashSet<CooldownProgressAnimation> progressAnimations = new HashSet<>();
     public static final HashSet<CooldownPhaseAnimation> phaseAnimations = new HashSet<>();
@@ -75,11 +74,11 @@ public abstract class Animation implements IConfig.Configured {
         this.config = config;
     }
     public Animation(String name) {
-        this.config = IConfig.getConfig(FOLDER, name);
+        this.config = NeoBlockMod.get().getConfig(FOLDER, name);
     }
     public Animation(String category, String name) {
         final Path subfolder = FOLDER.resolve(category);
-        this.config = IConfig.getConfig(subfolder, name);
+        this.config = NeoBlockMod.get().getConfig(subfolder, name);
     }
 
     public boolean isEnabled() {

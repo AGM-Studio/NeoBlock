@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import xyz.agmstudio.neoblock.compatibility.ForgivingVoid;
-import xyz.agmstudio.neoblock.util.MinecraftUtil;
+import xyz.agmstudio.neocore.NeoMC;
 
 @Mixin(Entity.class)
 public abstract class EntityVoidRescueMixin {
@@ -15,7 +15,7 @@ public abstract class EntityVoidRescueMixin {
     private void onEntityDiscard(CallbackInfo ci) {
         //noinspection DataFlowIssue
         Entity self = (Entity) (Object) this;
-        if (self.level() instanceof ServerLevel level && self.getY() < MinecraftUtil.getLevelMinY(level))
+        if (self.level() instanceof ServerLevel level && self.getY() < NeoMC.getLevelMinY(level))
             if (ForgivingVoid.handleVoid(level, self)) ci.cancel();
     }
 }

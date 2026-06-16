@@ -6,8 +6,8 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlockMod;
-import xyz.agmstudio.neoblock.util.MinecraftUtil;
-import xyz.agmstudio.neoblock.util.PatternUtil;
+import xyz.agmstudio.neocore.NeoMC;
+import xyz.agmstudio.neocore.util.StringUtil;
 
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 
 public class NeoBlockSpec {
     private static final Pattern PATTERN =
-            PatternUtil.COUNT.optional().then(PatternUtil.namespace("block")).build(true);
+            StringUtil.COUNT.optional().then(StringUtil.namespace("block")).build(true);
     protected static Block getDefault() {
         return BlockManager.DEFAULT_SPEC.getBlock();
     }
@@ -35,14 +35,14 @@ public class NeoBlockSpec {
 
         Matcher matcher = PATTERN.matcher(input.trim());
         if (!matcher.matches()) {
-            NeoBlockMod.LOGGER.warn("Invalid block: '{}'", input);
+            NeoBlockMod.getLogger().warn("Invalid block: '{}'", input);
             return Optional.empty();
         }
 
         String blockString = matcher.group("block");
-        Optional<Block> block = MinecraftUtil.getBlock(blockString);
+        Optional<Block> block = NeoMC.getBlock(blockString);
         if (block.isEmpty()) {
-            NeoBlockMod.LOGGER.warn("Unknown block ID: '{}'", blockString);
+            NeoBlockMod.getLogger().warn("Unknown block ID: '{}'", blockString);
             return Optional.empty();
         }
 
@@ -71,7 +71,7 @@ public class NeoBlockSpec {
     }
     public String getID() {
         String range = weight > 1 ? weight + "x " : "";
-        return range + MinecraftUtil.getBlockResource(getBlock()).orElse(null);
+        return range + NeoMC.getBlockResource(getBlock()).orElse(null);
     }
 
     public void placeAt(@NotNull LevelAccessor level, BlockPos pos) {

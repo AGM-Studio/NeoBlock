@@ -19,7 +19,7 @@ import xyz.agmstudio.neoblock.neo.loot.trade.NeoMerchant;
 import xyz.agmstudio.neoblock.neo.tiers.TierSpec;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
 import xyz.agmstudio.neoblock.neo.world.WorldManager;
-import xyz.agmstudio.neoblock.util.MinecraftUtil;
+import xyz.agmstudio.neocore.NeoMC;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,7 +55,7 @@ public class BlockManager {
 
         TierSpec tier = getRandomTierSpec();
         if (tier == null) {
-            NeoBlockMod.LOGGER.error("Unable to find a block for {} blocks", WorldManager.getWorldData().getBlockCount());
+            NeoBlockMod.getLogger().error("Unable to find a block for {} blocks", WorldManager.getWorldData().getBlockCount());
             return DEFAULT_SPEC;
         }
 
@@ -111,9 +111,9 @@ public class BlockManager {
 
     public static void handleEndPortalFrameBreak(ServerLevel level, BlockState state, BlockPos pos, Player player) {
         ItemStack tool = player.getMainHandItem();
-        if (!MinecraftUtil.canBreak(tool.getItem(), Blocks.OBSIDIAN.defaultBlockState())) return;
+        if (!NeoMC.canBreak(tool.getItem(), Blocks.OBSIDIAN.defaultBlockState())) return;
 
-        ItemStack drop = MinecraftUtil.isSilkTouched(tool) ?
+        ItemStack drop = NeoMC.isSilkTouched(tool) ?
                 new ItemStack(Blocks.END_PORTAL_FRAME) :
                 new ItemStack(Blocks.END_STONE);
 

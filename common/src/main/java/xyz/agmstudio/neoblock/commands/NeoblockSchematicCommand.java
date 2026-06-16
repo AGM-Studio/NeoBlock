@@ -5,10 +5,10 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
-import xyz.agmstudio.neoblock.commands.util.NeoArgumentBlockPos;
-import xyz.agmstudio.neoblock.commands.util.NeoArgumentString;
-import xyz.agmstudio.neoblock.commands.util.NeoCommand;
-import xyz.agmstudio.neoblock.data.Schematic;
+import xyz.agmstudio.neocore.commands.NeoArgumentBlockPos;
+import xyz.agmstudio.neocore.commands.NeoArgumentString;
+import xyz.agmstudio.neocore.commands.NeoCommand;
+import xyz.agmstudio.neoblock.schematics.Schematic;
 
 import java.nio.file.Path;
 

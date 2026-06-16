@@ -4,7 +4,7 @@ import net.minecraft.client.gui.screens.worldselection.WorldCreationUiState;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.presets.WorldPreset;
-import xyz.agmstudio.neoblock.util.MinecraftUtil;
+import xyz.agmstudio.neocore.NeoMC;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -30,7 +30,7 @@ public final class NeoMixinCenter {
         try {
             uiState = getUiState(screen);
         } catch (RuntimeException e) {
-            NeoBlockMod.LOGGER.error("Could not access the \"uiState\". Aborting the mixin!", e);
+            NeoBlockMod.getLogger().error("Could not access the \"uiState\". Aborting the mixin!", e);
             return;
         }
 
@@ -41,7 +41,7 @@ public final class NeoMixinCenter {
                         "neoblock:neoblock_no_nether" : "neoblock:neoblock"
         );
 
-        ResourceLocation location = MinecraftUtil.parseResourceLocation(name);
+        ResourceLocation location = NeoMC.parseResourceLocation(name);
         WorldCreationUiState.WorldTypeEntry type = uiState.getWorldType();
         for (WorldCreationUiState.WorldTypeEntry entry : list) {
             Holder<WorldPreset> world = entry.preset();

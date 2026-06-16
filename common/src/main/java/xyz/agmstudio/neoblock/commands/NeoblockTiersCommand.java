@@ -3,9 +3,8 @@ package xyz.agmstudio.neoblock.commands;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.commands.CommandSourceStack;
-import xyz.agmstudio.neoblock.commands.util.NeoArgumentBoolean;
-import xyz.agmstudio.neoblock.commands.util.NeoArgumentTier;
-import xyz.agmstudio.neoblock.commands.util.NeoCommand;
+import xyz.agmstudio.neocore.commands.NeoArgumentBoolean;
+import xyz.agmstudio.neocore.commands.NeoCommand;
 import xyz.agmstudio.neoblock.neo.tiers.TierSpec;
 import xyz.agmstudio.neoblock.neo.world.WorldManager;
 

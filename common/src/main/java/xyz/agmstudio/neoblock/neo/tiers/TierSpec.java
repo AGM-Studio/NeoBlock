@@ -3,7 +3,8 @@ package xyz.agmstudio.neoblock.neo.tiers;
 import net.minecraft.nbt.CompoundTag;
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlockMod;
-import xyz.agmstudio.neoblock.data.NBTSaveable;
+import xyz.agmstudio.neoblock.configs.TierConfig;
+import xyz.agmstudio.neocore.data.NBTSaveable;
 import xyz.agmstudio.neoblock.neo.block.BlockManager;
 import xyz.agmstudio.neoblock.neo.block.NeoBlockSpec;
 import xyz.agmstudio.neoblock.neo.block.NeoSeqBlockSpec;
@@ -13,17 +14,15 @@ import xyz.agmstudio.neoblock.neo.loot.trade.NeoTrade;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoTradePool;
 import xyz.agmstudio.neoblock.neo.world.WorldCooldown;
 import xyz.agmstudio.neoblock.neo.world.WorldManager;
-import xyz.agmstudio.neoblock.platform.IConfig;
-import xyz.agmstudio.neoblock.util.PatternUtil;
-import xyz.agmstudio.neoblock.util.ResourceUtil;
-import xyz.agmstudio.neoblock.util.StringUtil;
+import xyz.agmstudio.neocore.platform.IConfig;
+import xyz.agmstudio.neocore.util.StringUtil;
 
 import java.nio.file.Path;
 import java.util.*;
 import java.util.regex.Matcher;
 
 public class TierSpec implements NBTSaveable {
-    public static final Path FOLDER = ResourceUtil.getConfigFolder(NeoBlockMod.MOD_ID, "tiers");
+    public static final Path FOLDER = NeoBlockMod.get().getConfigFolder("tiers");
 
     // Stored data in world info
     @NBTData protected int id;
@@ -32,6 +31,12 @@ public class TierSpec implements NBTSaveable {
     @NBTData protected boolean commanded = false;
     @NBTData protected boolean researched = false;
     @NBTData protected String hash = "";
+    // Loaded from config
+    protected TierConfig config;
+    public TierSpec(@NotNull TierConfig config) {
+        this.config = config;
+        this.hash = config.getHashCode();
+    }
 
     public TierSpec(final int id, boolean loadConfig) {
         this.id = id;
@@ -69,11 +74,10 @@ public class TierSpec implements NBTSaveable {
     public NeoEventAction researchActions;
 
     public void loadConfig() {
-        Path FOLDER = ResourceUtil.getConfigFolder(NeoBlockMod.MOD_ID, "tiers");
-        IConfig config = IConfig.getConfig(FOLDER, "tier-" + this.id);
+        IConfig config = NeoBlockMod.get().getConfig(FOLDER, "tier-" + this.id);
         if (config == null) throw new NBTSaveable.AbortException("Unable to find config for tier " + this.id);
 
-        NeoBlockMod.LOGGER.debug("Loading tier {}...", this.id);
+        NeoBlockMod.getLogger().debug("Loading tier {}...", this.id);
         this.name = config.get("name", "Tier-" + this.id);
 
         this.requirements.clear();
@@ -107,31 +111,31 @@ public class TierSpec implements NBTSaveable {
         this.researchActions = new NeoEventAction(config, "on-research").withMessage("message.neoblock.research_trader", this.id);
 
         for (String key: config.keys()) {
-            Matcher obm = PatternUtil.ON_BLOCK_PATTERN.matcher(key);
+            Matcher obm = NeoEventBlockTrigger.ON_BLOCK_PATTERN.matcher(key);
             if (obm.matches()) {
                 int count = Integer.parseInt(obm.group("count"));
                 NeoEventAction actions = new NeoEventAction(config, obm.group()).withMessage("message.neoblock.trader_spawned", this.id);
                 this.onBlockActions.put(count, actions);
-                NeoBlockMod.LOGGER.debug("Added OB {} action for tier {}.", key, this.id);
+                NeoBlockMod.getLogger().debug("Added OB {} action for tier {}.", key, this.id);
             }
-            Matcher ebm = PatternUtil.EVERY_BLOCK_PATTERN.matcher(key);
+            Matcher ebm = NeoEventBlockTrigger.EVERY_BLOCK_PATTERN.matcher(key);
             if (ebm.matches()) {
                 int count = Integer.parseInt(ebm.group("count"));
                 NeoEventAction actions = new NeoEventAction(config, ebm.group()).withMessage("message.neoblock.trader_spawned", this.id);
                 this.otherBlockActions.put(new NeoEventBlockTrigger.Every(count), actions);
-                NeoBlockMod.LOGGER.debug("Added EB {} action for tier {}.", key, this.id);
+                NeoBlockMod.getLogger().debug("Added EB {} action for tier {}.", key, this.id);
             }
-            Matcher ebo = PatternUtil.EVERY_BLOCK_OFFSET_PATTERN.matcher(key);
+            Matcher ebo = NeoEventBlockTrigger.EVERY_BLOCK_OFFSET_PATTERN.matcher(key);
             if (ebo.matches()) {
                 int count = Integer.parseInt(ebo.group("count"));
                 int offset = Integer.parseInt(ebo.group("offset"));
                 NeoEventAction actions = new NeoEventAction(config, ebo.group()).withMessage("message.neoblock.trader_spawned", this.id);
                 this.otherBlockActions.put(new NeoEventBlockTrigger.EveryOffset(count, offset), actions);
-                NeoBlockMod.LOGGER.debug("Added EBO {} action for tier {}.", key, this.id);
+                NeoBlockMod.getLogger().debug("Added EBO {} action for tier {}.", key, this.id);
             }
         }
 
-        NeoBlockMod.LOGGER.debug("Tier {} loaded. Hash key: {}", this.id, this.getHashCode());
+        NeoBlockMod.getLogger().debug("Tier {} loaded. Hash key: {}", this.id, this.getHashCode());
     }
 
     // Methods
@@ -159,7 +163,7 @@ public class TierSpec implements NBTSaveable {
             if (randomValue < 0) return entry;
         }
 
-        NeoBlockMod.LOGGER.error("Unable to get a random block from tier {}", id);
+        NeoBlockMod.getLogger().error("Unable to get a random block from tier {}", id);
         return blocks.stream().findFirst().orElse(BlockManager.DEFAULT_SPEC);
     }
     public List<NeoBlockSpec> getBlocks() {

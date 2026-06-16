@@ -17,18 +17,18 @@ import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.animations.Animation;
 import xyz.agmstudio.neoblock.commands.NeoblockForceCommand;
-import xyz.agmstudio.neoblock.commands.util.NeoCommand;
+import xyz.agmstudio.neoblock.configs.TierConfig;
+import xyz.agmstudio.neocore.commands.NeoCommand;
 import xyz.agmstudio.neoblock.compatibility.ForgivingVoid;
-import xyz.agmstudio.neoblock.data.NBTSaveable;
-import xyz.agmstudio.neoblock.data.Schematic;
+import xyz.agmstudio.neocore.data.NBTSaveable;
+import xyz.agmstudio.neoblock.schematics.Schematic;
 import xyz.agmstudio.neoblock.neo.block.*;
 import xyz.agmstudio.neoblock.neo.loot.NeoTagItemSpec;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoMerchant;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoTrade;
 import xyz.agmstudio.neoblock.neo.tiers.TierSpec;
-import xyz.agmstudio.neoblock.platform.IConfig;
-import xyz.agmstudio.neoblock.util.MinecraftUtil;
-import xyz.agmstudio.neoblock.util.ResourceUtil;
+import xyz.agmstudio.neocore.platform.IConfig;
+import xyz.agmstudio.neocore.NeoMC;
 
 import java.io.FileNotFoundException;
 import java.nio.file.Files;
@@ -56,7 +56,7 @@ public abstract class WorldManager extends SavedData {
     }
 
     public static void reloadConfig() {
-        NeoBlockMod.reloadConfig();
+        NeoBlockMod.get().reloadModConfig();
 
         NeoTagItemSpec.reloadTags();
         NeoTrade.reloadTrades();
@@ -103,7 +103,7 @@ public abstract class WorldManager extends SavedData {
                         int result = Schematic.loadSchematic(level, pos, name);
                         if (result == 0) throw new FileNotFoundException("File \"" + name + "\" not found");
                     } catch (Exception e) {
-                        NeoBlockMod.LOGGER.error("Unable to load schematic {}", iterator, e);
+                        NeoBlockMod.getLogger().error("Unable to load schematic {}", iterator, e);
                     }
                     iterator++;
                 }
@@ -114,7 +114,7 @@ public abstract class WorldManager extends SavedData {
             } else {
                 Optional<NeoblockForceCommand.SetBlock> command = NeoCommand.getFromRegistry(NeoblockForceCommand.SetBlock.class);
 
-                NeoBlockMod.LOGGER.info("NeoBlock has been disabled.");
+                NeoBlockMod.getLogger().info("NeoBlock has been disabled.");
                 NeoBlockMod.sendMessage("message.neoblock.disabled_world_1", level, false);
                 NeoBlockMod.sendMessage("message.neoblock.disabled_world_2", level, false, command.map(NeoCommand::getCommand).orElse(null));
 
@@ -124,7 +124,7 @@ public abstract class WorldManager extends SavedData {
         } else if (instance.status.state == WorldData.State.UPDATED) {
             Optional<NeoblockForceCommand.ResetTiers> command = NeoCommand.getFromRegistry(NeoblockForceCommand.ResetTiers.class);
 
-            NeoBlockMod.LOGGER.info("NeoBlock tiers has been updated.");
+            NeoBlockMod.getLogger().info("NeoBlock tiers has been updated.");
             NeoBlockMod.sendMessage("message.neoblock.updated_world", level, false, command.map(NeoCommand::getCommand).orElse(null));
 
             instance.status.state = WorldData.State.UPDATED;
@@ -138,13 +138,13 @@ public abstract class WorldManager extends SavedData {
         data.status = new WorldData(data);
         data.tiers.addAll(fetchTiers(true));
 
-        NeoBlockMod.LOGGER.debug("Creating new world data");
+        NeoBlockMod.getLogger().debug("Creating new world data");
         return data;
     }
     public static @NotNull WorldManager load(@NotNull CompoundTag tag, ServerLevel level) {
         WorldManager data = NeoBlockMod.instanceWorldData(level);
 
-        NeoBlockMod.LOGGER.debug("Loading WorldData from {}", tag);
+        NeoBlockMod.getLogger().debug("Loading WorldData from {}", tag);
         data.status = NBTSaveable.instance(WorldData.class, tag, data);
         data.tiers.addAll(fetchTiers(false));
 
@@ -172,13 +172,13 @@ public abstract class WorldManager extends SavedData {
     }
 
     public static List<TierSpec> fetchTiers(boolean loadConfig) {
-        ResourceUtil.loadAllTierConfigs();
+        TierConfig.loadAllTierConfigs();
 
         List<TierSpec> tiers = new ArrayList<>();
         for (int i = 0; Files.exists(TierSpec.FOLDER.resolve("tier-" + i + ".toml")); i++)
             tiers.add(new TierSpec(i, loadConfig));
 
-        NeoBlockMod.LOGGER.info("Loaded {} tiers from the tiers folder.", tiers.size());
+        NeoBlockMod.getLogger().info("Loaded {} tiers from the tiers folder.", tiers.size());
         return tiers;
     }
 
@@ -188,7 +188,7 @@ public abstract class WorldManager extends SavedData {
         for (TierSpec tier: tiers) list.add(tier.save());
         tag.put("Tiers", list);
 
-        NeoBlockMod.LOGGER.debug("WorldData saved as {}", tag);
+        NeoBlockMod.getLogger().debug("WorldData saved as {}", tag);
         return tag;
     }
 
@@ -250,9 +250,9 @@ public abstract class WorldManager extends SavedData {
         Objective objective = scoreboard.getObjective(BLOCK_BREAK_OBJECTIVE);
         if (objective != null) return objective;
 
-        objective = MinecraftUtil.createScoreboardObjective(scoreboard, BLOCK_BREAK_OBJECTIVE, ObjectiveCriteria.DUMMY, "scoreboard.neoblock.title", ObjectiveCriteria.RenderType.INTEGER);
-        MinecraftUtil.setScoreboardDisplay(scoreboard, MinecraftUtil.ScoreboardSlots.LIST, objective);
-        MinecraftUtil.setScoreboardDisplay(scoreboard, MinecraftUtil.ScoreboardSlots.BELOW_NAME, objective);
+        objective = NeoMC.createScoreboardObjective(scoreboard, BLOCK_BREAK_OBJECTIVE, ObjectiveCriteria.DUMMY, "scoreboard.neoblock.title", ObjectiveCriteria.RenderType.INTEGER);
+        NeoMC.setScoreboardDisplay(scoreboard, NeoMC.ScoreboardSlots.LIST, objective);
+        NeoMC.setScoreboardDisplay(scoreboard, NeoMC.ScoreboardSlots.BELOW_NAME, objective);
 
         return objective;
     }
@@ -260,18 +260,18 @@ public abstract class WorldManager extends SavedData {
         Scoreboard scoreboard = player.getScoreboard();
         Objective objective = getObjective(scoreboard);
 
-        MinecraftUtil.addPlayerScore(scoreboard, player, objective, amount);
+        NeoMC.addPlayerScore(scoreboard, player, objective, amount);
     }
     public static void setBlocksBroken(ServerPlayer player, int amount) {
         Scoreboard scoreboard = player.getScoreboard();
         Objective objective = getObjective(scoreboard);
 
-        MinecraftUtil.setPlayerScore(scoreboard, player, objective, amount);
+        NeoMC.setPlayerScore(scoreboard, player, objective, amount);
     }
     public static int getBlocksBroken(ServerPlayer player) {
         Scoreboard scoreboard = player.getScoreboard();
         Objective objective = getObjective(scoreboard);
 
-        return MinecraftUtil.getPlayerScore(scoreboard, player, objective);
+        return NeoMC.getPlayerScore(scoreboard, player, objective);
     }
 }

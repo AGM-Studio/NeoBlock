@@ -16,8 +16,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.neo.block.NeoBlockPos;
-import xyz.agmstudio.neoblock.platform.IConfig;
-import xyz.agmstudio.neoblock.util.MinecraftUtil;
+import xyz.agmstudio.neocore.platform.IConfig;
+import xyz.agmstudio.neocore.NeoMC;
 
 import java.util.*;
 import java.util.function.Function;
@@ -87,15 +87,15 @@ public class ForgivingVoid {
         IConfig potions = config.getSection("forgiving-void.potions");
         if (potions != null) potions.forEach((key, value) -> {
             if (!(value instanceof Double time)) return;
-            Optional<MobEffect> effect = MinecraftUtil.getMobEffect(key.replace('-', ':'));
+            Optional<MobEffect> effect = NeoMC.getMobEffect(key.replace('-', ':'));
             if (time > 0 && effect.isPresent()) effects.put(effect.get(), (int) (time * 20));
         });
 
-        NeoBlockMod.LOGGER.debug("ForgivingVoid: Config loaded.");
+        NeoBlockMod.getLogger().debug("ForgivingVoid: Config loaded.");
     }
 
     private static boolean shallBeRescued(Entity entity) {
-        Optional<ResourceLocation> location = MinecraftUtil.getEntityTypeResource(entity.getType());
+        Optional<ResourceLocation> location = NeoMC.getEntityTypeResource(entity.getType());
         if (location.map(Objects::toString).map(exceptions::contains).orElse(false)) return true;
 
         if (entity instanceof Player) return ForgivingVoid.players;
@@ -132,7 +132,7 @@ public class ForgivingVoid {
     }
     private static void addEffects(Player player) {
         for (Map.Entry<MobEffect, Integer> entry : effects.entrySet()) {
-            MobEffectInstance effect = MinecraftUtil.getMobEffectInstance(entry.getKey(), entry.getValue());
+            MobEffectInstance effect = NeoMC.getMobEffectInstance(entry.getKey(), entry.getValue());
             player.addEffect(effect);
         }
     }

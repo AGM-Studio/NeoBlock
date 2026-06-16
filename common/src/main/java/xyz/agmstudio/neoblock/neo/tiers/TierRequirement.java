@@ -2,7 +2,7 @@ package xyz.agmstudio.neoblock.neo.tiers;
 
 import xyz.agmstudio.neoblock.compatibility.jei.NeoJEIPlugin;
 import xyz.agmstudio.neoblock.neo.world.WorldManager;
-import xyz.agmstudio.neoblock.util.StringUtil;
+import xyz.agmstudio.neocore.util.StringUtil;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;

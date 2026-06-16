@@ -18,8 +18,8 @@ import net.minecraft.world.item.Items;
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.neo.world.WorldManager;
-import xyz.agmstudio.neoblock.platform.INBTHelper;
-import xyz.agmstudio.neoblock.util.StringUtil;
+import xyz.agmstudio.neocore.NeoNBT;
+import xyz.agmstudio.neocore.util.StringUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,7 +47,7 @@ public class TierDisplayCategory implements IRecipeCategory<TierDisplay> {
         height = 78 + 18 * rows;
         background = helper.createBlankDrawable(166, height);
         slot = helper.getSlotDrawable();
-        icon = helper.createDrawableIngredient(VanillaTypes.ITEM_STACK, new ItemStack(NeoBlockMod.REGISTRY.getNeoBlockItem()));
+        icon = helper.createDrawableIngredient(VanillaTypes.ITEM_STACK, new ItemStack(NeoBlockMod.getRegistry().getNeoBlockItem()));
     }
 
     @Override public @NotNull Component getTitle() {
@@ -86,7 +86,7 @@ public class TierDisplayCategory implements IRecipeCategory<TierDisplay> {
     private void addBlockGeneration(@NotNull IRecipeLayoutBuilder builder, @NotNull TierDisplay display, Item item, int x, int y, int count) {
         IRecipeSlotBuilder build = builder.addSlot(RecipeIngredientRole.OUTPUT, x, y).setBackground(slot, -1, -1);
         if (item == null || item == Items.AIR) return;
-        INBTHelper.JEI.addTooltip(build.addItemStack(new ItemStack(item, count)), List.of(
+        NeoNBT.JEI.addTooltip(build.addItemStack(new ItemStack(item, count)), List.of(
             Component.translatable("tooltip.neoblock.tier_chance", StringUtil.percentage(display.getChance(item), 2)),
             Component.translatable("tooltip.neoblock.total_chance", StringUtil.percentage(NeoJEIPlugin.getTotalChance(item), 2))
         ));

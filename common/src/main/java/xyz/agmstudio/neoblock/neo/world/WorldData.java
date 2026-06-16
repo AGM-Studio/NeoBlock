@@ -15,14 +15,14 @@ import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.agmstudio.neoblock.NeoBlockMod;
-import xyz.agmstudio.neoblock.data.NBTSaveable;
+import xyz.agmstudio.neoblock.neo.events.NeoEventBlockTrigger;
+import xyz.agmstudio.neocore.data.NBTSaveable;
 import xyz.agmstudio.neoblock.neo.block.BlockManager;
 import xyz.agmstudio.neoblock.neo.block.NeoBlockPos;
 import xyz.agmstudio.neoblock.neo.block.NeoBlockSpec;
 import xyz.agmstudio.neoblock.neo.events.NeoEventAction;
-import xyz.agmstudio.neoblock.platform.IConfig;
-import xyz.agmstudio.neoblock.util.MinecraftUtil;
-import xyz.agmstudio.neoblock.util.PatternUtil;
+import xyz.agmstudio.neocore.platform.IConfig;
+import xyz.agmstudio.neocore.NeoMC;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -46,7 +46,7 @@ public class WorldData implements NBTSaveable {
 
     @Override public void onLoad(CompoundTag tag) {
         final CompoundTag mobs = tag.getCompound("TradedMobs");
-        mobs.getAllKeys().forEach(key -> tradedMobs.merge(MinecraftUtil.getEntityType(key).orElse(null), mobs.getInt(key), Integer::sum));
+        mobs.getAllKeys().forEach(key -> tradedMobs.merge(NeoMC.getEntityType(key).orElse(null), mobs.getInt(key), Integer::sum));
 
         queue.clear();
         final ListTag blocks = tag.getList("Queue", Tag.TAG_STRING);
@@ -61,25 +61,25 @@ public class WorldData implements NBTSaveable {
 
         IConfig config = NeoBlockMod.getConfig();
         for (String key: config.keys()) {
-            Matcher obm = PatternUtil.ON_BLOCK_PATTERN.matcher(key);
+            Matcher obm = NeoEventBlockTrigger.ON_BLOCK_PATTERN.matcher(key);
             if (obm.matches()) {
                 int count = Integer.parseInt(obm.group("count"));
                 NeoEventAction actions = new NeoEventAction(config, obm.group()).withMessage("message.neoblock.trader_spawned", "GLOBAL");
                 onBlockActions.put(count, actions);
-                NeoBlockMod.LOGGER.debug("Added on-block action {} for world.", key);
+                NeoBlockMod.getLogger().debug("Added on-block action {} for world.", key);
             }
-            Matcher ebm = PatternUtil.EVERY_BLOCK_PATTERN.matcher(key);
+            Matcher ebm = NeoEventBlockTrigger.EVERY_BLOCK_PATTERN.matcher(key);
             if (ebm.matches()) {
                 int count = Integer.parseInt(ebm.group("count"));
                 NeoEventAction actions = new NeoEventAction(config, ebm.group()).withMessage("message.neoblock.trader_spawned", "GLOBAL");
                 everyBlockActions.put(count, actions);
-                NeoBlockMod.LOGGER.debug("Added on-every-block action {} for world.", key);
+                NeoBlockMod.getLogger().debug("Added on-every-block action {} for world.", key);
             }
         }
     }
     @Override public CompoundTag onSave(CompoundTag tag) {
         final CompoundTag mobs = new CompoundTag();
-        tradedMobs.forEach((key, value) -> mobs.putInt(String.valueOf(MinecraftUtil.getEntityTypeResource(key)), value));
+        tradedMobs.forEach((key, value) -> mobs.putInt(String.valueOf(NeoMC.getEntityTypeResource(key)), value));
         tag.put("TradedMobs", mobs);
 
         final ListTag blocks = new ListTag();
@@ -108,7 +108,7 @@ public class WorldData implements NBTSaveable {
     }
     public ServerLevel getDimension(MinecraftServer server) {
         if (this.dimension == null || this.dimension.isEmpty()) return server.getLevel(Level.OVERWORLD);
-        @NotNull ResourceLocation location = MinecraftUtil.parseResourceLocation(this.dimension);
+        @NotNull ResourceLocation location = NeoMC.parseResourceLocation(this.dimension);
         ResourceKey<Level> dimension = ResourceKey.create(Registries.DIMENSION, location);
         return server.getLevel(dimension);
     }

@@ -18,13 +18,13 @@ import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.neo.tiers.TierSpec;
 import xyz.agmstudio.neoblock.neo.world.WorldManager;
-import xyz.agmstudio.neoblock.util.MinecraftUtil;
+import xyz.agmstudio.neocore.NeoMC;
 
 import java.util.*;
 
 @JeiPlugin
 public class NeoJEIPlugin implements IModPlugin {
-    private static final ResourceLocation ID = MinecraftUtil.parseResourceLocation("neoblock:jei_plugin");
+    private static final ResourceLocation ID = NeoMC.parseResourceLocation("neoblock:jei_plugin");
 
     public static final int WHITE_COLOR = 0xFFFFFF;
     public static final int RED_COLOR = 0xFF5555;
@@ -68,7 +68,7 @@ public class NeoJEIPlugin implements IModPlugin {
     }
 
     @Override public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
-        registration.addRecipeCatalyst(new ItemStack(NeoBlockMod.REGISTRY.getNeoBlockItem()), TierDisplayCategory.TYPE);
+        registration.addRecipeCatalyst(new ItemStack(NeoBlockMod.getRegistry().getNeoBlockItem()), TierDisplayCategory.TYPE);
     }
 
     @Override public void registerRecipes(IRecipeRegistration registration) {

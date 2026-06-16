@@ -1,4 +1,6 @@
 {
+  "command.neocore.unexpected_exception": "An unexpected error happened while executing the command:\n  - %s",
+
   "generator.neoblock.neoblock": "NeoBlock",
   "generator.neoblock.neoblock_no_nether": "NeoBlock (No Nether)",
   "generator.neoblock.neoblock_oceans": "NeoBlock (Oceans)",
@@ -43,8 +45,6 @@
   "message.neoblock.disabling_trader": "As for disabling this tier, a trader with significant trades has been spawned.",
 
   "message.neoblock.warning": "Something has gone wrong... please check the logs...\nMessage: %s",
-
-  "command.neoblock.unexpected_exception": "An unexpected error happened while executing the command:\n  - %s",
 
   "command.neoblock.invalid_tier": "Tier mentioned not found",
   "command.neoblock.disable_tier": "Tier \"%s\" has been disabled!",

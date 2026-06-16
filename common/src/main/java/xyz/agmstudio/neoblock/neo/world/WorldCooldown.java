@@ -4,7 +4,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.animations.Animation;
-import xyz.agmstudio.neoblock.data.NBTSaveable;
+import xyz.agmstudio.neocore.data.NBTSaveable;
 import xyz.agmstudio.neoblock.neo.block.BlockManager;
 import xyz.agmstudio.neoblock.neo.tiers.TierSpec;
 

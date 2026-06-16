@@ -7,9 +7,9 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.neo.world.WorldManager;
-import xyz.agmstudio.neoblock.platform.IConfig;
-import xyz.agmstudio.neoblock.util.MinecraftUtil;
-import xyz.agmstudio.neoblock.util.PatternUtil;
+import xyz.agmstudio.neocore.platform.IConfig;
+import xyz.agmstudio.neocore.NeoMC;
+import xyz.agmstudio.neocore.util.StringUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,21 +21,21 @@ import java.util.regex.Pattern;
 
 public class NeoTagBlockSpec extends NeoBlockSpec {
     private static final Pattern PATTERN =
-            PatternUtil.COUNT.optional().then("#").then(PatternUtil.NAMESPACE).build(true);
+            StringUtil.COUNT.optional().then("#").then(StringUtil.NAMESPACE).build(true);
     private static final HashMap<String, List<NeoBlockSpec>> MAP = new HashMap<>();
 
     public static void reloadTags() {
-        IConfig config = IConfig.getConfig(NeoBlockMod.CONFIG_FOLDER, "tags");
+        IConfig config = NeoBlockMod.get().getConfig("tags");
         IConfig section = config != null ? config.getSection("blocks") : null;
         if (section == null) {
-            NeoBlockMod.LOGGER.error("Failed to load block tags from configs.");
+            NeoBlockMod.getLogger().error("Failed to load block tags from configs.");
             return;
         }
 
         section.forEach((key, value) -> {
             List<String> list = section.get(key);
             if (list == null || list.isEmpty()) {
-                NeoBlockMod.LOGGER.warn("Failed to load blocks from blocks.{}.", key);
+                NeoBlockMod.getLogger().warn("Failed to load blocks from blocks.{}.", key);
                 return;
             }
 
@@ -43,7 +43,7 @@ public class NeoTagBlockSpec extends NeoBlockSpec {
             list.forEach(item -> NeoBlockSpec.parse(item).ifPresent(result::add));
 
             MAP.put(key, result);
-            NeoBlockMod.LOGGER.info("Loaded {} blocks for tag #neoblock:{}.", list.size(), key);
+            NeoBlockMod.getLogger().info("Loaded {} blocks for tag #neoblock:{}.", list.size(), key);
         });
     }
 
@@ -56,10 +56,10 @@ public class NeoTagBlockSpec extends NeoBlockSpec {
         this.supplier = () -> this.ofTag(tag);
     }
     private Block ofTag(TagKey<Block> tag) {
-        List<Block> blocks = MinecraftUtil.getBlocksOfTag(tag);
+        List<Block> blocks = NeoMC.getBlocksOfTag(tag);
         Optional<Block> block = WorldManager.getRandomItem(blocks);
         if (block.isEmpty()) {
-            NeoBlockMod.LOGGER.warn("Tag key {} has no items to choose from.", location);
+            NeoBlockMod.getLogger().warn("Tag key {} has no items to choose from.", location);
             return NeoBlockSpec.getDefault();
         }
         return block.get();
@@ -67,7 +67,7 @@ public class NeoTagBlockSpec extends NeoBlockSpec {
 
     public NeoTagBlockSpec(String name, int weight) {
         super(Blocks.AIR, weight);
-        this.location = MinecraftUtil.createResourceLocation(NeoBlockMod.MOD_ID, name);
+        this.location = NeoMC.createResourceLocation(NeoBlockMod.MOD_ID, name);
 
         List<NeoBlockSpec> list = MAP.getOrDefault(name, List.of());
         this.supplier = () -> this.ofList(list);
@@ -75,7 +75,7 @@ public class NeoTagBlockSpec extends NeoBlockSpec {
     private Block ofList(List<NeoBlockSpec> list) {
         Optional<NeoBlockSpec> block = WorldManager.getRandomItem(list);
         if (block.isEmpty()) {
-            NeoBlockMod.LOGGER.warn("Custom list {} has no items to choose from.", list);
+            NeoBlockMod.getLogger().warn("Custom list {} has no items to choose from.", list);
             return NeoBlockSpec.getDefault();
         }
         return block.get().getBlock();
@@ -97,10 +97,10 @@ public class NeoTagBlockSpec extends NeoBlockSpec {
         String countString = matcher.group("count");
         int count = (countString != null) ? Integer.parseInt(countString) : 1;
 
-        ResourceLocation location = MinecraftUtil.parseResourceLocation(matcher.group("id"));
+        ResourceLocation location = NeoMC.parseResourceLocation(matcher.group("id"));
         if (location.getNamespace().equals(NeoBlockMod.MOD_ID)) {
             if (MAP.getOrDefault(location.getPath(), List.of()).isEmpty()) {
-                NeoBlockMod.LOGGER.warn("Tag block #{} is empty.", location);
+                NeoBlockMod.getLogger().warn("Tag block #{} is empty.", location);
                 return Optional.empty();
             }
 

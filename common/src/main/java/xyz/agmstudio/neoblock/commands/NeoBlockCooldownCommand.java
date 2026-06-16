@@ -3,11 +3,11 @@ package xyz.agmstudio.neoblock.commands;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.commands.CommandSourceStack;
-import xyz.agmstudio.neoblock.commands.util.NeoArgumentInteger;
-import xyz.agmstudio.neoblock.commands.util.NeoCommand;
+import xyz.agmstudio.neocore.commands.NeoArgumentInteger;
+import xyz.agmstudio.neocore.commands.NeoCommand;
 import xyz.agmstudio.neoblock.neo.world.WorldCooldown;
 import xyz.agmstudio.neoblock.neo.world.WorldManager;
-import xyz.agmstudio.neoblock.util.StringUtil;
+import xyz.agmstudio.neocore.util.StringUtil;
 
 public class NeoBlockCooldownCommand extends NeoCommand {
     protected NeoBlockCooldownCommand(NeoCommand parent) {

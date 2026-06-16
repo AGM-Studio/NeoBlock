@@ -13,8 +13,8 @@ import xyz.agmstudio.neoblock.neo.block.NeoBlockPos;
 import xyz.agmstudio.neoblock.neo.tiers.TierSpec;
 import xyz.agmstudio.neoblock.neo.world.WorldManager;
 import xyz.agmstudio.neoblock.neo.world.WorldData;
-import xyz.agmstudio.neoblock.platform.IConfig;
-import xyz.agmstudio.neoblock.util.MinecraftUtil;
+import xyz.agmstudio.neocore.platform.IConfig;
+import xyz.agmstudio.neocore.NeoMC;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,7 +37,7 @@ public class NeoMerchant {
                 Math.max(0, config.get("neo-trader.life-span-max"))
         );
 
-        NeoBlockMod.LOGGER.debug("NeoMerchant: Config loaded. \n\tChance: {}\n\tChance Increment: {}\n\tAttempt Interval: {}\n\tLifespan: {}", NeoMerchant.chance, NeoMerchant.increment, NeoMerchant.attemptInterval, NeoMerchant.lifespan);
+        NeoBlockMod.getLogger().debug("NeoMerchant: Config loaded. \n\tChance: {}\n\tChance Increment: {}\n\tAttempt Interval: {}\n\tLifespan: {}", NeoMerchant.chance, NeoMerchant.increment, NeoMerchant.attemptInterval, NeoMerchant.lifespan);
     }
 
     public static @Nullable WanderingTrader spawnTraderWith(List<NeoTrade> trades, ServerLevel level, String... tags) {
@@ -48,7 +48,7 @@ public class NeoMerchant {
         return trader.spawnTrader(level, tags);
     }
     public static boolean exists(@NotNull ServerLevel level, String tag) {
-        for (Entity entity: MinecraftUtil.allEntities(level))
+        for (Entity entity: NeoMC.allEntities(level))
             if (entity.getTags().contains(tag)) return true;
 
         return false;
@@ -59,7 +59,7 @@ public class NeoMerchant {
         double chance = NeoMerchant.chance + (increment * status.getTraderFailedAttempts());
         if (WorldManager.getRandom().nextFloat() > chance) {
             int fails = status.addTraderFailedAttempts();
-            NeoBlockMod.LOGGER.debug("Trader chance {} failed for {} times in a row", chance, fails);
+            NeoBlockMod.getLogger().debug("Trader chance {} failed for {} times in a row", chance, fails);
             return null;
         }
         return forceSpawnTrader(level);
@@ -78,8 +78,8 @@ public class NeoMerchant {
         HashMap<EntityType<?>, Integer> tradedMobs = status.getTradedMobs();
         tradedMobs.forEach((type, count) -> {
             for (int i = 0; i < count; i++) {
-                Entity mob = MinecraftUtil.spawnEntity(level, type, trader.getOnPos());
-                MinecraftUtil.leash(mob, trader);
+                Entity mob = NeoMC.spawnEntity(level, type, trader.getOnPos());
+                NeoMC.leash(mob, trader);
             }
         });
         status.clearTradedMobs();

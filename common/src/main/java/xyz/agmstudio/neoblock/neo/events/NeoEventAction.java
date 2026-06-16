@@ -11,8 +11,8 @@ import xyz.agmstudio.neoblock.neo.loot.trade.NeoMerchant;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoTradePool;
 import xyz.agmstudio.neoblock.neo.world.WorldCooldown;
 import xyz.agmstudio.neoblock.neo.world.WorldRules;
-import xyz.agmstudio.neoblock.platform.IConfig;
-import xyz.agmstudio.neoblock.util.StringUtil;
+import xyz.agmstudio.neocore.platform.IConfig;
+import xyz.agmstudio.neocore.util.StringUtil;
 
 import java.util.HashMap;
 import java.util.List;

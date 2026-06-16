@@ -5,9 +5,8 @@ import net.minecraft.world.item.trading.MerchantOffer;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.neo.loot.NeoItemSpec;
 import xyz.agmstudio.neoblock.neo.world.WorldManager;
-import xyz.agmstudio.neoblock.util.MinecraftUtil;
-import xyz.agmstudio.neoblock.util.PatternUtil;
-import xyz.agmstudio.neoblock.util.StringUtil;
+import xyz.agmstudio.neocore.NeoMC;
+import xyz.agmstudio.neocore.util.StringUtil;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
@@ -15,11 +14,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class NeoTradeSingle extends NeoTrade {
-    private static final Pattern PATTERN = PatternUtil.group("result", " ;").then(";").space()
-            .then(PatternUtil.group("costA", " ;").then(";")).space()
-            .then(PatternUtil.group("costB", " ;").then(";").optional()).space()
-            .then(PatternUtil.RANGE_NOX.optional()).space()
-            .then(PatternUtil.CHANCE.optional()).build(false);
+    private static final Pattern PATTERN = StringUtil.group("result", " ;").then(";").space()
+            .then(StringUtil.group("costA", " ;").then(";")).space()
+            .then(StringUtil.group("costB", " ;").then(";").optional()).space()
+            .then(StringUtil.RANGE_NOX.optional()).space()
+            .then(StringUtil.CHANCE.optional()).build(false);
 
     private final NeoItemSpec result;
     private final NeoItemSpec costA;
@@ -37,7 +36,7 @@ public class NeoTradeSingle extends NeoTrade {
 
     @Override public Optional<MerchantOffer> getOffer() {
         if (WorldManager.getRandom().nextDouble() > chance) return Optional.empty();
-        return MinecraftUtil.getOfferOf(result, costA, costB, uses);
+        return NeoMC.getOfferOf(result, costA, costB, uses);
     }
 
     public static Optional<NeoTrade> parse(String input) {
@@ -45,7 +44,7 @@ public class NeoTradeSingle extends NeoTrade {
 
         Matcher matcher = PATTERN.matcher(input.trim().toLowerCase());
         if (!matcher.matches()) {
-            NeoBlockMod.LOGGER.error("Invalid trade syntax: {}", input);
+            NeoBlockMod.getLogger().error("Invalid trade syntax: {}", input);
             return Optional.empty();
         }
 
@@ -53,7 +52,7 @@ public class NeoTradeSingle extends NeoTrade {
         NeoItemSpec costA = NeoItemSpec.parseItem(matcher.group("costA")).orElse(null);
         if (result == null || costA == null) {
             String key = result == null ? "result" : "costA";
-            NeoBlockMod.LOGGER.error("Invalid trade {} '{}' for: {}", key, matcher.group(key), input);
+            NeoBlockMod.getLogger().error("Invalid trade {} '{}' for: {}", key, matcher.group(key), input);
             return Optional.empty();
         }
 

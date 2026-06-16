@@ -2,9 +2,12 @@ package xyz.agmstudio.neoblock.neo.loot.trade;
 
 import net.minecraft.world.item.trading.MerchantOffer;
 import xyz.agmstudio.neoblock.NeoBlockMod;
-import xyz.agmstudio.neoblock.platform.IConfig;
+import xyz.agmstudio.neocore.platform.IConfig;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
 
 public abstract class NeoTrade {
     private static final HashMap<String, List<NeoTrade>> TRADES = new HashMap<>();
@@ -13,9 +16,9 @@ public abstract class NeoTrade {
     }
 
     public static void reloadTrades() {
-        IConfig config = IConfig.getConfig(NeoBlockMod.CONFIG_FOLDER, "trades");
+        IConfig config = NeoBlockMod.get().getConfig("trades");
         if (config == null) {
-            NeoBlockMod.LOGGER.error("Failed to load trades config.");
+            NeoBlockMod.getLogger().error("Failed to load trades config.");
             return;
         }
 
@@ -25,7 +28,7 @@ public abstract class NeoTrade {
             List<String> entries = config.get(key);
             if (entries == null) {
                 TRADES.put(key, List.of());
-                NeoBlockMod.LOGGER.info("Loaded 0 trades for {}", key);
+                NeoBlockMod.getLogger().info("Loaded 0 trades for {}", key);
             }
             else {
                 List<NeoTrade> list = new ArrayList<>();
@@ -35,11 +38,11 @@ public abstract class NeoTrade {
                     else NeoTradeSingle.parse(entry).ifPresent(list::add);
                 }
                 TRADES.put(key, list);
-                NeoBlockMod.LOGGER.info("Loaded {} trades for {}", list.size(), key);
+                NeoBlockMod.getLogger().info("Loaded {} trades for {}", list.size(), key);
             }
         });
 
-        NeoBlockMod.LOGGER.info("Loaded {} trades.", TRADES.size());
+        NeoBlockMod.getLogger().info("Loaded {} trades.", TRADES.size());
     }
 
     public abstract Optional<MerchantOffer> getOffer();

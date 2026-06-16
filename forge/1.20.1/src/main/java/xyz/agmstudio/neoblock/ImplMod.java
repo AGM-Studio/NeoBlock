@@ -13,23 +13,27 @@ import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.fml.loading.FMLLoader;
-import net.minecraftforge.fml.loading.FMLPaths;
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.neo.world.WorldManager;
+import xyz.agmstudio.neoblock.platform.ForgeMC;
 import xyz.agmstudio.neoblock.platform.ForgeRegistry;
+import xyz.agmstudio.neocore.NeoMod;
 
-import java.nio.file.Path;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+
 @Mod(NeoBlockMod.MOD_ID)
 public final class ImplMod extends NeoBlockMod {
+    static { // Should be in NeoCore in future
+        NeoMod.MC = new ForgeMC();
+    }
+
     public ImplMod() {
-        super(NeoBlockMod.MOD_NAME);
+        super(new ForgeRegistry());
+        NeoMod.MC = new ForgeMC();
 
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
 
@@ -73,18 +77,6 @@ public final class ImplMod extends NeoBlockMod {
         else event.setAmount(result.getResult());
     }
 
-    @Override public String getPlatformNameImpl() {
-        return "Forge";
-    }
-    @Override public boolean isModLoadedImpl(String modId) {
-        return ModList.get().isLoaded(modId);
-    }
-    @Override public boolean isDevelopmentEnvironmentImpl() {
-        return !FMLLoader.isProduction();
-    }
-    @Override public Path getConfigFolderImpl() {
-        return FMLPaths.CONFIGDIR.get();
-    }
     @Override public <T extends SavedData> T captureSavedDataImpl(ServerLevel level, String name, Function<CompoundTag, T> loader, Supplier<T> creator) {
         return level.getDataStorage().computeIfAbsent(loader, creator, name);
     }

@@ -6,7 +6,7 @@ import net.minecraft.server.level.ServerBossEvent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.BossEvent;
-import xyz.agmstudio.neoblock.util.StringUtil;
+import xyz.agmstudio.neocore.util.StringUtil;
 
 public class CooldownBarAnimation extends Animation {
     @ConfigField

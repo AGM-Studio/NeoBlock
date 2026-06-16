@@ -9,10 +9,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.neo.world.WorldManager;
-import xyz.agmstudio.neoblock.platform.IConfig;
-import xyz.agmstudio.neoblock.util.MinecraftUtil;
-import xyz.agmstudio.neoblock.util.PatternUtil;
-import xyz.agmstudio.neoblock.util.StringUtil;
+import xyz.agmstudio.neocore.platform.IConfig;
+import xyz.agmstudio.neocore.NeoMC;
+import xyz.agmstudio.neocore.util.StringUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,21 +23,21 @@ import java.util.regex.Pattern;
 
 public class NeoTagItemSpec extends NeoItemSpec {
     private static final Pattern TAG_PATTERN =
-            PatternUtil.RANGE.optional().then("#").then(PatternUtil.NAMESPACE).then(PatternUtil.CHANCE.optional()).build(false);
+            StringUtil.RANGE.optional().then("#").then(StringUtil.NAMESPACE).then(StringUtil.CHANCE.optional()).build(false);
     private static final HashMap<String, List<NeoItemSpec>> MAP = new HashMap<>();
 
     public static void reloadTags() {
-        IConfig config = IConfig.getConfig(NeoBlockMod.CONFIG_FOLDER, "tags");
+        IConfig config = NeoBlockMod.get().getConfig("tags");
         IConfig section = config != null ? config.getSection("items") : null;
         if (section == null) {
-            NeoBlockMod.LOGGER.error("Failed to load item tags from configs.");
+            NeoBlockMod.getLogger().error("Failed to load item tags from configs.");
             return;
         }
 
         section.forEach((key, value) -> {
             List<String> list = section.get(key);
             if (list == null || list.isEmpty()) {
-                NeoBlockMod.LOGGER.warn("Failed to load items from items.{}.", key);
+                NeoBlockMod.getLogger().warn("Failed to load items from items.{}.", key);
                 return;
             }
 
@@ -46,7 +45,7 @@ public class NeoTagItemSpec extends NeoItemSpec {
             list.forEach(item -> NeoItemSpec.parseItem(item).ifPresent(result::add));
 
             MAP.put(key, result);
-            NeoBlockMod.LOGGER.info("Loaded {} items for tag #neoblock:{}", list.size(), key);
+            NeoBlockMod.getLogger().info("Loaded {} items for tag #neoblock:{}", list.size(), key);
         });
     }
 
@@ -59,10 +58,10 @@ public class NeoTagItemSpec extends NeoItemSpec {
         this.supplier = () -> this.ofTag(tag);
     }
     private ItemStack ofTag(TagKey<Item> tag) {
-        List<Item> items = MinecraftUtil.getItemsOfTag(tag);
+        List<Item> items = NeoMC.getItemsOfTag(tag);
         Optional<Item> item = WorldManager.getRandomItem(items);
         if (item.isEmpty()) {
-            NeoBlockMod.LOGGER.warn("Tag key {} has no items to choose from.", location);
+            NeoBlockMod.getLogger().warn("Tag key {} has no items to choose from.", location);
             return NeoItemSpec.getDefault();
         }
         return new ItemStack(item.get(), range.sample(WorldManager.getRandom()));
@@ -70,7 +69,7 @@ public class NeoTagItemSpec extends NeoItemSpec {
 
     public NeoTagItemSpec(String name, UniformInt range, double chance) {
         super(Items.DIRT, range, chance);
-        this.location = MinecraftUtil.createResourceLocation(NeoBlockMod.MOD_ID, name);
+        this.location = NeoMC.createResourceLocation(NeoBlockMod.MOD_ID, name);
 
         List<NeoItemSpec> list = MAP.getOrDefault(name, List.of());
         this.supplier = () -> this.ofList(list);
@@ -78,7 +77,7 @@ public class NeoTagItemSpec extends NeoItemSpec {
     private ItemStack ofList(List<NeoItemSpec> list) {
         Optional<NeoItemSpec> item = WorldManager.getRandomItem(list);
         if (item.isEmpty()) {
-            NeoBlockMod.LOGGER.warn("Custom list {} has no items to choose from.", list);
+            NeoBlockMod.getLogger().warn("Custom list {} has no items to choose from.", list);
             return NeoItemSpec.getDefault();
         }
         return item.get().getStack();
@@ -107,10 +106,10 @@ public class NeoTagItemSpec extends NeoItemSpec {
         UniformInt range = StringUtil.parseRange(matcher.group("count"));
         double chance = StringUtil.parseChance(matcher.group("chance"));
 
-        ResourceLocation location = MinecraftUtil.parseResourceLocation(matcher.group("id"));
+        ResourceLocation location = NeoMC.parseResourceLocation(matcher.group("id"));
         if (location.getNamespace().equals(NeoBlockMod.MOD_ID)) {
             if (MAP.getOrDefault(location.getPath(), List.of()).isEmpty()) {
-                NeoBlockMod.LOGGER.warn("Tag item #{} is empty.", location);
+                NeoBlockMod.getLogger().warn("Tag item #{} is empty.", location);
                 return Optional.empty();
             }
 

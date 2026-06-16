@@ -5,7 +5,7 @@ import xyz.agmstudio.neoblock.neo.block.NeoBlockSpec;
 import xyz.agmstudio.neoblock.neo.block.NeoChestSpec;
 import xyz.agmstudio.neoblock.neo.tiers.TierSpec;
 import xyz.agmstudio.neoblock.neo.world.WorldManager;
-import xyz.agmstudio.neoblock.util.StringUtil;
+import xyz.agmstudio.neocore.util.StringUtil;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
