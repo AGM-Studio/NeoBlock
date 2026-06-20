@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoMerchant;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoTradePool;
+import xyz.agmstudio.neoblock.neo.world.NeoBlock;
 import xyz.agmstudio.neoblock.neo.world.WorldCooldown;
 import xyz.agmstudio.neoblock.neo.world.WorldRules;
 import xyz.agmstudio.neocore.platform.IConfig;
@@ -55,7 +56,8 @@ public final class NeoEventAction {
         return this;
     }
 
-    public void apply(ServerLevel level) {
+    public void apply(@NotNull NeoBlock block) {
+        ServerLevel level = block.level;
         for (Map.Entry<String, Object> rule : this.rules.entrySet())
             WorldRules.applyGameRule(level, rule.getKey(), rule.getValue());
 
@@ -64,7 +66,7 @@ public final class NeoEventAction {
         for (String command : this.commands)
             server.getCommands().performPrefixedCommand(source, command);
 
-        WanderingTrader trader = NeoMerchant.spawnTraderWith(trades.getPool(), level, "UnlockTrader");
+        WanderingTrader trader = NeoMerchant.spawnTraderWith(trades.getPool(), block, "UnlockTrader");
         if (trader != null)
             if (customTraderMessage != null) NeoBlockMod.sendInstantMessage(customTraderMessage, level, false);
             else NeoBlockMod.sendInstantMessage(traderMessage, level, false, traderMessageArgs);

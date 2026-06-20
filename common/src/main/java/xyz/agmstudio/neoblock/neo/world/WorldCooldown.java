@@ -5,7 +5,6 @@ import net.minecraft.server.level.ServerLevel;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.animations.Animation;
 import xyz.agmstudio.neocore.data.NBTSaveable;
-import xyz.agmstudio.neoblock.neo.block.BlockManager;
 import xyz.agmstudio.neoblock.neo.tiers.TierSpec;
 
 import java.util.List;
@@ -110,7 +109,6 @@ public class WorldCooldown implements NBTSaveable {
     // Static methods
     private static boolean FIRST = true;
     public static void tick(ServerLevel level) {
-        WorldData data = WorldManager.getWorldData();
         if (data == null || !data.isOnCooldown()) return;
         if (data.cooldowns.isEmpty()) return;
         WorldCooldown cooldown = data.cooldowns.get(0);

@@ -5,7 +5,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.phys.Vec3;
-import xyz.agmstudio.neoblock.neo.block.NeoBlockPos;
 
 import java.util.ArrayList;
 import java.util.Iterator;

@@ -39,12 +39,11 @@ damage-livings = 0.0        # Positive value: like 2.5 for the exact amount...
 minecraft-blindness = 8     # 8 seconds of blindness
 minecraft-nausea = 12       # 12 seconds of nausea
 
-
-# [schematics.custom_0]       # You can add as many custom schematics to be loaded when the world is generated. Remove the `#` at the beginning of the lines to start and for more duplicte this.
+# [schematics.1]              # You can add as many custom schematics to be loaded when the world is generated. Remove the `#` at the beginning of the lines to start and for more duplicte this.
 # name = "NeoBlockSchematic_0.nbt"
-# x = 20                      # The title must increase in order (schematics.custom_0, schematics.custom_1, schematics.custom_2, ...)
+# x = 20                      # The title must increase in order (schematics.1, schematics.2, schematics.3, ...)
 # y = 67                      # The name of file in the schematics folder and the position you want the structure be placed.
-# z = 12                      # Note: "main.nbt" is always loaded over the NeoBlock and is centered around neoblock position
+# z = 12
 
 [neo-trader]
 chance = 0.3                # Chance of spawning a NeoMerchant per interval. If no trades are available or another trader lives, no NeoMerchant will be spawned.
@@ -59,6 +58,7 @@ doPatrolSpawning = false
 doInsomnia = false
 doMobSpawning = false
 
+# Will work on every neoblock you hve in your world
 [on-every-100-blocks]
 action-message = "{c=#999999}NeoBlock is exhausted! It will be back soon!"
 cooldown = 1200

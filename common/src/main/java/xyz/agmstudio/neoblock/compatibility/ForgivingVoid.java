@@ -1,5 +1,6 @@
 package xyz.agmstudio.neoblock.compatibility;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.effect.MobEffect;
@@ -15,9 +16,10 @@ import net.minecraft.world.entity.npc.WanderingTrader;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import xyz.agmstudio.neoblock.NeoBlockMod;
-import xyz.agmstudio.neoblock.neo.block.NeoBlockPos;
-import xyz.agmstudio.neocore.platform.IConfig;
+import xyz.agmstudio.neoblock.neo.world.NeoBlock;
+import xyz.agmstudio.neoblock.neo.world.WorldManager;
 import xyz.agmstudio.neocore.NeoMC;
+import xyz.agmstudio.neocore.platform.IConfig;
 
 import java.util.*;
 import java.util.function.Function;
@@ -139,15 +141,25 @@ public class ForgivingVoid {
 
     public static boolean handleVoid(ServerLevel level, Entity entity) {
         if (!shallBeRescued(entity)) return false;
+        BlockPos safety = null;
+        double distance = Double.MAX_VALUE;
+        for (NeoBlock block: WorldManager.getBlocks()) {
+            if (block.level != level) continue;
+            double newDist = block.safeBlock().distToCenterSqr(entity.position());
+            if (newDist < distance) {
+                safety = block.safeBlock();
+                distance = newDist;
+            }
+        }
 
-        NeoBlockPos safety = NeoBlockPos.safeBlock();
-        safety.teleportTo(entity, offset);
+        if (safety == null) return false;
+        NeoMC.teleportEntity(entity, level, safety.getX() + offset.x, safety.getY() + offset.y, safety.getZ() + offset.z, 0, 0);
         entity.setDeltaMovement(Vec3.ZERO);
         entity.fallDistance = 0;
 
         if (entity instanceof LivingEntity living) {
             living.hurt(living.damageSources().fall(), getDamage(living));
-            ForgivingVoid.animate(safety.getLevel(), living);
+            ForgivingVoid.animate(level, living);
             if (living instanceof Player player) addEffects(player);
         }
 

@@ -15,7 +15,6 @@ import net.minecraft.world.item.ItemStack;
 import xyz.agmstudio.neocore.commands.NeoArgumentEntityType;
 import xyz.agmstudio.neocore.commands.NeoArgumentInteger;
 import xyz.agmstudio.neocore.commands.NeoCommand;
-import xyz.agmstudio.neoblock.neo.block.NeoBlockPos;
 import xyz.agmstudio.neoblock.neo.loot.NeoMobSpec;
 import xyz.agmstudio.neoblock.neo.tiers.TierSpec;
 import xyz.agmstudio.neoblock.neo.world.WorldManager;

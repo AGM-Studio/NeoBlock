@@ -1,11 +1,10 @@
 package xyz.agmstudio.neoblock.neo.block;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlockMod;
+import xyz.agmstudio.neoblock.neo.world.NeoBlock;
 import xyz.agmstudio.neocore.NeoMC;
 import xyz.agmstudio.neocore.util.StringUtil;
 
@@ -17,7 +16,7 @@ public class NeoBlockSpec {
     private static final Pattern PATTERN =
             StringUtil.COUNT.optional().then(StringUtil.namespace("block")).build(true);
     protected static Block getDefault() {
-        return BlockManager.DEFAULT_SPEC.getBlock();
+        return NeoBlock.DEFAULT_SPEC.getBlock();
     }
 
     protected final Block block;
@@ -74,9 +73,9 @@ public class NeoBlockSpec {
         return range + NeoMC.getBlockResource(getBlock()).orElse(null);
     }
 
-    public void placeAt(@NotNull LevelAccessor level, BlockPos pos) {
-        level.setBlock(pos, getState(), 3);
-        BlockManager.ensureNoFall(level);
+    public void placeAt(@NotNull NeoBlock block) {
+        block.level.setBlock(block.getBlockPos(), getState(), 3);
+        block.ensureNoFall();
     }
 
     public NeoBlockSpec copy() {

@@ -1,12 +1,10 @@
 package xyz.agmstudio.neoblock.neo.block;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlockMod;
-import xyz.agmstudio.neoblock.neo.world.WorldManager;
+import xyz.agmstudio.neoblock.neo.world.NeoBlock;
 import xyz.agmstudio.neocore.platform.IConfig;
 import xyz.agmstudio.neocore.util.StringUtil;
 
@@ -82,7 +80,7 @@ public class NeoSeqBlockSpec extends NeoBlockSpec {
         return blocks.isEmpty();
     }
 
-    public void addToQueue(boolean removeFirst) {
+    public void addToQueue(NeoBlock block, boolean removeFirst) {
         List<NeoBlockSpec> blocks = new ArrayList<>(this.blocks);
 
         if (removeFirst) {
@@ -90,9 +88,9 @@ public class NeoSeqBlockSpec extends NeoBlockSpec {
             if (first.weight > 1) blocks.add(0, first.copy(first.weight - 1));
         }
 
-        blocks.forEach(block -> {
-            for (int i = 0; i < block.weight; i++)
-                WorldManager.getWorldData().addToQueue(block.copy(1));
+        blocks.forEach(b -> {
+            for (int i = 0; i < b.weight; i++)
+                block.addToQueue(b.copy(1));
         });
     }
 
@@ -105,16 +103,15 @@ public class NeoSeqBlockSpec extends NeoBlockSpec {
         return range + "neoblock:sequence:" + id;
     }
 
-    @Override public void placeAt(@NotNull LevelAccessor level, BlockPos pos) {
+    @Override public void placeAt(@NotNull NeoBlock block) {
         if (blocks.isEmpty()) {
-            NeoBlockMod.warnPlayers(level, "Unable to place {} because it's empty. Capturing a random block again.", getID());
-            BlockManager.getRandomBlock().placeAt(level, pos);
+            NeoBlockMod.warnPlayers(block.level, "Unable to place {} because it's empty. Capturing a random block again.", getID());
+            block.getRandomBlock().placeAt(block);
             return;
         }
 
-        super.placeAt(level, pos);  // Place the first block
-
-        addToQueue(true);
+        super.placeAt(block);  // Place the first block
+        addToQueue(block, true);
     }
 
     @Override public NeoBlockSpec copy() {

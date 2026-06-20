@@ -3,7 +3,6 @@ package xyz.agmstudio.neoblock.animations.progress;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.phys.Vec3;
-import xyz.agmstudio.neoblock.neo.block.NeoBlockPos;
 
 import java.util.ArrayList;
 import java.util.Iterator;

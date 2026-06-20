@@ -2,7 +2,6 @@ package xyz.agmstudio.neoblock.animations.idle;
 
 import net.minecraft.world.phys.Vec3;
 import xyz.agmstudio.neoblock.animations.Animation;
-import xyz.agmstudio.neoblock.neo.block.NeoBlockPos;
 
 import java.util.Arrays;
 import java.util.HashSet;

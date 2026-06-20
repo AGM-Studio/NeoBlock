@@ -10,31 +10,48 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.agmstudio.neoblock.NeoBlockMod;
-import xyz.agmstudio.neoblock.neo.events.NeoEventBlockTrigger;
-import xyz.agmstudio.neocore.data.NBTSaveable;
-import xyz.agmstudio.neoblock.neo.block.BlockManager;
-import xyz.agmstudio.neoblock.neo.block.NeoBlockPos;
+import xyz.agmstudio.neoblock.NeoListener;
+import xyz.agmstudio.neoblock.animations.Animation;
 import xyz.agmstudio.neoblock.neo.block.NeoBlockSpec;
 import xyz.agmstudio.neoblock.neo.events.NeoEventAction;
-import xyz.agmstudio.neocore.platform.IConfig;
+import xyz.agmstudio.neoblock.neo.events.NeoEventBlockTrigger;
+import xyz.agmstudio.neoblock.neo.loot.trade.NeoMerchant;
+import xyz.agmstudio.neoblock.neo.tiers.TierSpec;
 import xyz.agmstudio.neocore.NeoMC;
+import xyz.agmstudio.neocore.data.NBTSaveable;
+import xyz.agmstudio.neocore.platform.IConfig;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 
-public class WorldData implements NBTSaveable {
-    private final WorldManager data;
+public class NeoBlock implements NBTSaveable {
+    public static final NeoBlockSpec DEFAULT_SPEC = new NeoBlockSpec(Blocks.GRASS_BLOCK);
+    public static final NeoBlockSpec BEDROCK_SPEC = new NeoBlockSpec(Blocks.BEDROCK);
+    public static final double AABB_RANGE = 1.0;
 
-    @NBTData("WorldState") protected State state = State.INACTIVE;
+    public final WorldManager world;
+    public final ServerLevel level;
+
+    @NBTData("State") protected State state = State.INACTIVE;
     @NBTData("BlockCount") protected int blockCount = 0;
     @NBTData("LastTierSpawn") protected int lastTierSpawn = 0;
     @NBTData("TraderFailedAttempts") protected int traderFailedAttempts = 0;
-    @NBTData("NeoBlock") protected BlockPos pos = new BlockPos(0, 64, 0);
+    @NBTData("Position") protected BlockPos pos = new BlockPos(0, 64, 0);
     @NBTData("Dimension") protected String dimension = "minecraft:overworld";
 
     protected final HashMap<EntityType<?>, Integer> tradedMobs = new HashMap<>();
@@ -44,7 +61,12 @@ public class WorldData implements NBTSaveable {
     protected final LinkedHashMap<Integer, NeoEventAction> onBlockActions = new LinkedHashMap<>();
     protected final LinkedHashMap<Integer, NeoEventAction> everyBlockActions = new LinkedHashMap<>();
 
-    @Override public void onLoad(CompoundTag tag) {
+    public NeoBlock(@NotNull ServerLevel level, @NotNull WorldManager world) {
+        this.level = level;
+        this.world = world;
+    }
+
+    @Override public void onLoad(@NotNull CompoundTag tag) {
         final CompoundTag mobs = tag.getCompound("TradedMobs");
         mobs.getAllKeys().forEach(key -> tradedMobs.merge(NeoMC.getEntityType(key).orElse(null), mobs.getInt(key), Integer::sum));
 
@@ -77,7 +99,7 @@ public class WorldData implements NBTSaveable {
             }
         }
     }
-    @Override public CompoundTag onSave(CompoundTag tag) {
+    @Override public CompoundTag onSave(@NotNull CompoundTag tag) {
         final CompoundTag mobs = new CompoundTag();
         tradedMobs.forEach((key, value) -> mobs.putInt(String.valueOf(NeoMC.getEntityTypeResource(key)), value));
         tag.put("TradedMobs", mobs);
@@ -93,10 +115,6 @@ public class WorldData implements NBTSaveable {
         return tag;
     }
 
-    public WorldData(WorldManager data) {
-        this.data = data;
-    }
-
     public boolean isCorrectDimension(@NotNull ServerLevel level) {
         return isCorrectDimension(level.dimension());
     }
@@ -104,7 +122,7 @@ public class WorldData implements NBTSaveable {
         return dimension.location().toString().equals(this.dimension);
     }
     public ServerLevel getDimension() {
-        return getDimension(data.getLevel().getServer());
+        return getDimension(world.getLevel().getServer());
     }
     public ServerLevel getDimension(MinecraftServer server) {
         if (this.dimension == null || this.dimension.isEmpty()) return server.getLevel(Level.OVERWORLD);
@@ -115,6 +133,11 @@ public class WorldData implements NBTSaveable {
     public BlockPos getBlockPos() {
         return pos;
     }
+    public BlockPos safeBlock() {
+        int y = level.getHeight(Heightmap.Types.MOTION_BLOCKING, pos.getX(), pos.getZ());
+        return new BlockPos(pos.getX(), y, pos.getZ());
+    }
+
     public Optional<NeoBlockSpec> getNextInQueue() {
         if (queue.isEmpty()) return Optional.empty();
         else return Optional.of(queue.remove(0));
@@ -141,37 +164,37 @@ public class WorldData implements NBTSaveable {
 
     public void setInactive() {
         state = State.INACTIVE;
-        data.setDirty();
+        world.setDirty();
     }
     public void setActive() {
         state = State.ACTIVE;
-        data.setDirty();
+        world.setDirty();
     }
     public void setDisabled() {
         state = State.DISABLED;
-        data.setDirty();
+        world.setDirty();
     }
     public void setUpdated() {
         state = State.UPDATED;
-        data.setDirty();
+        world.setDirty();
     }
     public void setOnCooldown() {
         state = State.STOPPED;
-        data.setDirty();
+        world.setDirty();
     }
 
     public void addCooldown(WorldCooldown cooldown) {
         cooldowns.add(cooldown);
         setOnCooldown();
 
-        BlockManager.BEDROCK_SPEC.placeAt(WorldManager.getWorldLevel(), NeoBlockPos.get());
+        BEDROCK_SPEC.placeAt(this);
     }
     public void removeCooldown(WorldCooldown cooldown) {
         cooldowns.remove(cooldown);
         if (cooldowns.isEmpty()) {
             setActive();
-            BlockManager.updateBlock(WorldManager.getWorldLevel(), false);
-        } else data.setDirty();
+            updateBlock(WorldManager.getWorldLevel(), false);
+        } else world.setDirty();
     }
     public List<WorldCooldown> getCooldowns() {
         return cooldowns;
@@ -187,7 +210,7 @@ public class WorldData implements NBTSaveable {
         blockCount = count;
         for (int i: everyBlockActions.keySet()) if (count % i == 0) everyBlockActions.get(i).apply(WorldManager.getWorldLevel());
         if (onBlockActions.containsKey(count)) onBlockActions.get(count).apply(WorldManager.getWorldLevel());
-        data.setDirty();
+        world.setDirty();
     }
     public void addBlockCount(int count) {
         setBlockCount(blockCount + count);
@@ -198,7 +221,7 @@ public class WorldData implements NBTSaveable {
     }
     public void setLastTierSpawn(int tier) {
         this.lastTierSpawn = tier;
-        data.setDirty();
+        world.setDirty();
     }
 
     public int getTraderFailedAttempts() {
@@ -206,11 +229,11 @@ public class WorldData implements NBTSaveable {
     }
     public void resetTraderFailedAttempts() {
         traderFailedAttempts = 0;
-        data.setDirty();
+        world.setDirty();
     }
     public int addTraderFailedAttempts() {
         traderFailedAttempts += 1;
-        data.setDirty();
+        world.setDirty();
 
         return traderFailedAttempts;
     }
@@ -220,11 +243,11 @@ public class WorldData implements NBTSaveable {
     }
     public void addTradedMob(EntityType<?> entityType, int count) {
         tradedMobs.merge(entityType, count, Integer::sum);
-        data.setDirty();
+        world.setDirty();
     }
     public void clearTradedMobs() {
         tradedMobs.clear();
-        data.setDirty();
+        world.setDirty();
     }
 
     public void setDimension(@NotNull ServerLevel level) {
@@ -232,15 +255,26 @@ public class WorldData implements NBTSaveable {
     }
     public void setDimension(@NotNull ResourceKey<Level> dimension) {
         this.dimension = dimension.location().toString();
-        data.setDirty();
+        world.setDirty();
     }
     public void setBlockPos(BlockPos pos, ServerLevel level) {
-        BlockManager.cleanBlock(level, this.pos);
+        cleanBlock(level, this.pos);
 
         this.pos = pos;
-        data.setDirty();
+        world.setDirty();
 
         level.setDefaultSpawnPos(this.pos, 0.0f);
+    }
+    public void cleanBlock(ServerLevel level, BlockPos pos) {
+        BlockState block = getCurrentBlock(level);
+        if (block.getBlock().equals(Blocks.BEDROCK))
+            DEFAULT_SPEC.placeAt(this);
+    }
+
+    public void initiate(@NotNull ServerLevel level) {
+        TierSpec tier0 = WorldManager.getWorldTier(0);
+        if (tier0 != null) tier0.getStartSequence().addToQueue(this, false);
+        updateBlock(level, false);
     }
 
     public enum State {
@@ -264,5 +298,85 @@ public class WorldData implements NBTSaveable {
             for (State state : values()) if (state.id == id) return state;
             return INACTIVE;
         }
+    }
+
+    public void ensureNoFall() {
+        Vec3 center = pos.getCenter();
+        for(Entity entity: level.getEntities(null, AABB.ofSize(center, AABB_RANGE, AABB_RANGE, AABB_RANGE)))
+            entity.teleportTo(entity.getX(), center.y + AABB_RANGE / 2.0, entity.getZ());
+    }
+
+    public TierSpec getRandomTierSpec() {
+        AtomicInteger totalChance = new AtomicInteger();
+        List<TierSpec> tiers = new ArrayList<>();
+
+        WorldManager.getWorldTiers().stream().filter(TierSpec::isEnabled).forEach(tier -> {
+            tiers.add(tier);
+            totalChance.addAndGet(tier.getWeight());
+        });
+
+        if (totalChance.get() == 0) return null;
+        int randomValue = WorldManager.getRandom().nextInt(totalChance.get());
+        for (TierSpec tier : tiers) {
+            randomValue -= tier.getWeight();
+            if (randomValue < 0) return tier;
+        }
+
+        return null;
+    }
+    public NeoBlockSpec getRandomBlock() {
+        Optional<NeoBlockSpec> queued = getNextInQueue();
+        if (queued.isPresent()) return queued.get();
+
+        TierSpec tier = getRandomTierSpec();
+        if (tier == null) {
+            NeoBlockMod.getLogger().error("Unable to find a block for {} blocks", getBlockCount());
+            return DEFAULT_SPEC;
+        }
+
+        setLastTierSpawn(tier.getID());
+        return tier.getRandomBlock();
+    }
+
+    public void updateBlock(ServerLevel level, boolean trigger) {
+        int lastSpawnTier = getLastTierSpawn();
+        if (state == State.ACTIVE) getRandomBlock().placeAt(this);
+        else BEDROCK_SPEC.placeAt(this);  // Creative cheaters & Move block in mid-search (Just in case)
+
+        if (!trigger) return;
+        addBlockCount(1);
+        Animation.resetIdleTick();
+        NeoListener.execute(() -> NeoMerchant.attemptSpawnTrader(level));
+        TierSpec last = WorldManager.getWorldTier(lastSpawnTier);
+        if (last != null) last.addCount(1);
+
+        for (TierSpec tier: WorldManager.getWorldTiers())
+            if (tier.canBeResearched()) tier.startResearch();
+    }
+
+    public BlockState getCurrentBlock(ServerLevel level) {
+        return level.getBlockState(pos);
+    }
+
+    public void tick() {
+        final BlockState block = level.getBlockState(pos);
+        if (state == State.UPDATED || state == State.STOPPED) {
+            if (block.getBlock() != Blocks.BEDROCK) BEDROCK_SPEC.placeAt(this);
+        } else if (block.isAir() || block.canBeReplaced()) updateBlock(level, true);
+    }
+
+    public boolean isNeoBlock(ServerLevel level, BlockPos pos) {
+        return isCorrectDimension(level) && getBlockPos().equals(pos);
+    }
+
+    public static void handleEndPortalFrameBreak(ServerLevel level, BlockState state, BlockPos pos, Player player) {
+        ItemStack tool = player.getMainHandItem();
+        if (!NeoMC.canBreak(tool.getItem(), Blocks.OBSIDIAN.defaultBlockState())) return;
+
+        ItemStack drop = NeoMC.isSilkTouched(tool) ?
+                new ItemStack(Blocks.END_PORTAL_FRAME) :
+                new ItemStack(Blocks.END_STONE);
+
+        Block.popResource(level, pos, drop);
     }
 }

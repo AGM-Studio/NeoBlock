@@ -4,7 +4,6 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import xyz.agmstudio.neoblock.neo.block.NeoBlockPos;
 
 public class ExplosionAnimation extends CooldownPhaseAnimation {
     @ConfigField("at-start")

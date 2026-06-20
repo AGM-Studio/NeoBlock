@@ -9,18 +9,20 @@ import net.minecraft.world.item.trading.MerchantOffers;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.agmstudio.neoblock.NeoBlockMod;
-import xyz.agmstudio.neoblock.neo.block.NeoBlockPos;
 import xyz.agmstudio.neoblock.neo.tiers.TierSpec;
+import xyz.agmstudio.neoblock.neo.world.NeoBlock;
 import xyz.agmstudio.neoblock.neo.world.WorldManager;
-import xyz.agmstudio.neoblock.neo.world.WorldData;
 import xyz.agmstudio.neocore.platform.IConfig;
 import xyz.agmstudio.neocore.NeoMC;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
+
+@ParametersAreNonnullByDefault
 public class NeoMerchant {
     public static double chance;
     public static double increment;
@@ -40,12 +42,12 @@ public class NeoMerchant {
         NeoBlockMod.getLogger().debug("NeoMerchant: Config loaded. \n\tChance: {}\n\tChance Increment: {}\n\tAttempt Interval: {}\n\tLifespan: {}", NeoMerchant.chance, NeoMerchant.increment, NeoMerchant.attemptInterval, NeoMerchant.lifespan);
     }
 
-    public static @Nullable WanderingTrader spawnTraderWith(List<NeoTrade> trades, ServerLevel level, String... tags) {
+    public static @Nullable WanderingTrader spawnTraderWith(List<NeoTrade> trades, NeoBlock at, String... tags) {
         NeoMerchant trader = new NeoMerchant();
         trader.trades.addAll(trades);
 
         if (trader.trades.isEmpty()) return null;
-        return trader.spawnTrader(level, tags);
+        return trader.spawnTrader(at, tags);
     }
     public static boolean exists(@NotNull ServerLevel level, String tag) {
         for (Entity entity: NeoMC.allEntities(level))
@@ -53,36 +55,34 @@ public class NeoMerchant {
 
         return false;
     }
-    public static WanderingTrader attemptSpawnTrader(ServerLevel level) {
-        WorldData status = WorldManager.getWorldData();
-        if (status.getBlockCount() % attemptInterval != 0 || exists(level, "NeoMerchant")) return null;
-        double chance = NeoMerchant.chance + (increment * status.getTraderFailedAttempts());
+    public static @Nullable WanderingTrader attemptSpawnTrader(NeoBlock at) {
+        if (at.getBlockCount() % attemptInterval != 0 || exists(at.level, "NeoMerchant")) return null;
+        double chance = NeoMerchant.chance + (increment * at.getTraderFailedAttempts());
         if (WorldManager.getRandom().nextFloat() > chance) {
-            int fails = status.addTraderFailedAttempts();
+            int fails = at.addTraderFailedAttempts();
             NeoBlockMod.getLogger().debug("Trader chance {} failed for {} times in a row", chance, fails);
             return null;
         }
-        return forceSpawnTrader(level);
+        return forceSpawnTrader(at);
     }
-    public static WanderingTrader forceSpawnTrader(ServerLevel level) {
-        WorldData status = WorldManager.getWorldData();
-        status.resetTraderFailedAttempts();
+    public static @Nullable WanderingTrader forceSpawnTrader(NeoBlock at) {
+        at.resetTraderFailedAttempts();
         List<NeoTrade> trades = new ArrayList<>();
         WorldManager.getWorldTiers().stream().filter(TierSpec::isEnabled).forEach(tier -> trades.addAll(tier.getTrades()));
 
-        WanderingTrader trader = spawnTraderWith(trades, level, "NeoMerchant");
+        WanderingTrader trader = spawnTraderWith(trades, at, "NeoMerchant");
         if (trader == null) return null;
 
-        NeoBlockMod.sendInstantMessage("message.neoblock.trader_spawned", level, true);
+        NeoBlockMod.sendInstantMessage("message.neoblock.trader_spawned", at.level, true);
 
-        HashMap<EntityType<?>, Integer> tradedMobs = status.getTradedMobs();
+        HashMap<EntityType<?>, Integer> tradedMobs = at.getTradedMobs();
         tradedMobs.forEach((type, count) -> {
             for (int i = 0; i < count; i++) {
-                Entity mob = NeoMC.spawnEntity(level, type, trader.getOnPos());
+                Entity mob = NeoMC.spawnEntity(at.level, type, trader.getOnPos());
                 NeoMC.leash(mob, trader);
             }
         });
-        status.clearTradedMobs();
+        at.clearTradedMobs();
 
         return trader;
     }
@@ -98,9 +98,9 @@ public class NeoMerchant {
     }
 
     private final List<NeoTrade> trades = new ArrayList<>();
-    public WanderingTrader spawnTrader(ServerLevel level, String... tags) {
-        WanderingTrader trader = new WanderingTrader(EntityType.WANDERING_TRADER, level);
-        trader.setPos(NeoBlockPos.get().getCenter().add(0, 2, 0));
+    public WanderingTrader spawnTrader(NeoBlock at, String... tags) {
+        WanderingTrader trader = new WanderingTrader(EntityType.WANDERING_TRADER, at.level);
+        trader.setPos(at.safeBlock().above(2).getCenter());
         trader.setDespawnDelay(lifespan.sample(WorldManager.getRandom()));
         for (String tag: tags) trader.addTag(tag);
 
@@ -108,7 +108,7 @@ public class NeoMerchant {
         for (NeoTrade trade: trades) trade.getOffer().ifPresent(offers::add);
         offerMap.put(trader.getUUID(), offers);
 
-        level.addFreshEntity(trader);
+        at.level.addFreshEntity(trader);
         return trader;
     }
 }

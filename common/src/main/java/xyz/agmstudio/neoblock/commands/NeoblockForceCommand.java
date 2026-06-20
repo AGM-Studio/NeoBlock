@@ -9,8 +9,6 @@ import net.minecraft.world.entity.npc.WanderingTrader;
 import xyz.agmstudio.neocore.commands.NeoArgumentBlockPos;
 import xyz.agmstudio.neocore.commands.NeoArgumentDimension;
 import xyz.agmstudio.neocore.commands.NeoCommand;
-import xyz.agmstudio.neoblock.neo.block.BlockManager;
-import xyz.agmstudio.neoblock.neo.block.NeoBlockPos;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoMerchant;
 import xyz.agmstudio.neoblock.neo.world.WorldManager;
 

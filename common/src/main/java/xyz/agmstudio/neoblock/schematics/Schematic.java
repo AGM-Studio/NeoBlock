@@ -9,7 +9,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 import xyz.agmstudio.neoblock.NeoBlockMod;
-import xyz.agmstudio.neoblock.neo.block.NeoBlockPos;
 import xyz.agmstudio.neocore.NeoNBT;
 
 import java.io.File;
@@ -61,7 +60,6 @@ public class Schematic {
     }
 
     public static Schematic fromNBT(CompoundTag tag, ServerLevel level) {
-        BlockPos origin = NeoNBT.Block.readBlockPos(tag, "origin", NeoBlockPos.get());
         List<BlockInfo> blocks = new ArrayList<>();
         ListTag blockList = tag.getList("blocks", Tag.TAG_COMPOUND);
 
@@ -73,6 +71,7 @@ public class Schematic {
             blocks.add(new BlockInfo(offset, state, nbt));
         }
 
+        BlockPos origin = NeoNBT.Block.readBlockPos(tag, "origin", BlockPos.ZERO);
         return new Schematic(origin, blocks);
     }
 

@@ -1,13 +1,12 @@
 package xyz.agmstudio.neoblock.neo.block;
 
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.neo.loot.NeoItemSpec;
+import xyz.agmstudio.neoblock.neo.world.NeoBlock;
 import xyz.agmstudio.neocore.platform.IConfig;
 import xyz.agmstudio.neocore.util.StringUtil;
 
@@ -78,9 +77,9 @@ public class NeoChestSpec extends NeoBlockSpec {
         return range + "neoblock:chest:" + id;
     }
 
-    @Override public void placeAt(@NotNull LevelAccessor level, BlockPos pos) {
-        super.placeAt(level, pos);
-        if (level.getBlockEntity(pos) instanceof ChestBlockEntity chest) {
+    @Override public void placeAt(@NotNull NeoBlock block) {
+        super.placeAt(block);
+        if (block.level.getBlockEntity(block.getBlockPos()) instanceof ChestBlockEntity chest) {
             List<Integer> slots = IntStream.range(0, chest.getContainerSize()).boxed().collect(Collectors.toList());
             Collections.shuffle(slots);
 

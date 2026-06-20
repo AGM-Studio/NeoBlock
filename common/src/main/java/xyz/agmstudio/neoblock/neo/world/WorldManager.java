@@ -14,32 +14,36 @@ import net.minecraft.world.scores.Objective;
 import net.minecraft.world.scores.Scoreboard;
 import net.minecraft.world.scores.criteria.ObjectiveCriteria;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.animations.Animation;
 import xyz.agmstudio.neoblock.commands.NeoblockForceCommand;
-import xyz.agmstudio.neoblock.configs.TierConfig;
-import xyz.agmstudio.neocore.commands.NeoCommand;
 import xyz.agmstudio.neoblock.compatibility.ForgivingVoid;
-import xyz.agmstudio.neocore.data.NBTSaveable;
-import xyz.agmstudio.neoblock.schematics.Schematic;
-import xyz.agmstudio.neoblock.neo.block.*;
+import xyz.agmstudio.neoblock.configs.TierConfig;
+import xyz.agmstudio.neoblock.neo.block.NeoChestSpec;
+import xyz.agmstudio.neoblock.neo.block.NeoSeqBlockSpec;
+import xyz.agmstudio.neoblock.neo.block.NeoTagBlockSpec;
 import xyz.agmstudio.neoblock.neo.loot.NeoTagItemSpec;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoMerchant;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoTrade;
 import xyz.agmstudio.neoblock.neo.tiers.TierSpec;
-import xyz.agmstudio.neocore.platform.IConfig;
+import xyz.agmstudio.neoblock.schematics.Schematic;
 import xyz.agmstudio.neocore.NeoMC;
+import xyz.agmstudio.neocore.commands.NeoCommand;
+import xyz.agmstudio.neocore.data.NBTSaveable;
+import xyz.agmstudio.neocore.platform.IConfig;
 
 import java.io.FileNotFoundException;
 import java.nio.file.Files;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 public abstract class WorldManager extends SavedData {
     private static final String BLOCK_BREAK_OBJECTIVE = "neoblocks_broken";
-
-    private static WorldManager load(ServerLevel level) {
-        return NeoBlockMod.captureSavedData(level, "neo_block_data", t -> WorldManager.load(t, level), () -> WorldManager.create(level));
-    }
+    private static final double AABB_RANGE = 1.0;
+    private final List<NeoBlock> blocks = new ArrayList<>();
 
     private static WorldManager instance;
     public static WorldManager getInstance() {
@@ -72,102 +76,88 @@ public abstract class WorldManager extends SavedData {
     }
 
     public static void setup(@NotNull ServerLevel level) {
-        reloadConfig();
-        instance = load(level);
+        WorldManager.reloadConfig();
+        WorldManager.instance = NeoBlockMod.captureSavedData(level, "neo_block_data", t -> WorldManager.load(t, level), () -> WorldManager.create(level));
+    }
 
-        if (instance == null) return;
-        IConfig config = NeoBlockMod.getConfig();
-        if (instance.status.state == WorldData.State.INACTIVE) {
-            boolean allowNeoBlock = true;
-            final int x = config.get("world.block.x", 0);
-            final int y = config.get("world.block.y", 64);
-            final int z = config.get("world.block.z", 0);
+    private static @NotNull List<BlockPos> getConfigPositions(@NotNull ServerLevel level, @NotNull IConfig config) {
+        List<BlockPos> positions = new ArrayList<>();
+        IConfig blockSection = config.getSection("world.block");
 
-            ChunkGenerator gen = level.getChunkSource().getGenerator();
-            if (gen instanceof FlatLevelSource || config.get("world.force-block", false)) {
-                getWorldData().setBlockPos(new BlockPos(x, y, z), level);
-                TierSpec tier0 = getWorldTier(0);
-                if (tier0 != null) tier0.getStartSequence().addToQueue(false);
+        String blockDimension = blockSection.get("dimension");
+        if (blockDimension == null || !blockDimension.equals(level.dimension().location().toString()))
+            positions.add(new BlockPos(blockSection.getInt("x"), blockSection.getInt("y"), blockSection.getInt("z")));
 
-                IConfig rules = config.getSection("rules");
-                if (rules != null) WorldRules.applyGameRules(level, rules);
-
-                // Load schematics from config!
-                Schematic.loadSchematic(level, NeoBlockPos.get(), "main.nbt");
-                int iterator = 0;
-                while (config.contains("schematics.custom_" + iterator)) {
-                    try {
-                        IConfig scheme = config.getSection("schematics.custom_" + iterator);
-                        String name = scheme.get("name", "NeoBlockSchematic_" + iterator);
-                        BlockPos pos = new BlockPos(scheme.getInt("x"), scheme.getInt("y"), scheme.getInt("z"));
-                        int result = Schematic.loadSchematic(level, pos, name);
-                        if (result == 0) throw new FileNotFoundException("File \"" + name + "\" not found");
-                    } catch (Exception e) {
-                        NeoBlockMod.getLogger().error("Unable to load schematic {}", iterator, e);
-                    }
-                    iterator++;
-                }
-                instance.status.state = WorldData.State.ACTIVE;
-                instance.setDirty();
-
-                BlockManager.updateBlock(level, false);
-            } else {
-                Optional<NeoblockForceCommand.SetBlock> command = NeoCommand.getFromRegistry(NeoblockForceCommand.SetBlock.class);
-
-                NeoBlockMod.getLogger().info("NeoBlock has been disabled.");
-                NeoBlockMod.sendMessage("message.neoblock.disabled_world_1", level, false);
-                NeoBlockMod.sendMessage("message.neoblock.disabled_world_2", level, false, command.map(NeoCommand::getCommand).orElse(null));
-
-                instance.status.state = WorldData.State.DISABLED;
-                instance.setDirty();
-            }
-        } else if (instance.status.state == WorldData.State.UPDATED) {
-            Optional<NeoblockForceCommand.ResetTiers> command = NeoCommand.getFromRegistry(NeoblockForceCommand.ResetTiers.class);
-
-            NeoBlockMod.getLogger().info("NeoBlock tiers has been updated.");
-            NeoBlockMod.sendMessage("message.neoblock.updated_world", level, false, command.map(NeoCommand::getCommand).orElse(null));
-
-            instance.status.state = WorldData.State.UPDATED;
-            instance.setDirty();
+        int blockSectionCounter = 0;
+        blockSection = config.getSection("world.block-" + (++blockSectionCounter));
+        while (blockSection != null) {
+            blockDimension = blockSection.get("dimension");
+            if (blockDimension != null && blockDimension.equals(level.dimension().location().toString())) continue;
+            positions.add(new BlockPos(blockSection.getInt("x"), blockSection.getInt("y"), blockSection.getInt("z")));
+            blockSection = config.getSection("world.block-" + (++blockSectionCounter));
         }
+
+        return positions;
     }
 
     public static @NotNull WorldManager create(@NotNull ServerLevel level) {
         WorldManager data = NeoBlockMod.instanceWorldData(level);
 
-        data.status = new WorldData(data);
+        IConfig config = NeoBlockMod.getConfig();
+        ChunkGenerator gen = level.getChunkSource().getGenerator();
+        if (gen instanceof FlatLevelSource || config.get("world.force-block", false)) {
+            IConfig rules = config.getSection("rules");
+            if (rules != null) WorldRules.applyGameRules(level, rules);
+
+            // Load schematics from config!
+            int iterator = 0;
+            while (config.contains("schematics." + iterator)) {
+                try {
+                    IConfig scheme = config.getSection("schematics." + iterator);
+                    String name = scheme.get("name", "NeoBlockSchematic_" + iterator);
+                    BlockPos pos = new BlockPos(scheme.getInt("x"), scheme.getInt("y"), scheme.getInt("z"));
+                    int result = Schematic.loadSchematic(level, pos, name);
+                    if (result == 0) throw new FileNotFoundException("File \"" + name + "\" not found");
+                } catch (Exception e) {
+                    NeoBlockMod.getLogger().error("Unable to load schematic {}", iterator, e);
+                }
+                iterator++;
+            }
+
+            for (BlockPos pos: getConfigPositions(level, config)) {
+                NeoBlock block = new NeoBlock(level, data);
+                block.dimension = level.dimension().location().toString();
+                block.pos = pos;
+                block.initiate(level);
+                data.blocks.add(block);
+            }
+
+            instance.setDirty();
+        } else {
+            Optional<NeoblockForceCommand.SetBlock> command = NeoCommand.getFromRegistry(NeoblockForceCommand.SetBlock.class);
+
+            NeoBlockMod.getLogger().info("NeoBlock has been disabled.");
+            NeoBlockMod.sendMessage("message.neoblock.disabled_world_1", level, false);
+            NeoBlockMod.sendMessage("message.neoblock.disabled_world_2", level, false, command.map(NeoCommand::getCommand).orElse(null));
+        }
+
         data.tiers.addAll(fetchTiers(true));
 
-        NeoBlockMod.getLogger().debug("Creating new world data");
         return data;
     }
     public static @NotNull WorldManager load(@NotNull CompoundTag tag, ServerLevel level) {
         WorldManager data = NeoBlockMod.instanceWorldData(level);
 
         NeoBlockMod.getLogger().debug("Loading WorldData from {}", tag);
-        data.status = NBTSaveable.instance(WorldData.class, tag, data);
         data.tiers.addAll(fetchTiers(false));
+        data.blocks.clear();
+        tag.getList("Blocks", StringTag.TAG_COMPOUND).forEach(t -> {
+            CompoundTag bt = (CompoundTag) t;
+            if (!level.dimension().location().toString().equals(bt.getString("dimension"))) return;
+            NeoBlock block = NBTSaveable.instance(NeoBlock.class, bt, level, data);
+            data.blocks.add(block);
+        });
 
-        boolean isUpdated = false;
-        final ListTag tiers = tag.getList("Tiers", StringTag.TAG_COMPOUND);
-        for (int i = 0; i < tiers.size(); i++) {
-            CompoundTag tt = tiers.getCompound(i);
-            int id = tt.getInt("id");
-
-            if (id >= data.tiers.size()) {
-                isUpdated = true;
-                continue;
-            }
-            TierSpec tier = data.tiers.get(id);
-            tier.load(tt);
-
-            if (!tier.isStable()) {
-                NeoBlockMod.sendMessage("message.neoblock.tier_updated", level, false, id);
-                isUpdated = true;
-            }
-        }
-
-        if (isUpdated || tiers.size() < data.tiers.size()) data.status.setUpdated();
         return data;
     }
 
@@ -183,18 +173,15 @@ public abstract class WorldManager extends SavedData {
     }
 
     public @NotNull CompoundTag saveDataOnTag(@NotNull CompoundTag tag) {
-        tag.merge(status.save());
         ListTag list = new ListTag();
-        for (TierSpec tier: tiers) list.add(tier.save());
-        tag.put("Tiers", list);
+        for (NeoBlock block: blocks) list.add(block.save());
+        tag.put("Blocks", list);
 
         NeoBlockMod.getLogger().debug("WorldData saved as {}", tag);
         return tag;
     }
 
     private final ServerLevel level;
-
-    private WorldData status;
     private final List<TierSpec> tiers = new ArrayList<>();
 
     public WorldManager(ServerLevel level) {
@@ -209,12 +196,6 @@ public abstract class WorldManager extends SavedData {
         return Optional.of(collection.get(getRandom().nextInt(collection.size())));
     }
 
-    public WorldData getStatus() {
-        return status;
-    }
-    public static WorldData getWorldData() {
-        return instance.status;
-    }
     public ServerLevel getLevel() {
         return level;
     }
@@ -246,6 +227,7 @@ public abstract class WorldManager extends SavedData {
         if (force && tier.canBeResearched()) tier.startResearch();
     }
 
+    // Scoreboard manager
     private static Objective getObjective(Scoreboard scoreboard) {
         Objective objective = scoreboard.getObjective(BLOCK_BREAK_OBJECTIVE);
         if (objective != null) return objective;
@@ -273,5 +255,19 @@ public abstract class WorldManager extends SavedData {
         Objective objective = getObjective(scoreboard);
 
         return NeoMC.getPlayerScore(scoreboard, player, objective);
+    }
+
+    public static void tick(ServerLevel level) {
+        if (instance == null) return;
+        for (NeoBlock block: instance.blocks) if (block.level == level) block.tick();
+    }
+    public static @NotNull @Unmodifiable List<NeoBlock> getBlocks() {
+        return List.copyOf(instance.blocks);
+    }
+    public static boolean isNeoBlock(ServerLevel level, BlockPos pos) {
+        for (NeoBlock block: instance.blocks)
+            if (block.isCorrectDimension(level) && block.getBlockPos().equals(pos)) return true;
+
+        return false;
     }
 }

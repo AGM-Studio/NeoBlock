@@ -14,14 +14,13 @@ import org.slf4j.Logger;
 import org.slf4j.helpers.MessageFormatter;
 import xyz.agmstudio.neoblock.animations.Animation;
 import xyz.agmstudio.neoblock.configs.TierConfig;
-import xyz.agmstudio.neoblock.neo.block.BlockManager;
 import xyz.agmstudio.neoblock.neo.loot.NeoMobSpec;
 import xyz.agmstudio.neoblock.neo.world.WorldCooldown;
 import xyz.agmstudio.neoblock.neo.world.WorldManager;
 import xyz.agmstudio.neoblock.schematics.Schematic;
+import xyz.agmstudio.neocore.NeoMC;
 import xyz.agmstudio.neocore.NeoMod;
 import xyz.agmstudio.neocore.platform.IConfig;
-import xyz.agmstudio.neocore.NeoMC;
 
 import java.util.*;
 import java.util.function.Function;
@@ -70,7 +69,7 @@ public abstract class NeoBlockMod extends NeoMod {
         }
 
         NeoListener.registerTicker(Animation::tickAll);
-        NeoListener.registerTicker(BlockManager::tick);
+        NeoListener.registerTicker(WorldManager::tick);
         NeoListener.registerTicker(WorldCooldown::tick);
 
         NeoMobSpec.load();
