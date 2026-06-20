@@ -15,7 +15,6 @@ import org.slf4j.helpers.MessageFormatter;
 import xyz.agmstudio.neoblock.animations.Animation;
 import xyz.agmstudio.neoblock.configs.TierConfig;
 import xyz.agmstudio.neoblock.neo.loot.NeoMobSpec;
-import xyz.agmstudio.neoblock.neo.world.WorldCooldown;
 import xyz.agmstudio.neoblock.neo.world.WorldManager;
 import xyz.agmstudio.neoblock.schematics.Schematic;
 import xyz.agmstudio.neocore.NeoMC;
@@ -70,7 +69,6 @@ public abstract class NeoBlockMod extends NeoMod {
 
         NeoListener.registerTicker(Animation::tickAll);
         NeoListener.registerTicker(WorldManager::tick);
-        NeoListener.registerTicker(WorldCooldown::tick);
 
         NeoMobSpec.load();
     }

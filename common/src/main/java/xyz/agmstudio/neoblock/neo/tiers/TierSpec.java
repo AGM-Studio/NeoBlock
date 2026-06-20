@@ -11,7 +11,7 @@ import xyz.agmstudio.neoblock.neo.events.NeoEventAction;
 import xyz.agmstudio.neoblock.neo.events.NeoEventBlockTrigger;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoTrade;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoTradePool;
-import xyz.agmstudio.neoblock.neo.world.WorldCooldown;
+import xyz.agmstudio.neoblock.neo.world.NeoBlockCooldown;
 import xyz.agmstudio.neoblock.neo.world.WorldManager;
 import xyz.agmstudio.neocore.platform.IConfig;
 import xyz.agmstudio.neocore.util.StringUtil;
@@ -197,7 +197,7 @@ public class TierSpec implements NBTSaveable {
     }
     public void startResearch() {
         if (researched) return;
-        WorldCooldown.Type.TierResearch.create(this);
+        NeoBlockCooldown.Type.TierResearch.create(this);
     }
     public void setResearched(boolean value) {
         researched = value;

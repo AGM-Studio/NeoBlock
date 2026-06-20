@@ -13,7 +13,7 @@ import xyz.agmstudio.neoblock.animations.progress.BreakingAnimation;
 import xyz.agmstudio.neoblock.animations.progress.CooldownProgressAnimation;
 import xyz.agmstudio.neoblock.animations.progress.SparkleAnimation;
 import xyz.agmstudio.neoblock.animations.progress.SpiralAnimation;
-import xyz.agmstudio.neoblock.neo.world.WorldCooldown;
+import xyz.agmstudio.neoblock.neo.world.NeoBlockCooldown;
 import xyz.agmstudio.neocore.platform.IConfig;
 
 import java.lang.reflect.Field;
@@ -170,7 +170,7 @@ public abstract class Animation implements IConfig.Configured {
         for (CooldownPhaseAnimation animation : Animation.phaseAnimations)
             if (animation.isActiveOnUpgradeStart()) animation.animate(level);
     }
-    public static void tickCooldown(ServerLevel level, WorldCooldown cooldown) {
+    public static void tickCooldown(ServerLevel level, NeoBlockCooldown cooldown) {
         if (cooldownBar != null) cooldownBar.update(cooldown.getTick(), cooldown.getTime());
         for (CooldownProgressAnimation animation : Animation.progressAnimations)
             animation.upgradeTick(level, cooldown.getTick());

@@ -5,7 +5,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.commands.CommandSourceStack;
 import xyz.agmstudio.neocore.commands.NeoArgumentInteger;
 import xyz.agmstudio.neocore.commands.NeoCommand;
-import xyz.agmstudio.neoblock.neo.world.WorldCooldown;
+import xyz.agmstudio.neoblock.neo.world.NeoBlockCooldown;
 import xyz.agmstudio.neoblock.neo.world.WorldManager;
 import xyz.agmstudio.neocore.util.StringUtil;
 
@@ -19,7 +19,7 @@ public class NeoBlockCooldownCommand extends NeoCommand {
 
     @Override
     public int execute(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        WorldCooldown cooldown = WorldManager.getWorldData().getCooldown();
+        NeoBlockCooldown cooldown = WorldManager.getWorldData().getCooldown();
         if (cooldown == null) return fail(context, "command.neoblock.cooldown.no_cooldown");
         return success(context, "command.neoblock.cooldown", cooldown.getType().id(), StringUtil.formatTicks(cooldown.getTick()), StringUtil.formatTicks(cooldown.getTime()));
     }
@@ -31,7 +31,7 @@ public class NeoBlockCooldownCommand extends NeoCommand {
         }
 
         @Override public int execute(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-            WorldCooldown cooldown = WorldManager.getWorldData().getCooldown();
+            NeoBlockCooldown cooldown = WorldManager.getWorldData().getCooldown();
             if (cooldown == null) return fail(context, "command.neoblock.cooldown.no_cooldown");
 
             int value = this.getArgument(context, "ticks");
@@ -48,7 +48,7 @@ public class NeoBlockCooldownCommand extends NeoCommand {
 
         @Override public int execute(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
             int value = this.getArgument(context, "ticks");
-            WorldCooldown.Type.Normal.create(value);
+            NeoBlockCooldown.Type.Normal.create(value);
 
             return success(context, "command.neoblock.cooldown.add", StringUtil.formatTicks(value));
         }

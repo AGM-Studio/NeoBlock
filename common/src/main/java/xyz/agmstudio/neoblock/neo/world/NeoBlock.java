@@ -56,7 +56,7 @@ public class NeoBlock implements NBTSaveable {
 
     protected final HashMap<EntityType<?>, Integer> tradedMobs = new HashMap<>();
     protected final List<NeoBlockSpec> queue = new ArrayList<>();
-    protected final List<WorldCooldown> cooldowns = new ArrayList<>();
+    protected final List<NeoBlockCooldown> cooldowns = new ArrayList<>();
 
     protected final LinkedHashMap<Integer, NeoEventAction> onBlockActions = new LinkedHashMap<>();
     protected final LinkedHashMap<Integer, NeoEventAction> everyBlockActions = new LinkedHashMap<>();
@@ -77,7 +77,7 @@ public class NeoBlock implements NBTSaveable {
         cooldowns.clear();
         final ListTag cools = tag.getList("Cooldowns", Tag.TAG_COMPOUND);
         cools.forEach(cool -> {
-            WorldCooldown cooldown = NBTSaveable.instance(WorldCooldown.class, (CompoundTag) cool);
+            NeoBlockCooldown cooldown = NBTSaveable.instance(NeoBlockCooldown.class, (CompoundTag) cool, this);
             cooldowns.add(cooldown);
         });
 
@@ -183,23 +183,23 @@ public class NeoBlock implements NBTSaveable {
         world.setDirty();
     }
 
-    public void addCooldown(WorldCooldown cooldown) {
+    public void addCooldown(NeoBlockCooldown cooldown) {
         cooldowns.add(cooldown);
         setOnCooldown();
 
         BEDROCK_SPEC.placeAt(this);
     }
-    public void removeCooldown(WorldCooldown cooldown) {
+    public void removeCooldown(NeoBlockCooldown cooldown) {
         cooldowns.remove(cooldown);
         if (cooldowns.isEmpty()) {
             setActive();
-            updateBlock(WorldManager.getWorldLevel(), false);
+            updateBlock(false);
         } else world.setDirty();
     }
-    public List<WorldCooldown> getCooldowns() {
+    public List<NeoBlockCooldown> getCooldowns() {
         return cooldowns;
     }
-    public @Nullable WorldCooldown getCooldown() {
+    public @Nullable NeoBlockCooldown getCooldown() {
         if (cooldowns.isEmpty()) return null;
         return cooldowns.get(0);
     }
@@ -208,8 +208,8 @@ public class NeoBlock implements NBTSaveable {
     }
     public void setBlockCount(int count) {
         blockCount = count;
-        for (int i: everyBlockActions.keySet()) if (count % i == 0) everyBlockActions.get(i).apply(WorldManager.getWorldLevel());
-        if (onBlockActions.containsKey(count)) onBlockActions.get(count).apply(WorldManager.getWorldLevel());
+        for (int i: everyBlockActions.keySet()) if (count % i == 0) everyBlockActions.get(i).apply(this);
+        if (onBlockActions.containsKey(count)) onBlockActions.get(count).apply(this);
         world.setDirty();
     }
     public void addBlockCount(int count) {
@@ -274,7 +274,7 @@ public class NeoBlock implements NBTSaveable {
     public void initiate(@NotNull ServerLevel level) {
         TierSpec tier0 = WorldManager.getWorldTier(0);
         if (tier0 != null) tier0.getStartSequence().addToQueue(this, false);
-        updateBlock(level, false);
+        updateBlock(false);
     }
 
     public enum State {
@@ -338,7 +338,7 @@ public class NeoBlock implements NBTSaveable {
         return tier.getRandomBlock();
     }
 
-    public void updateBlock(ServerLevel level, boolean trigger) {
+    public void updateBlock(boolean trigger) {
         int lastSpawnTier = getLastTierSpawn();
         if (state == State.ACTIVE) getRandomBlock().placeAt(this);
         else BEDROCK_SPEC.placeAt(this);  // Creative cheaters & Move block in mid-search (Just in case)
@@ -346,7 +346,7 @@ public class NeoBlock implements NBTSaveable {
         if (!trigger) return;
         addBlockCount(1);
         Animation.resetIdleTick();
-        NeoListener.execute(() -> NeoMerchant.attemptSpawnTrader(level));
+        NeoListener.execute(() -> NeoMerchant.attemptSpawnTrader(this));
         TierSpec last = WorldManager.getWorldTier(lastSpawnTier);
         if (last != null) last.addCount(1);
 
@@ -362,7 +362,28 @@ public class NeoBlock implements NBTSaveable {
         final BlockState block = level.getBlockState(pos);
         if (state == State.UPDATED || state == State.STOPPED) {
             if (block.getBlock() != Blocks.BEDROCK) BEDROCK_SPEC.placeAt(this);
-        } else if (block.isAir() || block.canBeReplaced()) updateBlock(level, true);
+            if (state == State.STOPPED && !cooldowns.isEmpty()) tickCooldown();
+        } else if (block.isAir() || block.canBeReplaced()) updateBlock(true);
+    }
+
+    private boolean isFirstCooldown = true;
+    public void tickCooldown() {
+        NeoBlockCooldown cooldown = cooldowns.get(0);
+        if (cooldown.tick++ == 0) {
+            cooldown.onStart();
+            if (isFirstCooldown) Animation.animateCooldownStart(level);
+        }
+        if (isFirstCooldown) isFirstCooldown = false;
+        if (cooldown.time > 0 && cooldown.tick >= cooldown.time) {
+            cooldown.onFinish();
+            removeCooldown(cooldown);
+            if (cooldowns.isEmpty()) {
+                Animation.animateCooldownFinish(level);
+                isFirstCooldown = true;
+            }
+        } else Animation.tickCooldown(level, cooldown);
+
+        WorldManager.getInstance().setDirty();
     }
 
     public boolean isNeoBlock(ServerLevel level, BlockPos pos) {

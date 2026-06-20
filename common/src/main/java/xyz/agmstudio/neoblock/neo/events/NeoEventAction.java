@@ -10,7 +10,7 @@ import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoMerchant;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoTradePool;
 import xyz.agmstudio.neoblock.neo.world.NeoBlock;
-import xyz.agmstudio.neoblock.neo.world.WorldCooldown;
+import xyz.agmstudio.neoblock.neo.world.NeoBlockCooldown;
 import xyz.agmstudio.neoblock.neo.world.WorldRules;
 import xyz.agmstudio.neocore.platform.IConfig;
 import xyz.agmstudio.neocore.util.StringUtil;
@@ -73,6 +73,6 @@ public final class NeoEventAction {
 
         NeoBlockMod.sendInstantMessage(actionMessage, level, true);
         for (Component message: this.messages) NeoBlockMod.sendInstantMessage(message, level, false);
-        if (cooldown > 0) WorldCooldown.Type.Normal.create(cooldown);
+        if (cooldown > 0) NeoBlockCooldown.Type.Normal.create(block, cooldown);
     }
 }
