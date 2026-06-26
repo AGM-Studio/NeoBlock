@@ -1,3 +1,4 @@
+//file:noinspection SpellCheckingInspection
 plugins {
     id 'multiloader-common'
     id 'net.neoforged.moddev'
@@ -43,4 +44,3 @@ artifacts {
     commonJava sourceSets.main.java.sourceDirectories.singleFile
     commonResources sourceSets.main.resources.sourceDirectories.singleFile
 }
-
