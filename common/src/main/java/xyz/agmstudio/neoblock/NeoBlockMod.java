@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.helpers.MessageFormatter;
 import xyz.agmstudio.neoblock.animations.Animation;
-import xyz.agmstudio.neoblock.configs.TierConfig;
+import xyz.agmstudio.neoblock.neo.tiers.TierConfig;
 import xyz.agmstudio.neoblock.neo.loot.NeoMobSpec;
 import xyz.agmstudio.neoblock.neo.world.WorldManager;
 import xyz.agmstudio.neoblock.schematics.Schematic;

@@ -26,6 +26,7 @@ import org.jetbrains.annotations.Nullable;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.NeoListener;
 import xyz.agmstudio.neoblock.animations.Animation;
+import xyz.agmstudio.neoblock.neo.tiers.TierConfig;
 import xyz.agmstudio.neoblock.neo.block.NeoBlockSpec;
 import xyz.agmstudio.neoblock.neo.events.NeoEventAction;
 import xyz.agmstudio.neoblock.neo.events.NeoEventBlockTrigger;
@@ -49,12 +50,14 @@ public class NeoBlock implements NBTSaveable {
 
     @NBTData("State") protected State state = State.INACTIVE;
     @NBTData("BlockCount") protected int blockCount = 0;
-    @NBTData("LastTierSpawn") protected int lastTierSpawn = 0;
+    @NBTData("LastTierSpawn") protected String lastTierSpawn = null;
     @NBTData("TraderFailedAttempts") protected int traderFailedAttempts = 0;
     @NBTData("Position") protected BlockPos pos = new BlockPos(0, 64, 0);
     @NBTData("Dimension") protected String dimension = "minecraft:overworld";
 
+    protected String group = null;
     protected final HashMap<EntityType<?>, Integer> tradedMobs = new HashMap<>();
+    protected final HashMap<String, TierSpec> tiers = new HashMap<>();
     protected final List<NeoBlockSpec> queue = new ArrayList<>();
     protected final List<NeoBlockCooldown> cooldowns = new ArrayList<>();
 
@@ -67,6 +70,16 @@ public class NeoBlock implements NBTSaveable {
     }
 
     @Override public void onLoad(@NotNull CompoundTag tag) {
+        this.group = tag.getString("Group");
+
+        tiers.clear();
+        final CompoundTag tiersTag = tag.getCompound("Tiers");
+        for (Map.Entry<String, TierConfig> entry: WorldManager.getTierConfigGroup(group).entrySet()) {
+            TierSpec spec = new TierSpec(this, entry.getKey(), entry.getValue());
+            spec.load(tiersTag.getCompound(entry.getKey()));
+            tiers.put(entry.getKey(), spec);
+        }
+
         final CompoundTag mobs = tag.getCompound("TradedMobs");
         mobs.getAllKeys().forEach(key -> tradedMobs.merge(NeoMC.getEntityType(key).orElse(null), mobs.getInt(key), Integer::sum));
 
@@ -100,6 +113,12 @@ public class NeoBlock implements NBTSaveable {
         }
     }
     @Override public CompoundTag onSave(@NotNull CompoundTag tag) {
+        tag.putString("Group", group);
+
+        final CompoundTag tiersTag = new CompoundTag();
+        tiers.forEach((key, value) -> tiersTag.put(key, value.save()));
+        tag.put("Tiers", tiersTag);
+
         final CompoundTag mobs = new CompoundTag();
         tradedMobs.forEach((key, value) -> mobs.putInt(String.valueOf(NeoMC.getEntityTypeResource(key)), value));
         tag.put("TradedMobs", mobs);
@@ -113,6 +132,10 @@ public class NeoBlock implements NBTSaveable {
         tag.put("Cooldowns", cools);
 
         return tag;
+    }
+
+    public TierSpec getTier(String id) {
+        return tiers.get(id);
     }
 
     public boolean isCorrectDimension(@NotNull ServerLevel level) {
@@ -184,6 +207,12 @@ public class NeoBlock implements NBTSaveable {
     }
 
     public void addCooldown(NeoBlockCooldown cooldown) {
+        if (cooldown.time <= 0) { // Insta finish
+            cooldown.onStart();
+            cooldown.onFinish();
+            return;
+        }
+
         cooldowns.add(cooldown);
         setOnCooldown();
 
@@ -203,6 +232,7 @@ public class NeoBlock implements NBTSaveable {
         if (cooldowns.isEmpty()) return null;
         return cooldowns.get(0);
     }
+
     public int getBlockCount() {
         return blockCount;
     }
@@ -216,11 +246,11 @@ public class NeoBlock implements NBTSaveable {
         setBlockCount(blockCount + count);
     }
 
-    public int getLastTierSpawn() {
-        return lastTierSpawn;
+    public TierSpec getLastTierSpawn() {
+        return lastTierSpawn == null ? tiers.get(lastTierSpawn) : null;
     }
-    public void setLastTierSpawn(int tier) {
-        this.lastTierSpawn = tier;
+    public void setLastTierSpawn(TierSpec tier) {
+        this.lastTierSpawn = tier != null ? tier.getID() : null;
         world.setDirty();
     }
 
@@ -272,8 +302,10 @@ public class NeoBlock implements NBTSaveable {
     }
 
     public void initiate(@NotNull ServerLevel level) {
-        TierSpec tier0 = WorldManager.getWorldTier(0);
-        if (tier0 != null) tier0.getStartSequence().addToQueue(this, false);
+        tiers.values().forEach(t -> {
+            if (t.canBeResearched()) t.startResearch();
+            if (t.isEnabled()) t.getStartSequence().addToQueue(this, false);
+        });
         updateBlock(false);
     }
 
@@ -310,7 +342,7 @@ public class NeoBlock implements NBTSaveable {
         AtomicInteger totalChance = new AtomicInteger();
         List<TierSpec> tiers = new ArrayList<>();
 
-        WorldManager.getWorldTiers().stream().filter(TierSpec::isEnabled).forEach(tier -> {
+        this.tiers.values().stream().filter(TierSpec::isEnabled).forEach(tier -> {
             tiers.add(tier);
             totalChance.addAndGet(tier.getWeight());
         });
@@ -334,12 +366,11 @@ public class NeoBlock implements NBTSaveable {
             return DEFAULT_SPEC;
         }
 
-        setLastTierSpawn(tier.getID());
+        setLastTierSpawn(tier);
         return tier.getRandomBlock();
     }
 
     public void updateBlock(boolean trigger) {
-        int lastSpawnTier = getLastTierSpawn();
         if (state == State.ACTIVE) getRandomBlock().placeAt(this);
         else BEDROCK_SPEC.placeAt(this);  // Creative cheaters & Move block in mid-search (Just in case)
 
@@ -347,10 +378,10 @@ public class NeoBlock implements NBTSaveable {
         addBlockCount(1);
         Animation.resetIdleTick();
         NeoListener.execute(() -> NeoMerchant.attemptSpawnTrader(this));
-        TierSpec last = WorldManager.getWorldTier(lastSpawnTier);
-        if (last != null) last.addCount(1);
+        TierSpec lastSpawnTier = getLastTierSpawn();
+        if (lastSpawnTier != null) lastSpawnTier.addCount(1);
 
-        for (TierSpec tier: WorldManager.getWorldTiers())
+        for (TierSpec tier: tiers.values())
             if (tier.canBeResearched()) tier.startResearch();
     }
 
@@ -383,7 +414,7 @@ public class NeoBlock implements NBTSaveable {
             }
         } else Animation.tickCooldown(level, cooldown);
 
-        WorldManager.getInstance().setDirty();
+        WorldManager.get().setDirty();
     }
 
     public boolean isNeoBlock(ServerLevel level, BlockPos pos) {

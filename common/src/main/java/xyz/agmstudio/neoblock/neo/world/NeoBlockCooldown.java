@@ -22,10 +22,10 @@ public class NeoBlockCooldown implements NBTSaveable {
                 this.tier = tier;
             }
             public static void create(TierSpec tier) {
-                NeoBlockCooldown cooldown = new NeoBlockCooldown(null, new TierResearch(tier)); // TODO: with TierSpec holding block
+                NeoBlockCooldown cooldown = new NeoBlockCooldown(tier.block, new TierResearch(tier));
                 cooldown.time = tier.getResearchTime();
 
-                // tier.block.addCooldown(cooldown); TODO: with TierSpec holding block
+                tier.block.addCooldown(cooldown);
             }
 
             public String id() {
@@ -34,17 +34,19 @@ public class NeoBlockCooldown implements NBTSaveable {
             public void onFinish(NeoBlock block) {
                 tier.enable();
                 tier.setResearched(true);
-                tier.startSequence.addToQueue(block, false);
-                tier.unlockActions.apply(block);
+                tier.getStartSequence().addToQueue(block, false);
+                tier.getUnlockActions().apply(block);
                 NeoBlockMod.sendInstantMessage("message.neoblock.unlocked_tier", block.level, false, tier.getID());
             }
             public void onStart(NeoBlock block) {
                 NeoBlockMod.sendInstantMessage("message.neoblock.unlocking_tier", block.level, false, tier.getID());
-                tier.researchActions.apply(block);
+                tier.getResearchActions().apply(block);
             }
         }
         class Normal implements Type {
             private final static Type NORMAL = new Normal();
+            private Normal() {}
+
             public static void create(@NotNull NeoBlock block, long ticks) {
                 if (!block.cooldowns.isEmpty()) {
                     NeoBlockCooldown last = block.cooldowns.get(block.cooldowns.size() - 1);
@@ -69,13 +71,12 @@ public class NeoBlockCooldown implements NBTSaveable {
             }
         }
 
-        static Type parse(@NotNull String id) {
+        static @NotNull Type parse(@NotNull NeoBlock block, @NotNull String id) {
             if (id.startsWith("cooldown-")) {
-                int tier = Integer.parseInt(id.substring(9));
-                TierSpec spec = WorldManager.getWorldTier(tier);
+                TierSpec spec = block.getTier(id.substring(9));
                 return new TierResearch(spec);
             }
-            return new Normal();
+            return Normal.NORMAL;
         }
     }
 
@@ -96,7 +97,7 @@ public class NeoBlockCooldown implements NBTSaveable {
         return tag;
     }
     @Override public void onLoad(CompoundTag tag) {
-        this.type = Type.parse(tag.getString("type"));
+        this.type = Type.parse(block, tag.getString("type"));
     }
 
     public long advanceBy(int value) {

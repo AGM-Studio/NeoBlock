@@ -1,197 +1,68 @@
 package xyz.agmstudio.neoblock.neo.tiers;
 
-import net.minecraft.nbt.CompoundTag;
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlockMod;
-import xyz.agmstudio.neoblock.configs.TierConfig;
+import xyz.agmstudio.neoblock.neo.world.NeoBlock;
 import xyz.agmstudio.neocore.data.NBTSaveable;
 import xyz.agmstudio.neoblock.neo.block.NeoBlockSpec;
 import xyz.agmstudio.neoblock.neo.block.NeoSeqBlockSpec;
 import xyz.agmstudio.neoblock.neo.events.NeoEventAction;
 import xyz.agmstudio.neoblock.neo.events.NeoEventBlockTrigger;
-import xyz.agmstudio.neoblock.neo.loot.trade.NeoTrade;
-import xyz.agmstudio.neoblock.neo.loot.trade.NeoTradePool;
 import xyz.agmstudio.neoblock.neo.world.NeoBlockCooldown;
 import xyz.agmstudio.neoblock.neo.world.WorldManager;
-import xyz.agmstudio.neocore.platform.IConfig;
-import xyz.agmstudio.neocore.util.StringUtil;
 
 import java.nio.file.Path;
 import java.util.*;
-import java.util.regex.Matcher;
 
 public class TierSpec implements NBTSaveable {
     public static final Path FOLDER = NeoBlockMod.get().getConfigFolder("tiers");
 
+    public final NeoBlock block;
+    private final TierConfig config;
+
     // Stored data in world info
-    @NBTData protected int id;
+    @NBTData protected String id;
     @NBTData protected int count = 0;
     @NBTData protected boolean enabled;
     @NBTData protected boolean commanded = false;
     @NBTData protected boolean researched = false;
-    @NBTData protected String hash = "";
-    // Loaded from config
-    protected TierConfig config;
-    public TierSpec(@NotNull TierConfig config) {
-        this.config = config;
-        this.hash = config.getHashCode();
-    }
 
-    public TierSpec(final int id, boolean loadConfig) {
+    public TierSpec(@NotNull NeoBlock block, @NotNull String id, @NotNull TierConfig config) {
         this.id = id;
-        this.enabled = id == 0;
-
-        if (loadConfig) this.loadConfig();
-
-        this.hash = getHashCode();
+        this.config = config;
+        this.block = block;
     }
 
-    @Override
-    public void onLoad(CompoundTag tag) {
-        this.loadConfig();
-    }
-
-    // Data loaded from config
-    protected String name;
-    protected int weight;
-    protected int researchTime;
-
-    protected final HashSet<TierRequirement> requirements = new HashSet<>();
-
-    protected final List<NeoBlockSpec> blocks = new ArrayList<>();
-    protected int totalBlockWeight = 0;
-
-    protected final LinkedHashMap<Integer, NeoEventAction> onBlockActions = new LinkedHashMap<>();
-    protected final LinkedHashMap<NeoEventBlockTrigger, NeoEventAction> otherBlockActions = new LinkedHashMap<>();
-
-    public NeoTradePool trades;
-    public NeoSeqBlockSpec startSequence;
-
-    public NeoEventAction unlockActions;
-    public NeoEventAction enableActions;
-    public NeoEventAction disableActions;
-    public NeoEventAction researchActions;
-
-    public void loadConfig() {
-        IConfig config = NeoBlockMod.get().getConfig(FOLDER, "tier-" + this.id);
-        if (config == null) throw new NBTSaveable.AbortException("Unable to find config for tier " + this.id);
-
-        NeoBlockMod.getLogger().debug("Loading tier {}...", this.id);
-        this.name = config.get("name", "Tier-" + this.id);
-
-        this.requirements.clear();
-        this.researchTime = config.getInt("unlock.unlock-time", 0);
-        if (this.id > 0) {
-            long time = config.getInt("unlock.game-time", -1);
-            if (time > 0) this.requirements.add(new TierRequirement.GameTime(time));
-            long blocks = config.getInt("unlock.blocks", -1);
-            if (blocks > 0) this.requirements.add(new TierRequirement.BlockBroken(blocks));
-            if (config.get("unlock.command", this.requirements.isEmpty()))
-                this.requirements.add(new TierRequirement.Special());
-        } else this.researched = true;
-
-        this.blocks.clear();
-        final List<String> blocks_list = config.get("blocks", List.of("minecraft:grass_block"));
-        blocks_list.forEach(value -> NeoBlockSpec.parse(value).ifPresent(this.blocks::add));
-        this.totalBlockWeight = blocks.stream().mapToInt(NeoBlockSpec::getWeight).sum();
-
-        if (this.blocks.isEmpty()) this.weight = 0;
-        else this.weight = Math.max(0, config.getInt("weight", 1));
-
-        final List<String> list = config.get("trader-trades", config.get("trades", List.of()));
-        this.trades = NeoTradePool.parse(list);
-
-        final List<NeoBlockSpec> start = NeoSeqBlockSpec.extractSequenceList(config.get("starting-blocks", List.of()));
-        this.startSequence = new NeoSeqBlockSpec(start, 1, "tier-" + this.id + "-start");
-
-        this.unlockActions = new NeoEventAction(config, "on-unlock").withMessage("message.neoblock.unlocking_trader", this.id);
-        this.enableActions = new NeoEventAction(config, "on-enable").withMessage("message.neoblock.enabling_trader", this.id);
-        this.disableActions = new NeoEventAction(config, "on-disable").withMessage("message.neoblock.disabling_trader", this.id);
-        this.researchActions = new NeoEventAction(config, "on-research").withMessage("message.neoblock.research_trader", this.id);
-
-        for (String key: config.keys()) {
-            Matcher obm = NeoEventBlockTrigger.ON_BLOCK_PATTERN.matcher(key);
-            if (obm.matches()) {
-                int count = Integer.parseInt(obm.group("count"));
-                NeoEventAction actions = new NeoEventAction(config, obm.group()).withMessage("message.neoblock.trader_spawned", this.id);
-                this.onBlockActions.put(count, actions);
-                NeoBlockMod.getLogger().debug("Added OB {} action for tier {}.", key, this.id);
-            }
-            Matcher ebm = NeoEventBlockTrigger.EVERY_BLOCK_PATTERN.matcher(key);
-            if (ebm.matches()) {
-                int count = Integer.parseInt(ebm.group("count"));
-                NeoEventAction actions = new NeoEventAction(config, ebm.group()).withMessage("message.neoblock.trader_spawned", this.id);
-                this.otherBlockActions.put(new NeoEventBlockTrigger.Every(count), actions);
-                NeoBlockMod.getLogger().debug("Added EB {} action for tier {}.", key, this.id);
-            }
-            Matcher ebo = NeoEventBlockTrigger.EVERY_BLOCK_OFFSET_PATTERN.matcher(key);
-            if (ebo.matches()) {
-                int count = Integer.parseInt(ebo.group("count"));
-                int offset = Integer.parseInt(ebo.group("offset"));
-                NeoEventAction actions = new NeoEventAction(config, ebo.group()).withMessage("message.neoblock.trader_spawned", this.id);
-                this.otherBlockActions.put(new NeoEventBlockTrigger.EveryOffset(count, offset), actions);
-                NeoBlockMod.getLogger().debug("Added EBO {} action for tier {}.", key, this.id);
-            }
-        }
-
-        NeoBlockMod.getLogger().debug("Tier {} loaded. Hash key: {}", this.id, this.getHashCode());
-    }
-
-    // Methods
-    public boolean isStable() {
-        return Objects.equals(hash, getHashCode());
-    }
-
-    public String getHashCode() {
-        StringBuilder data = new StringBuilder(id + ":");
-        for (TierRequirement requirement: requirements)
-            data.append(requirement.hash()).append(":");
-
-        return StringUtil.encodeToBase64(data.toString());
-    }
-
-    public List<NeoTrade> getTrades() {
-        return trades.getPool();
-    }
     public NeoBlockSpec getRandomBlock() {
-        if (blocks.isEmpty()) return BlockManager.DEFAULT_SPEC;
-
-        int randomValue = WorldManager.getRandom().nextInt(totalBlockWeight);
-        for (NeoBlockSpec entry: blocks) {
-            randomValue -= entry.getWeight();
-            if (randomValue < 0) return entry;
-        }
-
-        NeoBlockMod.getLogger().error("Unable to get a random block from tier {}", id);
-        return blocks.stream().findFirst().orElse(BlockManager.DEFAULT_SPEC);
+        return config.getRandomBlock();
     }
     public List<NeoBlockSpec> getBlocks() {
-        return Collections.unmodifiableList(blocks);
+        return Collections.unmodifiableList(config.blocks);
     }
     public NeoSeqBlockSpec getStartSequence() {
-        return startSequence;
+        return config.startSequence;
     }
     public double getTotalBlockWeight() {
-        return totalBlockWeight;
+        return config.totalBlockWeight;
     }
 
     public @NotNull String getName() {
-        return name;
+        return config.name;
     }
     public int getWeight() {
-        return weight;
+        return config.weight;
     }
 
     public boolean isResearched() {
         return researched;
     }
     public boolean canBeResearched() {
-        return canBeResearched(WorldManager.getInstance());
+        return canBeResearched(WorldManager.get());
     }
     public boolean canBeResearched(WorldManager manager) {
         if (researched) return false;
-        for (TierRequirement requirement: requirements)
-            if (!requirement.isMet(manager, this)) return false;
+        for (TierRequirement requirement: config.requirements)
+            if (!requirement.isMet(this)) return false;
 
         return true;
     }
@@ -203,20 +74,34 @@ public class TierSpec implements NBTSaveable {
         researched = value;
     }
     public int getResearchTime() {
-        return researchTime;
+        return config.researchTime;
     }
 
     public void setSpecialRequirement(boolean special) {
         this.commanded = special;
     }
     public Set<TierRequirement> getRequirements() {
-        return Collections.unmodifiableSet(requirements);
+        return Collections.unmodifiableSet(config.requirements);
     }
     public boolean hasSpecialRequirement() {
-        for (TierRequirement requirement: requirements)
+        for (TierRequirement requirement: config.requirements)
             if (requirement instanceof TierRequirement.Special) return true;
 
         return false;
+    }
+
+
+    public NeoEventAction getDisableActions() {
+        return config.disableActions;
+    }
+    public NeoEventAction getEnableActions() {
+        return config.enableActions;
+    }
+    public NeoEventAction getResearchActions() {
+        return config.researchActions;
+    }
+    public NeoEventAction getUnlockActions() {
+        return config.unlockActions;
     }
 
     public boolean isEnabled() {
@@ -224,20 +109,20 @@ public class TierSpec implements NBTSaveable {
     }
     public TierSpec enable() {
         enabled = true;
-        enableActions.apply(WorldManager.getWorldLevel());
+        config.enableActions.apply(block);
         return this;
     }
     public TierSpec disable() {
         enabled = false;
-        disableActions.apply(WorldManager.getWorldLevel());
+        config.disableActions.apply(block);
         return this;
     }
 
     public int setCount(int count) {
         this.count = count;
-        for (Map.Entry<NeoEventBlockTrigger, NeoEventAction> entry: otherBlockActions.entrySet())
-            if (entry.getKey().matches(count)) entry.getValue().apply(WorldManager.getWorldLevel());
-        if (onBlockActions.containsKey(count)) onBlockActions.get(count).apply(WorldManager.getWorldLevel());
+        for (Map.Entry<NeoEventBlockTrigger, NeoEventAction> entry: config.otherBlockActions.entrySet())
+            if (entry.getKey().matches(count)) entry.getValue().apply(block);
+        if (config.onBlockActions.containsKey(count)) config.onBlockActions.get(count).apply(block);
         return count;
     }
     public int getCount() {
@@ -247,7 +132,7 @@ public class TierSpec implements NBTSaveable {
         return setCount(this.count + count);
     }
 
-    public int getID() {
+    public String getID() {
         return id;
     }
 }

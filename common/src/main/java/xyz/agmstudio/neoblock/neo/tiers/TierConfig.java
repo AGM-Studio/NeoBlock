@@ -1,4 +1,4 @@
-package xyz.agmstudio.neoblock.configs;
+package xyz.agmstudio.neoblock.neo.tiers;
 
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlockMod;
@@ -6,13 +6,10 @@ import xyz.agmstudio.neoblock.neo.block.NeoBlockSpec;
 import xyz.agmstudio.neoblock.neo.block.NeoSeqBlockSpec;
 import xyz.agmstudio.neoblock.neo.events.NeoEventAction;
 import xyz.agmstudio.neoblock.neo.events.NeoEventBlockTrigger;
-import xyz.agmstudio.neoblock.neo.loot.trade.NeoTrade;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoTradePool;
-import xyz.agmstudio.neoblock.neo.tiers.TierRequirement;
-import xyz.agmstudio.neoblock.neo.tiers.TierSpec;
+import xyz.agmstudio.neoblock.neo.world.NeoBlock;
 import xyz.agmstudio.neoblock.neo.world.WorldManager;
 import xyz.agmstudio.neocore.platform.IConfig;
-import xyz.agmstudio.neocore.util.StringUtil;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -21,25 +18,25 @@ import java.util.*;
 import java.util.regex.Matcher;
 
 public class TierConfig {
-    protected final String name;
-    protected final int weight;
-    protected final int researchTime;
+    final String name;
+    final int weight;
+    final int researchTime;
 
-    protected final HashSet<TierRequirement> requirements = new HashSet<>();
+    final HashSet<TierRequirement> requirements = new HashSet<>();
 
-    protected final List<NeoBlockSpec> blocks = new ArrayList<>();
-    protected final int totalBlockWeight;
+    final List<NeoBlockSpec> blocks = new ArrayList<>();
+    final int totalBlockWeight;
 
-    protected final LinkedHashMap<Integer, NeoEventAction> onBlockActions = new LinkedHashMap<>();
-    protected final LinkedHashMap<NeoEventBlockTrigger, NeoEventAction> otherBlockActions = new LinkedHashMap<>();
+    final LinkedHashMap<Integer, NeoEventAction> onBlockActions = new LinkedHashMap<>();
+    final LinkedHashMap<NeoEventBlockTrigger, NeoEventAction> otherBlockActions = new LinkedHashMap<>();
 
-    public final NeoTradePool trades;
-    public final NeoSeqBlockSpec startSequence;
+    final NeoTradePool trades;
+    final NeoSeqBlockSpec startSequence;
 
-    public final NeoEventAction unlockActions;
-    public final NeoEventAction enableActions;
-    public final NeoEventAction disableActions;
-    public final NeoEventAction researchActions;
+    final NeoEventAction unlockActions;
+    final NeoEventAction enableActions;
+    final NeoEventAction disableActions;
+    final NeoEventAction researchActions;
 
     public TierConfig(@NotNull IConfig config) {
         this.name = config.get("name", "UNNAMED");
@@ -97,7 +94,20 @@ public class TierConfig {
             }
         }
 
-        NeoBlockMod.getLogger().debug("Tier {} loaded. Hash key: {}", this.name, this.getHashCode());
+        NeoBlockMod.getLogger().debug("Tier {} loaded.", this.name);
+    }
+
+    public NeoBlockSpec getRandomBlock() {
+        if (blocks.isEmpty()) return NeoBlock.DEFAULT_SPEC;
+
+        int randomValue = WorldManager.getRandom().nextInt(totalBlockWeight);
+        for (NeoBlockSpec entry: blocks) {
+            randomValue -= entry.getWeight();
+            if (randomValue < 0) return entry;
+        }
+
+        NeoBlockMod.getLogger().error("Unable to get a random block from tier {}", name);
+        return blocks.stream().findFirst().orElse(NeoBlock.DEFAULT_SPEC);
     }
 
     /**
@@ -137,46 +147,5 @@ public class TierConfig {
                 break;
             }
         }
-    }
-
-    // Methods
-    public String getHashCode() {
-        StringBuilder data = new StringBuilder(name + ":");
-        for (TierRequirement requirement: requirements)
-            data.append(requirement.hash()).append(":");
-
-        return StringUtil.encodeToBase64(data.toString());
-    }
-
-    public List<NeoTrade> getTrades() {
-        return trades.getPool();
-    }
-    public NeoBlockSpec getRandomBlock() {
-        if (blocks.isEmpty()) return BlockManager.DEFAULT_SPEC;
-
-        int randomValue = WorldManager.getRandom().nextInt(totalBlockWeight);
-        for (NeoBlockSpec entry: blocks) {
-            randomValue -= entry.getWeight();
-            if (randomValue < 0) return entry;
-        }
-
-        NeoBlockMod.getLogger().error("Unable to get a random block from tier {}", name);
-        return blocks.stream().findFirst().orElse(BlockManager.DEFAULT_SPEC);
-    }
-    public List<NeoBlockSpec> getBlocks() {
-        return Collections.unmodifiableList(blocks);
-    }
-    public NeoSeqBlockSpec getStartSequence() {
-        return startSequence;
-    }
-    public double getTotalBlockWeight() {
-        return totalBlockWeight;
-    }
-
-    public @NotNull String getName() {
-        return name;
-    }
-    public int getWeight() {
-        return weight;
     }
 }

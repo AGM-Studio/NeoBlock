@@ -14,12 +14,13 @@ import net.minecraft.world.scores.Objective;
 import net.minecraft.world.scores.Scoreboard;
 import net.minecraft.world.scores.criteria.ObjectiveCriteria;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.animations.Animation;
 import xyz.agmstudio.neoblock.commands.NeoblockForceCommand;
 import xyz.agmstudio.neoblock.compatibility.ForgivingVoid;
-import xyz.agmstudio.neoblock.configs.TierConfig;
+import xyz.agmstudio.neoblock.neo.tiers.TierConfig;
 import xyz.agmstudio.neoblock.neo.block.NeoChestSpec;
 import xyz.agmstudio.neoblock.neo.block.NeoSeqBlockSpec;
 import xyz.agmstudio.neoblock.neo.block.NeoTagBlockSpec;
@@ -35,40 +36,53 @@ import xyz.agmstudio.neocore.platform.IConfig;
 
 import java.io.FileNotFoundException;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public abstract class WorldManager extends SavedData {
     private static final String BLOCK_BREAK_OBJECTIVE = "neoblocks_broken";
     private static final double AABB_RANGE = 1.0;
-    private final List<NeoBlock> blocks = new ArrayList<>();
+    private static final HashMap<String, HashMap<String, TierConfig>> tierConfigs = new HashMap<>();
+    public static void reloadTiersConfig() {
+        TierConfig.loadAllTierConfigs();
+
+        HashMap<String, TierConfig> tiers = new HashMap<>();
+        for (int i = 0; Files.exists(TierSpec.FOLDER.resolve("tier-" + i + ".toml")); i++) {
+            IConfig config = NeoBlockMod.get().getConfig(TierSpec.FOLDER, "tier-" + i + ".toml");
+            if (config == null) break; // Should not be null with the file check
+            tiers.put("tier-" + i, new TierConfig(config));
+        }
+
+        NeoBlockMod.getLogger().info("Loaded {} tiers from the tiers folder.", tiers.size());
+        tierConfigs.put(null, tiers);
+    }
+    public static HashMap<String, TierConfig> getTierConfigGroup(@Nullable String group) {
+        return tierConfigs.get(group);
+    }
+    public static TierConfig getTierConfig(String name) {
+        return getTierConfig(null, name);
+    }
+    public static @Nullable TierConfig getTierConfig(String group, String name) {
+        HashMap<String, TierConfig> tierGroup = tierConfigs.get(group);
+        return tierGroup != null ? tierGroup.get(name) : null;
+    }
 
     private static WorldManager instance;
-    public static WorldManager getInstance() {
+    public static WorldManager get() {
         return instance;
-    }
-
-    public static List<TierSpec> resetTiers() {
-        return resetTiers(instance);
-    }
-    public static List<TierSpec> resetTiers(WorldManager data) {
-        data.tiers.clear();
-        data.tiers.addAll(fetchTiers(true));
-        return data.tiers;
     }
 
     public static void reloadConfig() {
         NeoBlockMod.get().reloadModConfig();
 
         NeoTagItemSpec.reloadTags();
-        NeoTrade.reloadTrades();
-        NeoMerchant.loadConfig();
-
         NeoTagBlockSpec.reloadTags();
         NeoChestSpec.reloadChests();
         NeoSeqBlockSpec.reloadSequences();
+
+        NeoTrade.reloadTrades();
+        NeoMerchant.loadConfig();
+
+        WorldManager.reloadTiersConfig();
 
         ForgivingVoid.loadConfig();
 
@@ -141,15 +155,12 @@ public abstract class WorldManager extends SavedData {
             NeoBlockMod.sendMessage("message.neoblock.disabled_world_2", level, false, command.map(NeoCommand::getCommand).orElse(null));
         }
 
-        data.tiers.addAll(fetchTiers(true));
-
         return data;
     }
     public static @NotNull WorldManager load(@NotNull CompoundTag tag, ServerLevel level) {
         WorldManager data = NeoBlockMod.instanceWorldData(level);
 
         NeoBlockMod.getLogger().debug("Loading WorldData from {}", tag);
-        data.tiers.addAll(fetchTiers(false));
         data.blocks.clear();
         tag.getList("Blocks", StringTag.TAG_COMPOUND).forEach(t -> {
             CompoundTag bt = (CompoundTag) t;
@@ -159,17 +170,6 @@ public abstract class WorldManager extends SavedData {
         });
 
         return data;
-    }
-
-    public static List<TierSpec> fetchTiers(boolean loadConfig) {
-        TierConfig.loadAllTierConfigs();
-
-        List<TierSpec> tiers = new ArrayList<>();
-        for (int i = 0; Files.exists(TierSpec.FOLDER.resolve("tier-" + i + ".toml")); i++)
-            tiers.add(new TierSpec(i, loadConfig));
-
-        NeoBlockMod.getLogger().info("Loaded {} tiers from the tiers folder.", tiers.size());
-        return tiers;
     }
 
     public @NotNull CompoundTag saveDataOnTag(@NotNull CompoundTag tag) {
@@ -182,7 +182,7 @@ public abstract class WorldManager extends SavedData {
     }
 
     private final ServerLevel level;
-    private final List<TierSpec> tiers = new ArrayList<>();
+    private final List<NeoBlock> blocks = new ArrayList<>();
 
     public WorldManager(ServerLevel level) {
         this.level = level;
@@ -202,23 +202,14 @@ public abstract class WorldManager extends SavedData {
     public static ServerLevel getWorldLevel() {
         return instance.level;
     }
-    public TierSpec getTier(int id) {
-        for (TierSpec tier: tiers) if (tier.getID() == id) return tier;
-        return null;
-    }
-    public static TierSpec getWorldTier(int id) {
-        return instance.getTier(id);
-    }
 
-    public List<TierSpec> getTiers() {
-        return tiers;
+    public TierConfig getTier(@Nullable String group, String id) {
+        HashMap<String, TierConfig> map = tierConfigs.get(group);
+        if (map == null) return null;
+        return map.get(id);
     }
-    public static List<TierSpec> getWorldTiers() {
-        if (instance == null) return List.of();
-        return Collections.unmodifiableList(instance.tiers);
-    }
-    public static int totalWeight() {
-        return instance.tiers.stream().filter(TierSpec::isEnabled).mapToInt(TierSpec::getWeight).sum();
+    public HashMap<String, TierConfig> getTiers(String group) {
+        return tierConfigs.get(group);
     }
 
     public static void setCommanded(TierSpec tier, boolean force) {
