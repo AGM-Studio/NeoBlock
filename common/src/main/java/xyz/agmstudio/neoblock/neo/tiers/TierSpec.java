@@ -2,6 +2,7 @@ package xyz.agmstudio.neoblock.neo.tiers;
 
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlockMod;
+import xyz.agmstudio.neoblock.neo.loot.trade.NeoTrade;
 import xyz.agmstudio.neoblock.neo.world.NeoBlock;
 import xyz.agmstudio.neocore.data.NBTSaveable;
 import xyz.agmstudio.neoblock.neo.block.NeoBlockSpec;
@@ -134,5 +135,9 @@ public class TierSpec implements NBTSaveable {
 
     public String getID() {
         return id;
+    }
+
+    public Collection<? extends NeoTrade> getTrades() {
+        return config.trades.getPool();
     }
 }

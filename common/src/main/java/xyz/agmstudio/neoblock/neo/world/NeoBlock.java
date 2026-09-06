@@ -11,7 +11,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -26,11 +25,11 @@ import org.jetbrains.annotations.Nullable;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.NeoListener;
 import xyz.agmstudio.neoblock.animations.Animation;
-import xyz.agmstudio.neoblock.neo.tiers.TierConfig;
 import xyz.agmstudio.neoblock.neo.block.NeoBlockSpec;
 import xyz.agmstudio.neoblock.neo.events.NeoEventAction;
 import xyz.agmstudio.neoblock.neo.events.NeoEventBlockTrigger;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoMerchant;
+import xyz.agmstudio.neoblock.neo.tiers.TierConfig;
 import xyz.agmstudio.neoblock.neo.tiers.TierSpec;
 import xyz.agmstudio.neocore.NeoMC;
 import xyz.agmstudio.neocore.data.NBTSaveable;
@@ -57,7 +56,6 @@ public class NeoBlock implements NBTSaveable {
     @NBTData("Dimension") protected String dimension = "minecraft:overworld";
 
     protected String group = null;
-    protected final HashMap<EntityType<?>, Integer> tradedMobs = new HashMap<>();
     protected final HashMap<String, TierSpec> tiers = new HashMap<>();
     protected final List<NeoBlockSpec> queue = new ArrayList<>();
     protected final List<NeoBlockCooldown> cooldowns = new ArrayList<>();
@@ -80,9 +78,6 @@ public class NeoBlock implements NBTSaveable {
             spec.load(tiersTag.getCompound(entry.getKey()));
             tiers.put(entry.getKey(), spec);
         }
-
-        final CompoundTag mobs = tag.getCompound("TradedMobs");
-        mobs.getAllKeys().forEach(key -> tradedMobs.merge(NeoMC.getEntityType(key).orElse(null), mobs.getInt(key), Integer::sum));
 
         queue.clear();
         final ListTag blocks = tag.getList("Queue", Tag.TAG_STRING);
@@ -119,10 +114,6 @@ public class NeoBlock implements NBTSaveable {
         final CompoundTag tiersTag = new CompoundTag();
         tiers.forEach((key, value) -> tiersTag.put(key, value.save()));
         tag.put("Tiers", tiersTag);
-
-        final CompoundTag mobs = new CompoundTag();
-        tradedMobs.forEach((key, value) -> mobs.putInt(String.valueOf(NeoMC.getEntityTypeResource(key)), value));
-        tag.put("TradedMobs", mobs);
 
         final ListTag blocks = new ListTag();
         queue.forEach(block -> blocks.add(StringTag.valueOf(block.getID())));
@@ -267,18 +258,6 @@ public class NeoBlock implements NBTSaveable {
         world.setDirty();
 
         return traderFailedAttempts;
-    }
-
-    public HashMap<EntityType<?>, Integer> getTradedMobs() {
-        return tradedMobs;
-    }
-    public void addTradedMob(EntityType<?> entityType, int count) {
-        tradedMobs.merge(entityType, count, Integer::sum);
-        world.setDirty();
-    }
-    public void clearTradedMobs() {
-        tradedMobs.clear();
-        world.setDirty();
     }
 
     public void setDimension(@NotNull ServerLevel level) {

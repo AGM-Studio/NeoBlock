@@ -7,6 +7,7 @@ import net.minecraft.nbt.StringTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.FlatLevelSource;
 import net.minecraft.world.level.saveddata.SavedData;
@@ -40,7 +41,7 @@ import java.util.*;
 
 public abstract class WorldManager extends SavedData {
     private static final String BLOCK_BREAK_OBJECTIVE = "neoblocks_broken";
-    private static final double AABB_RANGE = 1.0;
+
     private static final HashMap<String, HashMap<String, TierConfig>> tierConfigs = new HashMap<>();
     public static void reloadTiersConfig() {
         TierConfig.loadAllTierConfigs();
@@ -66,6 +67,7 @@ public abstract class WorldManager extends SavedData {
         return tierGroup != null ? tierGroup.get(name) : null;
     }
 
+    protected final HashMap<EntityType<?>, Integer> tradedMobs = new HashMap<>();
     private static WorldManager instance;
     public static WorldManager get() {
         return instance;
@@ -146,7 +148,7 @@ public abstract class WorldManager extends SavedData {
                 data.blocks.add(block);
             }
 
-            instance.setDirty();
+            data.setDirty();
         } else {
             Optional<NeoblockForceCommand.SetBlock> command = NeoCommand.getFromRegistry(NeoblockForceCommand.SetBlock.class);
 
@@ -169,6 +171,9 @@ public abstract class WorldManager extends SavedData {
             data.blocks.add(block);
         });
 
+        final CompoundTag mobs = tag.getCompound("TradedMobs");
+        mobs.getAllKeys().forEach(key -> data.tradedMobs.merge(NeoMC.getEntityType(key).orElse(null), mobs.getInt(key), Integer::sum));
+
         return data;
     }
 
@@ -176,6 +181,10 @@ public abstract class WorldManager extends SavedData {
         ListTag list = new ListTag();
         for (NeoBlock block: blocks) list.add(block.save());
         tag.put("Blocks", list);
+
+        final CompoundTag mobs = new CompoundTag();
+        tradedMobs.forEach((key, value) -> mobs.putInt(String.valueOf(NeoMC.getEntityTypeResource(key)), value));
+        tag.put("TradedMobs", mobs);
 
         NeoBlockMod.getLogger().debug("WorldData saved as {}", tag);
         return tag;
@@ -216,6 +225,18 @@ public abstract class WorldManager extends SavedData {
         tier.setSpecialRequirement(true);
 
         if (force && tier.canBeResearched()) tier.startResearch();
+    }
+
+    public HashMap<EntityType<?>, Integer> getTradedMobs() {
+        return tradedMobs;
+    }
+    public void addTradedMob(EntityType<?> entityType, int count) {
+        tradedMobs.merge(entityType, count, Integer::sum);
+        setDirty();
+    }
+    public void clearTradedMobs() {
+        tradedMobs.clear();
+        setDirty();
     }
 
     // Scoreboard manager

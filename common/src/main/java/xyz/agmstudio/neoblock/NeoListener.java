@@ -101,25 +101,22 @@ public final class NeoListener {
         tickers.add(Ticker.of(ticker).condition(l -> l.dimension() == level).build());
     }
 
-    private static @Nullable ServerLevel getServerConditioned(LevelAccessor level, boolean isNotDisabled) {
-        if (!(level instanceof ServerLevel server)) return null;
-        if (isNotDisabled && WorldManager.getWorldData().isDisabled()) return null;
-
-        return server;
+    private static @Nullable ServerLevel captureServer(LevelAccessor level) {
+        return level instanceof ServerLevel server ? server : null;
     }
 
     public static void onWorldLoad(LevelAccessor accessor) {
-        ServerLevel level = getServerConditioned(accessor, false);
+        ServerLevel level = captureServer(accessor);
         if (level != null && level.dimension() == Level.OVERWORLD) WorldManager.setup(level);
     }
 
     public static void onWorldTick(LevelAccessor accessor) {
-        ServerLevel level = getServerConditioned(accessor, true);
+        ServerLevel level = captureServer(accessor);
         for (Ticker ticker : tickers) if (ticker.canTick(level)) ticker.tick(level);
     }
 
     public static void onBlockBroken(LevelAccessor accessor, ServerPlayer player, BlockPos pos, BlockState state) {
-        ServerLevel level = getServerConditioned(accessor, true);
+        ServerLevel level = captureServer(accessor);
         if (player.isCreative() || accessor == null) return;
         if (WorldManager.isNeoBlock(level, pos))
             WorldManager.addBlocksBroken(player, 1);
@@ -128,12 +125,12 @@ public final class NeoListener {
     }
 
     public static void onEntitySpawn(LevelAccessor accessor, Entity entity) {
-        ServerLevel level = getServerConditioned(accessor, true);
+        ServerLevel level = captureServer(accessor);
         if (level == null) return;
 
         if (entity instanceof WanderingTrader trader) NeoMerchant.handleTrader(trader);
         if (entity instanceof ServerPlayer player) {
-            if (WorldManager.getWorldData().isOnCooldown())
+            if (true) // TODO: COOLDOWN BR IS BROKEN IN NEW SYSTEM
                 CooldownBarAnimation.addPlayer(player);
             NeoBlockMod.onPlayerJoin(level, player);
         }
@@ -149,7 +146,7 @@ public final class NeoListener {
         }
     }
     public static LivingDamageResult onLivingDamage(LivingEntity entity, DamageSource source, float amount) {
-        ServerLevel level = getServerConditioned(entity.level(), true);
+        ServerLevel level = captureServer(entity.level());
         if (source.is(DamageTypes.FELL_OUT_OF_WORLD))
             if (ForgivingVoid.handleVoid(level, entity)) return new LivingDamageResult(0.0F, true);
 

@@ -15,8 +15,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.neo.world.WorldManager;
-import xyz.agmstudio.neocore.NeoNBT;
 import xyz.agmstudio.neocore.NeoMC;
+import xyz.agmstudio.neocore.NeoNBT;
 import xyz.agmstudio.neocore.util.StringUtil;
 
 import java.util.List;
@@ -92,7 +92,7 @@ public class NeoMobSpec extends NeoItemSpec {
         if (mob.isEmpty()) return false;
 
         NeoBlockMod.sendInstantMessage("message.neoblock.trades.mob", level, true, item.getCount(), mob.get().getDescription());
-        WorldManager.getWorldData().addTradedMob(mob.get(), item.getCount());
+        WorldManager.get().addTradedMob(mob.get(), item.getCount());
         item.setCount(0);
 
         return true;

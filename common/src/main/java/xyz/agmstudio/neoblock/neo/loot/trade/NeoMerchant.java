@@ -68,21 +68,21 @@ public class NeoMerchant {
     public static @Nullable WanderingTrader forceSpawnTrader(NeoBlock at) {
         at.resetTraderFailedAttempts();
         List<NeoTrade> trades = new ArrayList<>();
-        WorldManager.getWorldTiers().stream().filter(TierSpec::isEnabled).forEach(tier -> trades.addAll(tier.getTrades()));
+        at.getTierStream().filter(TierSpec::isEnabled).forEach(tier -> trades.addAll(tier.getTrades()));
 
         WanderingTrader trader = spawnTraderWith(trades, at, "NeoMerchant");
         if (trader == null) return null;
 
         NeoBlockMod.sendInstantMessage("message.neoblock.trader_spawned", at.level, true);
 
-        HashMap<EntityType<?>, Integer> tradedMobs = at.getTradedMobs();
+        HashMap<EntityType<?>, Integer> tradedMobs = WorldManager.get().getTradedMobs();
         tradedMobs.forEach((type, count) -> {
             for (int i = 0; i < count; i++) {
                 Entity mob = NeoMC.spawnEntity(at.level, type, trader.getOnPos());
                 NeoMC.leash(mob, trader);
             }
         });
-        at.clearTradedMobs();
+        WorldManager.get().clearTradedMobs();
 
         return trader;
     }
