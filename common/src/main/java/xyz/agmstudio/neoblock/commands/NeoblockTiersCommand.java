@@ -20,9 +20,9 @@ public class NeoblockTiersCommand extends NeoCommand.ParentHolder {
     public static class Satisfy extends NeoCommand {
         protected Satisfy(NeoCommand parent) {
             super(parent, "satisfy");
-            new NeoArgumentTier.Builder(this, "tier")
-                    .provider(NeoArgumentTier.createSuggester(tier -> !tier.hasSpecialRequirement() && !tier.isResearched()))
-                    .build();
+            //new NeoArgumentTier.Builder(this, "tier")
+            //        .provider(NeoArgumentTier.createSuggester(tier -> !tier.hasSpecialRequirement() && !tier.isResearched()))
+            //        .build();
             new NeoArgumentBoolean.Builder(this, "force").defaultValue(true).build();
         }
     
@@ -38,9 +38,9 @@ public class NeoblockTiersCommand extends NeoCommand.ParentHolder {
     public static class Disable extends NeoCommand {
         protected Disable(NeoCommand parent) {
             super(parent, "disable");
-            new NeoArgumentTier.Builder(this, "tier")
-                    .provider(NeoArgumentTier.createSuggester(tier -> tier.isEnabled() && tier.isResearched()))
-                    .build();
+            //new NeoArgumentTier.Builder(this, "tier")
+            //        .provider(NeoArgumentTier.createSuggester(tier -> tier.isEnabled() && tier.isResearched()))
+            //        .build();
         }
     
         @Override public int execute(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
@@ -52,9 +52,9 @@ public class NeoblockTiersCommand extends NeoCommand.ParentHolder {
     public static class Enable extends NeoCommand {
         protected Enable(NeoCommand parent) {
             super(parent, "enable");
-            new NeoArgumentTier.Builder(this, "tier")
-                    .provider(NeoArgumentTier.createSuggester(tier -> !tier.isEnabled() && tier.isResearched()))
-                    .build();
+            //new NeoArgumentTier.Builder(this, "tier")
+            //        .provider(NeoArgumentTier.createSuggester(tier -> !tier.isEnabled() && tier.isResearched()))
+            //        .build();
         }
     
         @Override public int execute(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {

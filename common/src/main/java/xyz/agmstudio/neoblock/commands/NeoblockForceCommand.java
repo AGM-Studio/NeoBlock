@@ -9,8 +9,6 @@ import net.minecraft.world.entity.npc.WanderingTrader;
 import xyz.agmstudio.neocore.commands.NeoArgumentBlockPos;
 import xyz.agmstudio.neocore.commands.NeoArgumentDimension;
 import xyz.agmstudio.neocore.commands.NeoCommand;
-import xyz.agmstudio.neoblock.neo.loot.trade.NeoMerchant;
-import xyz.agmstudio.neoblock.neo.world.WorldManager;
 
 import java.util.Optional;
 
@@ -35,16 +33,16 @@ public class NeoblockForceCommand extends NeoCommand.ParentHolder {
             BlockPos origin = getArgument(context, "pos");
             ServerLevel world = getArgument(context, "dimension", context.getSource()::getLevel);
 
-            WorldManager.getWorldData().setBlockPos(origin, WorldManager.getWorldLevel());
-            WorldManager.getWorldData().setDimension(world);
-            String message = "command.neoblock.force_block";
-            if (WorldManager.getWorldData().isDisabled()) {
-                WorldManager.getWorldData().setActive();
-                message += ".enabled";
-            }
+            //WorldManager.getWorldData().setBlockPos(origin, WorldManager.getWorldLevel());
+            //WorldManager.getWorldData().setDimension(world);
+            //String message = "command.neoblock.force_block";
+            //if (WorldManager.getWorldData().isDisabled()) {
+            //    WorldManager.getWorldData().setActive();
+            //    message += ".enabled";
+            //}
             
-            BlockManager.updateBlock(WorldManager.getWorldLevel(), false);
-            return success(context, message);
+            //BlockManager.updateBlock(WorldManager.getWorldLevel(), false);
+            return success(context, "command.neoblock.force_block");
         }
     }
 
@@ -54,8 +52,8 @@ public class NeoblockForceCommand extends NeoCommand.ParentHolder {
         }
 
         @Override public int execute(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-            BlockManager.cleanBlock(WorldManager.getWorldLevel(), NeoBlockPos.get());
-            WorldManager.getWorldData().setDisabled();
+            //BlockManager.cleanBlock(WorldManager.getWorldLevel(), NeoBlockPos.get());
+            //WorldManager.getWorldData().setDisabled();
 
             Optional<SetBlock> command = NeoCommand.getFromRegistry(SetBlock.class);
             return success(context, "command.neoblock.disabled", command.map(NeoCommand::getCommand).orElse(null));
@@ -69,7 +67,7 @@ public class NeoblockForceCommand extends NeoCommand.ParentHolder {
 
         @Override public int execute(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
             CommandSourceStack source = context.getSource();
-            WanderingTrader trader = NeoMerchant.forceSpawnTrader(source.getLevel());
+            WanderingTrader trader = null; // NeoMerchant.forceSpawnTrader(source.getLevel());
             if (trader != null)
                 return success(context, "command.neoblock.force_trader.success");
             
@@ -83,7 +81,7 @@ public class NeoblockForceCommand extends NeoCommand.ParentHolder {
         }
 
         @Override public int execute(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-            WorldManager.resetTiers();
+            // WorldManager.resetTiers();
             return success(context, "command.neoblock.update.success");
         }
     }

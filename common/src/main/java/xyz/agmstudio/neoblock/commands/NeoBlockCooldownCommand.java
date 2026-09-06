@@ -19,7 +19,7 @@ public class NeoBlockCooldownCommand extends NeoCommand {
 
     @Override
     public int execute(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        NeoBlockCooldown cooldown = WorldManager.getWorldData().getCooldown();
+        NeoBlockCooldown cooldown = null; // WorldManager.getWorldData().getCooldown();
         if (cooldown == null) return fail(context, "command.neoblock.cooldown.no_cooldown");
         return success(context, "command.neoblock.cooldown", cooldown.getType().id(), StringUtil.formatTicks(cooldown.getTick()), StringUtil.formatTicks(cooldown.getTime()));
     }
@@ -31,7 +31,7 @@ public class NeoBlockCooldownCommand extends NeoCommand {
         }
 
         @Override public int execute(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-            NeoBlockCooldown cooldown = WorldManager.getWorldData().getCooldown();
+            NeoBlockCooldown cooldown = null; // WorldManager.getWorldData().getCooldown();
             if (cooldown == null) return fail(context, "command.neoblock.cooldown.no_cooldown");
 
             int value = this.getArgument(context, "ticks");
@@ -48,7 +48,7 @@ public class NeoBlockCooldownCommand extends NeoCommand {
 
         @Override public int execute(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
             int value = this.getArgument(context, "ticks");
-            NeoBlockCooldown.Type.Normal.create(value);
+            NeoBlockCooldown.Type.Normal.create(WorldManager.getBlocks().get(0), value);
 
             return success(context, "command.neoblock.cooldown.add", StringUtil.formatTicks(value));
         }
