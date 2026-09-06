@@ -52,6 +52,7 @@
 
   "command.neoblock.info": "Stats:\n  Blocks broken: %d\n  Unlocked tiers: %s",
   "command.neoblock.home": "%s teleported to NeoBlock",
+  "command.neoblock.home_not_found": "Unable to find any NeoBlocks in your dimension",
   "command.neoblock.mobticket": "Mob ticket for %dx of \"%s\" is created.",
 
   "command.neoblock.scheme.save.fail": "Unable to save the schematic. Check the server logs for more information.",

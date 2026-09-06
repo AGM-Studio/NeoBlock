@@ -15,6 +15,7 @@ import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.npc.WanderingTrader;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.neo.world.NeoBlock;
 import xyz.agmstudio.neoblock.neo.world.WorldManager;
@@ -141,18 +142,11 @@ public class ForgivingVoid {
 
     public static boolean handleVoid(ServerLevel level, Entity entity) {
         if (!shallBeRescued(entity)) return false;
-        BlockPos safety = null;
-        double distance = Double.MAX_VALUE;
-        for (NeoBlock block: WorldManager.getBlocks()) {
-            if (block.level != level) continue;
-            double newDist = block.safeBlock().distToCenterSqr(entity.position());
-            if (newDist < distance) {
-                safety = block.safeBlock();
-                distance = newDist;
-            }
-        }
 
-        if (safety == null) return false;
+        NeoBlock block = findNearestBlock(level, entity);
+        if (block == null) return false;
+
+        BlockPos safety = block.safeBlock();
         NeoMC.teleportEntity(entity, level, safety.getX() + offset.x, safety.getY() + offset.y, safety.getZ() + offset.z, 0, 0);
         entity.setDeltaMovement(Vec3.ZERO);
         entity.fallDistance = 0;
@@ -164,5 +158,20 @@ public class ForgivingVoid {
         }
 
         return true;
+    }
+
+    public static @Nullable NeoBlock findNearestBlock(ServerLevel level, Entity entity) {
+        NeoBlock safety = null;
+        double distance = Double.MAX_VALUE;
+        for (NeoBlock block: WorldManager.getBlocks()) {
+            if (block.level != level) continue;
+            double newDist = block.getBlockPos().distToCenterSqr(entity.position());
+            if (newDist < distance) {
+                safety = block;
+                distance = newDist;
+            }
+        }
+
+        return safety;
     }
 }
