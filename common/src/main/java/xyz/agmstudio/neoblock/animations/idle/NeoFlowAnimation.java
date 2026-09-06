@@ -1,9 +1,8 @@
 package xyz.agmstudio.neoblock.animations.idle;
 
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
+import xyz.agmstudio.neoblock.neo.world.NeoBlock;
 import xyz.agmstudio.neocore.NeoMC;
 
 import java.awt.*;
@@ -33,18 +32,18 @@ public class NeoFlowAnimation extends IdleAnimation {
         tick = 0;
     }
 
-    @Override public void tick(ServerLevel level) {
-        if (tick++ > delay) animate(level);
+    @Override public void tick(NeoBlock block) {
+        if (tick++ > delay) animate(block);
     }
 
-    @Override public void animate(ServerLevel level) {
+    @Override public void animate(NeoBlock block) {
+        Vec3[] corners = getCorners(block);
         if (particles.isEmpty()) for (int i = 0; i < count; i++)
-            particles.add(AnimationParticle.fromRandom(level.getRandom()));
-
+            particles.add(new AnimationParticle(block, corners[block.level.random.nextInt(corners.length)]));
         for (AnimationParticle particle: particles) {
             Vec3 next = particle.next(speed);
             Vector3f color = getRainbowColor();
-            level.sendParticles(NeoMC.getDustParticle(color, 1.0f), next.x, next.y, next.z, 1, 0, 0, 0, 0.01);
+            block.level.sendParticles(NeoMC.getDustParticle(color, 1.0f), next.x, next.y, next.z, 1, 0, 0, 0, 0.01);
         }
     }
 
@@ -61,20 +60,14 @@ public class NeoFlowAnimation extends IdleAnimation {
     }
 
     private static class AnimationParticle {
-        private static AnimationParticle fromRandom(RandomSource random) {
-            Vec3[] corners = getCorners();
-            return new AnimationParticle(random, corners[random.nextInt(corners.length)]);
-        }
-
-        private final RandomSource random;
+        private final NeoBlock block;
         private Vec3 current;
         private Vec3 goal;
         private Vec3 last;
         private Vec3 direction;
 
-        private AnimationParticle(RandomSource random, Vec3 start) {
-            this.random = random;
-
+        private AnimationParticle(NeoBlock block, Vec3 start) {
+            this.block = block;
             this.current = start;
             this.last = start;
             updateGoal(start);
@@ -88,9 +81,9 @@ public class NeoFlowAnimation extends IdleAnimation {
         }
 
         private void updateGoal(Vec3 vec3) {
-            List<Vec3> options = Arrays.stream(getCorners()).filter(vec -> vec.distanceToSqr(vec3) == 1 && vec != this.last).toList();
             last = goal;
-            goal = options.get(random.nextInt(options.size()));
+            List<Vec3> options = Arrays.stream(getCorners(block)).filter(vec -> vec.distanceToSqr(vec3) == 1 && vec != this.last).toList();
+            goal = options.get(block.level.random.nextInt(options.size()));
             direction = goal.subtract(current).normalize();
         }
     }

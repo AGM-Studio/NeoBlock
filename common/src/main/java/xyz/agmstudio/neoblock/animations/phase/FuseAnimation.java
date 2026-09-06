@@ -5,6 +5,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.phys.Vec3;
+import xyz.agmstudio.neoblock.neo.world.NeoBlock;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -35,20 +36,21 @@ public class FuseAnimation extends CooldownPhaseAnimation {
         this.enabled = activeOnUpgradeStart || activeOnUpgradeFinish;
     }
 
-    @Override public void animate(ServerLevel level) {
+    @Override public void animate(NeoBlock block) {
         animations.add(0);
     }
 
-    @Override public void tick(ServerLevel level) {
+    @Override public void tick(NeoBlock block) {
         Iterator<Integer> iterator = new ArrayList<>(animations).iterator();
+        ServerLevel level = block.level;
         animations.clear();
 
         while (iterator.hasNext()) {
             int tick = iterator.next();
-            if (tick == 0) level.playSound(null, NeoBlockPos.get(), SoundEvents.CREEPER_PRIMED, SoundSource.BLOCKS, volume, 1.0f);
+            if (tick == 0) level.playSound(null, block.getBlockPos(), SoundEvents.CREEPER_PRIMED, SoundSource.BLOCKS, volume, 1.0f);
 
             for (int i = 0; i < 8; i++) {
-                Vec3 particlePos = Vec3.atCenterOf(NeoBlockPos.get()).add(
+                Vec3 particlePos = Vec3.atCenterOf(block.getBlockPos()).add(
                         (level.getRandom().nextDouble() - 0.5) * 1.5,
                         0.55,
                         (level.getRandom().nextDouble() - 0.5) * 1.5
@@ -56,7 +58,7 @@ public class FuseAnimation extends CooldownPhaseAnimation {
                 level.sendParticles(ParticleTypes.SMOKE, particlePos.x, particlePos.y, particlePos.z, 1, 0, 0, 0, 0.02);
             }
             if (tick % 5 == 0) {
-                Vec3 sparkPos = Vec3.atCenterOf(NeoBlockPos.get()).add(
+                Vec3 sparkPos = Vec3.atCenterOf(block.getBlockPos()).add(
                         (level.getRandom().nextDouble() - 0.5) * 0.7,
                         level.getRandom().nextDouble() * 1.1,
                         (level.getRandom().nextDouble() - 0.5) * 0.7

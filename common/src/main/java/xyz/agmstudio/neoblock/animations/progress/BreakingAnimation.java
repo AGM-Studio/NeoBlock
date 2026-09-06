@@ -1,10 +1,10 @@
 package xyz.agmstudio.neoblock.animations.progress;
 
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import xyz.agmstudio.neoblock.neo.world.NeoBlock;
 
 public class BreakingAnimation extends CooldownProgressAnimation {
     @ConfigField(min = 0)
@@ -14,8 +14,8 @@ public class BreakingAnimation extends CooldownProgressAnimation {
         super("breaking");
     }
 
-    @Override public void animate(ServerLevel level) {
-        level.levelEvent(2001, NeoBlockPos.get(), Block.getId(Blocks.BEDROCK.defaultBlockState()));
-        level.playSound(null, NeoBlockPos.get(), SoundEvents.STONE_BREAK, SoundSource.BLOCKS, volume, 1.0f);
+    @Override public void animate(NeoBlock block) {
+        block.level.levelEvent(2001, block.getBlockPos(), Block.getId(Blocks.BEDROCK.defaultBlockState()));
+        block.level.playSound(null, block.getBlockPos(), SoundEvents.STONE_BREAK, SoundSource.BLOCKS, volume, 1.0f);
     }
 }

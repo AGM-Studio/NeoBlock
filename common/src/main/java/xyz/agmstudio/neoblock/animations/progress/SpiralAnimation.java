@@ -1,8 +1,8 @@
 package xyz.agmstudio.neoblock.animations.progress;
 
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.phys.Vec3;
+import xyz.agmstudio.neoblock.neo.world.NeoBlock;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -20,11 +20,11 @@ public class SpiralAnimation extends CooldownProgressAnimation {
         super("spiral");
     }
 
-    @Override public void animate(ServerLevel level) {
+    @Override public void animate(NeoBlock block) {
         animations.add(0);
     }
 
-    @Override public void tick(ServerLevel level) {
+    @Override public void tick(NeoBlock block) {
         Iterator<Integer> iterator = new ArrayList<>(animations).iterator();
         animations.clear();
 
@@ -39,8 +39,8 @@ public class SpiralAnimation extends CooldownProgressAnimation {
                 double zOffset = Math.sin(angle) * radius;
                 double yOffset = progress * 1.2;
 
-                Vec3 particlePos = Vec3.atCenterOf(NeoBlockPos.get()).add(xOffset, yOffset, zOffset);
-                level.sendParticles(ParticleTypes.ENCHANT,
+                Vec3 particlePos = Vec3.atCenterOf(block.getBlockPos()).add(xOffset, yOffset, zOffset);
+                block.level.sendParticles(ParticleTypes.ENCHANT,
                         particlePos.x, particlePos.y, particlePos.z,
                         1, 0, 0, 0, 0.02);
             }

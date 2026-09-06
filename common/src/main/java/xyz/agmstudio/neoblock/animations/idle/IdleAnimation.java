@@ -1,7 +1,9 @@
 package xyz.agmstudio.neoblock.animations.idle;
 
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.animations.Animation;
+import xyz.agmstudio.neoblock.neo.world.NeoBlock;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -9,16 +11,16 @@ import java.util.List;
 import java.util.stream.Stream;
 
 public abstract class IdleAnimation extends Animation {
-    protected static Vec3[] getCorners() {
+    protected static Vec3 @NotNull [] getCorners(NeoBlock block) {
         return Stream.of(
-                new Vec3(0, 0, 0), new Vec3(1, 0, 0), new Vec3(1, 0, 1), new Vec3(0, 0, 1),
-                new Vec3(0, 1, 0), new Vec3(1, 1, 0), new Vec3(1, 1, 1), new Vec3(0, 1, 1)
-        ).map(vec3 -> vec3.add(NeoBlockPos.getCorner())).toArray(Vec3[]::new);
+                new Vec3(-0.5, -0.5, -0.5), new Vec3(0.5, -0.5, -0.5), new Vec3(0.5, -0.5, 0.5), new Vec3(-0.5, -0.5, 0.5),
+                new Vec3(-0.5, 0.5, -0.5), new Vec3(0.5, 0.5, -0.5), new Vec3(0.5, 0.5, 0.5), new Vec3(-0.5, 0.5, 0.5)
+        ).map(vec3 -> vec3.add(block.getBlockPos().getCenter())).toArray(Vec3[]::new);
     }
 
-    protected static HashSet<HashSet<Vec3>> getEdges() {
+    protected static @NotNull HashSet<HashSet<Vec3>> getEdges(NeoBlock block) {
         HashSet<HashSet<Vec3>> edges = new HashSet<>();
-        Vec3[] corners = getCorners();
+        Vec3[] corners = getCorners(block);
         for (Vec3 corner: corners) {
             List<Vec3> options = Arrays.stream(corners).filter(vec -> vec.distanceToSqr(corner) == 1).toList();
             for (Vec3 option: options) {

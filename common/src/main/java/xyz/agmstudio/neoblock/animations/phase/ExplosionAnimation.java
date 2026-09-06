@@ -1,9 +1,9 @@
 package xyz.agmstudio.neoblock.animations.phase;
 
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import xyz.agmstudio.neoblock.neo.world.NeoBlock;
 
 public class ExplosionAnimation extends CooldownPhaseAnimation {
     @ConfigField("at-start")
@@ -28,13 +28,13 @@ public class ExplosionAnimation extends CooldownPhaseAnimation {
         this.enabled = activeOnUpgradeStart || activeOnUpgradeFinish;
     }
 
-    @Override public void animate(ServerLevel level) {
-        level.sendParticles(ParticleTypes.EXPLOSION_EMITTER,
-                NeoBlockPos.get().getX() + 0.5,
-                NeoBlockPos.get().getY() + 0.5,
-                NeoBlockPos.get().getZ() + 0.5,
+    @Override public void animate(NeoBlock block) {
+        block.level.sendParticles(ParticleTypes.EXPLOSION_EMITTER,
+                block.getBlockPos().getX() + 0.5,
+                block.getBlockPos().getY() + 0.5,
+                block.getBlockPos().getZ() + 0.5,
                 1, 0, 0, 0, 1);
 
-        level.playSound(null, NeoBlockPos.get(), SoundEvents.ANVIL_LAND, SoundSource.BLOCKS, volume, 0.4f);
+        block.level.playSound(null, block.getBlockPos(), SoundEvents.ANVIL_LAND, SoundSource.BLOCKS, volume, 0.4f);
     }
 }

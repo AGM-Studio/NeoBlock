@@ -39,6 +39,7 @@ import xyz.agmstudio.neocore.platform.IConfig;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
+import java.util.stream.Stream;
 
 public class NeoBlock implements NBTSaveable {
     public static final NeoBlockSpec DEFAULT_SPEC = new NeoBlockSpec(Blocks.GRASS_BLOCK);
@@ -309,6 +310,10 @@ public class NeoBlock implements NBTSaveable {
         updateBlock(false);
     }
 
+    public Stream<TierSpec> getTierStream() {
+        return tiers.values().stream();
+    }
+
     public enum State {
         INACTIVE(0),    // Default, before activation
         ACTIVE(1),      // NeoBlock is running
@@ -402,17 +407,17 @@ public class NeoBlock implements NBTSaveable {
         NeoBlockCooldown cooldown = cooldowns.get(0);
         if (cooldown.tick++ == 0) {
             cooldown.onStart();
-            if (isFirstCooldown) Animation.animateCooldownStart(level);
+            if (isFirstCooldown) Animation.animateCooldownStart(this);
         }
         if (isFirstCooldown) isFirstCooldown = false;
         if (cooldown.time > 0 && cooldown.tick >= cooldown.time) {
             cooldown.onFinish();
             removeCooldown(cooldown);
             if (cooldowns.isEmpty()) {
-                Animation.animateCooldownFinish(level);
+                Animation.animateCooldownFinish(this);
                 isFirstCooldown = true;
             }
-        } else Animation.tickCooldown(level, cooldown);
+        } else Animation.tickCooldown(this, cooldown);
 
         WorldManager.get().setDirty();
     }

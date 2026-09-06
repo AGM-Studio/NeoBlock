@@ -1,8 +1,8 @@
 package xyz.agmstudio.neoblock.animations.idle;
 
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.phys.Vec3;
+import xyz.agmstudio.neoblock.neo.world.NeoBlock;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -23,19 +23,19 @@ public class PulseAnimation extends IdleAnimation {
         tick = 0;
     }
 
-    @Override public void tick(ServerLevel level) {
+    @Override public void tick(NeoBlock block) {
         if (tick++ % interval != 0 || tick < delay) return;
-        animate(level);
+        animate(block);
     }
 
-    @Override public void animate(ServerLevel level) {
-        for (HashSet<Vec3> edge: getEdges()) {
+    @Override public void animate(NeoBlock block) {
+        for (HashSet<Vec3> edge: getEdges(block)) {
             Iterator<Vec3> iter = edge.iterator();
             Vec3 from = iter.next();
             Vec3 step = iter.next().subtract(from).scale(0.1);
             for (int i = 0; i < 10; i++) {
                 Vec3 pos = from.add(step.scale(i));
-                level.sendParticles(ParticleTypes.ELECTRIC_SPARK, pos.x, pos.y, pos.z, 1, 0, 0, 0, 0.01);
+                block.level.sendParticles(ParticleTypes.ELECTRIC_SPARK, pos.x, pos.y, pos.z, 1, 0, 0, 0, 0.01);
             }
         }
     }

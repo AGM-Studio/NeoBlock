@@ -13,7 +13,9 @@ import xyz.agmstudio.neoblock.animations.progress.BreakingAnimation;
 import xyz.agmstudio.neoblock.animations.progress.CooldownProgressAnimation;
 import xyz.agmstudio.neoblock.animations.progress.SparkleAnimation;
 import xyz.agmstudio.neoblock.animations.progress.SpiralAnimation;
+import xyz.agmstudio.neoblock.neo.world.NeoBlock;
 import xyz.agmstudio.neoblock.neo.world.NeoBlockCooldown;
+import xyz.agmstudio.neoblock.neo.world.WorldManager;
 import xyz.agmstudio.neocore.platform.IConfig;
 
 import java.lang.reflect.Field;
@@ -48,7 +50,9 @@ public abstract class Animation implements IConfig.Configured {
     }
 
     public static void tickAll(ServerLevel level) {
-        animations.forEach(animation -> animation.tick(level));
+        for (NeoBlock block: WorldManager.getBlocks())
+            if (block.level == level)
+                animations.forEach(animation -> animation.tick(block));
     }
     public static void resetIdleTick() {
         for (Animation animation : animations)
@@ -104,16 +108,16 @@ public abstract class Animation implements IConfig.Configured {
     /**
      * Will always tick...
      *
-     * @param level the level to play animation
+     * @param block the NeoBlock to play animation for
      */
-    public void tick(ServerLevel level) {}
+    public void tick(NeoBlock block) {}
 
     /**
      * Should animate the animation!
      *
-     * @param level the level to play animation
+     * @param block the NeoBlock to play animation for
      */
-    public void animate(ServerLevel level) {}
+    public void animate(NeoBlock block) {}
 
     @Override public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -160,19 +164,19 @@ public abstract class Animation implements IConfig.Configured {
         return list;
     }
 
-    public static void animateCooldownFinish(ServerLevel level) {
-        CooldownBarAnimation.removeAllPlayers(level);
+    public static void animateCooldownFinish(NeoBlock block) {
+        CooldownBarAnimation.removeAllPlayers(block.level);
         for (CooldownPhaseAnimation animation : Animation.phaseAnimations)
-            if (animation.isActiveOnUpgradeFinish()) animation.animate(level);
+            if (animation.isActiveOnUpgradeFinish()) animation.animate(block);
     }
-    public static void animateCooldownStart(ServerLevel level) {
-        CooldownBarAnimation.addAllPlayers(level);
+    public static void animateCooldownStart(NeoBlock block) {
+        CooldownBarAnimation.addAllPlayers(block.level);
         for (CooldownPhaseAnimation animation : Animation.phaseAnimations)
-            if (animation.isActiveOnUpgradeStart()) animation.animate(level);
+            if (animation.isActiveOnUpgradeStart()) animation.animate(block);
     }
-    public static void tickCooldown(ServerLevel level, NeoBlockCooldown cooldown) {
+    public static void tickCooldown(NeoBlock block, NeoBlockCooldown cooldown) {
         if (cooldownBar != null) cooldownBar.update(cooldown.getTick(), cooldown.getTime());
         for (CooldownProgressAnimation animation : Animation.progressAnimations)
-            animation.upgradeTick(level, cooldown.getTick());
+            animation.upgradeTick(block, cooldown.getTick());
     }
 }
