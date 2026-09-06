@@ -141,11 +141,15 @@ public abstract class WorldManager extends SavedData {
             }
 
             for (BlockPos pos: getConfigPositions(level, config)) {
+                // Instance then use the nbt saved to load
                 NeoBlock block = new NeoBlock(level, data);
                 block.dimension = level.dimension().location().toString();
+                block.group = null;
                 block.pos = pos;
-                block.initiate(level);
-                data.blocks.add(block);
+
+                NeoBlock generated = NBTSaveable.instance(NeoBlock.class, block.save(), level, data);
+                data.blocks.add(generated);
+                generated.initiate(level);
             }
 
             data.setDirty();
@@ -166,7 +170,7 @@ public abstract class WorldManager extends SavedData {
         data.blocks.clear();
         tag.getList("Blocks", StringTag.TAG_COMPOUND).forEach(t -> {
             CompoundTag bt = (CompoundTag) t;
-            if (!level.dimension().location().toString().equals(bt.getString("dimension"))) return;
+            if (!level.dimension().location().toString().equals(bt.getString("Dimension"))) return;
             NeoBlock block = NBTSaveable.instance(NeoBlock.class, bt, level, data);
             data.blocks.add(block);
         });

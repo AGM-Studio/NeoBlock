@@ -47,7 +47,7 @@ public class TierConfig {
         if (timeReq > 0) this.requirements.add(new TierRequirement.GameTime(timeReq));
         long blocksReq = config.getInt("unlock.blocks", -1);
         if (blocksReq > 0) this.requirements.add(new TierRequirement.BlockBroken(blocksReq));
-        if (config.get("unlock.command", this.requirements.isEmpty()))
+        if (config.get("unlock.command", false))
             this.requirements.add(new TierRequirement.Special());
 
         this.blocks.clear();

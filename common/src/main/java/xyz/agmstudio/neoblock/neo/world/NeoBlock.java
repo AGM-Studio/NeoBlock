@@ -48,7 +48,6 @@ public class NeoBlock implements NBTSaveable {
     public final WorldManager world;
     public final ServerLevel level;
 
-    @NBTData("State") protected State state = State.INACTIVE;
     @NBTData("BlockCount") protected int blockCount = 0;
     @NBTData("LastTierSpawn") protected String lastTierSpawn = null;
     @NBTData("TraderFailedAttempts") protected int traderFailedAttempts = 0;
@@ -69,7 +68,7 @@ public class NeoBlock implements NBTSaveable {
     }
 
     @Override public void onLoad(@NotNull CompoundTag tag) {
-        this.group = tag.getString("Group");
+        this.group = tag.contains("Group") ? tag.getString("Group") : null;
 
         tiers.clear();
         final CompoundTag tiersTag = tag.getCompound("Tiers");
@@ -108,8 +107,9 @@ public class NeoBlock implements NBTSaveable {
             }
         }
     }
+
     @Override public CompoundTag onSave(@NotNull CompoundTag tag) {
-        tag.putString("Group", group);
+        if (group != null) tag.putString("Group", group);
 
         final CompoundTag tiersTag = new CompoundTag();
         tiers.forEach((key, value) -> tiersTag.put(key, value.save()));
@@ -161,41 +161,11 @@ public class NeoBlock implements NBTSaveable {
         queue.add(spec);
     }
 
-    public boolean isInactive() {
-        return state == State.INACTIVE;
-    }
     public boolean isActive() {
-        return state == State.ACTIVE;
-    }
-    public boolean isDisabled() {
-        return state == State.DISABLED;
-    }
-    public boolean isUpdated() {
-        return state == State.UPDATED;
+        return cooldowns.isEmpty();
     }
     public boolean isOnCooldown() {
-        return state == State.STOPPED;
-    }
-
-    public void setInactive() {
-        state = State.INACTIVE;
-        world.setDirty();
-    }
-    public void setActive() {
-        state = State.ACTIVE;
-        world.setDirty();
-    }
-    public void setDisabled() {
-        state = State.DISABLED;
-        world.setDirty();
-    }
-    public void setUpdated() {
-        state = State.UPDATED;
-        world.setDirty();
-    }
-    public void setOnCooldown() {
-        state = State.STOPPED;
-        world.setDirty();
+        return !cooldowns.isEmpty();
     }
 
     public void addCooldown(NeoBlockCooldown cooldown) {
@@ -206,16 +176,13 @@ public class NeoBlock implements NBTSaveable {
         }
 
         cooldowns.add(cooldown);
-        setOnCooldown();
-
         BEDROCK_SPEC.placeAt(this);
     }
     public void removeCooldown(NeoBlockCooldown cooldown) {
         cooldowns.remove(cooldown);
-        if (cooldowns.isEmpty()) {
-            setActive();
+        if (cooldowns.isEmpty())
             updateBlock(false);
-        } else world.setDirty();
+        else world.setDirty();
     }
     public List<NeoBlockCooldown> getCooldowns() {
         return cooldowns;
@@ -283,7 +250,10 @@ public class NeoBlock implements NBTSaveable {
 
     public void initiate(@NotNull ServerLevel level) {
         tiers.values().forEach(t -> {
-            if (t.canBeResearched()) t.startResearch();
+            if (t.canBeResearched()) {
+                t.setResearched(true);
+                t.enable();
+            }
             if (t.isEnabled()) t.getStartSequence().addToQueue(this, false);
         });
         updateBlock(false);
@@ -355,7 +325,7 @@ public class NeoBlock implements NBTSaveable {
     }
 
     public void updateBlock(boolean trigger) {
-        if (state == State.ACTIVE) getRandomBlock().placeAt(this);
+        if (isActive()) getRandomBlock().placeAt(this);
         else BEDROCK_SPEC.placeAt(this);  // Creative cheaters & Move block in mid-search (Just in case)
 
         if (!trigger) return;
@@ -375,9 +345,9 @@ public class NeoBlock implements NBTSaveable {
 
     public void tick() {
         final BlockState block = level.getBlockState(pos);
-        if (state == State.UPDATED || state == State.STOPPED) {
+        if (isOnCooldown()) {
+            tickCooldown();
             if (block.getBlock() != Blocks.BEDROCK) BEDROCK_SPEC.placeAt(this);
-            if (state == State.STOPPED && !cooldowns.isEmpty()) tickCooldown();
         } else if (block.isAir() || block.canBeReplaced()) updateBlock(true);
     }
 

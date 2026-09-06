@@ -20,7 +20,9 @@ public interface TierRequirement {
         @Override public boolean isMet(TierSpec spec) {
             return spec.block.getBlockCount() >= count;
         }
-
+        @Override public String toString() {
+            return "TierRequirement(BlockBroken=" + count + ")";
+        }
         //@Override public void addJEIBox(List<NeoJEIPlugin.TextBox> boxes, AtomicInteger y, TierSpec spec) {
         //    int count = spec.block.getBlockCount();
         //    NeoJEIPlugin.addBox(boxes, "jei.neoblock.requirement.blocks_broken", 7, y.getAndAdd(12), this.count <= count, this.count, count);
@@ -37,8 +39,9 @@ public interface TierRequirement {
         @Override public boolean isMet(TierSpec spec) {
             return spec.block.level.getGameTime() >= time;
         }
-
-
+        @Override public String toString() {
+            return "TierRequirement(GameTime=" + time + ")";
+        }
         //@Override public void addJEIBox(List<NeoJEIPlugin.TextBox> boxes, AtomicInteger y, TierSpec spec) {
         //    long time = WorldManager.getWorldLevel().getGameTime();
         //    NeoJEIPlugin.addBox(boxes,
@@ -52,7 +55,9 @@ public interface TierRequirement {
         @Override public boolean isMet(TierSpec spec) {
             return spec.commanded;
         }
-
+        @Override public String toString() {
+            return "TierRequirement(Special)";
+        }
         //@Override public void addJEIBox(List<NeoJEIPlugin.TextBox> boxes, AtomicInteger y, TierSpec spec) {
         //    NeoJEIPlugin.addBox(boxes,
         //            spec.commanded ? "jei.neoblock.requirement.command.met" : "jei.neoblock.requirement.command",
