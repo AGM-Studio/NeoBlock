@@ -230,6 +230,7 @@ public abstract class WorldManager extends SavedData {
     }
 
     public static @NotNull RandomSource getRandom() {
+        if (instance == null) return RandomSource.create();
         return instance.level.getRandom();
     }
     public static <T> Optional<T> getRandomItem(List<T> collection) {

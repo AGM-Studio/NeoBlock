@@ -206,7 +206,7 @@ public class NeoBlock implements NBTSaveable {
     }
 
     public TierSpec getLastTierSpawn() {
-        return lastTierSpawn == null ? tiers.get(lastTierSpawn) : null;
+        return lastTierSpawn != null ? tiers.get(lastTierSpawn) : null;
     }
     public void setLastTierSpawn(TierSpec tier) {
         this.lastTierSpawn = tier != null ? tier.getID() : null;
@@ -261,29 +261,6 @@ public class NeoBlock implements NBTSaveable {
 
     public Stream<TierSpec> getTierStream() {
         return tiers.values().stream();
-    }
-
-    public enum State {
-        INACTIVE(0),    // Default, before activation
-        ACTIVE(1),      // NeoBlock is running
-        DISABLED(2),    // NeoBlock is disabled
-        UPDATED(3),     // NeoBlock configs has been updated / Incompatible HASH
-        STOPPED(4);     // NeoBlock is running but is on cooldown
-
-        private final int id;
-
-        State(int id) {
-            this.id = id;
-        }
-
-        public int getId() {
-            return id;
-        }
-
-        public static State fromId(int id) {
-            for (State state : values()) if (state.id == id) return state;
-            return INACTIVE;
-        }
     }
 
     public void ensureNoFall() {

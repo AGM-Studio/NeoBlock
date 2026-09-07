@@ -19,10 +19,10 @@ public class TierSpec implements NBTSaveable {
     public static final Path FOLDER = NeoBlockMod.get().getConfigFolder("tiers");
 
     public final NeoBlock block;
+    private final String id;
     private final TierConfig config;
 
     // Stored data in world info
-    @NBTData protected String id;
     @NBTData protected int count = 0;
     @NBTData protected boolean enabled;
     @NBTData protected boolean commanded = false;

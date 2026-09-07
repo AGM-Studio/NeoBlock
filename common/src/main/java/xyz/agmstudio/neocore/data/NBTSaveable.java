@@ -180,9 +180,10 @@ public interface NBTSaveable {
                     })
                     .findFirst()
                     .orElseThrow(() -> new NoSuchMethodException("No matching constructor found"));
+            constructor.setAccessible(true);
             instance = constructor.newInstance(args);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to load NBT into " + clazz.getSimpleName(), e);
+            throw new RuntimeException("Failed to load NBT into " + clazz.getSimpleName() + "\nNBT Data: " + tag, e);
         } finally {
             if (instance != null) instance.load(tag);
         }
