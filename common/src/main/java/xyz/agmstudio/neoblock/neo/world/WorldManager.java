@@ -168,21 +168,14 @@ public abstract class WorldManager extends SavedData {
             }
 
             for (ConfigPos pos: getConfigPositions(level, config)) {
-                // Instance then use the nbt saved to load
-                NeoBlock block = new NeoBlock(level, data);
-                block.dimension = level.dimension().location().toString();
-                block.group = pos.group;
-                block.pos = pos.pos;
-                block.id = pos.id;
-
-                NeoBlock generated = NBTSaveable.instance(NeoBlock.class, block.save(), level, data);
+                NeoBlock generated = NeoBlock.create(level, pos.id, pos.pos, pos.group);
                 data.blocks.add(generated);
                 generated.initiate(level);
             }
 
             data.setDirty();
         } else {
-            Optional<NeoblockForceCommand.SetBlock> command = NeoCommand.getFromRegistry(NeoblockForceCommand.SetBlock.class);
+            Optional<NeoblockForceCommand.SetBlockPos> command = NeoCommand.getFromRegistry(NeoblockForceCommand.SetBlockPos.class);
 
             NeoBlockMod.getLogger().info("NeoBlock has been disabled.");
             NeoBlockMod.sendMessage("message.neoblock.disabled_world_1", level, false);
@@ -308,6 +301,12 @@ public abstract class WorldManager extends SavedData {
     }
     public static @NotNull @Unmodifiable List<NeoBlock> getBlocks() {
         return List.copyOf(instance.blocks);
+    }
+    public static void addNeoBlock(NeoBlock block) {
+        instance.blocks.add(block);
+    }
+    public static void removeNeoBlock(NeoBlock block) {
+        instance.blocks.removeIf(b -> block.getID().equals(b.getID()));
     }
     public static boolean isNeoBlock(ServerLevel level, BlockPos pos) {
         for (NeoBlock block: instance.blocks)

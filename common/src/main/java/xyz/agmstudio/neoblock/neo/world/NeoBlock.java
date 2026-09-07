@@ -35,6 +35,7 @@ import xyz.agmstudio.neocore.NeoMC;
 import xyz.agmstudio.neocore.data.NBTSaveable;
 import xyz.agmstudio.neocore.platform.IConfig;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
@@ -55,6 +56,7 @@ public class NeoBlock implements NBTSaveable {
     @NBTData("TraderFailedAttempts") protected int traderFailedAttempts = 0;
     @NBTData("Position") protected BlockPos pos = new BlockPos(0, 64, 0);
     @NBTData("Dimension") protected String dimension = "minecraft:overworld";
+    @NBTData("Stopped") protected boolean stopped = false;
 
     protected String group = null;
     protected final HashMap<String, TierSpec> tiers = new HashMap<>();
@@ -63,6 +65,17 @@ public class NeoBlock implements NBTSaveable {
 
     protected final LinkedHashMap<Integer, NeoEventAction> onBlockActions = new LinkedHashMap<>();
     protected final LinkedHashMap<Integer, NeoEventAction> everyBlockActions = new LinkedHashMap<>();
+
+    @ParametersAreNonnullByDefault
+    public static NeoBlock create(ServerLevel level, String id, BlockPos pos, @Nullable String group) {
+        NeoBlock block = new NeoBlock(level, WorldManager.get());
+        block.dimension = level.dimension().location().toString();
+        block.group = group;
+        block.pos = pos;
+        block.id = id;
+
+        return NBTSaveable.instance(NeoBlock.class, block.save(), level, WorldManager.get());
+    }
 
     public NeoBlock(@NotNull ServerLevel level, @NotNull WorldManager world) {
         this.level = level;
@@ -129,6 +142,9 @@ public class NeoBlock implements NBTSaveable {
         return tag;
     }
 
+    public String getID() {
+        return id;
+    }
     public TierSpec getTier(String id) {
         return tiers.get(id);
     }
@@ -164,8 +180,17 @@ public class NeoBlock implements NBTSaveable {
         queue.add(spec);
     }
 
+    public void stop() {
+        stopped = true;
+    }
+    public void activate() {
+        stopped = false;
+    }
+    public boolean isStopped() {
+        return stopped;
+    }
     public boolean isActive() {
-        return cooldowns.isEmpty();
+        return cooldowns.isEmpty() && !stopped;
     }
     public boolean isOnCooldown() {
         return !cooldowns.isEmpty();
@@ -230,6 +255,17 @@ public class NeoBlock implements NBTSaveable {
         return traderFailedAttempts;
     }
 
+
+    public void setGroup(String group) {
+        this.group = group;
+
+        tiers.clear();
+        for (Map.Entry<String, TierConfig> entry: WorldManager.getTierConfigGroup(group).entrySet()) {
+            TierSpec spec = new TierSpec(this, entry.getKey(), entry.getValue());
+            spec.load(new CompoundTag());
+            tiers.put(entry.getKey(), spec);
+        }
+    }
     public void setDimension(@NotNull ServerLevel level) {
         setDimension(level.dimension());
     }
@@ -242,8 +278,6 @@ public class NeoBlock implements NBTSaveable {
 
         this.pos = pos;
         world.setDirty();
-
-        level.setDefaultSpawnPos(this.pos, 0.0f);
     }
     public void cleanBlock(ServerLevel level, BlockPos pos) {
         BlockState block = getCurrentBlock(level);
@@ -325,7 +359,9 @@ public class NeoBlock implements NBTSaveable {
 
     public void tick() {
         final BlockState block = level.getBlockState(pos);
-        if (isOnCooldown()) {
+        if (stopped) {
+            if (block.getBlock() != Blocks.BEDROCK) BEDROCK_SPEC.placeAt(this);
+        } else if (isOnCooldown()) {
             tickCooldown();
             if (block.getBlock() != Blocks.BEDROCK) BEDROCK_SPEC.placeAt(this);
         } else if (block.isAir() || block.canBeReplaced()) updateBlock(true);

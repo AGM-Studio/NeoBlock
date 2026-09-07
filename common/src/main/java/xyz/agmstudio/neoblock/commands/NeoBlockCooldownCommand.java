@@ -3,15 +3,16 @@ package xyz.agmstudio.neoblock.commands;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.commands.CommandSourceStack;
+import xyz.agmstudio.neoblock.neo.world.NeoBlock;
+import xyz.agmstudio.neoblock.neo.world.NeoBlockCooldown;
 import xyz.agmstudio.neocore.commands.NeoArgumentInteger;
 import xyz.agmstudio.neocore.commands.NeoCommand;
-import xyz.agmstudio.neoblock.neo.world.NeoBlockCooldown;
-import xyz.agmstudio.neoblock.neo.world.WorldManager;
 import xyz.agmstudio.neocore.util.StringUtil;
 
 public class NeoBlockCooldownCommand extends NeoCommand {
     protected NeoBlockCooldownCommand(NeoCommand parent) {
         super(parent, "cooldown");
+        new NeoArgumentNeoBlock.Builder(this, "block").build();
 
         new Advance(this);
         new AddCooldown(this);
@@ -19,7 +20,8 @@ public class NeoBlockCooldownCommand extends NeoCommand {
 
     @Override
     public int execute(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        NeoBlockCooldown cooldown = null; // WorldManager.getWorldData().getCooldown();
+        NeoBlock block = this.getArgument(context, "block");
+        NeoBlockCooldown cooldown = block.getCooldown();
         if (cooldown == null) return fail(context, "command.neoblock.cooldown.no_cooldown");
         return success(context, "command.neoblock.cooldown", cooldown.getType().id(), StringUtil.formatTicks(cooldown.getTick()), StringUtil.formatTicks(cooldown.getTime()));
     }
@@ -27,11 +29,13 @@ public class NeoBlockCooldownCommand extends NeoCommand {
     public static class Advance extends NeoCommand {
         protected Advance(NeoCommand parent) {
             super(parent, "advance");
+            new NeoArgumentNeoBlock.Builder(this, "block").build();
             new NeoArgumentInteger.Builder(this, "ticks").build();
         }
 
         @Override public int execute(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-            NeoBlockCooldown cooldown = null; // WorldManager.getWorldData().getCooldown();
+            NeoBlock block = this.getArgument(context, "block");
+            NeoBlockCooldown cooldown = block.getCooldown();
             if (cooldown == null) return fail(context, "command.neoblock.cooldown.no_cooldown");
 
             int value = this.getArgument(context, "ticks");
@@ -43,12 +47,14 @@ public class NeoBlockCooldownCommand extends NeoCommand {
     public static class AddCooldown extends NeoCommand {
         protected AddCooldown(NeoCommand parent) {
             super(parent, "add");
+            new NeoArgumentNeoBlock.Builder(this, "block").build();
             new NeoArgumentInteger.Builder(this, "ticks").build();
         }
 
         @Override public int execute(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+            NeoBlock block = this.getArgument(context, "block");
             int value = this.getArgument(context, "ticks");
-            NeoBlockCooldown.Type.Normal.create(WorldManager.getBlocks().get(0), value);
+            NeoBlockCooldown.Type.Normal.create(block, value);
 
             return success(context, "command.neoblock.cooldown.add", StringUtil.formatTicks(value));
         }

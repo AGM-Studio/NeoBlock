@@ -19,6 +19,7 @@ import xyz.agmstudio.neoblock.neo.loot.NeoMobSpec;
 import xyz.agmstudio.neoblock.neo.world.NeoBlock;
 import xyz.agmstudio.neoblock.neo.world.WorldManager;
 import xyz.agmstudio.neocore.NeoMC;
+import xyz.agmstudio.neocore.commands.NeoArgumentBlockPos;
 import xyz.agmstudio.neocore.commands.NeoArgumentEntityType;
 import xyz.agmstudio.neocore.commands.NeoArgumentInteger;
 import xyz.agmstudio.neocore.commands.NeoCommand;
@@ -35,6 +36,7 @@ public class NeoblockCommand extends NeoCommand {
 
         new Home(this);
         new GiveMobTicket(this);
+        new GetBlockId(this);
 
         new NeoblockForceCommand(this);
         new NeoblockSchematicCommand(this);
@@ -94,6 +96,22 @@ public class NeoblockCommand extends NeoCommand {
             if (!added) player.drop(mob_ticket, false);
 
             return success(context, "command.neoblock.mobticket", count, type.toShortString());
+        }
+    }
+
+    public static class GetBlockId extends NeoCommand {
+        protected GetBlockId(NeoCommand parent) {
+            super(parent, "get id");
+            new NeoArgumentBlockPos.Builder(this, "block").build();
+        }
+
+        @Override public int execute(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+            BlockPos pos = this.getArgument(context, "block");
+            for (NeoBlock block: WorldManager.getBlocks())
+                if (block.getBlockPos().equals(pos))
+                    return success(context, "command.neoblock.get_block_id", block.getBlockPos().toShortString(), block.getID());
+
+            return fail(context, "command.neoblock.get_block_not_found");
         }
     }
 }

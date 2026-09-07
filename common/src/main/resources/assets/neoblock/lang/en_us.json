@@ -47,6 +47,7 @@
   "message.neoblock.warning": "Something has gone wrong... please check the logs...\nMessage: %s",
 
   "command.neoblock.invalid_tier": "Tier mentioned not found",
+  "command.neoblock.invalid_group": "Group mentioned not found",
   "command.neoblock.disable_tier": "Tier \"%s\" has been disabled!",
   "command.neoblock.enable_tier": "Tier \"%s\" has been enabled!",
 
@@ -54,6 +55,9 @@
   "command.neoblock.home": "%s teleported to NeoBlock",
   "command.neoblock.home_not_found": "Unable to find any NeoBlocks in your dimension",
   "command.neoblock.mobticket": "Mob ticket for %dx of \"%s\" is created.",
+
+  "command.neoblock.get_block_id": "The id for block at %s is \"%s\"",
+  "command.neoblock.get_block_not_found": "Block specified is not a NeoBlock.",
 
   "command.neoblock.scheme.save.fail": "Unable to save the schematic. Check the server logs for more information.",
   "command.neoblock.scheme.save.success": "Schematic has been saved as \"%s\".",
@@ -63,10 +67,14 @@
   "command.neoblock.scheme.load.success": "Schematic has been placed at %s",
 
   "command.neoblock.update.success": "Tiers have been overwritten with the new config. It might have caused some changes in unlocked tiers.",
-  "command.neoblock.disabled": "Neoblock has been set to dormant in this world. Enable it with \"%s\" if you want to.",
 
-  "command.neoblock.force_block": "Block has been set to the new position. Previous block has been removed.",
-  "command.neoblock.force_block.enabled": "Block has been set to the position and the mod has been activated.",
+  "command.neoblock.stopped": "The NeoBlock has been set to dormant. Enable it with \"%s\" if you want to. If you want to remove it use \"%s\"",
+  "command.neoblock.activated": "The NeoBlock has been activated.",
+
+  "command.neoblock.set_block_pos": "Block has been moved to the new position. Previous block has been removed.",
+  "command.neoblock.set_block_group": "Block group has changed to \"%s\". All previous tier data has been reset.",
+  "command.neoblock.add_block": "A new NeoBlock has been activated at the give position.",
+  "command.neoblock.remove_block": "NeoBlock has been removed. All data has been also removed and there is no return.",
 
   "command.neoblock.force_trader.success": "Summoning the trader has been successful.",
   "command.neoblock.force_trader.failure": "Unable to summon another trader. There is no valid trade for trder.",
