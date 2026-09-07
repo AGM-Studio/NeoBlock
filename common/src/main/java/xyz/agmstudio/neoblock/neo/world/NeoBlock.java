@@ -48,6 +48,8 @@ public class NeoBlock implements NBTSaveable {
     public final WorldManager world;
     public final ServerLevel level;
 
+    @NBTData(value = "ID", nullable = true)
+    protected String id = null;
     @NBTData("BlockCount") protected int blockCount = 0;
     @NBTData("LastTierSpawn") protected String lastTierSpawn = null;
     @NBTData("TraderFailedAttempts") protected int traderFailedAttempts = 0;
@@ -68,6 +70,7 @@ public class NeoBlock implements NBTSaveable {
     }
 
     @Override public void onLoad(@NotNull CompoundTag tag) {
+        if (id == null) id = "%s_%d_%d_%d".formatted(dimension, pos.getX(), pos.getY(), pos.getZ()).replace(" ", "_");
         this.group = tag.contains("Group") ? tag.getString("Group") : null;
 
         tiers.clear();

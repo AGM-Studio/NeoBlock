@@ -48,6 +48,7 @@ public interface NBTSaveable {
                     field.setAccessible(true);
                     NBTData annotation = field.getAnnotation(NBTData.class);
                     String key = annotation.value().isEmpty() ? field.getName() : annotation.value();
+
                     Class<?> type = field.getType();
                     if (type.isEnum()) {
                         try {
@@ -60,7 +61,7 @@ public interface NBTSaveable {
                             throw new RuntimeException("Failed to load enum field: " + field.getName(), e);
                         }
                     } else {
-                        Object value = getFromTag(tag, key, type, this);
+                        Object value = getFromTag(tag, key, type, this, annotation.nullable());
                         field.set(this, value);
                     }
                 }
@@ -110,7 +111,8 @@ public interface NBTSaveable {
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    static <R> R getFromTag(CompoundTag tag, String key, Class<R> type, Object root) {
+    static <R> R getFromTag(CompoundTag tag, String key, Class<R> type, Object root, boolean nullable) {
+        if (nullable && !tag.contains(key)) return null;
         if (NBTSaveable.class.isAssignableFrom(type)) {
             CompoundTag compound = tag.getCompound(key);
             try {
@@ -201,5 +203,6 @@ public interface NBTSaveable {
     @Target(ElementType.FIELD)
     @interface NBTData {
         String value() default ""; // Optional custom key name
+        boolean nullable() default false;
     }
 }

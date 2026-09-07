@@ -1,11 +1,17 @@
 [world]                                 # Added in 0.4.0! Effects only the client single player, for servers you need to change the level type
 preset = "neoblock:neoblock_no_nether"  # in servers.properties. "neoblock:neoblock" or "neoblock:neoblock_no_nether"
-force-block = false                     # If you want to use another preset, other than normal ones...
 
 [world.block]               # The position you want the block to be, will change world spawn too and
 x = 0                       #  will only affect when generating the world for the first time.
-y = 64                      # To change it after first generation, use /neoblock force setblock <x> <y> <z>
-z = 0
+y = 64                      # To change it after first generation, use /neoblock force setblock <id> <x> <y> <z> [group]
+z = 0                       # The id for this block will be "main"
+
+# Remove the "#" before the lines to activate them.
+# [world.block-secondary]     # You can add more blocks with unique ids like "secondary" here using the same format
+# x = 42
+# y = 76
+# y = 36
+# group = "secondary]         # If you provide group name, it will use that subdirectory inside the tiers folder for tier data
 
 [forgiving-void]
 players = true              # Save the players if they fall into void

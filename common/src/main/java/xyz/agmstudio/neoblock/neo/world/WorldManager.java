@@ -124,21 +124,20 @@ public abstract class WorldManager extends SavedData {
         WorldManager.instance = NeoBlockMod.captureSavedData(level, "neo_block_data", t -> WorldManager.load(t, level), () -> WorldManager.create(level));
     }
 
-    private static @NotNull List<BlockPos> getConfigPositions(@NotNull ServerLevel level, @NotNull IConfig config) {
-        List<BlockPos> positions = new ArrayList<>();
-        IConfig blockSection = config.getSection("world.block");
+    private record ConfigPos(String id, String group, BlockPos pos) {}
+    private static @NotNull List<ConfigPos> getConfigPositions(@NotNull ServerLevel level, @NotNull IConfig config) {
+        List<ConfigPos> positions = new ArrayList<>();
+        for (String key: config.getSection("world").sections()) {
+            NeoBlockMod.getLogger().debug("Section: {}", key);
+            if (!key.equals("block") && !key.startsWith("block-")) continue;
 
-        String blockDimension = blockSection.get("dimension");
-        if (blockDimension == null || !blockDimension.equals(level.dimension().location().toString()))
-            positions.add(new BlockPos(blockSection.getInt("x"), blockSection.getInt("y"), blockSection.getInt("z")));
+            IConfig section = config.getSection("world." + key);
+            String dimension = section.get("dimension");
+            if (dimension == null || !dimension.equals(level.dimension().location().toString())) continue;
 
-        int blockSectionCounter = 0;
-        blockSection = config.getSection("world.block-" + (++blockSectionCounter));
-        while (blockSection != null) {
-            blockDimension = blockSection.get("dimension");
-            if (blockDimension != null && blockDimension.equals(level.dimension().location().toString())) continue;
-            positions.add(new BlockPos(blockSection.getInt("x"), blockSection.getInt("y"), blockSection.getInt("z")));
-            blockSection = config.getSection("world.block-" + (++blockSectionCounter));
+            BlockPos pos = new BlockPos(section.getInt("x"), section.getInt("y"), section.getInt("z"));
+            String id = key.equals("block") ? "main" : key.substring(6);
+            positions.add(new ConfigPos(id, section.get("group", null), pos));
         }
 
         return positions;
@@ -168,12 +167,13 @@ public abstract class WorldManager extends SavedData {
                 iterator++;
             }
 
-            for (BlockPos pos: getConfigPositions(level, config)) {
+            for (ConfigPos pos: getConfigPositions(level, config)) {
                 // Instance then use the nbt saved to load
                 NeoBlock block = new NeoBlock(level, data);
                 block.dimension = level.dimension().location().toString();
-                block.group = null;
-                block.pos = pos;
+                block.group = pos.group;
+                block.pos = pos.pos;
+                block.id = pos.id;
 
                 NeoBlock generated = NBTSaveable.instance(NeoBlock.class, block.save(), level, data);
                 data.blocks.add(generated);
