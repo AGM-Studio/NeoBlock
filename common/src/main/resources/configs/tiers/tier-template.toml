@@ -2,9 +2,8 @@
 # NEOBLOCK TIER TEMPLATE
 # ================================================================
 # Copy this block to create a new tier.
-# IMPORTANT: Rename the file according to tier sequence:
-# tier-0.toml, tier-1.toml, tier-2.toml, etc.
 # Update the `name` and `weight`, then customize blocks, trades, and unlock conditions.
+# IMPORTANT: "template" in the file name wil disable the config from loading.
 # ================================================================
 
 name = "New Tier Name"  # The display name of your tier.
@@ -59,7 +58,7 @@ trades = [
 ]
 
 # Rules changes when tier unlocks
-[rules]
+[on-unlock.rules]
 doMobSpawning = true
 doDaylightCycle = true
 
@@ -73,7 +72,7 @@ commands = [
 ]
 
 # Optional rules changes
-[rules]
+[on-enable.rules]
 doWeatherCycle = true
 
 # ================================================================
@@ -89,7 +88,7 @@ commands = [
 trades = [
     "trade:example-disabled-trade"
 ]
-[rules]
+[on-disable.rules]
 doMobSpawning = false
 
 # ================================================================

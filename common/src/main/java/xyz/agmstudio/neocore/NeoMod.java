@@ -90,7 +90,12 @@ public abstract class NeoMod {
         } catch (Exception ignored) {}
         if (!Files.exists(configPath)) return null;
 
-        return NeoMod.MC.getConfig(configPath);
+        try {
+            return NeoMod.MC.getConfig(configPath);
+        } catch (Exception exception) {
+            NeoMod.CORE_LOGGER.error("Unable to load config of {} from {}", config, folder);
+            throw new RuntimeException(exception);
+        }
     }
 
     /**

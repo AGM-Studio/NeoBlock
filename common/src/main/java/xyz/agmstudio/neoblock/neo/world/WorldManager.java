@@ -21,13 +21,13 @@ import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.animations.Animation;
 import xyz.agmstudio.neoblock.commands.NeoblockForceCommand;
 import xyz.agmstudio.neoblock.compatibility.ForgivingVoid;
-import xyz.agmstudio.neoblock.neo.tiers.TierConfig;
 import xyz.agmstudio.neoblock.neo.block.NeoChestSpec;
 import xyz.agmstudio.neoblock.neo.block.NeoSeqBlockSpec;
 import xyz.agmstudio.neoblock.neo.block.NeoTagBlockSpec;
 import xyz.agmstudio.neoblock.neo.loot.NeoTagItemSpec;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoMerchant;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoTrade;
+import xyz.agmstudio.neoblock.neo.tiers.TierConfig;
 import xyz.agmstudio.neoblock.neo.tiers.TierSpec;
 import xyz.agmstudio.neoblock.schematics.Schematic;
 import xyz.agmstudio.neocore.NeoMC;
@@ -36,8 +36,11 @@ import xyz.agmstudio.neocore.data.NBTSaveable;
 import xyz.agmstudio.neocore.platform.IConfig;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
+import java.util.stream.Stream;
 
 public abstract class WorldManager extends SavedData {
     private static final String BLOCK_BREAK_OBJECTIVE = "neoblocks_broken";
@@ -45,16 +48,41 @@ public abstract class WorldManager extends SavedData {
     private static final HashMap<String, HashMap<String, TierConfig>> tierConfigs = new HashMap<>();
     public static void reloadTiersConfig() {
         TierConfig.loadAllTierConfigs();
+        tierConfigs.clear();
 
+        HashMap<String, TierConfig> rootTiers = loadTiersFromDirectory(TierSpec.FOLDER);
+        tierConfigs.put(null, rootTiers);
+        NeoBlockMod.getLogger().info("Loaded {} tiers as default tiers.", rootTiers.size());
+
+        try (Stream<Path> stream = Files.list(TierSpec.FOLDER)) {
+            stream.filter(Files::isDirectory).forEach(folder -> {
+                String folderName = folder.getFileName().toString();
+                HashMap<String, TierConfig> subTiers = loadTiersFromDirectory(folder);
+                tierConfigs.put(folderName, subTiers);
+                NeoBlockMod.getLogger().info("Loaded {} tiers for group '{}'.", subTiers.size(), folderName);
+            });
+        } catch (IOException e) {
+            NeoBlockMod.getLogger().error("Failed to read subdirectories from tier folder", e);
+        }
+    }
+
+    private static @NotNull HashMap<String, TierConfig> loadTiersFromDirectory(@NotNull Path dir) {
         HashMap<String, TierConfig> tiers = new HashMap<>();
-        for (int i = 0; Files.exists(TierSpec.FOLDER.resolve("tier-" + i + ".toml")); i++) {
-            IConfig config = NeoBlockMod.get().getConfig(TierSpec.FOLDER, "tier-" + i + ".toml");
-            if (config == null) break; // Should not be null with the file check
-            tiers.put("tier-" + i, new TierConfig(config));
+
+        if (Files.exists(dir)) try (Stream<Path> stream = Files.list(dir)) {
+            stream.filter(Files::isRegularFile).forEach(path -> {
+                String filename = path.getFileName().toString();
+                if (!filename.endsWith(".toml") || filename.contains("template")) return;
+
+                IConfig config = NeoBlockMod.get().getConfig(dir, filename);
+                if (config != null) tiers.put(filename.substring(0, filename.length() - 5), new TierConfig(config));
+                else NeoBlockMod.getLogger().warn("Failed to load tier config for file: {}", filename);
+            });
+        } catch (Exception e) {
+            NeoBlockMod.getLogger().error("Failed to read files from directory: {}", dir, e);
         }
 
-        NeoBlockMod.getLogger().info("Loaded {} tiers from the tiers folder.", tiers.size());
-        tierConfigs.put(null, tiers);
+        return tiers;
     }
     public static HashMap<String, TierConfig> getTierConfigGroup(@Nullable String group) {
         return tierConfigs.get(group);
