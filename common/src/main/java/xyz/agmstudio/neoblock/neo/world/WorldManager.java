@@ -39,7 +39,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 public abstract class WorldManager extends SavedData {
@@ -128,12 +131,13 @@ public abstract class WorldManager extends SavedData {
     private static @NotNull List<ConfigPos> getConfigPositions(@NotNull ServerLevel level, @NotNull IConfig config) {
         List<ConfigPos> positions = new ArrayList<>();
         for (String key: config.getSection("world").sections()) {
-            NeoBlockMod.getLogger().debug("Section: {}", key);
             if (!key.equals("block") && !key.startsWith("block-")) continue;
 
             IConfig section = config.getSection("world." + key);
             String dimension = section.get("dimension");
-            if (dimension == null || !dimension.equals(level.dimension().location().toString())) continue;
+            if (dimension == null) {
+                if (!level.dimension().location().toString().equals("minecraft:overworld")) continue;
+            } else if (!dimension.equals(level.dimension().location().toString())) continue;
 
             BlockPos pos = new BlockPos(section.getInt("x"), section.getInt("y"), section.getInt("z"));
             String id = key.equals("block") ? "main" : key.substring(6);
@@ -171,6 +175,7 @@ public abstract class WorldManager extends SavedData {
                 NeoBlock generated = NeoBlock.create(level, pos.id, pos.pos, pos.group);
                 data.blocks.add(generated);
                 generated.initiate(level);
+                NeoBlockMod.getLogger().info("NeoBlock with id \"{}\" is created at {}.", generated.id, generated.pos.toShortString());
             }
 
             data.setDirty();
@@ -208,7 +213,7 @@ public abstract class WorldManager extends SavedData {
         tag.put("Blocks", list);
 
         final CompoundTag mobs = new CompoundTag();
-        tradedMobs.forEach((key, value) -> mobs.putInt(String.valueOf(NeoMC.getEntityTypeResource(key)), value));
+        tradedMobs.forEach((key, value) -> NeoMC.getEntityTypeResource(key).ifPresent(mob -> mobs.putInt(String.valueOf(mob), value)));
         tag.put("TradedMobs", mobs);
 
         NeoBlockMod.getLogger().debug("WorldData saved as {}", tag);

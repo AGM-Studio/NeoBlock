@@ -11,7 +11,8 @@ z = 0                       # The id for this block will be "main"
 # x = 42
 # y = 76
 # y = 36
-# group = "secondary]         # If you provide group name, it will use that subdirectory inside the tiers folder for tier data
+# group = "secondary"         # If you provide group name, it will use that subdirectory inside the tiers folder for tier data
+# dimension = "minecraft:nether" # If you want to go to another dimension... You could...
 
 [forgiving-void]
 players = true              # Save the players if they fall into void
