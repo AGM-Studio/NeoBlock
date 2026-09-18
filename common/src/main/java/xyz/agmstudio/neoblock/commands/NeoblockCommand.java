@@ -2,13 +2,11 @@ package xyz.agmstudio.neoblock.commands;
 
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.Style;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -24,7 +22,10 @@ import xyz.agmstudio.neocore.commands.NeoArgumentEntityType;
 import xyz.agmstudio.neocore.commands.NeoArgumentInteger;
 import xyz.agmstudio.neocore.commands.NeoCommand;
 
-public class NeoblockCommand extends NeoCommand {
+import java.util.ArrayList;
+import java.util.List;
+
+public class NeoblockCommand extends NeoCommand.ParentHolder {
     private static NeoblockCommand instance = null;
     public static NeoblockCommand getInstance(CommandBuildContext buildContext) {
         if (instance == null) instance = new NeoblockCommand(buildContext);
@@ -34,6 +35,7 @@ public class NeoblockCommand extends NeoCommand {
     private NeoblockCommand(CommandBuildContext buildContext) {
         super(buildContext, "neoblock");
 
+        new Help(this);
         new Home(this);
         new GiveMobTicket(this);
         new GetBlockId(this);
@@ -42,19 +44,33 @@ public class NeoblockCommand extends NeoCommand {
         new NeoblockSchematicCommand(this);
         new NeoblockTiersCommand(this);
         new NeoBlockCooldownCommand(this);
+        new NeoblockTraderCommand(this);
     }
 
-    @Override public int execute(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        MutableComponent component = Component.literal("");
-        int blockCounter = 0;
-        for (NeoBlock block: WorldManager.getBlocks()) {
-            MutableComponent blockText = Component.literal("(" + block.getBlockPos().toShortString() + "@" + block.getDimension().dimension().location() + "): " + block.getBlockCount());
-            if (block.isOnCooldown()) blockText.setStyle(Style.EMPTY.withColor(ChatFormatting.RED));
-            else blockText.setStyle(Style.EMPTY.withColor(ChatFormatting.GRAY));
-            component.append("    " + (++blockCounter) + "- ").append(blockText).append("\n");
+    public static class Help extends NeoCommand {
+        protected Help(NeoCommand parent) {
+            super(parent, "help");
         }
 
-        return success(context, "command.neoblock.info", component);
+        @Override public int execute(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+            List<NeoCommand> commands = getListOf(instance);
+            MutableComponent component = Component.literal("");
+            int counter = 1;
+            for (NeoCommand command: commands) {
+                if (!command.permission.test(context.getSource())) continue;
+                component.append("\n" + (counter++) + "- ").append(command.getDescription());
+                component.append(":\n   ").append(command.getFullCommand());
+            }
+            return success(context, "command.neoblock.help", component);
+        }
+        private static List<NeoCommand> getListOf(NeoCommand command) {
+            List<NeoCommand> commands = new ArrayList<>();
+            if (!(command instanceof ParentHolder)) commands.add(command);
+            for (NeoCommand subCommand: command.getSubCommands())
+                commands.addAll(getListOf(subCommand));
+
+            return commands;
+        }
     }
 
     public static class Home extends NeoCommand {
@@ -67,8 +83,8 @@ public class NeoblockCommand extends NeoCommand {
             if (entity.level() instanceof ServerLevel server) {
                 NeoBlock block = ForgivingVoid.findNearestBlock(server, entity);
                 if (block == null) block = WorldManager.getBlocks().get(0);
-                BlockPos pos = block.getBlockPos();
-                NeoMC.teleportEntity(entity, block.level, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 0, 0);
+                BlockPos pos = block.safeBlock();
+                NeoMC.teleportEntity(entity, block.level, pos.getX() + 0.5, pos.getY() + 1.5, pos.getZ() + 0.5, 0, 0);
                 return success(context,"command.neoblock.home", entity.getDisplayName());
             } else {
                 return fail(context, "command.neoblock.home_not_found");

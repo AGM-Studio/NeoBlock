@@ -12,7 +12,7 @@ public class NeoArgumentInteger extends NeoArgument<Integer> {
     protected final int max;
 
     private static final SuggestionProvider<CommandSourceStack> dsp = (context, builder) -> {
-        for (int i = 0; i <= 4; i++) builder.suggest(String.valueOf(Math.pow(10, i)));
+        for (int i = 0; i <= 4; i++) builder.suggest(String.valueOf((int) Math.pow(10, i)));
         return builder.buildFuture();
     };
 

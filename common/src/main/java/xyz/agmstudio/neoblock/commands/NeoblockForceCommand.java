@@ -5,8 +5,6 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.entity.npc.WanderingTrader;
-import xyz.agmstudio.neoblock.neo.loot.trade.NeoMerchant;
 import xyz.agmstudio.neoblock.neo.tiers.TierConfig;
 import xyz.agmstudio.neoblock.neo.world.NeoBlock;
 import xyz.agmstudio.neoblock.neo.world.WorldManager;
@@ -29,13 +27,11 @@ public class NeoblockForceCommand extends NeoCommand.ParentHolder {
 
         new Stop(this);
         new Activate(this);
-
-        new TraderSpawn(this);
     }
 
     public static class SetBlockPos extends NeoCommand {
         protected SetBlockPos(NeoCommand parent) {
-            super(parent, "block set pos");
+            super(parent, "block setpos");
             new NeoArgumentNeoBlock.Builder(this, "block").build();
             new NeoArgumentBlockPos.Builder(this, "pos").build();
             new NeoArgumentDimension.Builder(this, "dimension").defaultValue(null).build();
@@ -48,13 +44,14 @@ public class NeoblockForceCommand extends NeoCommand.ParentHolder {
 
             block.setDimension(world.dimension());
             block.setBlockPos(origin, world);
+            if (block.isBedrock()) block.updateBlock(false);
             return success(context, "command.neoblock.set_block_pos");
         }
     }
 
     public static class SetBlockGroup extends NeoCommand {
         protected SetBlockGroup(NeoCommand parent) {
-            super(parent, "block set group");
+            super(parent, "block setgroup");
             new NeoArgumentNeoBlock.Builder(this, "block").build();
             new NeoArgumentString.Builder(this, "group").defaultValue(null).build();
         }
@@ -66,7 +63,9 @@ public class NeoblockForceCommand extends NeoCommand.ParentHolder {
 
             NeoBlock block = this.getArgument(context, "block");
             block.setGroup(group);
-            return success(context, "command.neoblock.set_block_group");
+            block.initiate();
+
+            return success(context, "command.neoblock.set_block_group", group);
         }
     }
 
@@ -86,7 +85,7 @@ public class NeoblockForceCommand extends NeoCommand.ParentHolder {
             String group = this.getArgument(context, "group");
 
             NeoBlock generated = NeoBlock.create(world, id, origin, group);
-            generated.initiate(world);
+            generated.initiate();
             WorldManager.addNeoBlock(generated);
             return success(context, "command.neoblock.add_block");
         }
@@ -137,22 +136,6 @@ public class NeoblockForceCommand extends NeoCommand.ParentHolder {
             if (block.isStopped()) block.activate();
 
             return success(context, "command.neoblock.activated");
-        }
-    }
-
-    public static class TraderSpawn extends NeoCommand {
-        protected TraderSpawn(NeoCommand parent) {
-            super(parent, "trader spawn");
-            new NeoArgumentNeoBlock.Builder(this, "block").build();
-        }
-
-        @Override public int execute(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-            NeoBlock block = this.getArgument(context, "block");
-            WanderingTrader trader = NeoMerchant.forceSpawnTrader(block);
-            if (trader != null)
-                return success(context, "command.neoblock.force_trader.success");
-            
-            return fail(context, "command.neoblock.force_trader.failure");
         }
     }
 }

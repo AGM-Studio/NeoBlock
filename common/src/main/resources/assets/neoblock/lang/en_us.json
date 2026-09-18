@@ -47,11 +47,13 @@
   "message.neoblock.warning": "Something has gone wrong... please check the logs...\nMessage: %s",
 
   "command.neoblock.invalid_tier": "Tier mentioned not found",
-  "command.neoblock.invalid_group": "Group mentioned not found",
+  "command.neoblock.invalid_block": "Block ID mentioned not found",
+  "command.neoblock.invalid_tier_group": "Group mentioned not found",
   "command.neoblock.disable_tier": "Tier \"%s\" has been disabled!",
   "command.neoblock.enable_tier": "Tier \"%s\" has been enabled!",
 
-  "command.neoblock.info": "Stats:\n  Blocks broken: %d\n  Unlocked tiers: %s",
+  "command.neoblock.info": "Stats:\n%s",
+  "command.neoblock.help": "Commands: %s",
   "command.neoblock.home": "%s teleported to NeoBlock",
   "command.neoblock.home_not_found": "Unable to find any NeoBlocks in your dimension",
   "command.neoblock.mobticket": "Mob ticket for %dx of \"%s\" is created.",
@@ -65,8 +67,6 @@
   "command.neoblock.scheme.load.not_found": "Schematic file not found.",
   "command.neoblock.scheme.load.fail": "Unable to load the schematic. Check the server logs for more information.",
   "command.neoblock.scheme.load.success": "Schematic has been placed at %s",
-
-  "command.neoblock.update.success": "Tiers have been overwritten with the new config. It might have caused some changes in unlocked tiers.",
 
   "command.neoblock.stopped": "The NeoBlock has been set to dormant. Enable it with \"%s\" if you want to. If you want to remove it use \"%s\"",
   "command.neoblock.activated": "The NeoBlock has been activated.",

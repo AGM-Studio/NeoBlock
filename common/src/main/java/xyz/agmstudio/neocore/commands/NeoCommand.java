@@ -39,9 +39,10 @@ public abstract class NeoCommand {
 
     protected final LinkedHashMap<String, NeoArgument<?>> arguments = new LinkedHashMap<>();
     protected final CommandBuildContext buildContext;
-    protected final Predicate<CommandSourceStack> permission;
+    public final Predicate<CommandSourceStack> permission;
     protected final int permission_value;
     protected final String pattern;
+    protected String description;
 
     private final List<NeoCommand> subcommands = new ArrayList<>();
 
@@ -54,6 +55,8 @@ public abstract class NeoCommand {
         this.permission = context -> context.hasPermission(permission);
         this.pattern = pattern;
         registry.add(this);
+
+        this.description = "command.help." + this.pattern.replace(" ", "_").toLowerCase();
     }
 
     public NeoCommand(NeoCommand parent, String pattern) {
@@ -66,9 +69,29 @@ public abstract class NeoCommand {
     }
 
     public MutableComponent getCommand() {
+        return getCommand(ChatFormatting.AQUA);
+    }
+    public MutableComponent getCommand(ChatFormatting color) {
         return Component.literal("/" + this.pattern).withStyle(
-                Style.EMPTY.withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/" + this.pattern)).withColor(ChatFormatting.AQUA)
+                Style.EMPTY.withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/" + this.pattern)).withColor(color)
         );
+    }
+    public MutableComponent getFullCommand() {
+        return getFullCommand(ChatFormatting.AQUA);
+    }
+    public MutableComponent getFullCommand(ChatFormatting color) {
+        StringBuilder cmd = new StringBuilder("/" + this.pattern);
+        for (Map.Entry<String, NeoArgument<?>> arg: arguments.entrySet()) {
+            if (arg.getValue().optional) cmd.append(" [").append(arg.getKey()).append("]");
+            else cmd.append(" <").append(arg.getKey()).append(">");
+        }
+        return Component.literal(cmd.toString()).withStyle(
+                Style.EMPTY.withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/" + this.pattern)).withColor(color)
+        );
+    }
+
+    public MutableComponent getDescription() {
+        return description != null ? Component.translatable(description) : Component.literal("");
     }
 
     public <T> T getArgument(CommandContext<CommandSourceStack> context, String key, Class<T> type) throws CommandSyntaxException {
@@ -155,7 +178,17 @@ public abstract class NeoCommand {
         return fail(context, Component.translatable(message, args));
     }
 
+    public List<NeoCommand> getSubCommands() {
+        return List.copyOf(subcommands);
+    }
+
     public static class ParentHolder extends NeoCommand {
+        protected ParentHolder(CommandBuildContext context, String pattern, int permission) {
+            super(context, pattern, permission);
+        }
+        protected ParentHolder(CommandBuildContext context, String pattern) {
+            super(context, pattern);
+        }
         protected ParentHolder(NeoCommand parent, String pattern, int permission) {
             super(parent, pattern, permission);
         }

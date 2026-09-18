@@ -21,9 +21,9 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 public class NeoArgumentTier extends NeoArgument<TierSpec> {
-    private static final DynamicCommandExceptionType TIER_EXCEPTION =
+    public static final DynamicCommandExceptionType TIER_EXCEPTION =
             new DynamicCommandExceptionType(size -> Component.translatable("command.neoblock.invalid_tier", size));
-    private static final SimpleCommandExceptionType BLOCK_EXCEPTION =
+    public static final SimpleCommandExceptionType BLOCK_EXCEPTION =
             new SimpleCommandExceptionType(Component.translatable("command.neoblock.invalid_block"));
 
     public static SuggestionProvider<CommandSourceStack> createSuggester(Function<CommandContext<CommandSourceStack>, NeoBlock> nbCapture, Predicate<TierSpec> filter) {
@@ -61,15 +61,24 @@ public class NeoArgumentTier extends NeoArgument<TierSpec> {
         private final String key;
         private boolean optional = false;
         private TierSpec defaultValue = null;
-        private SuggestionProvider<CommandSourceStack> provider;
+        private SuggestionProvider<CommandSourceStack> provider = null;
         private final Function<CommandContext<CommandSourceStack>, NeoBlock> nbCapture;
 
         public Builder(NeoCommand base, String key, Function<CommandContext<CommandSourceStack>, NeoBlock> nbCapture) {
             this.nbCapture = nbCapture;
             this.base = base;
             this.key = key;
-
-            this.provider = createSuggester(nbCapture, t -> true);
+        }
+        public Builder(NeoCommand base, String key, String blockHolder) {
+            this.nbCapture = ctx -> {
+                try {
+                    return base.getArgument(ctx, "block");
+                } catch (Exception ignored) {
+                    return null;
+                }
+            };
+            this.base = base;
+            this.key = key;
         }
 
         public Builder defaultValue(TierSpec defaultValue) {
@@ -77,9 +86,13 @@ public class NeoArgumentTier extends NeoArgument<TierSpec> {
             this.optional = true;
             return this;
         }
+        public Builder filterProvider(Predicate<TierSpec> filter) { this.provider = NeoArgumentTier.createSuggester(this.nbCapture, filter); return this; }
         public Builder provider(SuggestionProvider<CommandSourceStack> provider) { this.provider = provider; return this; }
 
         public NeoArgumentTier build() {
+            if (provider == null && nbCapture != null)
+                provider = NeoArgumentTier.createSuggester(nbCapture, t -> true);
+
             return new NeoArgumentTier(this);
         }
     }

@@ -3,10 +3,10 @@ package xyz.agmstudio.neoblock.commands;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.commands.CommandSourceStack;
-import xyz.agmstudio.neocore.commands.NeoArgumentBoolean;
-import xyz.agmstudio.neocore.commands.NeoCommand;
 import xyz.agmstudio.neoblock.neo.tiers.TierSpec;
 import xyz.agmstudio.neoblock.neo.world.WorldManager;
+import xyz.agmstudio.neocore.commands.NeoArgumentBoolean;
+import xyz.agmstudio.neocore.commands.NeoCommand;
 
 public class NeoblockTiersCommand extends NeoCommand.ParentHolder {
     protected NeoblockTiersCommand(NeoCommand parent) {
@@ -20,9 +20,8 @@ public class NeoblockTiersCommand extends NeoCommand.ParentHolder {
     public static class Satisfy extends NeoCommand {
         protected Satisfy(NeoCommand parent) {
             super(parent, "satisfy");
-            //new NeoArgumentTier.Builder(this, "tier")
-            //        .provider(NeoArgumentTier.createSuggester(tier -> !tier.hasSpecialRequirement() && !tier.isResearched()))
-            //        .build();
+            new NeoArgumentNeoBlock.Builder(this, "block").build();
+            new NeoArgumentTier.Builder(this, "tier", "block").filterProvider(tier -> !tier.hasSpecialRequirement() && !tier.isResearched()).build();
             new NeoArgumentBoolean.Builder(this, "force").defaultValue(true).build();
         }
     
@@ -38,9 +37,8 @@ public class NeoblockTiersCommand extends NeoCommand.ParentHolder {
     public static class Disable extends NeoCommand {
         protected Disable(NeoCommand parent) {
             super(parent, "disable");
-            //new NeoArgumentTier.Builder(this, "tier")
-            //        .provider(NeoArgumentTier.createSuggester(tier -> tier.isEnabled() && tier.isResearched()))
-            //        .build();
+            new NeoArgumentNeoBlock.Builder(this, "block").build();
+            new NeoArgumentTier.Builder(this, "tier", "block").filterProvider(tier -> tier.isEnabled() && tier.isResearched()).build();
         }
     
         @Override public int execute(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
@@ -52,9 +50,8 @@ public class NeoblockTiersCommand extends NeoCommand.ParentHolder {
     public static class Enable extends NeoCommand {
         protected Enable(NeoCommand parent) {
             super(parent, "enable");
-            //new NeoArgumentTier.Builder(this, "tier")
-            //        .provider(NeoArgumentTier.createSuggester(tier -> !tier.isEnabled() && tier.isResearched()))
-            //        .build();
+            new NeoArgumentNeoBlock.Builder(this, "block").build();
+            new NeoArgumentTier.Builder(this, "tier", "block").filterProvider(tier -> !tier.isEnabled() && tier.isResearched()).build();
         }
     
         @Override public int execute(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {

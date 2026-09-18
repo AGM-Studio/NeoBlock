@@ -185,6 +185,7 @@ public class NeoBlock implements NBTSaveable {
     }
     public void activate() {
         stopped = false;
+        if (isBedrock()) updateBlock(false);
     }
     public boolean isStopped() {
         return stopped;
@@ -285,7 +286,7 @@ public class NeoBlock implements NBTSaveable {
             DEFAULT_SPEC.placeAt(this);
     }
 
-    public void initiate(@NotNull ServerLevel level) {
+    public void initiate() {
         tiers.values().forEach(t -> {
             if (t.canBeResearched()) {
                 t.setResearched(true);
@@ -400,5 +401,9 @@ public class NeoBlock implements NBTSaveable {
                 new ItemStack(Blocks.END_STONE);
 
         Block.popResource(level, pos, drop);
+    }
+
+    public boolean isBedrock() {
+        return level.getBlockState(pos).getBlock() == Blocks.BEDROCK;
     }
 }
