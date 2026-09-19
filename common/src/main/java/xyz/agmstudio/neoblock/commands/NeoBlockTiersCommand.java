@@ -8,8 +8,8 @@ import xyz.agmstudio.neoblock.neo.world.WorldManager;
 import xyz.agmstudio.neocore.commands.NeoArgumentBoolean;
 import xyz.agmstudio.neocore.commands.NeoCommand;
 
-public class NeoblockTiersCommand extends NeoCommand.ParentHolder {
-    protected NeoblockTiersCommand(NeoCommand parent) {
+public class NeoBlockTiersCommand extends NeoCommand.ParentHolder {
+    protected NeoBlockTiersCommand(NeoCommand parent) {
         super(parent, "tiers", 3);
 
         new Satisfy(this);

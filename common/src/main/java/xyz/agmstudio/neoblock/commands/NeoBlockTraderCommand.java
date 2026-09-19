@@ -8,8 +8,8 @@ import xyz.agmstudio.neoblock.neo.loot.trade.NeoMerchant;
 import xyz.agmstudio.neoblock.neo.world.NeoBlock;
 import xyz.agmstudio.neocore.commands.NeoCommand;
 
-public class NeoblockTraderCommand extends NeoCommand.ParentHolder {
-    protected NeoblockTraderCommand(NeoCommand parent) {
+public class NeoBlockTraderCommand extends NeoCommand.ParentHolder {
+    protected NeoBlockTraderCommand(NeoCommand parent) {
         super(parent, "trader", 4);
 
         new Spawn(this);

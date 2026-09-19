@@ -17,34 +17,31 @@ import xyz.agmstudio.neoblock.neo.loot.NeoMobSpec;
 import xyz.agmstudio.neoblock.neo.world.NeoBlock;
 import xyz.agmstudio.neoblock.neo.world.WorldManager;
 import xyz.agmstudio.neocore.NeoMC;
-import xyz.agmstudio.neocore.commands.NeoArgumentBlockPos;
-import xyz.agmstudio.neocore.commands.NeoArgumentEntityType;
-import xyz.agmstudio.neocore.commands.NeoArgumentInteger;
-import xyz.agmstudio.neocore.commands.NeoCommand;
+import xyz.agmstudio.neocore.commands.*;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
-public class NeoblockCommand extends NeoCommand.ParentHolder {
-    private static NeoblockCommand instance = null;
-    public static NeoblockCommand getInstance(CommandBuildContext buildContext) {
-        if (instance == null) instance = new NeoblockCommand(buildContext);
+public class NeoBlockCommand extends NeoCommand.ParentHolder {
+    private static NeoBlockCommand instance = null;
+    public static NeoBlockCommand getInstance(CommandBuildContext buildContext) {
+        if (instance == null) instance = new NeoBlockCommand(buildContext);
         return instance;
     }
 
-    private NeoblockCommand(CommandBuildContext buildContext) {
+    private NeoBlockCommand(CommandBuildContext buildContext) {
         super(buildContext, "neoblock");
 
         new Help(this);
-        new Home(this);
+        new Teleport(this);
         new GiveMobTicket(this);
         new GetBlockId(this);
 
-        new NeoblockForceCommand(this);
-        new NeoblockSchematicCommand(this);
-        new NeoblockTiersCommand(this);
-        new NeoBlockCooldownCommand(this);
-        new NeoblockTraderCommand(this);
+        new NeoBlockBlockCommand(this);
+        new NeoBlockSchematicCommand(this);
+        new NeoBlockTiersCommand(this);
+        new NeoBlockTraderCommand(this);
     }
 
     public static class Help extends NeoCommand {
@@ -73,22 +70,28 @@ public class NeoblockCommand extends NeoCommand.ParentHolder {
         }
     }
 
-    public static class Home extends NeoCommand {
-        protected Home(NeoCommand parent) {
-            super(parent, "home");
+    public static class Teleport extends NeoCommand {
+        protected Teleport(NeoCommand parent) {
+            super(parent, "tp", 2);
+            new NeoArgumentEntities.Builder(this, "entities").build();
+            new NeoArgumentNeoBlock.Builder(this, "block").defaultValue(null).build();
         }
 
         @Override public int execute(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-            Entity entity = context.getSource().getEntityOrException();
-            if (entity.level() instanceof ServerLevel server) {
-                NeoBlock block = ForgivingVoid.findNearestBlock(server, entity);
-                if (block == null) block = WorldManager.getBlocks().get(0);
-                BlockPos pos = block.safeBlock();
-                NeoMC.teleportEntity(entity, block.level, pos.getX() + 0.5, pos.getY() + 1.5, pos.getZ() + 0.5, 0, 0);
-                return success(context,"command.neoblock.home", entity.getDisplayName());
-            } else {
-                return fail(context, "command.neoblock.home_not_found");
+            NeoBlock block = getArgument(context, "block");
+            Collection<Entity> entities = getArgument(context, "entities");
+            int succeed = 0;
+            for (Entity entity: entities) {
+                if (entity.level() instanceof ServerLevel server) {
+                    NeoBlock eb = block == null ? ForgivingVoid.findNearestBlock(server, entity) : block;
+                    if (eb == null) continue;
+                    BlockPos pos = eb.safeBlock();
+                    NeoMC.teleportEntity(entity, eb.level, pos.getX() + 0.5, pos.getY() + 1.5, pos.getZ() + 0.5, 0, 0);
+                    succeed++;
+                }
             }
+            if (succeed > 0) return success(context, "command.neoblock.tp", succeed);
+            else return fail(context, "command.neoblock.tp_no_tp");
         }
     }
 

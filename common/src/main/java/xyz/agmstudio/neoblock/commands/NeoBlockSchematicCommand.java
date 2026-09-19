@@ -12,8 +12,8 @@ import xyz.agmstudio.neoblock.schematics.Schematic;
 
 import java.nio.file.Path;
 
-public class NeoblockSchematicCommand extends NeoCommand.ParentHolder {
-    protected NeoblockSchematicCommand(NeoCommand parent) {
+public class NeoBlockSchematicCommand extends NeoCommand.ParentHolder {
+    protected NeoBlockSchematicCommand(NeoCommand parent) {
         super(parent, "scheme", 2);
 
         new Load(this);
@@ -24,7 +24,7 @@ public class NeoblockSchematicCommand extends NeoCommand.ParentHolder {
         protected Load(NeoCommand parent) {
             super(parent, "load");
             new NeoArgumentBlockPos.Builder(this, "pos").build();
-            new NeoArgumentString.Builder(this, "name").defaultValue(null).build();
+            new NeoArgumentString.Builder(this, "name").build();
         }
 
         @Override public int execute(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
@@ -46,8 +46,8 @@ public class NeoblockSchematicCommand extends NeoCommand.ParentHolder {
             super(parent, "save", 2);
             new NeoArgumentBlockPos.Builder(this, "pos1").build();
             new NeoArgumentBlockPos.Builder(this, "pos2").build();
-            new NeoArgumentBlockPos.Builder(this, "neoblock").defaultValue(null).build();
-            new NeoArgumentString.Builder(this, "name").defaultValue(null).build();
+            new NeoArgumentString.Builder(this, "name").build();
+            new NeoArgumentBlockPos.Builder(this, "center").defaultValue(null).build();
         }
 
         @Override public int execute(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
@@ -55,8 +55,8 @@ public class NeoblockSchematicCommand extends NeoCommand.ParentHolder {
             ServerLevel level = context.getSource().getLevel();
             BlockPos pos1 = getArgument(context, "pos1");
             BlockPos pos2 = getArgument(context, "pos2");
-            BlockPos center = getArgument(context, "neoblock");
             String name = getArgument(context, "name");
+            BlockPos center = getArgument(context, "center");
 
             Path result = Schematic.saveSchematic(level, pos1, pos2, center, name);
             if (result == null) return fail(context, "command.neoblock.scheme.save.fail");

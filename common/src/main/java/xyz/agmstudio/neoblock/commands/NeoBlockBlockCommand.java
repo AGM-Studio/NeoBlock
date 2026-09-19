@@ -16,9 +16,9 @@ import xyz.agmstudio.neocore.commands.NeoCommand;
 import java.util.HashMap;
 import java.util.Optional;
 
-public class NeoblockForceCommand extends NeoCommand.ParentHolder {
-    protected NeoblockForceCommand(NeoCommand parent) {
-        super(parent, "force", 4);
+public class NeoBlockBlockCommand extends NeoCommand.ParentHolder {
+    protected NeoBlockBlockCommand(NeoCommand parent) {
+        super(parent, "block", 4);
 
         new SetBlockPos(this);
         new SetBlockGroup(this);
@@ -27,11 +27,13 @@ public class NeoblockForceCommand extends NeoCommand.ParentHolder {
 
         new Stop(this);
         new Activate(this);
+
+        new NeoBlockCooldownCommand(this);
     }
 
     public static class SetBlockPos extends NeoCommand {
         protected SetBlockPos(NeoCommand parent) {
-            super(parent, "block setpos");
+            super(parent, "setpos");
             new NeoArgumentNeoBlock.Builder(this, "block").build();
             new NeoArgumentBlockPos.Builder(this, "pos").build();
             new NeoArgumentDimension.Builder(this, "dimension").defaultValue(null).build();
@@ -51,7 +53,7 @@ public class NeoblockForceCommand extends NeoCommand.ParentHolder {
 
     public static class SetBlockGroup extends NeoCommand {
         protected SetBlockGroup(NeoCommand parent) {
-            super(parent, "block setgroup");
+            super(parent, "setgroup");
             new NeoArgumentNeoBlock.Builder(this, "block").build();
             new NeoArgumentString.Builder(this, "group").defaultValue(null).build();
         }
@@ -71,7 +73,7 @@ public class NeoblockForceCommand extends NeoCommand.ParentHolder {
 
     public static class AddBlock extends NeoCommand {
         protected AddBlock(NeoCommand parent) {
-            super(parent, "block add");
+            super(parent, "add");
             new NeoArgumentString.Builder(this, "id").build();
             new NeoArgumentBlockPos.Builder(this, "pos").build();
             new NeoArgumentDimension.Builder(this, "dimension").defaultValue(null).build();
@@ -84,6 +86,9 @@ public class NeoblockForceCommand extends NeoCommand.ParentHolder {
             ServerLevel world = this.getArgument(context, "dimension", context.getSource()::getLevel);
             String group = this.getArgument(context, "group");
 
+            if (WorldManager.getBlocks().stream().anyMatch(b -> b.getID().equals(id))) return fail(context, "command.neoblock.add_block.exists");
+            if (WorldManager.getTierConfigGroup(group) == null) return fail(context, "command.neoblock.invalid_tier_group");
+
             NeoBlock generated = NeoBlock.create(world, id, origin, group);
             generated.initiate();
             WorldManager.addNeoBlock(generated);
@@ -93,7 +98,7 @@ public class NeoblockForceCommand extends NeoCommand.ParentHolder {
 
     public static class RemoveBlock extends NeoCommand {
         protected RemoveBlock(NeoCommand parent) {
-            super(parent, "block remove");
+            super(parent, "remove");
             new NeoArgumentNeoBlock.Builder(this, "block").build();
         }
 
@@ -107,7 +112,7 @@ public class NeoblockForceCommand extends NeoCommand.ParentHolder {
 
     public static class Stop extends NeoCommand {
         protected Stop(NeoCommand parent) {
-            super(parent, "block stop");
+            super(parent, "stop");
             new NeoArgumentNeoBlock.Builder(this, "block").provider(
                     NeoArgumentNeoBlock.createSuggester(b -> !b.isStopped())
             ).build();
@@ -125,7 +130,7 @@ public class NeoblockForceCommand extends NeoCommand.ParentHolder {
 
     public static class Activate extends NeoCommand {
         protected Activate(NeoCommand parent) {
-            super(parent, "block activate");
+            super(parent, "activate");
             new NeoArgumentNeoBlock.Builder(this, "block").provider(
                     NeoArgumentNeoBlock.createSuggester(NeoBlock::isStopped)
             ).build();

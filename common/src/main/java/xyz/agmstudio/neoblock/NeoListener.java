@@ -19,7 +19,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.agmstudio.neoblock.animations.CooldownBarAnimation;
-import xyz.agmstudio.neoblock.commands.NeoblockCommand;
+import xyz.agmstudio.neoblock.commands.NeoBlockCommand;
 import xyz.agmstudio.neoblock.compatibility.ForgivingVoid;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoMerchant;
 import xyz.agmstudio.neoblock.neo.world.NeoBlock;
@@ -137,7 +137,7 @@ public final class NeoListener {
     }
 
     public static void onRegisterCommands(CommandBuildContext buildContext, CommandDispatcher<CommandSourceStack> dispatcher) {
-        NeoblockCommand.getInstance(buildContext).register(dispatcher);
+        NeoBlockCommand.getInstance(buildContext).register(dispatcher);
     }
 
     public static final class LivingDamageResult extends CancelableEventResult<Float> {

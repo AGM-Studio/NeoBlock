@@ -19,7 +19,7 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.animations.Animation;
-import xyz.agmstudio.neoblock.commands.NeoblockForceCommand;
+import xyz.agmstudio.neoblock.commands.NeoBlockBlockCommand;
 import xyz.agmstudio.neoblock.compatibility.ForgivingVoid;
 import xyz.agmstudio.neoblock.neo.block.NeoChestSpec;
 import xyz.agmstudio.neoblock.neo.block.NeoSeqBlockSpec;
@@ -180,7 +180,7 @@ public abstract class WorldManager extends SavedData {
 
             data.setDirty();
         } else {
-            Optional<NeoblockForceCommand.SetBlockPos> command = NeoCommand.getFromRegistry(NeoblockForceCommand.SetBlockPos.class);
+            Optional<NeoBlockBlockCommand.AddBlock> command = NeoCommand.getFromRegistry(NeoBlockBlockCommand.AddBlock.class);
 
             NeoBlockMod.getLogger().info("NeoBlock has been disabled.");
             NeoBlockMod.sendMessage("message.neoblock.disabled_world_1", level, false);
