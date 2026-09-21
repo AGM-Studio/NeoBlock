@@ -5,6 +5,7 @@ import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import xyz.agmstudio.neoblock.neo.world.NeoBlock;
 import xyz.agmstudio.neoblock.neo.world.WorldManager;
 import xyz.agmstudio.neocore.providers.ItemStackProvider;
 import xyz.agmstudio.neocore.NeoMC;
@@ -31,7 +32,6 @@ public class NeoItemSpec implements ItemStackProvider {
         this.range = range;
         this.chance = Math.min(Math.max(chance, 0.0), 1.0);
     }
-
 
     @Override public ItemStack getStack() {
         int count = range.sample(WorldManager.getRandom());
@@ -60,6 +60,9 @@ public class NeoItemSpec implements ItemStackProvider {
     }
 
     public ItemStack modify(ItemStack item) {
+        return item;
+    }
+    public ItemStack modifyForTrader(ItemStack item, NeoBlock block) {
         return item;
     }
 

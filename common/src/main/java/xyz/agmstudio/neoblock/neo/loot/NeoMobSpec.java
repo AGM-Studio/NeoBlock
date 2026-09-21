@@ -14,12 +14,14 @@ import net.minecraft.world.item.context.UseOnContext;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.agmstudio.neoblock.NeoBlockMod;
+import xyz.agmstudio.neoblock.neo.world.NeoBlock;
 import xyz.agmstudio.neoblock.neo.world.WorldManager;
 import xyz.agmstudio.neocore.NeoMC;
 import xyz.agmstudio.neocore.NeoNBT;
 import xyz.agmstudio.neocore.util.StringUtil;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -55,6 +57,15 @@ public class NeoMobSpec extends NeoItemSpec {
         NeoNBT.Item.setItemTag(item, tag);
         return item;
     }
+    public ItemStack modifyForTrader(ItemStack item, NeoBlock block) {
+        CompoundTag tag = NeoNBT.Item.getItemTag(item);
+
+        tag.putString("neoBlockId", block.getID());
+
+        NeoNBT.Item.setItemTag(item, tag);
+        return item;
+    }
+
 
     @Override public ResourceLocation getResource() {
         return NeoMC.getEntityTypeResource(mob).orElse(DEFAULT);
@@ -86,24 +97,33 @@ public class NeoMobSpec extends NeoItemSpec {
         CompoundTag tag = NeoNBT.Item.getItemTag(item);
         return NeoMC.getEntityType(tag.getString("neoMobType"));
     }
+    public static Optional<NeoBlock> getMobTradeBlock(ItemStack item) {
+        if (item == null || !item.getItem().equals(NeoBlockMod.getRegistry().getMobTicket())) return Optional.empty();
+
+        CompoundTag tag = NeoNBT.Item.getItemTag(item);
+        String blockId = tag.getString("neoBlockId");
+        return WorldManager.getBlocks().stream().filter(b -> Objects.equals(b.getID(), blockId)).findFirst();
+    }
 
     public static boolean handlePossibleMobTrade(ItemStack item, ServerLevel level) {
         Optional<EntityType<?>> mob = getMobTradeEntity(item);
-        if (mob.isEmpty()) return false;
+        Optional<NeoBlock> block = getMobTradeBlock(item);
+        if (mob.isEmpty() || block.isEmpty()) return false;
 
         NeoBlockMod.sendInstantMessage("message.neoblock.trades.mob", level, true, item.getCount(), mob.get().getDescription());
-        WorldManager.get().addTradedMob(mob.get(), item.getCount());
+        block.get().addTradedMob(mob.get(), item.getCount());
         item.setCount(0);
 
         return true;
     }
 
-    public static ItemStack of(EntityType<?> mob, int count) {
+    public static ItemStack of(EntityType<?> mob, NeoBlock block, int count) {
         ItemStack item = new ItemStack(NeoBlockMod.getRegistry().getMobTicket(), count);
         CompoundTag tag = NeoNBT.Item.getItemTag(item);
 
         @Nullable ResourceLocation location = NeoMC.getEntityTypeResource(mob).orElse(null);
         tag.putString("neoMobType", location != null ? location.toString() : DEFAULT.toString());
+        tag.putString("neoBlockId", block.getID());
 
         NeoNBT.Item.setItemTag(item, tag);
         return item;
@@ -134,7 +154,8 @@ public class NeoMobSpec extends NeoItemSpec {
             Optional<EntityType<?>> mob = getMobTradeEntity(stack);
             return mob.<List<Component>>map(entityType -> List.of(
                     Component.translatable("tooltip.neoblock.spawn_lore", entityType.getDescription())
-                            .withStyle(ChatFormatting.ITALIC, ChatFormatting.GRAY)
+                            .withStyle(ChatFormatting.ITALIC, ChatFormatting.GRAY),
+                    Component.literal("Block: " + getMobTradeBlock(stack).map(NeoBlock::getID).orElse(null))
             )).orElseGet(List::of);
         }
     }

@@ -2,6 +2,7 @@ package xyz.agmstudio.neoblock.neo.loot.trade;
 
 import net.minecraft.world.item.trading.MerchantOffer;
 import xyz.agmstudio.neoblock.NeoBlockMod;
+import xyz.agmstudio.neoblock.neo.world.NeoBlock;
 import xyz.agmstudio.neocore.platform.IConfig;
 
 import java.util.ArrayList;
@@ -45,5 +46,5 @@ public abstract class NeoTrade {
         NeoBlockMod.getLogger().info("Loaded {} trades.", TRADES.size());
     }
 
-    public abstract Optional<MerchantOffer> getOffer();
+    public abstract Optional<MerchantOffer> getOffer(NeoBlock block);
 }

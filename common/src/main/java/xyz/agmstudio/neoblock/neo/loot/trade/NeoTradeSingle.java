@@ -4,8 +4,10 @@ import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.item.trading.MerchantOffer;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.neo.loot.NeoItemSpec;
+import xyz.agmstudio.neoblock.neo.world.NeoBlock;
 import xyz.agmstudio.neoblock.neo.world.WorldManager;
 import xyz.agmstudio.neocore.NeoMC;
+import xyz.agmstudio.neocore.providers.ItemStackProvider;
 import xyz.agmstudio.neocore.util.StringUtil;
 
 import javax.annotation.Nullable;
@@ -34,8 +36,9 @@ public class NeoTradeSingle extends NeoTrade {
         this.uses = uses == null ? UniformInt.of(1, 1) : uses;
     }
 
-    @Override public Optional<MerchantOffer> getOffer() {
+    @Override public Optional<MerchantOffer> getOffer(NeoBlock block) {
         if (WorldManager.getRandom().nextDouble() > chance) return Optional.empty();
+        ItemStackProvider result = () -> this.result.modifyForTrader(this.result.getStack(), block);
         return NeoMC.getOfferOf(result, costA, costB, uses);
     }
 

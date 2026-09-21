@@ -1,6 +1,7 @@
 package xyz.agmstudio.neoblock.neo.loot.trade;
 
 import net.minecraft.world.item.trading.MerchantOffer;
+import xyz.agmstudio.neoblock.neo.world.NeoBlock;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,9 +26,9 @@ public class NeoTradePool {
         return new NeoTradePool(list);
     }
 
-    public List<MerchantOffer> getAllOffers() {
+    public List<MerchantOffer> getAllOffers(NeoBlock block) {
         List<MerchantOffer> offers = new ArrayList<>();
-        for (NeoTrade trade :trades) trade.getOffer().ifPresent(offers::add);
+        for (NeoTrade trade: trades) trade.getOffer(block).ifPresent(offers::add);
         return offers;
     }
 

@@ -99,17 +99,19 @@ public class NeoBlockCommand extends NeoCommand.ParentHolder {
         protected GiveMobTicket(NeoCommand parent) {
             super(parent, "get mobticket");
             new NeoArgumentEntityType.Builder(this, "entity").build(this.buildContext);
+            new NeoArgumentNeoBlock.Builder(this, "block").build();
             new NeoArgumentInteger.Builder(this, "count").defaultValue(1).min(1).build();
         }
 
         @Override public int execute(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
             EntityType<?> type = this.getArgument(context, "entity");
+            NeoBlock block = this.getArgument(context, "block");
 
             CommandSourceStack source = context.getSource();
             ServerPlayer player = source.getPlayerOrException();
 
             int count = this.getArgument(context, "count");
-            ItemStack mob_ticket = NeoMobSpec.of(type, count);
+            ItemStack mob_ticket = NeoMobSpec.of(type, block, count);
 
             boolean added = player.getInventory().add(mob_ticket);
             if (!added) player.drop(mob_ticket, false);

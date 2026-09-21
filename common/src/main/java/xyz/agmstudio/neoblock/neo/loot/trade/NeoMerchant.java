@@ -75,14 +75,14 @@ public class NeoMerchant {
 
         NeoBlockMod.sendInstantMessage("message.neoblock.trader_spawned", at.level, true);
 
-        HashMap<EntityType<?>, Integer> tradedMobs = WorldManager.get().getTradedMobs();
+        HashMap<EntityType<?>, Integer> tradedMobs = at.getTradedMobs();
         tradedMobs.forEach((type, count) -> {
             for (int i = 0; i < count; i++) {
                 Entity mob = NeoMC.spawnEntity(at.level, type, trader.getOnPos());
                 NeoMC.leash(mob, trader);
             }
         });
-        WorldManager.get().clearTradedMobs();
+        at.clearTradedMobs();
 
         return trader;
     }
@@ -105,7 +105,7 @@ public class NeoMerchant {
         for (String tag: tags) trader.addTag(tag);
 
         MerchantOffers offers = new MerchantOffers();
-        for (NeoTrade trade: trades) trade.getOffer().ifPresent(offers::add);
+        for (NeoTrade trade: trades) trade.getOffer(at).ifPresent(offers::add);
         offerMap.put(trader.getUUID(), offers);
 
         at.level.addFreshEntity(trader);

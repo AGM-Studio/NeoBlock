@@ -11,6 +11,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -63,6 +64,8 @@ public class NeoBlock implements NBTSaveable {
     protected final List<NeoBlockSpec> queue = new ArrayList<>();
     protected final List<NeoBlockCooldown> cooldowns = new ArrayList<>();
 
+    protected final HashMap<EntityType<?>, Integer> tradedMobs = new HashMap<>();
+
     protected final LinkedHashMap<Integer, NeoEventAction> onBlockActions = new LinkedHashMap<>();
     protected final LinkedHashMap<Integer, NeoEventAction> everyBlockActions = new LinkedHashMap<>();
 
@@ -105,6 +108,9 @@ public class NeoBlock implements NBTSaveable {
             cooldowns.add(cooldown);
         });
 
+        final CompoundTag mobs = tag.getCompound("TradedMobs");
+        mobs.getAllKeys().forEach(key -> tradedMobs.merge(NeoMC.getEntityType(key).orElse(null), mobs.getInt(key), Integer::sum));
+
         IConfig config = NeoBlockMod.getConfig();
         for (String key: config.keys()) {
             Matcher obm = NeoEventBlockTrigger.ON_BLOCK_PATTERN.matcher(key);
@@ -138,6 +144,10 @@ public class NeoBlock implements NBTSaveable {
         final ListTag cools = new ListTag();
         cooldowns.forEach(cool -> cools.add(cool.save()));
         tag.put("Cooldowns", cools);
+
+        final CompoundTag mobs = new CompoundTag();
+        tradedMobs.forEach((key, value) -> NeoMC.getEntityTypeResource(key).ifPresent(mob -> mobs.putInt(String.valueOf(mob), value)));
+        tag.put("TradedMobs", mobs);
 
         return tag;
     }
@@ -255,7 +265,17 @@ public class NeoBlock implements NBTSaveable {
 
         return traderFailedAttempts;
     }
-
+    public HashMap<EntityType<?>, Integer> getTradedMobs() {
+        return tradedMobs;
+    }
+    public void addTradedMob(EntityType<?> entityType, int count) {
+        tradedMobs.merge(entityType, count, Integer::sum);
+        world.setDirty();
+    }
+    public void clearTradedMobs() {
+        tradedMobs.clear();
+        world.setDirty();
+    }
 
     public void setGroup(String group) {
         this.group = group;

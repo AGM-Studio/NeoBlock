@@ -1,6 +1,7 @@
 package xyz.agmstudio.neoblock.neo.loot.trade;
 
 import net.minecraft.world.item.trading.MerchantOffer;
+import xyz.agmstudio.neoblock.neo.world.NeoBlock;
 import xyz.agmstudio.neoblock.neo.world.WorldManager;
 import xyz.agmstudio.neocore.util.StringUtil;
 
@@ -22,14 +23,14 @@ public class NeoTradeGroup extends NeoTrade {
     }
 
     @Override
-    public Optional<MerchantOffer> getOffer() {
+    public Optional<MerchantOffer> getOffer(NeoBlock block) {
         if (WorldManager.getRandom().nextDouble() > chance) return Optional.empty();
 
         List<NeoTrade> trades = NeoTrade.getTrades(name);
         if (trades == null || trades.isEmpty()) return Optional.empty();
 
         NeoTrade selected = trades.get(WorldManager.getRandom().nextInt(trades.size()));
-        return selected.getOffer();
+        return selected.getOffer(block);
     }
 
     public static Optional<NeoTrade> parse(String input) {
