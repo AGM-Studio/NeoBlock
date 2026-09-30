@@ -1,11 +1,14 @@
 package xyz.agmstudio.neoblock.platform;
 
-import mezz.jei.api.gui.builder.IRecipeSlotBuilder;
+import com.mojang.brigadier.StringReader;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.minecraft.commands.arguments.item.ItemParser;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.*;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.CustomData;
@@ -13,6 +16,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neocore.platform.INBT;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -20,7 +24,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.List;
 
 
 @ParametersAreNonnullByDefault
@@ -73,8 +76,23 @@ public final class ForgeNBT implements INBT {
         be.setChanged();
     }
 
-    @SuppressWarnings("removal")
-    @Override public IRecipeSlotBuilder addTooltip(IRecipeSlotBuilder builder, List<Component> components) {
-        return builder.addTooltipCallback((view, tooltip) -> tooltip.addAll(components));
+    @Override public ItemStack applyModifiers(ItemStack stack, @Nullable String dataString, ServerLevel level) {
+        if (dataString == null || dataString.isBlank()) return stack;
+        HolderLookup.Provider registries = level.registryAccess();
+        try {
+            if (dataString.startsWith("{")) dataString = "[minecraft:custom_data=" + dataString + "]";
+
+            String itemId = BuiltInRegistries.ITEM.getKey(stack.getItem()).toString();
+            String fullInput = itemId + dataString;
+
+            ItemParser parser = new ItemParser(registries);
+            ItemParser.ItemResult result = parser.parse(new StringReader(fullInput));
+
+            stack.applyComponents(result.components());
+        } catch (CommandSyntaxException e) {
+            NeoBlockMod.getLogger().error("Unable to apply data components to the given item: \n\tData: {}", dataString, e);
+        }
+
+        return stack;
     }
 }

@@ -16,9 +16,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class NeoTradeSingle extends NeoTrade {
-    private static final Pattern PATTERN = StringUtil.group("result", " ;").then(";").space()
-            .then(StringUtil.group("costA", " ;").then(";")).space()
-            .then(StringUtil.group("costB", " ;").then(";").optional()).space()
+    private static final Pattern PATTERN = StringUtil.group("result", ";").then(";").space()
+            .then(StringUtil.group("costA", ";").then(";")).space()
+            .then(StringUtil.group("costB", ";").then(";").optional()).space()
             .then(StringUtil.RANGE_NOX.optional()).space()
             .then(StringUtil.CHANCE.optional()).build(false);
 
@@ -45,7 +45,7 @@ public class NeoTradeSingle extends NeoTrade {
     public static Optional<NeoTrade> parse(String input) {
         if (input == null) return Optional.empty();
 
-        Matcher matcher = PATTERN.matcher(input.trim().toLowerCase());
+        Matcher matcher = PATTERN.matcher(input.trim());
         if (!matcher.matches()) {
             NeoBlockMod.getLogger().error("Invalid trade syntax: {}", input);
             return Optional.empty();

@@ -1,10 +1,8 @@
 package xyz.agmstudio.neocore;
 
-import mezz.jei.api.gui.builder.IRecipeSlotBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -17,7 +15,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 
 public final class NeoNBT {
     private static final INBT nbt = NeoMod.MC.getINBT();
@@ -68,11 +65,9 @@ public final class NeoNBT {
         public static void setItemTag(@NotNull ItemStack item, @NotNull CompoundTag tag) {
             nbt.setItemTag(item, tag);
         }
-    }
 
-    public static final class JEI {
-        public static IRecipeSlotBuilder addTooltip(IRecipeSlotBuilder builder, List<Component> components) {
-            return nbt.addTooltip(builder, components);
+        public static ItemStack applyModifiers(@NotNull ItemStack item, String data, ServerLevel level) {
+            return nbt.applyModifiers(item, data, level);
         }
     }
 }

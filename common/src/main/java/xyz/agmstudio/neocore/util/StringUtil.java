@@ -285,6 +285,7 @@ public final class StringUtil {
     public static final Fragment STRICT_ID  = () -> "(?<id>[a-z_][a-z0-9_]*)";
     public static final Fragment NAME       = () -> "(?<name>[\\w-]+)";
     public static final Fragment CHANCE     = () -> "(?:\\s+(?<chance>\\d+(?:\\.\\d*)?)%?)";
+    public static final Fragment ITEM_DATA  = () -> "(?<data>\\{.*\\}|\\[.*\\])?";
 
 
     @Contract(pure = true)

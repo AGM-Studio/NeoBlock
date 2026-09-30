@@ -1,22 +1,20 @@
 package xyz.agmstudio.neocore.platform;
 
-import mezz.jei.api.gui.builder.IRecipeSlotBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.List;
 
 
 @ParametersAreNonnullByDefault
@@ -37,5 +35,5 @@ public interface INBT {
     CompoundTag getBlockEntity(BlockEntity be, ServerLevel level);
     void loadBlockEntity(BlockEntity be, CompoundTag tag, ServerLevel level);
 
-    IRecipeSlotBuilder addTooltip(IRecipeSlotBuilder builder, List<Component> components);
+    ItemStack applyModifiers(ItemStack stack, @Nullable String dataString, ServerLevel level);
 }

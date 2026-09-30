@@ -7,6 +7,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import xyz.agmstudio.neoblock.neo.world.NeoBlock;
 import xyz.agmstudio.neoblock.neo.world.WorldManager;
+import xyz.agmstudio.neocore.NeoNBT;
 import xyz.agmstudio.neocore.providers.ItemStackProvider;
 import xyz.agmstudio.neocore.NeoMC;
 import xyz.agmstudio.neocore.util.StringUtil;
@@ -17,7 +18,7 @@ import java.util.regex.Pattern;
 
 public class NeoItemSpec implements ItemStackProvider {
     private static final Pattern PATTERN =
-            StringUtil.RANGE.optional().then(StringUtil.NAMESPACE).then(StringUtil.CHANCE.optional()).build(false);
+            StringUtil.RANGE.optional().then(StringUtil.NAMESPACE).then(StringUtil.ITEM_DATA.optional()).then(StringUtil.CHANCE.optional()).build(false);
     private static final ResourceLocation DEFAULT = NeoMC.parseResourceLocation("minecraft:stone");
     protected static ItemStack getDefault() {
         return new ItemStack(Items.STONE, 1);
@@ -26,16 +27,22 @@ public class NeoItemSpec implements ItemStackProvider {
     protected final Item item;
     protected final UniformInt range;
     protected final double chance;
+    protected final String data;
 
     public NeoItemSpec(Item item, UniformInt range, double chance) {
+        this(item, range, chance, null);
+    }
+    public NeoItemSpec(Item item, UniformInt range, double chance, String data) {
         this.item = item;
         this.range = range;
         this.chance = Math.min(Math.max(chance, 0.0), 1.0);
+        this.data = data != null && !data.isBlank() ? data : null;
     }
 
     @Override public ItemStack getStack() {
         int count = range.sample(WorldManager.getRandom());
-        return modify(new ItemStack(getItem(), count));
+        ItemStack stack = NeoNBT.Item.applyModifiers(new ItemStack(getItem(), count), data, WorldManager.getWorldLevel());
+        return modify(stack);
     }
 
     public ItemStack getStackWithChance() {
@@ -69,6 +76,9 @@ public class NeoItemSpec implements ItemStackProvider {
     @Override public String toString() {
         return StringUtil.stringUniformInt(range) + getId() + StringUtil.stringChance(chance);
     }
+    public String getData() {
+        return data;
+    }
 
     public static Optional<? extends NeoItemSpec> parseItem(String input) {
         if (input == null) return Optional.empty();
@@ -79,7 +89,7 @@ public class NeoItemSpec implements ItemStackProvider {
         Optional<NeoTagItemSpec> tag = NeoTagItemSpec.parseTagItem(input);
         if (tag.isPresent()) return tag;
 
-        Matcher matcher = PATTERN.matcher(input.trim().toLowerCase());
+        Matcher matcher = PATTERN.matcher(input.trim());
         if (!matcher.matches()) return Optional.empty();
 
         Item item = NeoMC.getItem(matcher.group("id")).orElse(null);
@@ -87,7 +97,8 @@ public class NeoItemSpec implements ItemStackProvider {
 
         UniformInt range = StringUtil.parseRange(matcher.group("count"));
         double chance = StringUtil.parseChance(matcher.group("chance"));
+        String data = matcher.group("data");
 
-        return Optional.of(new NeoItemSpec(item, range, chance));
+        return Optional.of(new NeoItemSpec(item, range, chance, data));
     }
 }

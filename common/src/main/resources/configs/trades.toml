@@ -1,3 +1,9 @@
+# Since V0.9-Beta you can add NBT to any item. This also works in Tiers' config files.
+# Just get the NBT from a website like https://www.gamergeeks.net/apps/minecraft/give-command-generator for correct version of minecraft
+# And paste it as it is... For example the command is "/give @a iron_sword{...}" in 1.20.1 or "/give @a iron_sword[...]" in 1.20.5+
+# You should use the "1xminecrft:iron_sword{...}" or "1xminecrft:iron_sword[...]" with no change in the NBT except for:
+# Important: You need to escpe all double quotations in the NBT by adding a "\" before them like "iron_sword[custom_name='[{\"text\":\"Epic One\",\"italic\":false}]']".
+# This is crucial and if you miss one, it will result in a crash on startup.
 oak-saplings = [
     "1xminecraft:oak_sapling; 10-15xminecraft:dirt; 3",
     "1xminecraft:oak_sapling; 10-15xminecraft:moss_block; 3"

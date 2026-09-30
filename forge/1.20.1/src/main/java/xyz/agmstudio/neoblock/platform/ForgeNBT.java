@@ -1,19 +1,16 @@
 package xyz.agmstudio.neoblock.platform;
 
-import mezz.jei.api.gui.builder.IRecipeSlotBuilder;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtIo;
-import net.minecraft.nbt.NbtUtils;
-import net.minecraft.nbt.Tag;
-import net.minecraft.network.chat.Component;
+import net.minecraft.nbt.*;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neocore.platform.INBT;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -21,7 +18,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.List;
 
 
 @ParametersAreNonnullByDefault
@@ -76,8 +72,15 @@ public final class ForgeNBT implements INBT {
         be.setChanged();
     }
 
-    @SuppressWarnings("removal")
-    @Override public IRecipeSlotBuilder addTooltip(IRecipeSlotBuilder builder, List<Component> components) {
-        return builder.addTooltipCallback((view, tooltip) -> tooltip.addAll(components));
+    @Override public ItemStack applyModifiers(ItemStack stack, @Nullable String dataString, ServerLevel level) {
+        if (dataString == null || dataString.isBlank()) return stack;
+        try {
+            CompoundTag parsedTag = TagParser.parseTag(dataString);
+            stack.getOrCreateTag().merge(parsedTag);
+        } catch (CommandSyntaxException e) {
+            NeoBlockMod.getLogger().error("Unable to apply data components to the given item: \n\tData: {}", dataString, e);
+        }
+
+        return stack;
     }
 }
