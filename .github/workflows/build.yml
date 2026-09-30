@@ -8,6 +8,8 @@ on:
 jobs:
   build-and-release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout repository
@@ -52,7 +54,11 @@ jobs:
           tag_name: experimental-build
           name: Experimental Build
           body_path: .github/experimental-build.md
-          files: build/libs/*.jar
+          files: |
+            build/**/libs/*.jar
+            !build/**/libs/*-sources.jar
+            !build/**/libs/*-javadoc.jar
+            !build/**/libs/*-dev.jar
           draft: false
           prerelease: false
         env:
