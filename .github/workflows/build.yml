@@ -32,7 +32,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build JAR
-        run: ./gradlew build
+        run: ./gradlew build --no-configuration-cache
 
       - name: Delete local tag if exists
         run: git tag -d experimental-build || true
@@ -47,7 +47,7 @@ jobs:
         run: git push origin experimental-build
 
       - name: Create or update release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: experimental-build
           name: Experimental Build
