@@ -71,13 +71,17 @@ public class NeoBlock implements NBTSaveable {
 
     @ParametersAreNonnullByDefault
     public static NeoBlock create(ServerLevel level, String id, BlockPos pos, @Nullable String group) {
-        NeoBlock block = new NeoBlock(level, WorldManager.get());
+        return NeoBlock.create(level, id, pos, group, WorldManager.get());
+    }
+    @ParametersAreNonnullByDefault
+    public static NeoBlock create(ServerLevel level, String id, BlockPos pos, @Nullable String group, WorldManager manager) {
+        NeoBlock block = new NeoBlock(level, manager);
         block.dimension = level.dimension().location().toString();
         block.group = group;
         block.pos = pos;
         block.id = id;
 
-        return NBTSaveable.instance(NeoBlock.class, block.save(), level, WorldManager.get());
+        return NBTSaveable.instance(NeoBlock.class, block.save(), level, manager);
     }
 
     public NeoBlock(@NotNull ServerLevel level, @NotNull WorldManager world) {

@@ -170,7 +170,7 @@ public abstract class WorldManager extends SavedData {
             }
 
             for (ConfigPos pos: getConfigPositions(level, config)) {
-                NeoBlock generated = NeoBlock.create(level, pos.id, pos.pos, pos.group);
+                NeoBlock generated = NeoBlock.create(level, pos.id, pos.pos, pos.group, data);
                 data.blocks.add(generated);
                 generated.initiate();
                 NeoBlockMod.getLogger().info("NeoBlock with id \"{}\" is created at {}.", generated.id, generated.pos.toShortString());

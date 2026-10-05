@@ -287,6 +287,9 @@ public final class StringUtil {
     public static final Fragment CHANCE     = () -> "(?:\\s+(?<chance>\\d+(?:\\.\\d*)?)%?)";
     public static final Fragment ITEM_DATA  = () -> "(?<data>\\{.*\\}|\\[.*\\])?";
 
+    public static final Fragment BLOCK_STATE = () -> "(?<states>\\[[^\\]]*\\])?";
+    public static final Fragment BLOCK_NBT   = () -> "(?<nbt>\\{.*\\})?";
+
 
     @Contract(pure = true)
     public static @NotNull Fragment namespace(String name) {

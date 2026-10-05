@@ -10,6 +10,7 @@ starting-blocks = [
 ]
 # List of all blocks in this tier. All of them have equal chance to be chosen in this tier.
 # Note that, blocks from tier 0 are available
+# You can use BlockState & NBT too as you would with /setblock command like: "5xminecraft:barrel[facing=east]{CustomName:'\"Vault\"'}"
 blocks = [
     "10xminecraft:stone",
     "4xminecraft:coal_ore",
