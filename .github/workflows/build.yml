@@ -51,12 +51,10 @@ jobs:
       - name: Stage Release JARs
         run: |
           mkdir -p release_artifacts
-          # Find all JARs, exclude sources, javadoc, dev, and reobf intermediates, then copy to staging
-          find build -type f -name "*.jar" \
+          find build -type f -name "neoblock-*.jar" \
             ! -name "*-sources.jar" \
             ! -name "*-javadoc.jar" \
             ! -name "*-dev.jar" \
-            ! -name "*-all.jar" \
             -exec cp -v {} release_artifacts/ \;
 
       - name: Create or update release
@@ -66,6 +64,7 @@ jobs:
           name: Experimental Build
           body_path: .github/experimental-build.md
           files: release_artifacts/*.jar
+          prune_assets: true
           draft: false
           prerelease: false
         env:
