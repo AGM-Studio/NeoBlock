@@ -77,6 +77,11 @@ public final class ImplMod extends NeoBlockMod {
         else event.setAmount(result.getResult());
     }
 
+    @SubscribeEvent
+    public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
+        NeoListener.onPlayerTick(event.player);
+    }
+
     @Override public <T extends SavedData> T captureSavedDataImpl(ServerLevel level, String name, Function<CompoundTag, T> loader, Supplier<T> creator) {
         return level.getDataStorage().computeIfAbsent(loader, creator, name);
     }

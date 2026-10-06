@@ -298,4 +298,10 @@ public abstract class WorldManager extends SavedData {
 
         return false;
     }
+    public static NeoBlock getNeoBlock(ServerLevel level, BlockPos pos) {
+        for (NeoBlock block: instance.blocks)
+            if (block.isCorrectDimension(level) && block.getBlockPos().equals(pos)) return block;
+
+        return null;
+    }
 }

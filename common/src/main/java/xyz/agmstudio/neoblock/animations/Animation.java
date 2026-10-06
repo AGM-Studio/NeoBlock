@@ -1,6 +1,7 @@
 package xyz.agmstudio.neoblock.animations;
 
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.animations.idle.IdleAnimation;
@@ -58,6 +59,10 @@ public abstract class Animation implements IConfig.Configured {
         for (Animation animation : animations)
             if (animation instanceof IdleAnimation idle)
                 idle.resetTick();
+    }
+
+    public static void onPlayerTick(Player player) {
+        if (cooldownBar != null && cooldownBar.isEnabled()) cooldownBar.checkPlayer(player);
     }
 
     private static String createPath(String category, String name) {
@@ -165,17 +170,15 @@ public abstract class Animation implements IConfig.Configured {
     }
 
     public static void animateCooldownFinish(NeoBlock block) {
-        CooldownBarAnimation.removeAllPlayers(block.level);
         for (CooldownPhaseAnimation animation : Animation.phaseAnimations)
             if (animation.isActiveOnUpgradeFinish()) animation.animate(block);
     }
     public static void animateCooldownStart(NeoBlock block) {
-        CooldownBarAnimation.addAllPlayers(block.level);
         for (CooldownPhaseAnimation animation : Animation.phaseAnimations)
             if (animation.isActiveOnUpgradeStart()) animation.animate(block);
     }
     public static void tickCooldown(NeoBlock block, NeoBlockCooldown cooldown) {
-        if (cooldownBar != null) cooldownBar.update(cooldown.getTick(), cooldown.getTime());
+        if (cooldownBar != null) cooldownBar.update(block, cooldown.getTick(), cooldown.getTime());
         for (CooldownProgressAnimation animation : Animation.progressAnimations)
             animation.upgradeTick(block, cooldown.getTick());
     }

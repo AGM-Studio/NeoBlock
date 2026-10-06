@@ -12,13 +12,14 @@ import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.npc.WanderingTrader;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import xyz.agmstudio.neoblock.animations.CooldownBarAnimation;
+import xyz.agmstudio.neoblock.animations.Animation;
 import xyz.agmstudio.neoblock.commands.NeoBlockCommand;
 import xyz.agmstudio.neoblock.compatibility.ForgivingVoid;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoMerchant;
@@ -125,15 +126,12 @@ public final class NeoListener {
     }
 
     public static void onEntitySpawn(LevelAccessor accessor, Entity entity) {
-        ServerLevel level = captureServer(accessor);
-        if (level == null) return;
-
+        if (!(accessor instanceof ServerLevel)) return;
         if (entity instanceof WanderingTrader trader) NeoMerchant.handleTrader(trader);
-        if (entity instanceof ServerPlayer player) {
-            if (true) // TODO: COOLDOWN BR IS BROKEN IN NEW SYSTEM
-                CooldownBarAnimation.addPlayer(player);
-            NeoBlockMod.onPlayerJoin(level, player);
-        }
+    }
+
+    public static void onPlayerTick(Player player) {
+        Animation.onPlayerTick(player);
     }
 
     public static void onRegisterCommands(CommandBuildContext buildContext, CommandDispatcher<CommandSourceStack> dispatcher) {
