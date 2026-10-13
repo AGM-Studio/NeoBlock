@@ -7,6 +7,9 @@ import net.minecraft.nbt.StringTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
+import net.minecraft.util.valueproviders.ConstantInt;
+import net.minecraft.util.valueproviders.IntProvider;
+import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.FlatLevelSource;
 import net.minecraft.world.level.saveddata.SavedData;
@@ -42,6 +45,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 public abstract class WorldManager extends SavedData {
@@ -125,7 +130,27 @@ public abstract class WorldManager extends SavedData {
         WorldManager.instance = NeoBlockMod.captureSavedData(level, "neo_block_data", t -> WorldManager.load(t, level), () -> WorldManager.create(level));
     }
 
-    private record ConfigPos(String id, String group, BlockPos pos) {}
+    private final static Pattern BLOCK_POS_RANGE = Pattern.compile("^(-?\\d+),(-?\\d+)$");
+    private record ConfigPos(String id, String group, IntProvider x, IntProvider y, IntProvider z) {
+        public @NotNull BlockPos getPos(RandomSource rng) {
+            return new BlockPos(x.sample(rng), y.sample(rng), z.sample(rng));
+        }
+    }
+    private static IntProvider getIntProvider(IConfig config, String name) {
+        Object raw = config.get(name);
+        if (raw instanceof Integer integer) return ConstantInt.of(integer);
+        if (raw instanceof String value) {
+            if (Pattern.matches("^-?\\d+$", value)) return ConstantInt.of(Integer.parseInt(value));
+
+            Matcher matcher = BLOCK_POS_RANGE.matcher(value);
+            if (matcher.matches()) {
+                int a = Integer.parseInt(matcher.group(1));
+                int b = Integer.parseInt(matcher.group(2));
+                return UniformInt.of(a, b);
+            }
+        }
+        throw new IllegalArgumentException("Missing value for " + name);
+    }
     private static @NotNull List<ConfigPos> getConfigPositions(@NotNull ServerLevel level, @NotNull IConfig config) {
         List<ConfigPos> positions = new ArrayList<>();
         for (String key: config.getSection("world").sections()) {
@@ -137,9 +162,11 @@ public abstract class WorldManager extends SavedData {
                 if (!level.dimension().location().toString().equals("minecraft:overworld")) continue;
             } else if (!dimension.equals(level.dimension().location().toString())) continue;
 
-            BlockPos pos = new BlockPos(section.getInt("x"), section.getInt("y"), section.getInt("z"));
+            IntProvider x = getIntProvider(section, "x");
+            IntProvider y = getIntProvider(section, "y");
+            IntProvider z = getIntProvider(section, "z");
             String id = key.equals("block") ? "main" : key.substring(6);
-            positions.add(new ConfigPos(id, section.get("group", null), pos));
+            positions.add(new ConfigPos(id, section.get("group", null), x, y, z));
         }
 
         return positions;
@@ -170,7 +197,7 @@ public abstract class WorldManager extends SavedData {
             }
 
             for (ConfigPos pos: getConfigPositions(level, config)) {
-                NeoBlock generated = NeoBlock.create(level, pos.id, pos.pos, pos.group, data);
+                NeoBlock generated = NeoBlock.create(level, pos.id, pos.getPos(level.getRandom()), pos.group, data);
                 data.blocks.add(generated);
                 generated.initiate();
                 NeoBlockMod.getLogger().info("NeoBlock with id \"{}\" is created at {}.", generated.id, generated.pos.toShortString());
