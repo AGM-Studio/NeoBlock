@@ -11,7 +11,6 @@ import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
-import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.neo.world.NeoBlock;
 import xyz.agmstudio.neoblock.neo.world.WorldManager;
 import xyz.agmstudio.neocore.util.StringUtil;
@@ -60,10 +59,8 @@ public class CooldownBarAnimation extends Animation {
     public void checkPlayer(Player entity) {
         if (!(entity instanceof ServerPlayer player) || !(player.level() instanceof ServerLevel level)) return;
         BlockHitResult looking = raycastBlock(player, 5.0);
-        NeoBlockMod.getLogger().debug("Tick Player: {} @ {}", player, looking.getType());
         if (looking.getType() == HitResult.Type.BLOCK) {
             NeoBlock block = WorldManager.getNeoBlock(level, looking.getBlockPos());
-            NeoBlockMod.getLogger().debug("Block: {} @ {}", block, looking.getBlockPos());
             if (block != null) {
                 if (block.isOnCooldown()) {
                     ServerBossEvent bar = getBar(block);
