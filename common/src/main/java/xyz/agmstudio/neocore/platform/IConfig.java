@@ -1,5 +1,9 @@
 package xyz.agmstudio.neocore.platform;
 
+import net.minecraft.util.valueproviders.ConstantInt;
+import net.minecraft.util.valueproviders.IntProvider;
+import net.minecraft.util.valueproviders.UniformInt;
+import org.jetbrains.annotations.NotNull;
 import xyz.agmstudio.neocore.NeoMod;
 
 import java.lang.annotation.ElementType;
@@ -10,6 +14,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Set;
 import java.util.function.BiConsumer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public interface IConfig {
     class ConfigPath {
@@ -72,6 +78,23 @@ public interface IConfig {
     default int getInt(String path, int defaultValue) {
         Number n = get(path);
         return n == null ? defaultValue : n.intValue();
+    }
+
+    Pattern INT_RANGE = Pattern.compile("^\\s*(-?\\d+)\\s*,\\s*(-?\\d+)\\s*$");
+    default @NotNull IntProvider getIntProvider(String name) {
+        Object raw = get(name);
+        if (raw instanceof Integer integer) return ConstantInt.of(integer);
+        if (raw instanceof String value) {
+            if (Pattern.matches("^\\s*-?\\d+\\s*$", value)) return ConstantInt.of(Integer.parseInt(value));
+
+            Matcher matcher = INT_RANGE.matcher(value);
+            if (matcher.matches()) {
+                int a = Integer.parseInt(matcher.group(1));
+                int b = Integer.parseInt(matcher.group(2));
+                return UniformInt.of(a, b);
+            }
+        }
+        throw new IllegalArgumentException("Missing value for " + name);
     }
 
     void load();

@@ -70,18 +70,23 @@ public class NeoBlock implements NBTSaveable {
     protected final LinkedHashMap<Integer, NeoEventAction> everyBlockActions = new LinkedHashMap<>();
 
     @ParametersAreNonnullByDefault
-    public static NeoBlock create(ServerLevel level, String id, BlockPos pos, @Nullable String group) {
+    public static @NotNull NeoBlock create(ServerLevel level, String id, BlockPos pos, @Nullable String group) {
         return NeoBlock.create(level, id, pos, group, WorldManager.get());
     }
     @ParametersAreNonnullByDefault
-    public static NeoBlock create(ServerLevel level, String id, BlockPos pos, @Nullable String group, WorldManager manager) {
+    public static @NotNull NeoBlock create(ServerLevel level, String id, BlockPos pos, @Nullable String group, WorldManager manager) {
         NeoBlock block = new NeoBlock(level, manager);
         block.dimension = level.dimension().location().toString();
         block.group = group;
         block.pos = pos;
         block.id = id;
 
-        return NBTSaveable.instance(NeoBlock.class, block.save(), level, manager);
+        NeoBlock finalBlock = NBTSaveable.instance(NeoBlock.class, block.save(), level, manager);
+        manager.addNeoBlock(finalBlock);
+        finalBlock.initiate();
+        NeoBlockMod.getLogger().info("NeoBlock with id \"{}\" is created at {}.", finalBlock.id, finalBlock.pos.toShortString());
+
+        return finalBlock;
     }
 
     public NeoBlock(@NotNull ServerLevel level, @NotNull WorldManager world) {

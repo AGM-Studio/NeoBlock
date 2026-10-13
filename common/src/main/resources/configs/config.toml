@@ -14,6 +14,14 @@ z = 0                       # The id for this block will be "main"
 # group = "secondary"         # If you provide group name, it will use that subdirectory inside the tiers folder for tier data
 # dimension = "minecraft:nether" # If you want to go to another dimension... You could...
 
+[per-player-blocks]         # Known as PPB. By enabling this feature,
+enabled = false             #  every player joining the game will recieve a neoblock for themselves
+x = 0                       # The position for the central neoblock, given to 1st player.
+y = 64                      # It can be randomized like described above
+z = 0
+distancing = 256            # Will space the block by this amount. The pattern it follows is like a snail shell.
+# group = "player-block"    # Providing a group will set the block tiers. If not provided will use the default tiers.
+
 [forgiving-void]
 players = true              # Save the players if they fall into void
 hostile = true              # Save hostile entities that fall into void

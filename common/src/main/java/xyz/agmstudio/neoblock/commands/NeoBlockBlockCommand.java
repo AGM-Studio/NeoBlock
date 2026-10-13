@@ -90,8 +90,6 @@ public class NeoBlockBlockCommand extends NeoCommand.ParentHolder {
             if (WorldManager.getTierConfigGroup(group) == null) return fail(context, "command.neoblock.invalid_tier_group");
 
             NeoBlock generated = NeoBlock.create(world, id, origin, group);
-            generated.initiate();
-            WorldManager.addNeoBlock(generated);
             return success(context, "command.neoblock.add_block");
         }
     }
@@ -104,7 +102,7 @@ public class NeoBlockBlockCommand extends NeoCommand.ParentHolder {
 
         @Override public int execute(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
             NeoBlock block = this.getArgument(context, "block");
-            WorldManager.removeNeoBlock(block);
+            WorldManager.get().removeNeoBlock(block);
 
             return success(context, "command.neoblock.remove_block");
         }

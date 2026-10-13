@@ -128,6 +128,7 @@ public final class NeoListener {
     public static void onEntitySpawn(LevelAccessor accessor, Entity entity) {
         if (!(accessor instanceof ServerLevel)) return;
         if (entity instanceof WanderingTrader trader) NeoMerchant.handleTrader(trader);
+        if (entity instanceof ServerPlayer player) WorldManager.get().getPPB().onPlayerJoin(player);
     }
 
     public static void onPlayerTick(Player player) {
