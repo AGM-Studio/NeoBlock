@@ -130,7 +130,7 @@ public abstract class WorldManager extends SavedData {
         WorldManager.instance = NeoBlockMod.captureSavedData(level, "neo_block_data", t -> WorldManager.load(t, level), () -> WorldManager.create(level));
     }
 
-    private final static Pattern BLOCK_POS_RANGE = Pattern.compile("^(-?\\d+),(-?\\d+)$");
+    private final static Pattern BLOCK_POS_RANGE = Pattern.compile("^\\s*(-?\\d+)\\s*,\\s*(-?\\d+)\\s*$");
     private record ConfigPos(String id, String group, IntProvider x, IntProvider y, IntProvider z) {
         public @NotNull BlockPos getPos(RandomSource rng) {
             return new BlockPos(x.sample(rng), y.sample(rng), z.sample(rng));
@@ -140,7 +140,7 @@ public abstract class WorldManager extends SavedData {
         Object raw = config.get(name);
         if (raw instanceof Integer integer) return ConstantInt.of(integer);
         if (raw instanceof String value) {
-            if (Pattern.matches("^-?\\d+$", value)) return ConstantInt.of(Integer.parseInt(value));
+            if (Pattern.matches("^\\s*-?\\d+\\s*$", value)) return ConstantInt.of(Integer.parseInt(value));
 
             Matcher matcher = BLOCK_POS_RANGE.matcher(value);
             if (matcher.matches()) {

@@ -8,9 +8,9 @@ z = 0                       # The id for this block will be "main"
 
 # Remove the "#" before the lines to activate them.
 # [world.block-secondary]     # You can add more blocks with unique ids like "secondary" here using the same format
-# x = 42
-# y = 76
-# y = 36
+# x = 42                      # You can provide a constant like this
+# y = "70,80"                 #  or a range to be random the format is the lower range like -10 or 15 then a comma
+# y = "-10,-5"                #  and finally the upper range. The number is randomized including these numbers.
 # group = "secondary"         # If you provide group name, it will use that subdirectory inside the tiers folder for tier data
 # dimension = "minecraft:nether" # If you want to go to another dimension... You could...
 
