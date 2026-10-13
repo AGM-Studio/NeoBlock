@@ -50,7 +50,7 @@ jobs:
 
       - name: Stage Release JARs
         run: |
-          rd /q /s "c:\yourFolder" 2>nul
+          rd /q /s "release_artifacts" 2>nul
           mkdir -p release_artifacts
           find build -type f -name "neoblock-*.jar" \
             ! -name "*-sources.jar" \
