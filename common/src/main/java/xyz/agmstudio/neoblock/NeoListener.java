@@ -17,6 +17,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.agmstudio.neoblock.animations.Animation;
@@ -25,6 +26,7 @@ import xyz.agmstudio.neoblock.compatibility.ForgivingVoid;
 import xyz.agmstudio.neoblock.neo.loot.trade.NeoMerchant;
 import xyz.agmstudio.neoblock.neo.world.NeoBlock;
 import xyz.agmstudio.neoblock.neo.world.WorldManager;
+import xyz.agmstudio.neocore.NeoMC;
 
 import java.util.HashSet;
 import java.util.concurrent.Callable;
@@ -133,6 +135,18 @@ public final class NeoListener {
 
     public static void onPlayerTick(Player player) {
         Animation.onPlayerTick(player);
+    }
+
+    public static void onPlayerRespawn(Player player) {
+        if (!(player instanceof ServerPlayer sp)) return;
+        if (!WorldManager.get().getPPB().enabled) return;
+        if (sp.getRespawnPosition() != null) return;
+
+        NeoBlock block = WorldManager.getNeoBlock("ppb-" + sp.getGameProfile().getId());
+        if (block != null) {
+            Vec3 pos = block.safeBlock().getCenter();
+            NeoMC.teleportEntity(player, block.level, pos.x, pos.y, pos.z, 0, 0);
+        }
     }
 
     public static void onRegisterCommands(CommandBuildContext buildContext, CommandDispatcher<CommandSourceStack> dispatcher) {

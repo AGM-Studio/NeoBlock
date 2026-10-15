@@ -320,4 +320,10 @@ public abstract class WorldManager extends SavedData {
 
         return null;
     }
+    public static @Nullable NeoBlock getNeoBlock(String id) {
+        for (NeoBlock block: instance.blocks)
+            if (block.id.equals(id)) return block;
+
+        return null;
+    }
 }
