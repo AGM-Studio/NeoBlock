@@ -50,13 +50,18 @@ jobs:
 
       - name: Stage Release JARs
         run: |
-          rd /q /s "release_artifacts" 2>nul
+          rm -rf release_artifacts
           mkdir -p release_artifacts
-          find build -type f -name "neoblock-*.jar" \
-            ! -name "*-sources.jar" \
-            ! -name "*-javadoc.jar" \
-            ! -name "*-dev.jar" \
-            -exec cp -v {} release_artifacts/ \;
+          
+          find build -type f -path "*/libs/*.jar" -name "neoblock-*.jar" \
+          -mmin -60 \
+          ! -name "*-sources.jar" \
+          ! -name "*-javadoc.jar" \
+          ! -name "*-dev.jar" \
+          -exec cp -v {} release_artifacts/ \;
+          
+          echo "=== Staged Release JARs ==="
+          ls -la release_artifacts/
 
       - name: Create or update release
         uses: softprops/action-gh-release@v2
