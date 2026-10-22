@@ -48,28 +48,13 @@ jobs:
       - name: Push tag
         run: git push origin experimental-build
 
-      - name: Stage Release JARs
-        run: |
-          rm -rf release_artifacts
-          mkdir -p release_artifacts
-          
-          find build -type f -path "*/libs/*.jar" -name "neoblock-*.jar" \
-          -mmin -60 \
-          ! -name "*-sources.jar" \
-          ! -name "*-javadoc.jar" \
-          ! -name "*-dev.jar" \
-          -exec cp -v {} release_artifacts/ \;
-          
-          echo "=== Staged Release JARs ==="
-          ls -la release_artifacts/
-
       - name: Create or update release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: experimental-build
           name: Experimental Build
           body_path: .github/experimental-build.md
-          files: release_artifacts/*.jar
+          files: "build/**/libs/*-Alpha.jar"
           prune_assets: true
           draft: false
           prerelease: false
