@@ -24,7 +24,6 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.agmstudio.neoblock.NeoBlockMod;
-import xyz.agmstudio.neoblock.NeoListener;
 import xyz.agmstudio.neoblock.animations.Animation;
 import xyz.agmstudio.neoblock.neo.block.NeoBlockSpec;
 import xyz.agmstudio.neoblock.neo.events.NeoEventAction;
@@ -59,6 +58,7 @@ public class NeoBlock implements NBTSaveable {
     @NBTData("Dimension") protected String dimension = "minecraft:overworld";
     @NBTData("Stopped") protected boolean stopped = false;
 
+    protected UUID trader = null;
     protected String group = null;
     protected final HashMap<String, TierSpec> tiers = new HashMap<>();
     protected final List<NeoBlockSpec> queue = new ArrayList<>();
@@ -119,6 +119,10 @@ public class NeoBlock implements NBTSaveable {
 
         final CompoundTag mobs = tag.getCompound("TradedMobs");
         mobs.getAllKeys().forEach(key -> tradedMobs.merge(NeoMC.getEntityType(key).orElse(null), mobs.getInt(key), Integer::sum));
+        final String tUUID = tag.getString("Trader");
+        try {
+            trader = UUID.fromString(tUUID);
+        } catch (IllegalArgumentException ignored) {}
 
         IConfig config = NeoBlockMod.getConfig();
         for (String key: config.keys()) {
@@ -157,6 +161,8 @@ public class NeoBlock implements NBTSaveable {
         final CompoundTag mobs = new CompoundTag();
         tradedMobs.forEach((key, value) -> NeoMC.getEntityTypeResource(key).ifPresent(mob -> mobs.putInt(String.valueOf(mob), value)));
         tag.put("TradedMobs", mobs);
+
+        if (trader != null) tag.putString("Trader", trader.toString());
 
         return tag;
     }
@@ -375,7 +381,7 @@ public class NeoBlock implements NBTSaveable {
         if (!trigger) return;
         addBlockCount(1);
         Animation.resetIdleTick();
-        NeoListener.execute(() -> NeoMerchant.attemptSpawnTrader(this));
+        NeoMerchant.attemptSpawnTrader(this);
         TierSpec lastSpawnTier = getLastTierSpawn();
         if (lastSpawnTier != null) lastSpawnTier.addCount(1);
 
@@ -434,5 +440,14 @@ public class NeoBlock implements NBTSaveable {
 
     public boolean isBedrock() {
         return level.getBlockState(pos).getBlock() == Blocks.BEDROCK;
+    }
+
+    public @Nullable Entity getTrader() {
+        if (trader == null) return null;
+        return level.getEntity(trader);
+    }
+    public void setTrader(Entity trader) {
+        if (trader == null) this.trader = null;
+        else this.trader = trader.getUUID();
     }
 }

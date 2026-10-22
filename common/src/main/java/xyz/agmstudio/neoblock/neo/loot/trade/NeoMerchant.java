@@ -1,19 +1,17 @@
 package xyz.agmstudio.neoblock.neo.loot.trade;
 
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.npc.WanderingTrader;
 import net.minecraft.world.item.trading.MerchantOffers;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import xyz.agmstudio.neoblock.NeoBlockMod;
 import xyz.agmstudio.neoblock.neo.tiers.TierSpec;
 import xyz.agmstudio.neoblock.neo.world.NeoBlock;
 import xyz.agmstudio.neoblock.neo.world.WorldManager;
-import xyz.agmstudio.neocore.platform.IConfig;
 import xyz.agmstudio.neocore.NeoMC;
+import xyz.agmstudio.neocore.platform.IConfig;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
@@ -49,14 +47,9 @@ public class NeoMerchant {
         if (trader.trades.isEmpty()) return null;
         return trader.spawnTrader(at, tags);
     }
-    public static boolean exists(@NotNull ServerLevel level, String tag) {
-        for (Entity entity: NeoMC.allEntities(level))
-            if (entity.getTags().contains(tag)) return true;
-
-        return false;
-    }
     public static @Nullable WanderingTrader attemptSpawnTrader(NeoBlock at) {
-        if (at.getBlockCount() % attemptInterval != 0 || exists(at.level, "NeoMerchant")) return null;
+        if (at.getBlockCount() % attemptInterval != 0) return null;
+        if (at.getTrader() != null) return null;
         double chance = NeoMerchant.chance + (increment * at.getTraderFailedAttempts());
         if (WorldManager.getRandom().nextFloat() > chance) {
             int fails = at.addTraderFailedAttempts();
@@ -83,6 +76,7 @@ public class NeoMerchant {
             }
         });
         at.clearTradedMobs();
+        at.setTrader(trader);
 
         return trader;
     }
